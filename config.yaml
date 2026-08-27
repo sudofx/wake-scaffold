@@ -1,0 +1,8 @@
+# Which backend to wake up with. Change this to swap models without
+# touching any memory files or the wake loop itself.
+#
+# provider: one of gemini | anthropic | openai | ollama
+# model: optional override; leave blank to use each provider's default
+
+provider: gemini
+model:
