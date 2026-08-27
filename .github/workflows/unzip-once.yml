@@ -1,4 +1,3 @@
-
 name: Unzip Once
 on: workflow_dispatch
 
@@ -7,15 +6,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: List zip contents (debug)
+        run: unzip -l wake-scaffold.zip
+
       - name: Unzip and flatten
         run: |
-          unzip wake-scaffold.zip
+          unzip -o wake-scaffold.zip
+          rm -rf __MACOSX
           rsync -a wake-scaffold/ ./
           rm -rf wake-scaffold wake-scaffold.zip
+
       - name: Commit extracted files
         run: |
           git config user.name "setup-bot"
           git config user.email "setup-bot@users.noreply.github.com"
           git add -A
-          git commit -m "Extract scaffold from zip"
+          git diff --cached --quiet || git commit -m "Extract scaffold from zip"
           git push
