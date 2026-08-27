@@ -14,7 +14,7 @@ jobs:
         run: |
           unzip -o wake-scaffold.zip
           rm -rf __MACOSX
-          rsync -a wake-scaffold/ ./
+          rsync -a --exclude='.github/workflows/' wake-scaffold/ ./
           rm -rf wake-scaffold wake-scaffold.zip
 
       - name: Commit extracted files
