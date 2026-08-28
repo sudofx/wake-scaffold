@@ -18,4 +18,4 @@ model:
 # requests" both checked. If those aren't set, this fails gracefully
 # and falls back to a normal journal-only proposal — it won't crash a
 # wake either way.
-enable_pull_requests: false
+enable_pull_requests: true
