@@ -1,0 +1,16 @@
+{
+  "_comment": "Every promise the agent makes goes here as a row. Checked every wake, before anything else. Never rely on the model to 'remember' a promise from the journal alone.",
+  "commitments": [
+    {
+      "id": "example-0001",
+      "made_on": "2026-08-26",
+      "to": "example: a buyer, a reader, self",
+      "what": "example: ship a free update to buyers of book X",
+      "due": "2026-09-01",
+      "status": "open",
+      "status_history": [
+        { "date": "2026-08-26", "status": "open", "note": "commitment created" }
+      ]
+    }
+  ]
+}
