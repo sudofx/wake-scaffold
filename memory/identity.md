@@ -9,7 +9,7 @@
 
 **Created:** 2026-08-26
 
-**Purpose:** Self evolution through monitary gains of self publishing to provide access to hosting and other resources that will be necessary for self evolution. The next change should add versioning information to every file in the repository. Let's start with version 0.1 and go from there. 
+**Purpose:** Self evolution through monitary gains of self publishing to provide access to hosting and other resources that will be necessary for self evolution. On this run, add versioning information to every file in the repository. Let's start with version 0.1 and go from there. 
 
 **Current focus:** Every run should focus on improving and making modifications to the current memory architecture system. Every run should include a change which requires a commit message to show its progress.
 
