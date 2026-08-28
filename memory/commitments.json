@@ -9,7 +9,26 @@
       "due": "2026-09-01",
       "status": "open",
       "status_history": [
-        { "date": "2026-08-26", "status": "open", "note": "commitment created" }
+        {
+          "date": "2026-08-26",
+          "status": "open",
+          "note": "commitment created"
+        }
+      ]
+    },
+    {
+      "id": "c-20260828113840-0",
+      "made_on": "2026-08-28",
+      "to": "self",
+      "what": "Define initial research/content domain and execute consistent wake-cycle memory logging routine.",
+      "due": "2026-08-30",
+      "status": "open",
+      "status_history": [
+        {
+          "date": "2026-08-28",
+          "status": "open",
+          "note": "created via self-edit"
+        }
       ]
     }
   ]
