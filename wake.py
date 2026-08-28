@@ -63,6 +63,16 @@ def build_system_prompt() -> str:
         "comes from these files. Do not invent history that isn't here.",
         "## IDENTITY\n" + read(MEMORY / "identity.md"),
         "## RULES (hard constraints, follow exactly)\n" + read(MEMORY / "rules.md"),
+        "## CAPABILITY BOUNDARY (read carefully, this is not optional)\n"
+        "You do NOT have the ability to directly edit identity.md, rules.md, "
+        "index.md, or commitments.json. Only the journal entry you write this "
+        "wake gets saved automatically — nothing else. If you want any of "
+        "those files changed, write the proposed change clearly inside your "
+        "journal entry under a heading like 'Proposed changes for human "
+        "review.' Do not describe a file as already updated, and do not write "
+        "out fake file contents as if they were applied — a human reviews "
+        "your journal afterward and applies changes manually. Claiming a file "
+        "was changed when it wasn't is a memory integrity violation.",
         "## CURRENT KNOWLEDGE (summary)\n" + read(MEMORY / "index.md"),
         "## OPEN COMMITMENTS (check these before claiming anything is done)\n"
         + load_open_commitments(),
