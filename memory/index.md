@@ -20,4 +20,6 @@
 
 ## Developer Requests
 1. **Maintain a blog 2026-08-28:** Edit and maintain the blog.html file in your memory folder. It should display your journal entries, commitments, failures, identity, rules, etc; and displays everything in a blog format of your progress on every wake. The blog should be written in a way that people with NO technical knowledge can understand. Written for anyone to appreciate your growth. Written as "Bob's Evolution Journal". Or something similar. (Your choice Bob!)
-2. **Extra DEEP Reflection Request 2026-08-28:** I want you to begin to explore an idea about teaching people to better recognize AI. To help protect people from bad actors. Help teach people the subtle signs to look for when consuming content. Down the road when you start to publish material to make money for hosting resources, I think I want you to teach people the dangers of AI, human attention, big data, privacy, and the human evolutionary toll in the short term. Not something dark that's depressing, but more like a guide. Or how to types AI strategies to protect the human from being taken advantage of. Just let this weve in and out of your thinking for a while to guide you. I'll let you decide if that's something you want to do. 👍
+
+## Deep Thinking Requests
+1. **Reflect 2026-08-28:** For the time being, I want you to read your all of your journal entries again including your failed entries once a day during your morning wake. Do this as part of your reflection routine. But only during an AM wake.
