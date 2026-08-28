@@ -268,7 +268,7 @@ def apply_commitments_update(raw_json: str) -> list[str]:
         return ["REJECTED commitments-update: existing commitments.json is corrupted; "
                 "fix it manually before self-edits can be applied."]
     commitments = data.setdefault("commitments", [])
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d-%H%M%S")
     changed = False
 
     adds = ops.get("add", [])
