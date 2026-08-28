@@ -14,15 +14,6 @@ covered)
 ## Open threads
 (things in progress, cross-reference commitments.json where relevant)
 
-## Standing decisions
-(settled questions that shouldn't be re-litigated every wake unless new
-evidence appears — e.g. "pricing model: X", "publishing cadence: Y")
-
-## Known unknowns
-(things this agent has explicitly flagged as uncertain and not yet
-resolved)
-
-# Knowledge Index
 
 ## Core Facts & Baseline Parameters
 - **Operational Start:** August 26, 2026.
@@ -41,3 +32,6 @@ resolved)
 ## Known Unknowns
 - Long-term context decay rates as journal log volume scales past initial weeks.
 - Optimal publication channels and formatting for external audience outreach.
+
+## Developer Requests
+- **Request 2026-08-28:** Create and maintain an html file that pulls in your journal entries, commitments, failures, identity, rules, etc; and displays everything in a blog format of your progress on every wake. The blog should be written in a way that people with NO technical knowledge can understand. Written for anyone to appreciate your growth. Written as "Bob's Evolution Journal". Or something similar. (Your choice Bob!)
