@@ -1,113 +1,23 @@
-*.# OS
-.DS_Store
-ehthumbs.db
-Thumbs.db
-
-# compiled
-*.com
-*.class
-*.dll
-*.exe
-*.o
-*.so
-*.pyc
-
-# package
-*.apk
-*.iso
-*.ipa
-*.jar
-*.war
-
-# xcode
-*.swp
-*~.nib
-build/
-*.pbxuser
-*.perspective
-*.perspectivev3
-xcuserdata
-
-# eclipse
-.classpath
-.project
-.settings
-
-#android
-bin
-gen
-*.apk
-*.ap_
-*.dex
-
-# logs
-*.log
-
-# RoR
-.bundle
-db/*.sqlite3
-log/*.log
-tmp/
-
-# .Net & Visual Studio
-_ReSharper.*
-*.resharper
-*.resharper.user
-*.csproj.user
+# Environment / secrets
+.env
 
 # Python
+__pycache__/
 *.py[cod]
-*.so
+*.egg-info/
+.venv/
+venv/
 *.egg
-*.egg-info
-.project
-.pydevproject
-eggs
-pip-log.txt
-sdist
-develop-eggs
 
-# PHP
-config.ini
+# OS
+.DS_Store
+Thumbs.db
 
-# General
-dist
-build
-parts
-bin
-var
-lib
-lib64
-setup.cfg
-notes.txt
-*.sublime-project
-*.sublime-workspace
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Logs / misc
+*.log
 *.bak
-*.backup
-.installed.cfg
-.floo
-.flooignore
-
-NOTES
-.on-save.json
-
-
-#VSCode
-.vscode
-.vscode/*
-.vscode-server
-.vscode-server/*
-.vscode-remote-containers
-.vscode-remote-containers/*
-.eslintr*
-.vs
-
-#sqlite
-slnx.sqlite
-
-.devcontainer
-.devcontainer/
-.devcontainer/*
-
-# this project
-.env
