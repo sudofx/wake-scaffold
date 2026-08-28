@@ -233,7 +233,7 @@ def apply_identity_update(raw_json: str) -> list[str]:
         text = re.sub(r"\n{3,}", "\n\n", text)  # collapse accumulated blank lines
 
     if changed:
-        date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        date = datetime.now(timezone.utc).strftime("%Y-%m-%d-%H%M%S")
         last_updated = re.compile(r"\*\*Last updated:\*\*.*")
         replacement = f"**Last updated:** {date} — reason: self-edit via wake cycle"
         text = last_updated.sub(replacement, text, count=1) if last_updated.search(text) \
@@ -347,7 +347,7 @@ def apply_self_edits(model_output: str) -> str:
 
 
 def next_journal_filename() -> str:
-    date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    date = datetime.now(timezone.utc).strftime("%Y-%m-%d-%H%M%S")
     existing = sorted(JOURNAL.glob(f"{date}-*.md"))
     n = len(existing) + 1
     return f"{date}-{n:04d}.md"
