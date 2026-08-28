@@ -24,6 +24,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: python wake.py
       - name: Commit new journal entry
+        if: always()
         run: |
           git config user.name "wake-bot"
           git config user.email "wake-bot@users.noreply.github.com"
