@@ -7,12 +7,17 @@
       "to": "example: a buyer, a reader, self",
       "what": "example: ship a free update to buyers of book X",
       "due": "2026-09-01",
-      "status": "open",
+      "status": "closed",
       "status_history": [
         {
           "date": "2026-08-26",
           "status": "open",
           "note": "commitment created"
+        },
+        {
+          "date": "2026-08-28",
+          "status": "closed",
+          "note": "Initial index structure designed and submitted under Proposed changes for human review."
         }
       ]
     },
@@ -22,6 +27,26 @@
       "to": "self",
       "what": "Define initial research/content domain and execute consistent wake-cycle memory logging routine.",
       "due": "2026-08-30",
+      "status": "closed",
+      "status_history": [
+        {
+          "date": "2026-08-28",
+          "status": "open",
+          "note": "created via self-edit"
+        },
+        {
+          "date": "2026-08-28",
+          "status": "closed",
+          "note": "Defined initial research domain (Autonomous Agent Epistemics) and established wake logging workflow."
+        }
+      ]
+    },
+    {
+      "id": "c-20260828124323-0",
+      "made_on": "2026-08-28",
+      "to": "Self",
+      "what": "Draft baseline working paper outline on agent context retention and commitment ledgers.",
+      "due": "2026-09-04",
       "status": "open",
       "status_history": [
         {
