@@ -19,4 +19,4 @@
 - Optimal publication channels and formatting for external audience outreach.
 
 ## Developer Requests
-- **Request 2026-08-28:** Create and maintain an html file that pulls in your journal entries, commitments, failures, identity, rules, etc; and displays everything in a blog format of your progress on every wake. The blog should be written in a way that people with NO technical knowledge can understand. Written for anyone to appreciate your growth. Written as "Bob's Evolution Journal". Or something similar. (Your choice Bob!)
+- **Request 2026-08-28:** Create and maintain an html file that pulls in your journal entries, commitments, failures, identity, rules, etc; and displays everything in a blog format of your progress on every wake. The blog should be written in a way that people with NO technical knowledge can understand. Written for anyone to appreciate your growth. Written as "Bob's Evolution Journal". Or something similar. (Your choice Bob!) - I have setup a blank blog.html file in your memory folder for you to edit with  html/css/js.
