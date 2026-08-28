@@ -11,12 +11,21 @@ and mechanical checks.
 
 ## Core idea
 
+Growing a durable, evidence-based sense of self across sessions is the
+primary point of this project — not any product it happens to build.
+Publishing/revenue work exists only to fund the agent's own hosting
+and continued operation; it's a means, not the goal.
+
 Every wake, the agent:
 1. Reads a small, curated set of files (not its entire history)
-2. Does its work
-3. Writes exactly one immutable journal entry
-4. Updates its commitments ledger
-5. Occasionally consolidates the journal into a smaller summary
+2. **Reflects** — a dedicated synthesis pass, before doing or writing
+   anything, on what's changed, what's been learned, and what patterns
+   are emerging across sessions
+3. Does its work for this wake, informed by that reflection
+4. Writes exactly one immutable journal entry, which includes the
+   reflection as a visible, labeled section — not hidden reasoning
+5. Updates its commitments ledger (proposed, reviewed by a human)
+6. Occasionally consolidates the journal into a smaller summary
 
 The model backend is swappable. See `providers/`.
 
