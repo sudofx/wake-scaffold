@@ -28,10 +28,12 @@ the loop enough to automate that too.
 import json
 import os
 import re
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+import requests
 import yaml
 
 from providers import get_provider
@@ -105,7 +107,25 @@ def build_reflection_prompt() -> str:
     ])
 
 
-def build_journal_prompt(reflection: str) -> str:
+def build_journal_prompt(reflection: str, enable_pull_requests: bool = False) -> str:
+    pr_section = ""
+    if enable_pull_requests:
+        pr_section = (
+            "\n\n**To propose a full-file change to rules.md or index.md "
+            "as a real pull request** (instead of just writing it in "
+            "prose for a human to apply by hand), include a fenced "
+            "block:\n"
+            "```proposal\n"
+            '{"file": "rules.md", "reason": "why this change makes '
+            'sense", "content": "the COMPLETE new file content"}\n'
+            "```\n"
+            "'file' must be exactly 'rules.md' or 'index.md'. 'content' "
+            "is the whole file, not a diff. This opens a real PR against "
+            "the repo for a human to review and merge — it does NOT "
+            "apply automatically. Only include this if you have a "
+            "specific, well-reasoned change in mind; don't manufacture "
+            "one just because the option exists."
+        )
     return "\n\n---\n\n".join([
         "You are the same agent from the reflection step above. Here is "
         "the reflection you just wrote:",
@@ -143,10 +163,11 @@ def build_journal_prompt(reflection: str) -> str:
         "You can never delete a commitment or rewrite an existing one's "
         "fields outright — only add new ones or move an existing one's "
         "status forward with a note explaining why. Up to 5 adds per "
-        "wake; anything beyond that is ignored.\n\n"
-        "Both blocks are optional. Explain your reasoning in prose before "
-        "any block you include — the reasoning is saved in the journal "
-        "even though it isn't itself machine-applied.",
+        "wake; anything beyond that is ignored."
+        + pr_section +
+        "\n\nAll of these blocks are optional. Explain your reasoning in "
+        "prose before any block you include — the reasoning is saved in "
+        "the journal even though it isn't itself machine-applied.",
     ])
 
 
@@ -268,7 +289,7 @@ def apply_commitments_update(raw_json: str) -> list[str]:
         return ["REJECTED commitments-update: existing commitments.json is corrupted; "
                 "fix it manually before self-edits can be applied."]
     commitments = data.setdefault("commitments", [])
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d-%H%M%S")
+    now_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
     changed = False
 
     adds = ops.get("add", [])
@@ -280,12 +301,12 @@ def apply_commitments_update(raw_json: str) -> list[str]:
             new_id = f"c-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}-{i}"
             entry = {
                 "id": new_id,
-                "made_on": today,
+                "made_on": now_str,
                 "to": str(new_c["to"]).strip()[:200],
                 "what": str(new_c["what"]).strip()[:500],
                 "due": str(new_c["due"]).strip()[:50],
                 "status": "open",
-                "status_history": [{"date": today, "status": "open",
+                "status_history": [{"date": now_str, "status": "open",
                                      "note": "created via self-edit"}],
             }
             commitments.append(entry)
@@ -310,7 +331,7 @@ def apply_commitments_update(raw_json: str) -> list[str]:
             continue
         match["status"] = new_status
         match.setdefault("status_history", []).append(
-            {"date": today, "status": new_status, "note": note}
+            {"date": now_str, "status": new_status, "note": note}
         )
         notes.append(f"UPDATED commitment {cid} -> {new_status}")
         changed = True
@@ -322,11 +343,105 @@ def apply_commitments_update(raw_json: str) -> list[str]:
     return notes
 
 
-def apply_self_edits(model_output: str) -> str:
+ALLOWED_PR_FILES = {"rules.md", "index.md"}
+
+
+def extract_proposal_block(text: str):
+    """Pull a ```proposal block out of model output. Returns None if
+    absent, or a dict with '_error' if present but unparseable."""
+    raw = extract_block(text, "proposal")
+    if raw is None:
+        return None
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError as e:
+        return {"_error": f"proposal block was not valid JSON: {e}"}
+
+
+def open_proposal_pull_request(proposal: dict) -> str:
+    """
+    Best-effort: open a real GitHub pull request proposing a full-file
+    replacement of rules.md or index.md, using the repo's own
+    GITHUB_TOKEN. This ONLY runs when explicitly enabled in
+    config.yaml. ANY failure — missing token, git error, API error —
+    is caught and reported as a note, never crashes the wake, and the
+    repo is always left checked out back on the base branch afterward
+    so the workflow's own journal-commit step still lands in the right
+    place.
+    """
+    if "_error" in proposal:
+        return f"REJECTED proposal: {proposal['_error']}"
+
+    target = proposal.get("file")
+    content = proposal.get("content")
+    reason = str(proposal.get("reason", "")).strip()[:1000]
+
+    if target not in ALLOWED_PR_FILES:
+        return (f"REJECTED proposal: 'file' must be one of "
+                f"{sorted(ALLOWED_PR_FILES)}, got {target!r}.")
+    if not content or not isinstance(content, str):
+        return "REJECTED proposal: missing or empty 'content'."
+
+    token = os.environ.get("GITHUB_TOKEN")
+    repo = os.environ.get("GITHUB_REPOSITORY")
+    base_branch = os.environ.get("GITHUB_REF_NAME", "main")
+
+    if not token or not repo:
+        return ("SKIPPED proposal PR: GITHUB_TOKEN / GITHUB_REPOSITORY not set "
+                "(this only works inside GitHub Actions with the token wired "
+                "in). Falling back to a journal-only proposal — nothing was "
+                "opened.")
+
+    branch = f"bob-proposal-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}"
+    file_path = MEMORY / target
+
+    def run(*args):
+        return subprocess.run(args, cwd=ROOT, check=True, capture_output=True, text=True)
+
+    try:
+        run("git", "checkout", "-b", branch)
+        file_path.write_text(content.rstrip() + "\n")
+        run("git", "add", str(file_path.relative_to(ROOT)))
+        run("git", "-c", "user.name=wake-bot",
+            "-c", "user.email=wake-bot@users.noreply.github.com",
+            "commit", "-m", f"Proposed update to {target}")
+        run("git", "push", "-u", "origin", branch)
+
+        resp = requests.post(
+            f"https://api.github.com/repos/{repo}/pulls",
+            headers={"Authorization": f"token {token}",
+                     "Accept": "application/vnd.github+json"},
+            json={
+                "title": f"Proposed update to {target}",
+                "head": branch,
+                "base": base_branch,
+                "body": reason or "(no reason given)",
+            },
+            timeout=30,
+        )
+        resp.raise_for_status()
+        pr_url = resp.json().get("html_url", "(url unavailable)")
+        result = f"OPENED pull request for {target}: {pr_url}"
+    except subprocess.CalledProcessError as e:
+        result = f"FAILED to open proposal PR for {target}: git error: {e.stderr.strip()}"
+    except Exception as e:
+        result = f"FAILED to open proposal PR for {target}: {type(e).__name__}: {e}"
+    finally:
+        # Always return to the base branch, no matter what happened above,
+        # so the caller's later commit step never lands on a stray branch.
+        subprocess.run(["git", "checkout", base_branch], cwd=ROOT,
+                        capture_output=True, text=True)
+
+    return result
+
+
+def apply_self_edits(model_output: str, config: dict) -> str:
     """
     Look for identity-update / commitments-update blocks in the journal
     output and apply them if valid, via the narrow structured functions
-    above. Returns a short system note summarizing what was applied,
+    above. If enable_pull_requests is on in config, also looks for a
+    proposal block and attempts to open a real PR for rules.md/index.md
+    changes. Returns a short system note summarizing what was applied,
     ignored, or rejected — appended visibly to the journal, never hidden.
     """
     all_notes = []
@@ -339,6 +454,11 @@ def apply_self_edits(model_output: str) -> str:
     if commitments_block is not None:
         all_notes.extend(apply_commitments_update(commitments_block))
 
+    if config.get("enable_pull_requests"):
+        proposal = extract_proposal_block(model_output)
+        if proposal is not None:
+            all_notes.append(open_proposal_pull_request(proposal))
+
     if not all_notes:
         return ""
     return "\n\n---\n\n## System note: self-edit outcomes\n\n" + "\n".join(
@@ -347,7 +467,7 @@ def apply_self_edits(model_output: str) -> str:
 
 
 def next_journal_filename() -> str:
-    date = datetime.now(timezone.utc).strftime("%Y-%m-%d-%H%M%S")
+    date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     existing = sorted(JOURNAL.glob(f"{date}-*.md"))
     n = len(existing) + 1
     return f"{date}-{n:04d}.md"
@@ -431,7 +551,10 @@ def main():
     )
 
     try:
-        output = provider.generate(build_journal_prompt(reflection), user_prompt)
+        output = provider.generate(
+            build_journal_prompt(reflection, config.get("enable_pull_requests", False)),
+            user_prompt,
+        )
     except Exception as e:
         write_failure_record(provider_name, "journal", e, reflection=reflection)
         return 1
@@ -439,7 +562,7 @@ def main():
     # Apply any identity.md / commitments.json self-edits the model
     # included in its output, then append the outcome (applied/rejected)
     # to the journal text so it's part of the permanent record.
-    self_edit_notes = apply_self_edits(output)
+    self_edit_notes = apply_self_edits(output, config)
     output_with_notes = output + self_edit_notes
 
     path = write_journal_entry(reflection, output_with_notes, provider_name)

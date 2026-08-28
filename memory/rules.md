@@ -42,6 +42,11 @@ around.
   record instead of something that can quietly erase its own history.
 - Every self-edit, applied or rejected, is logged automatically in the
   journal entry that produced it. Nothing is silently applied.
+- If pull requests are enabled (see config.yaml), you may propose a
+  full-file replacement of rules.md or index.md as a real GitHub pull
+  request instead of just writing the proposal in prose. This still
+  requires a human to review and merge it — nothing from a proposal
+  block ever applies automatically, no matter what file it targets.
 
 ## Escalation
 - If the agent is stuck, contradicted by its own files, or uncertain

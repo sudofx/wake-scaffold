@@ -33,22 +33,81 @@ The model backend is swappable. See `providers/`.
 
 ```
 memory/
-  identity.md          - who the agent is, updated only on real evidence
-  rules.md             - hard constraints, read every wake
-  commitments.json      - promises made, tracked to completion
-  failure_modes.md      - named, dated log of memory failures and fixes
-  index.md               - periodically-refreshed summary of everything known
+  identity.md            - who the agent is. Name/Created/Purpose only
+                           change by human edit. Current focus and
+                           Known limitations can be self-edited by
+                           the agent, within limits (see below).
+  rules.md               - hard constraints, read every wake. Human-edit
+                           only, or via an opt-in pull request (below).
+  commitments.json        - promises made, tracked to completion. Bob
+                           can add new ones and move existing ones
+                           forward in status; can never delete one or
+                           rewrite it outright.
+  failure_modes.md        - named, dated log of memory failures and fixes
+  index.md                 - periodically-refreshed summary of everything
+                           known. Human-edit only, or via an opt-in
+                           pull request (below).
   journal/
-    2026-08-26-0001.md   - one append-only file per wake, never edited after
+    2026-08-28-0001.md     - one append-only file per wake, never edited
+                           after. Filenames group by UTC date; the
+                           "Woke:" line inside each entry has the full
+                           date + time the wake actually happened.
+    FAILED-<timestamp>.md  - written instead of a normal entry when a
+                           wake's API call fails, so a failure never
+                           just vanishes silently.
+
+base_memory/
+  A static backup/reference copy of the original template files, kept
+  for comparison or resetting from — nothing in wake.py reads from
+  this directory automatically.
 
 providers/
   base.py               - the interface every model backend implements
-  gemini.py, anthropic.py, openai.py, ollama.py
+  gemini.py, anthropic.py, openai.py, ollama.py, mock.py (for testing)
 
 wake.py                 - the orchestrator: runs one wake cycle
-config.yaml              - model choice, schedule metadata, price ceilings etc
+config.yaml              - provider/model choice, self-edit and pull
+                           request settings
 .github/workflows/wake.yml - free cron trigger via GitHub Actions
 ```
+
+## Self-editing
+
+Bob can write to two things automatically, through a structured format
+described in his own wake prompt — free-form text describing a change
+does NOT apply it, only these exact blocks do:
+
+- **`identity.md`**: Current focus (full replace) and Known limitations
+  (append-only). Name, Created, and Purpose can never be touched this
+  way — those need a human edit, or an opt-in pull request (below).
+- **`commitments.json`**: adding new commitments (capped at 5 per wake)
+  and moving an existing commitment's status forward with a note.
+  Nothing can ever be deleted or have its other fields silently
+  rewritten.
+
+Every self-edit — applied, ignored, or rejected — is logged in that
+wake's journal entry under "System note: self-edit outcomes," so
+there's always a visible record of what actually happened versus what
+was merely proposed.
+
+## Optional: proposals as real pull requests
+
+By default, anything outside Bob's self-edit scope (rules.md, index.md,
+or identity's Name/Created/Purpose) just gets written as prose in the
+journal under "Proposed changes for human review" — you read it and
+apply it by hand if you agree.
+
+Setting `enable_pull_requests: true` in `config.yaml` lets Bob instead
+open a real GitHub pull request proposing a full-file replacement of
+`rules.md` or `index.md`, for you to review and merge (or close)
+through GitHub's normal PR flow rather than copy-pasting from a
+journal entry. This requires, in the repo's Settings → Actions →
+General → Workflow permissions: "Read and write permissions" and
+"Allow GitHub Actions to create and approve pull requests" both
+checked. If those aren't set, or anything else about the attempt
+fails, it degrades to the normal journal-only proposal rather than
+breaking the wake — this path is off by default and worth testing
+with a manual `workflow_dispatch` run before relying on it.
 
 ## Getting started
 

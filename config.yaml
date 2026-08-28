@@ -6,3 +6,16 @@
 
 provider: gemini
 model:
+
+# Off by default. When true, Bob can open a real GitHub pull request
+# proposing a full-file change to rules.md or index.md (in addition to
+# the normal journal-text proposal), instead of only writing about it
+# in prose. Requires two things set up in the GitHub repo before it'll
+# work: GITHUB_TOKEN passed to the wake step in the workflow file (this
+# is a built-in secret you don't need to create), and, in this repo's
+# Settings > Actions > General > Workflow permissions, "Read and write
+# permissions" plus "Allow GitHub Actions to create and approve pull
+# requests" both checked. If those aren't set, this fails gracefully
+# and falls back to a normal journal-only proposal — it won't crash a
+# wake either way.
+enable_pull_requests: false

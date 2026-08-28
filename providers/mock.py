@@ -53,5 +53,9 @@ class MockProvider(ModelProvider):
             "```commitments-update\n"
             '{"add": [{"to": "self", "what": "verify self-edit wiring '
             'end to end", "due": "2026-08-29"}]}\n'
+            "```\n\n"
+            "```proposal\n"
+            '{"file": "index.md", "reason": "mock test of the proposal/PR '
+            'mechanism", "content": "# Index (mock proposed content)"}\n'
             "```"
         )
