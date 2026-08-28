@@ -3,7 +3,7 @@ from .base import ModelProvider
 
 
 class GeminiProvider(ModelProvider):
-    def __init__(self, model: str = "gemini-2.0-flash"):
+    def __init__(self, model: str = "gemini-3.6-flash"):
         from google import genai  # pip install google-genai
 
         api_key = os.environ.get("GEMINI_API_KEY")
