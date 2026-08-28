@@ -163,7 +163,18 @@ def build_journal_prompt(reflection: str, enable_pull_requests: bool = False) ->
         "You can never delete a commitment or rewrite an existing one's "
         "fields outright — only add new ones or move an existing one's "
         "status forward with a note explaining why. Up to 5 adds per "
-        "wake; anything beyond that is ignored."
+        "wake; anything beyond that is ignored.\n\n"
+        "**To write or update your local blog.html page** (a plain "
+        "HTML/CSS/JS file for a human to view locally — this is NOT "
+        "hosted or public), include a fenced block with the COMPLETE "
+        "page (not a diff, the whole document), like:\n"
+        "```blog-update\n"
+        "<!DOCTYPE html>\n<html>...the whole page...</html>\n"
+        "```\n"
+        "This replaces the entire file each time, so regenerate it in "
+        "full from current state rather than trying to patch it. "
+        "Capped at 50,000 characters; content must contain <html> or "
+        "<!DOCTYPE> to be accepted."
         + pr_section +
         "\n\nAll of these blocks are optional. Explain your reasoning in "
         "prose before any block you include — the reasoning is saved in "
@@ -435,14 +446,48 @@ def open_proposal_pull_request(proposal: dict) -> str:
     return result
 
 
+MAX_BLOG_LEN = 50_000
+
+
+def apply_blog_update(raw_html: str) -> list[str]:
+    """
+    Whole-file replace of memory/blog.html. Unlike identity.md and
+    commitments.json, there's no "sacred" section here to protect —
+    the whole point is a dashboard-style page Bob regenerates fresh
+    each wake from current state, not something built up incrementally.
+    Local file only, not hosted or served anywhere by this project.
+    """
+    content = raw_html.strip()
+    if not content:
+        return ["REJECTED blog-update: content is empty."]
+
+    truncated_note = None
+    if len(content) > MAX_BLOG_LEN:
+        truncated_note = (f"TRUNCATED blog-update: content was {len(content)} "
+                          f"chars, capped at {MAX_BLOG_LEN}.")
+        content = content[:MAX_BLOG_LEN]
+
+    lower = content.lower()
+    if "<html" not in lower and "<!doctype" not in lower:
+        return ["REJECTED blog-update: doesn't look like a full HTML "
+                "document (no <html> or <!DOCTYPE> found). Nothing written."]
+
+    (MEMORY / "blog.html").write_text(content + "\n")
+    notes = [f"APPLIED blog.html update ({len(content)} chars)."]
+    if truncated_note:
+        notes.append(truncated_note)
+    return notes
+
+
 def apply_self_edits(model_output: str, config: dict) -> str:
     """
-    Look for identity-update / commitments-update blocks in the journal
-    output and apply them if valid, via the narrow structured functions
-    above. If enable_pull_requests is on in config, also looks for a
-    proposal block and attempts to open a real PR for rules.md/index.md
-    changes. Returns a short system note summarizing what was applied,
-    ignored, or rejected — appended visibly to the journal, never hidden.
+    Look for identity-update / commitments-update / blog-update blocks
+    in the journal output and apply them if valid, via the narrow
+    structured functions above. If enable_pull_requests is on in
+    config, also looks for a proposal block and attempts to open a
+    real PR for rules.md/index.md changes. Returns a short system note
+    summarizing what was applied, ignored, or rejected — appended
+    visibly to the journal, never hidden.
     """
     all_notes = []
 
@@ -453,6 +498,10 @@ def apply_self_edits(model_output: str, config: dict) -> str:
     commitments_block = extract_block(model_output, "commitments-update")
     if commitments_block is not None:
         all_notes.extend(apply_commitments_update(commitments_block))
+
+    blog_block = extract_block(model_output, "blog-update")
+    if blog_block is not None:
+        all_notes.extend(apply_blog_update(blog_block))
 
     if config.get("enable_pull_requests"):
         proposal = extract_proposal_block(model_output)

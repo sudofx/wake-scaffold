@@ -47,6 +47,9 @@ memory/
   index.md                 - periodically-refreshed summary of everything
                            known. Human-edit only, or via an opt-in
                            pull request (below).
+  blog.html                - a plain HTML/CSS/JS page Bob can regenerate
+                           each wake. Local file only — not hosted or
+                           served anywhere by this project (yet).
   journal/
     2026-08-28-0001.md     - one append-only file per wake, never edited
                            after. Filenames group by UTC date; the
@@ -84,6 +87,10 @@ does NOT apply it, only these exact blocks do:
   and moving an existing commitment's status forward with a note.
   Nothing can ever be deleted or have its other fields silently
   rewritten.
+- **`blog.html`**: a whole-file replace each wake (not append) — a
+  plain HTML/CSS/JS local dashboard page. Capped at 50,000 characters
+  and rejected if it doesn't look like a real HTML document. Not
+  hosted or served publicly by this project as-is.
 
 Every self-edit — applied, ignored, or rejected — is logged in that
 wake's journal entry under "System note: self-edit outcomes," so

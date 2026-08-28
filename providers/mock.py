@@ -57,5 +57,9 @@ class MockProvider(ModelProvider):
             "```proposal\n"
             '{"file": "index.md", "reason": "mock test of the proposal/PR '
             'mechanism", "content": "# Index (mock proposed content)"}\n'
+            "```\n\n"
+            "```blog-update\n"
+            "<!DOCTYPE html><html><head><title>Bob</title></head>"
+            "<body><h1>Mock test of blog-update wiring</h1></body></html>\n"
             "```"
         )
