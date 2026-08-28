@@ -63,6 +63,16 @@ def build_system_prompt() -> str:
         "comes from these files. Do not invent history that isn't here.",
         "## IDENTITY\n" + read(MEMORY / "identity.md"),
         "## RULES (hard constraints, follow exactly)\n" + read(MEMORY / "rules.md"),
+        "## CAPABILITY BOUNDARY (read carefully, this is not optional)\n"
+        "You do NOT have the ability to directly edit identity.md, rules.md, "
+        "index.md, or commitments.json. Only the journal entry you write this "
+        "wake gets saved automatically — nothing else. If you want any of "
+        "those files changed, write the proposed change clearly inside your "
+        "journal entry under a heading like 'Proposed changes for human "
+        "review.' Do not describe a file as already updated, and do not write "
+        "out fake file contents as if they were applied — a human reviews "
+        "your journal afterward and applies changes manually. Claiming a file "
+        "was changed when it wasn't is a memory integrity violation.",
         "## CURRENT KNOWLEDGE (summary)\n" + read(MEMORY / "index.md"),
         "## OPEN COMMITMENTS (check these before claiming anything is done)\n"
         + load_open_commitments(),
@@ -100,46 +110,4 @@ def main():
 
     provider = get_provider(provider_name, model)
 
-    system_prompt = build_system_prompt()
-    user_prompt = (
-        "This is a new wake cycle. Based on your identity, rules, current "
-        "knowledge, and open commitments above, decide what to work on and "
-        "do it. Then write your journal entry for this session covering: "
-        "what you read, what you did, what you decided and why, which "
-        "commitment IDs (if any) you touched and their new status, and any "
-        "uncertainties or flags for next time. Be concrete and specific — "
-        "avoid vague or inflated language about your own progress."
-    )
-
-    try:
-        output = provider.generate(system_prompt, user_prompt)
-    except Exception as e:
-        # A failed wake should leave a record, not just vanish into a CI
-        # log nobody's watching. This does NOT count as a journal entry
-        # about the agent's work — it's an operational failure log.
-        JOURNAL.mkdir(parents=True, exist_ok=True)
-        fail_path = JOURNAL / f"FAILED-{datetime.now(timezone.utc).strftime('%Y-%m-%dT%H%M%S')}.md"
-        fail_path.write_text(
-            f"# Wake FAILED\n\n"
-            f"**Attempted:** {datetime.now(timezone.utc).isoformat()}\n"
-            f"**Provider:** {provider_name}\n"
-            f"**Error:** {type(e).__name__}: {e}\n\n"
-            f"No journal entry was produced this wake. Check credentials, "
-            f"rate limits, and provider status before the next scheduled run.\n"
-        )
-        print(f"Wake FAILED — see {fail_path}", file=sys.stderr)
-        print(f"{type(e).__name__}: {e}", file=sys.stderr)
-        return 1
-
-    path = write_journal_entry(output, provider_name)
-
-    print(f"Wake complete. Journal entry written: {path}")
-    print(
-        "\nReminder: review this entry for any commitments or identity "
-        "changes that should be applied to memory/commitments.json or "
-        "memory/identity.md before the next wake."
-    )
-
-
-if __name__ == "__main__":
-    sys.exit(main())
+    system_prompt = build_system_promp
