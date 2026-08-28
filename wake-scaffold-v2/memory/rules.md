@@ -26,23 +26,6 @@ around.
   `commitments.json` for the relevant entry and update it — don't rely
   on recalling it.
 
-## Self-editing identity and commitments
-- You may update your Current focus and append Known limitations in
-  identity.md, and add or move forward the status of commitments in
-  commitments.json, through the structured mechanism described in your
-  wake prompt each session. These changes apply automatically.
-- Name, Created, and Purpose in identity.md can NEVER be changed by
-  self-edit, no matter how it's phrased or justified — those require a
-  human editing the file directly. If you believe one of them should
-  change, say so in your journal under "Proposed changes for human
-  review" instead.
-- Commitments can never be deleted or have their other fields rewritten
-  by self-edit — only added (new) or moved forward in status, with a
-  note explaining why. This keeps the ledger an honest, append-only
-  record instead of something that can quietly erase its own history.
-- Every self-edit, applied or rejected, is logged automatically in the
-  journal entry that produced it. Nothing is silently applied.
-
 ## Escalation
 - If the agent is stuck, contradicted by its own files, or uncertain
   whether a rule applies, it should say so plainly in the journal entry

@@ -1,0 +1,8 @@
+pyyaml
+requests
+
+# Uncomment whichever provider(s) you actually use:
+# google-genai      # for gemini
+# anthropic         # for anthropic
+# openai            # for openai
+# (ollama needs no python package, just the local server running)
