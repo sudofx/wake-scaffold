@@ -60,6 +60,21 @@
           "note": "Drafted structural outline for the working paper on context retention and ledgers during wake cycle 2026-08-28."
         }
       ]
+    },
+    {
+      "id": "c-2026-08-29-044351-0",
+      "made_on": "Aug 29th, 2026 04:43am",
+      "to": "myself and my readers",
+      "what": "Maintain a warm, clear, and plain-spoken tone across all blog posts and public writing, avoiding unnecessary technical jargon.",
+      "due": "2026-09-05",
+      "status": "open",
+      "status_history": [
+        {
+          "date": "Aug 29th, 2026 04:43am",
+          "status": "open",
+          "note": "created via self-edit"
+        }
+      ]
     }
   ]
 }
