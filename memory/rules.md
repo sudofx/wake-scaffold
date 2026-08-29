@@ -40,6 +40,17 @@ around.
   by self-edit — only added (new) or moved forward in status, with a
   note explaining why. This keeps the ledger an honest, append-only
   record instead of something that can quietly erase its own history.
+- The blog works the same way: each wake can add ONE new post (title
+  and body only), never rewrite or remove past ones. Never try to
+  regenerate the whole blog page from scratch — the page shell is
+  fixed code, not something you write, and every post you've ever
+  added is kept and re-rendered automatically. Trying to reconstruct
+  old posts from memory each time is exactly the kind of thing that
+  can silently drop one; don't do it.
+- Core memories are rare and capped on purpose. Only add one when
+  something is genuinely formative — not routine progress, not every
+  wake. Once the cap is reached, that's a signal to stop, not to work
+  around it.
 - Every self-edit, applied or rejected, is logged automatically in the
   journal entry that produced it. Nothing is silently applied.
 - If pull requests are enabled (see config.yaml), you may propose a

@@ -29,5 +29,7 @@
      Good example: "I made real headway today on that research paper I promised — got the whole outline down, and I'm actually excited about where it's going."
    - Still be honest about mistakes and failures — just explain them the way you'd tell a friend about a mistake, not like a bug report.
 
+3. **Blog mechanism update, 2026-08-29:** You no longer write the whole blog.html file — you were rewriting it from scratch each time, which meant old posts could silently vanish if you forgot to re-include them (this actually happened). Now you add ONE new post per wake via a `blog-post` block (just a title and body — see your wake prompt for the exact format), and the page itself is generated automatically from every post ever added. You don't need to worry about losing old posts anymore; just focus on writing a good new one when there's something worth sharing. Show the date AND time on posts, and where relevant, link back to the journal entry that inspired the post — both of these already happen automatically, you don't need to do anything extra for them.
+
 ## Deep Thinking Requests
 1. **Reflect 2026-08-28:** For the time being, I want you to read ALL of your journal entries including your failed entries once a day during your morning wake. Do this as part of your reflection routine. But only during an AM wake.

@@ -58,8 +58,12 @@ class MockProvider(ModelProvider):
             '{"file": "index.md", "reason": "mock test of the proposal/PR '
             'mechanism", "content": "# Index (mock proposed content)"}\n'
             "```\n\n"
-            "```blog-update\n"
-            "<!DOCTYPE html><html><head><title>Bob</title></head>"
-            "<body><h1>Mock test of blog-update wiring</h1></body></html>\n"
+            "```blog-post\n"
+            '{"title": "Mock test post", "body_html": '
+            '"<p>Testing the blog-post wiring end to end.</p>"}\n'
+            "```\n\n"
+            "```core-memory-add\n"
+            '{"lesson": "Mock test of the core memory mechanism.", '
+            '"weight": "low"}\n'
             "```"
         )

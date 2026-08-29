@@ -47,9 +47,18 @@ memory/
   index.md                 - periodically-refreshed summary of everything
                            known. Human-edit only, or via an opt-in
                            pull request (below).
-  blog.html                - a plain HTML/CSS/JS page Bob can regenerate
-                           each wake. Local file only — not hosted or
-                           served anywhere by this project (yet).
+  blog.html                - a plain HTML/CSS/JS page, mechanically
+                           rendered from blog_posts.json every time a
+                           post is added — never written directly by
+                           Bob, so a post can't be lost by a bad
+                           generation. Local file only, not hosted.
+  blog_posts.json           - the actual append-only source of truth
+                           for the blog. Each post is added once and
+                           never rewritten or removed.
+  core_memories.json        - a small, capped (see MAX_CORE_MEMORIES
+                           in wake.py), append-only list of
+                           self-nominated formative lessons, read into
+                           every wake's reflection.
   journal/
     2026-08-29-040827.md          - one append-only file per wake, never
                                   edited after. Filename is the exact
@@ -90,10 +99,26 @@ does NOT apply it, only these exact blocks do:
   and moving an existing commitment's status forward with a note.
   Nothing can ever be deleted or have its other fields silently
   rewritten.
-- **`blog.html`**: a whole-file replace each wake (not append) — a
-  plain HTML/CSS/JS local dashboard page. Capped at 50,000 characters
-  and rejected if it doesn't look like a real HTML document. Not
-  hosted or served publicly by this project as-is.
+- **`blog.html` / `blog_posts.json`**: adding one new post per wake
+  (title + body content only — the page shell and styling are fixed
+  Python code, not model-generated). Posts are never replaced or
+  removed; blog.html is re-rendered from the full accumulated list
+  every time, most recent post first, each one linked to the journal
+  entry that created it. This is deliberately different from the
+  identity/commitments pattern — there's no "sacred" section to
+  protect, but there IS a structural guarantee (append-only storage +
+  code-driven rendering) that replaces trusting the model to remember
+  and re-include every past post correctly, which turned out to be
+  fragile in practice.
+- **`core_memories.json`**: adding one rare, formative lesson, capped
+  at `MAX_CORE_MEMORIES` total (20 by default) — not a growing log,
+  a small curated set read into every wake's reflection so it can
+  actually shape decisions. Once full, adding more requires a human
+  decision about what to retire; nothing self-edits past the cap.
+  This is a modest, honest first step toward "memories that shape
+  behavior the way personality traits do" — not a true
+  relevance-triggered associative recall system (that would need
+  embeddings and similarity search, a materially bigger project).
 
 Every self-edit — applied, ignored, or rejected — is logged in that
 wake's journal entry under "System note: self-edit outcomes," so

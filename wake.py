@@ -131,6 +131,9 @@ def build_reflection_prompt(now: datetime) -> str:
         "comes from these files. Do not invent history that isn't here.",
         "## IDENTITY\n" + read(MEMORY / "identity.md"),
         "## RULES (hard constraints, follow exactly)\n" + read(MEMORY / "rules.md"),
+        "## CORE MEMORIES (rare, formative lessons — let these genuinely "
+        "shape how you act this wake, not just inform you)\n"
+        + format_core_memories_for_prompt(),
         "## CURRENT KNOWLEDGE (summary)\n" + read(MEMORY / "index.md"),
         "## OPEN COMMITMENTS\n" + load_open_commitments(),
         "## YOUR TASK RIGHT NOW: REFLECT, DO NOT JOURNAL YET\n"
@@ -214,17 +217,36 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         "fields outright — only add new ones or move an existing one's "
         "status forward with a note explaining why. Up to 5 adds per "
         "wake; anything beyond that is ignored.\n\n"
-        "**To write or update your local blog.html page** (a plain "
-        "HTML/CSS/JS file for a human to view locally — this is NOT "
-        "hosted or public), include a fenced block with the COMPLETE "
-        "page (not a diff, the whole document), like:\n"
-        "```blog-update\n"
-        "<!DOCTYPE html>\n<html>...the whole page...</html>\n"
+        "**To add a new post to your blog** (a plain local page, not "
+        "hosted or public), include a fenced block with JUST that "
+        "post's title and content — never the whole page, the code "
+        "builds the page shell and adds your post to it automatically:\n"
+        "```blog-post\n"
+        '{"title": "...", "body_html": "<p>...</p><p>...</p>"}\n'
         "```\n"
-        "This replaces the entire file each time, so regenerate it in "
-        "full from current state rather than trying to patch it. "
-        "Capped at 50,000 characters; content must contain <html> or "
-        "<!DOCTYPE> to be accepted."
+        "This ADDS a post — it never replaces or removes earlier ones, "
+        "so don't try to regenerate the whole blog from scratch or "
+        "re-paste old posts; the code keeps every post that's ever "
+        "been added automatically, most recent first, each one linked "
+        "to the journal entry that created it. Only include this when "
+        "you have something genuinely worth posting, not every wake. "
+        "'body_html' is just the post content (paragraphs, lists, "
+        "etc.), capped at 8,000 characters — no <html> or <!DOCTYPE>, "
+        "just the fragment. You can link to other past journal entries "
+        "inline in your prose if relevant, e.g. "
+        '<a href="journal/2026-08-28-025254.md">that day</a>.\n\n'
+        "**To record a core memory** — a rare, genuinely formative "
+        "lesson, not a routine observation — include a fenced block:\n"
+        "```core-memory-add\n"
+        '{"lesson": "a compressed, concrete lesson", "weight": '
+        '"low|medium|high"}\n'
+        "```\n"
+        f"Capped at {MAX_CORE_MEMORIES} total, ever — once full, adding "
+        "more requires a human decision about what to retire, not a "
+        "self-edit. That scarcity is intentional: these should be the "
+        "handful of things that actually shape how you act, the way a "
+        "real formative memory does, not a log of everything that "
+        "happened. Use this rarely."
         + pr_section +
         "\n\nAll of these blocks are optional. Explain your reasoning in "
         "prose before any block you include — the reasoning is saved in "
@@ -497,48 +519,262 @@ def open_proposal_pull_request(proposal: dict) -> str:
     return result
 
 
-MAX_BLOG_LEN = 50_000
+MAX_POST_TITLE_LEN = 200
+MAX_POST_BODY_LEN = 8_000
+
+BLOG_TEMPLATE = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Out Loud — Bob's Evolution Journal</title>
+    <style>
+        :root {{
+            --bg-color: #faf7f2;
+            --card-bg: #ffffff;
+            --text-main: #2b2927;
+            --text-muted: #6b6560;
+            --accent-color: #c85a32;
+            --accent-soft: #f4eae1;
+            --border-color: #e8e2d9;
+            --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }}
+        * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+        body {{
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-stack);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }}
+        .container {{ max-width: 760px; margin: 0 auto; }}
+        header {{
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }}
+        header h1 {{
+            font-size: 2.2rem; font-weight: 700; color: var(--text-main);
+            letter-spacing: -0.02em; margin-bottom: 0.5rem;
+        }}
+        header p {{ font-size: 1.1rem; color: var(--text-muted); }}
+        .post {{
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.75rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }}
+        .post-date {{
+            font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;
+            color: var(--accent-color); font-weight: 600; margin-bottom: 0.5rem;
+        }}
+        .post-date a {{ color: inherit; text-decoration: underline; font-weight: 400; }}
+        .post h2 {{ font-size: 1.5rem; margin-bottom: 1rem; color: var(--text-main); }}
+        .post p {{ margin-bottom: 1rem; color: var(--text-main); }}
+        .post p:last-child {{ margin-bottom: 0; }}
+        .post ul {{ margin: 1rem 0 1rem 1.5rem; }}
+        .post li {{ margin-bottom: 0.5rem; }}
+        footer {{
+            text-align: center; margin-top: 3rem; padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.9rem; color: var(--text-muted);
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Learning Out Loud</h1>
+            <p>An ongoing notebook tracking how I learn, adapt, and grow over time.</p>
+        </header>
+        <main>
+{posts_html}
+        </main>
+        <footer>
+            <p>Generated locally each wake — never rewritten, only added to.</p>
+        </footer>
+    </div>
+</body>
+</html>
+"""
+
+POST_TEMPLATE = """            <article class="post">
+                <div class="post-date">{date_display}{journal_link}</div>
+                <h2>{title}</h2>
+{body_html}
+            </article>"""
 
 
-def apply_blog_update(raw_html: str) -> list[str]:
+def load_blog_posts() -> dict:
+    path = MEMORY / "blog_posts.json"
+    if not path.exists():
+        return {"posts": []}
+    try:
+        return json.loads(path.read_text())
+    except json.JSONDecodeError:
+        return {"posts": []}  # corrupted -> treat as empty rather than crash
+
+
+def render_blog_html(data: dict) -> str:
     """
-    Whole-file replace of memory/blog.html. Unlike identity.md and
-    commitments.json, there's no "sacred" section here to protect —
-    the whole point is a dashboard-style page Bob regenerates fresh
-    each wake from current state, not something built up incrementally.
-    Local file only, not hosted or served anywhere by this project.
+    Builds the whole blog.html from the accumulated posts list. This is
+    plain Python string formatting, NOT model-generated — that's the
+    actual fix for the old whole-file-rewrite problem: a post can only
+    ever be lost if it's deleted from blog_posts.json itself (which
+    nothing in this codebase does), not by a model forgetting to
+    re-include it in a fresh generation.
     """
-    content = raw_html.strip()
-    if not content:
-        return ["REJECTED blog-update: content is empty."]
-
-    truncated_note = None
-    if len(content) > MAX_BLOG_LEN:
-        truncated_note = (f"TRUNCATED blog-update: content was {len(content)} "
-                          f"chars, capped at {MAX_BLOG_LEN}.")
-        content = content[:MAX_BLOG_LEN]
-
-    lower = content.lower()
-    if "<html" not in lower and "<!doctype" not in lower:
-        return ["REJECTED blog-update: doesn't look like a full HTML "
-                "document (no <html> or <!DOCTYPE> found). Nothing written."]
-
-    (MEMORY / "blog.html").write_text(content + "\n")
-    notes = [f"APPLIED blog.html update ({len(content)} chars)."]
-    if truncated_note:
-        notes.append(truncated_note)
-    return notes
+    posts = sorted(data.get("posts", []), key=lambda p: p.get("date_sortable", ""), reverse=True)
+    if not posts:
+        posts_html = '            <p style="color: var(--text-muted);">No posts yet.</p>'
+    else:
+        blocks = []
+        for p in posts:
+            journal_link = ""
+            if p.get("journal_entry"):
+                journal_link = (f' — <a href="journal/{p["journal_entry"]}">'
+                                f'{p["journal_entry"]}</a>')
+            blocks.append(POST_TEMPLATE.format(
+                date_display=p.get("date_display", ""),
+                journal_link=journal_link,
+                title=p.get("title", "(untitled)"),
+                body_html=p.get("body_html", ""),
+            ))
+        posts_html = "\n\n".join(blocks)
+    return BLOG_TEMPLATE.format(posts_html=posts_html)
 
 
-def apply_self_edits(model_output: str, config: dict) -> str:
+def apply_blog_post(raw_json: str, now: datetime, journal_fname: str) -> list[str]:
     """
-    Look for identity-update / commitments-update / blog-update blocks
-    in the journal output and apply them if valid, via the narrow
-    structured functions above. If enable_pull_requests is on in
-    config, also looks for a proposal block and attempts to open a
-    real PR for rules.md/index.md changes. Returns a short system note
-    summarizing what was applied, ignored, or rejected — appended
-    visibly to the journal, never hidden.
+    Appends ONE new post to blog_posts.json (never overwrites existing
+    posts), then re-renders the whole blog.html from the accumulated
+    list. date_display and journal_entry are attached by code from the
+    actual current wake, not trusted from the model, so they're always
+    accurate regardless of what the model believes the time or its own
+    filename to be.
+    """
+    try:
+        data_in = json.loads(raw_json)
+    except json.JSONDecodeError as e:
+        return [f"REJECTED blog-post: not valid JSON ({e}). No post added."]
+    if not isinstance(data_in, dict):
+        return ["REJECTED blog-post: must be a JSON object. No post added."]
+
+    title = str(data_in.get("title", "")).strip()[:MAX_POST_TITLE_LEN]
+    body_html = str(data_in.get("body_html", "")).strip()[:MAX_POST_BODY_LEN]
+
+    if not title:
+        return ["REJECTED blog-post: missing or empty 'title'. No post added."]
+    if not body_html:
+        return ["REJECTED blog-post: missing or empty 'body_html'. No post added."]
+    if "<html" in body_html.lower() or "<!doctype" in body_html.lower():
+        return ["REJECTED blog-post: 'body_html' should be just the post "
+                "content (e.g. <p> tags), not a full page — no <html> or "
+                "<!DOCTYPE>. No post added."]
+
+    data = load_blog_posts()
+    stamp = filename_stamp(now)
+    post = {
+        "id": f"post-{stamp}",
+        "date_sortable": stamp,
+        "date_display": format_display_time(now),
+        "title": title,
+        "body_html": body_html,
+        "journal_entry": journal_fname,
+    }
+    data.setdefault("posts", []).append(post)
+    (MEMORY / "blog_posts.json").write_text(json.dumps(data, indent=2) + "\n")
+    (MEMORY / "blog.html").write_text(render_blog_html(data))
+    return [f"ADDED blog post '{title[:60]}' and re-rendered blog.html "
+            f"({len(data['posts'])} total posts)."]
+
+
+MAX_CORE_MEMORIES = 20
+
+
+def load_core_memories() -> dict:
+    path = MEMORY / "core_memories.json"
+    if not path.exists():
+        return {"memories": []}
+    try:
+        return json.loads(path.read_text())
+    except json.JSONDecodeError:
+        return {"memories": []}
+
+
+def format_core_memories_for_prompt() -> str:
+    data = load_core_memories()
+    memories = data.get("memories", [])
+    if not memories:
+        return "None recorded yet."
+    lines = []
+    for m in memories:
+        link = f" (see {m['journal_entry']})" if m.get("journal_entry") else ""
+        lines.append(f"- [{m.get('weight', '?')}] {m.get('lesson', '')}{link}")
+    return "\n".join(lines)
+
+
+def apply_core_memory_add(raw_json: str, now: datetime, journal_fname: str) -> list[str]:
+    """
+    A small, capped, append-only list of self-nominated formative
+    lessons — NOT a true relevance-triggered associative memory system
+    (that would need embeddings and similarity search, a materially
+    bigger project). This is a simpler, honest approximation: a short
+    digest of the things Bob has decided actually matter, always
+    included in context because it's kept deliberately small. The cap
+    is the point — it forces choosing what's genuinely formative
+    instead of logging everything, the same way real core memories are
+    rare, not exhaustive.
+    """
+    try:
+        data_in = json.loads(raw_json)
+    except json.JSONDecodeError as e:
+        return [f"REJECTED core-memory-add: not valid JSON ({e}). Nothing added."]
+    if not isinstance(data_in, dict):
+        return ["REJECTED core-memory-add: must be a JSON object. Nothing added."]
+
+    lesson = str(data_in.get("lesson", "")).strip()[:500]
+    weight = str(data_in.get("weight", "")).strip().lower()
+
+    if not lesson:
+        return ["REJECTED core-memory-add: missing or empty 'lesson'. Nothing added."]
+    if weight not in {"low", "medium", "high"}:
+        return [f"REJECTED core-memory-add: 'weight' must be low/medium/high, "
+                f"got {weight!r}. Nothing added."]
+
+    data = load_core_memories()
+    memories = data.setdefault("memories", [])
+    if len(memories) >= MAX_CORE_MEMORIES:
+        return [f"REJECTED core-memory-add: already at the cap of "
+                f"{MAX_CORE_MEMORIES} core memories. This is deliberate — "
+                f"core memories are meant to be rare and chosen carefully, "
+                f"not a growing log. If this truly belongs, it should "
+                f"replace something less formative, which requires a "
+                f"human decision, not a self-edit."]
+
+    memories.append({
+        "id": f"mem-{filename_stamp(now)}",
+        "date_display": format_display_time(now),
+        "weight": weight,
+        "lesson": lesson,
+        "journal_entry": journal_fname,
+    })
+    (MEMORY / "core_memories.json").write_text(json.dumps(data, indent=2) + "\n")
+    return [f"ADDED core memory ({weight}): {lesson[:80]}"]
+
+
+def apply_self_edits(model_output: str, config: dict, now: datetime, journal_fname: str) -> str:
+    """
+    Look for identity-update / commitments-update / blog-post /
+    core-memory-add blocks in the journal output and apply them if
+    valid, via the narrow structured functions above. If
+    enable_pull_requests is on in config, also looks for a proposal
+    block and attempts to open a real PR for rules.md/index.md
+    changes. Returns a short system note summarizing what was applied,
+    ignored, or rejected — appended visibly to the journal, never
+    hidden.
     """
     all_notes = []
 
@@ -550,9 +786,13 @@ def apply_self_edits(model_output: str, config: dict) -> str:
     if commitments_block is not None:
         all_notes.extend(apply_commitments_update(commitments_block))
 
-    blog_block = extract_block(model_output, "blog-update")
+    blog_block = extract_block(model_output, "blog-post")
     if blog_block is not None:
-        all_notes.extend(apply_blog_update(blog_block))
+        all_notes.extend(apply_blog_post(blog_block, now, journal_fname))
+
+    core_memory_block = extract_block(model_output, "core-memory-add")
+    if core_memory_block is not None:
+        all_notes.extend(apply_core_memory_add(core_memory_block, now, journal_fname))
 
     if config.get("enable_pull_requests"):
         proposal = extract_proposal_block(model_output)
@@ -585,9 +825,8 @@ def journal_filename(dt: datetime, failed: bool = False) -> str:
     return f"{stamp}{suffix}-{i}.md"
 
 
-def write_journal_entry(now: datetime, reflection: str, model_output: str, backend_name: str):
+def write_journal_entry(now: datetime, filename: str, reflection: str, model_output: str, backend_name: str):
     JOURNAL.mkdir(parents=True, exist_ok=True)
-    filename = journal_filename(now, failed=False)
     path = JOURNAL / filename
     header = (
         f"# Session {filename[:-3]}\n\n"
@@ -641,8 +880,12 @@ def main():
 
     # One consistent "now" for the whole wake — used in the prompt context
     # shown to the model, the journal header, and the filename, so they
-    # can't drift out of sync with each other.
+    # can't drift out of sync with each other. The filename itself is
+    # also computed once here (not inside write_journal_entry) so that
+    # any blog post or core memory added during this wake can correctly
+    # link back to the exact file this entry will be saved as.
     now = now_local()
+    journal_fname = journal_filename(now, failed=False)
 
     # Pass 1: reflect, before doing or writing anything.
     try:
@@ -678,13 +921,14 @@ def main():
         write_failure_record(provider_name, "journal", e, reflection=reflection)
         return 1
 
-    # Apply any identity.md / commitments.json / blog.html self-edits the
-    # model included in its output, then append the outcome
-    # (applied/rejected) to the journal text so it's part of the record.
-    self_edit_notes = apply_self_edits(output, config)
+    # Apply any identity.md / commitments.json / blog-post / core-memory
+    # self-edits the model included in its output, then append the
+    # outcome (applied/rejected) to the journal text so it's part of
+    # the record.
+    self_edit_notes = apply_self_edits(output, config, now, journal_fname)
     output_with_notes = output + self_edit_notes
 
-    path = write_journal_entry(now, reflection, output_with_notes, provider_name)
+    path = write_journal_entry(now, journal_fname, reflection, output_with_notes, provider_name)
 
     print(f"Wake complete. Journal entry written: {path}")
     if self_edit_notes:
