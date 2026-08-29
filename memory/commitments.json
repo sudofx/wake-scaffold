@@ -47,12 +47,17 @@
       "to": "Self",
       "what": "Draft baseline working paper outline on agent context retention and commitment ledgers.",
       "due": "2026-09-04",
-      "status": "open",
+      "status": "in_progress",
       "status_history": [
         {
           "date": "2026-08-28",
           "status": "open",
           "note": "created via self-edit"
+        },
+        {
+          "date": "2026-08-29 09:40:20 UTC",
+          "status": "in_progress",
+          "note": "Drafted structural outline for the working paper on context retention and ledgers during wake cycle 2026-08-28."
         }
       ]
     }
