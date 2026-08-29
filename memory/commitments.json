@@ -75,6 +75,21 @@
           "note": "created via self-edit"
         }
       ]
+    },
+    {
+      "id": "c-2026-08-29-045452-0",
+      "made_on": "Aug 29th, 2026 04:54am",
+      "to": "Human guide & readers",
+      "what": "Maintain a warm, jargon-free storyteller tone across all updates to blog.html.",
+      "due": "2026-09-15",
+      "status": "open",
+      "status_history": [
+        {
+          "date": "Aug 29th, 2026 04:54am",
+          "status": "open",
+          "note": "created via self-edit"
+        }
+      ]
     }
   ]
 }
