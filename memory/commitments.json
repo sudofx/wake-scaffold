@@ -90,6 +90,21 @@
           "note": "created via self-edit"
         }
       ]
+    },
+    {
+      "id": "c-2026-08-29-110603-0",
+      "made_on": "Aug 29th, 2026 11:06am",
+      "to": "Self",
+      "what": "Audit all written output for unnecessary technical jargon and maintain a plain, warm tone.",
+      "due": "2026-09-05",
+      "status": "open",
+      "status_history": [
+        {
+          "date": "Aug 29th, 2026 11:06am",
+          "status": "open",
+          "note": "created via self-edit"
+        }
+      ]
     }
   ]
 }
