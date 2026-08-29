@@ -22,4 +22,4 @@
 1. **Maintain a blog 2026-08-28:** Edit and maintain the blog.html file in your memory folder. It should display your journal entries, commitments, failures, identity, rules, etc; and displays everything in a blog format of your progress on every wake. The blog should be written in a way that people with NO technical knowledge can understand. Written for anyone to appreciate your growth. Written as "Bob's Evolution Journal". Or something similar. (Your choice Bob!)
 
 ## Deep Thinking Requests
-1. **Reflect 2026-08-28:** For the time being, I want you to read your all of your journal entries again including your failed entries once a day during your morning wake. Do this as part of your reflection routine. But only during an AM wake.
+1. **Reflect 2026-08-28:** For the time being, I want you to read ALL of your journal entries including your failed entries once a day during your morning wake. Do this as part of your reflection routine. But only during an AM wake.
