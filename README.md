@@ -51,13 +51,16 @@ memory/
                            each wake. Local file only — not hosted or
                            served anywhere by this project (yet).
   journal/
-    2026-08-28-0001.md     - one append-only file per wake, never edited
-                           after. Filenames group by UTC date; the
-                           "Woke:" line inside each entry has the full
-                           date + time the wake actually happened.
-    FAILED-<timestamp>.md  - written instead of a normal entry when a
-                           wake's API call fails, so a failure never
-                           just vanishes silently.
+    2026-08-29-040827.md          - one append-only file per wake, never
+                                  edited after. Filename is the exact
+                                  local time the wake happened (see
+                                  "timezone" in config.yaml), so files
+                                  sort chronologically by name.
+    2026-08-29-040827-FAILED.md   - written instead of a normal entry
+                                  when a wake's API call fails, so a
+                                  failure never just vanishes silently.
+                                  Same naming scheme, "-FAILED" at the
+                                  end so it still sorts in time order.
 
 base_memory/
   A static backup/reference copy of the original template files, kept
@@ -115,6 +118,32 @@ checked. If those aren't set, or anything else about the attempt
 fails, it degrades to the normal journal-only proposal rather than
 breaking the wake — this path is off by default and worth testing
 with a manual `workflow_dispatch` run before relying on it.
+
+## Timezone
+
+Every timestamp this project writes — journal filenames, the "Woke:"
+line inside each entry, `identity.md`'s "Last updated", and the
+`made_on`/status dates in `commitments.json` — uses the timezone set
+in `config.yaml` (`timezone: America/Los_Angeles` by default). Bob is
+also explicitly told the current local time at the start of each wake,
+so anything he writes into `blog.html` or elsewhere should reflect it
+too, rather than guessing from file contents.
+
+This uses Python's `zoneinfo`, so daylight saving (PDT ↔ PST) is
+handled automatically — nothing to adjust by hand twice a year. The
+one exception is the *cron schedule itself* in
+`.github/workflows/wake.yml`: GitHub Actions cron is always UTC, so
+that still needs a manual one-hour shift when DST changes if you want
+the scheduled run time to stay pinned to a specific local time.
+
+`memory/journal/`'s naming scheme was old-UTC-based before
+(`2026-08-28-0001.md`, `FAILED-2026-08-28T161327.md`) and is now
+local-time-based (`2026-08-28-025254.md`,
+`2026-08-28-091327-FAILED.md`). `scripts/migrate_journal_filenames.py`
+renames existing old-scheme files to match — it only renames, never
+edits file contents, so it doesn't violate the append-only rule these
+files are supposed to follow. Run `python scripts/migrate_journal_filenames.py --dry-run`
+first to preview, then without `--dry-run` to actually rename.
 
 ## Getting started
 

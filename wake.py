@@ -32,6 +32,7 @@ import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import requests
 import yaml
@@ -42,10 +43,53 @@ ROOT = Path(__file__).parent
 MEMORY = ROOT / "memory"
 JOURNAL = MEMORY / "journal"
 
+_TZ_CACHE = None
+
 
 def load_config():
     with open(ROOT / "config.yaml") as f:
         return yaml.safe_load(f)
+
+
+def get_local_tz() -> ZoneInfo:
+    """
+    Reads the timezone from config.yaml (defaulting to Los Angeles),
+    cached after first read. Using zoneinfo means daylight saving
+    transitions (PDT <-> PST) are handled automatically and correctly
+    — no manual offset math anywhere in this file.
+    """
+    global _TZ_CACHE
+    if _TZ_CACHE is None:
+        cfg = load_config()
+        _TZ_CACHE = ZoneInfo(cfg.get("timezone", "America/Los_Angeles"))
+    return _TZ_CACHE
+
+
+def now_local() -> datetime:
+    return datetime.now(get_local_tz())
+
+
+def ordinal(n: int) -> str:
+    if 10 <= n % 100 <= 20:
+        suffix = "th"
+    else:
+        suffix = {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
+    return f"{n}{suffix}"
+
+
+def format_display_time(dt: datetime) -> str:
+    """e.g. 'Aug 29th, 2026 04:08am' — used anywhere a human reads a
+    timestamp inside a journal entry, identity.md, or a failure record."""
+    return (
+        f"{dt.strftime('%b')} {ordinal(dt.day)}, {dt.year} "
+        f"{dt.strftime('%I:%M')}{dt.strftime('%p').lower()}"
+    )
+
+
+def filename_stamp(dt: datetime) -> str:
+    """e.g. '2026-08-29-040827' — the machine-sortable form used in
+    journal filenames and other identifiers, always local time."""
+    return dt.strftime("%Y-%m-%d-%H%M%S")
 
 
 def read(path: Path) -> str:
@@ -70,7 +114,7 @@ def load_open_commitments() -> str:
     return json.dumps(open_items, indent=2)
 
 
-def build_reflection_prompt() -> str:
+def build_reflection_prompt(now: datetime) -> str:
     """
     The synthesis pass. This is NOT the journal entry — it's private
     thinking that happens first, and gets folded into the journal
@@ -78,6 +122,10 @@ def build_reflection_prompt() -> str:
     auditable, not hidden.
     """
     return "\n\n---\n\n".join([
+        f"## CURRENT TIME\n{format_display_time(now)} (Pacific time, "
+        "Los Angeles). This is the authoritative current time — use it "
+        "for any dates or timestamps you write, including inside "
+        "blog.html, rather than estimating from file contents.",
         "You are waking up with no memory of any previous session except "
         "what is written below. Everything you know about your own past "
         "comes from these files. Do not invent history that isn't here.",
@@ -107,7 +155,7 @@ def build_reflection_prompt() -> str:
     ])
 
 
-def build_journal_prompt(reflection: str, enable_pull_requests: bool = False) -> str:
+def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: bool = False) -> str:
     pr_section = ""
     if enable_pull_requests:
         pr_section = (
@@ -127,6 +175,8 @@ def build_journal_prompt(reflection: str, enable_pull_requests: bool = False) ->
             "one just because the option exists."
         )
     return "\n\n---\n\n".join([
+        f"## CURRENT TIME\n{format_display_time(now)} (Pacific time, "
+        "Los Angeles). Same moment as your reflection above.",
         "You are the same agent from the reflection step above. Here is "
         "the reflection you just wrote:",
         "## YOUR REFLECTION THIS WAKE\n" + reflection,
@@ -265,9 +315,9 @@ def apply_identity_update(raw_json: str) -> list[str]:
         text = re.sub(r"\n{3,}", "\n\n", text)  # collapse accumulated blank lines
 
     if changed:
-        date = datetime.now(timezone.utc).strftime("%Y-%m-%d-%H%M%S")
+        replacement = (f"**Last updated:** {format_display_time(now_local())} "
+                       f"— reason: self-edit via wake cycle")
         last_updated = re.compile(r"\*\*Last updated:\*\*.*")
-        replacement = f"**Last updated:** {date} — reason: self-edit via wake cycle"
         text = last_updated.sub(replacement, text, count=1) if last_updated.search(text) \
             else text + f"\n\n{replacement}\n"
         path.write_text(text)
@@ -300,7 +350,8 @@ def apply_commitments_update(raw_json: str) -> list[str]:
         return ["REJECTED commitments-update: existing commitments.json is corrupted; "
                 "fix it manually before self-edits can be applied."]
     commitments = data.setdefault("commitments", [])
-    now_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+    now = now_local()
+    now_str = format_display_time(now)
     changed = False
 
     adds = ops.get("add", [])
@@ -309,7 +360,7 @@ def apply_commitments_update(raw_json: str) -> list[str]:
             if not isinstance(new_c, dict) or not {"to", "what", "due"}.issubset(new_c):
                 notes.append(f"SKIPPED add #{i+1}: missing required field(s) (to/what/due).")
                 continue
-            new_id = f"c-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}-{i}"
+            new_id = f"c-{filename_stamp(now)}-{i}"
             entry = {
                 "id": new_id,
                 "made_on": now_str,
@@ -403,7 +454,7 @@ def open_proposal_pull_request(proposal: dict) -> str:
                 "in). Falling back to a journal-only proposal — nothing was "
                 "opened.")
 
-    branch = f"bob-proposal-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}"
+    branch = f"bob-proposal-{filename_stamp(now_local())}"
     file_path = MEMORY / target
 
     def run(*args):
@@ -515,20 +566,32 @@ def apply_self_edits(model_output: str, config: dict) -> str:
     )
 
 
-def next_journal_filename() -> str:
-    date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    existing = sorted(JOURNAL.glob(f"{date}-*.md"))
-    n = len(existing) + 1
-    return f"{date}-{n:04d}.md"
+def journal_filename(dt: datetime, failed: bool = False) -> str:
+    """
+    e.g. '2026-08-29-040827.md' or '2026-08-29-040827-FAILED.md'.
+    Second-precision local timestamps make natural per-day counters
+    unnecessary — filenames sort correctly by name already. In the
+    astronomically unlikely case two wakes land in the exact same
+    second, a numeric suffix disambiguates rather than overwriting.
+    """
+    stamp = filename_stamp(dt)
+    suffix = "-FAILED" if failed else ""
+    base = f"{stamp}{suffix}.md"
+    if not (JOURNAL / base).exists():
+        return base
+    i = 2
+    while (JOURNAL / f"{stamp}{suffix}-{i}.md").exists():
+        i += 1
+    return f"{stamp}{suffix}-{i}.md"
 
 
-def write_journal_entry(reflection: str, model_output: str, backend_name: str):
+def write_journal_entry(now: datetime, reflection: str, model_output: str, backend_name: str):
     JOURNAL.mkdir(parents=True, exist_ok=True)
-    filename = next_journal_filename()
+    filename = journal_filename(now, failed=False)
     path = JOURNAL / filename
     header = (
         f"# Session {filename[:-3]}\n\n"
-        f"**Woke:** {datetime.now(timezone.utc).isoformat()}\n"
+        f"**Woke:** {format_display_time(now)} (Pacific time)\n"
         f"**Model backend:** {backend_name}\n\n"
     )
     reflection_section = (
@@ -544,7 +607,9 @@ def write_journal_entry(reflection: str, model_output: str, backend_name: str):
 
 def write_failure_record(provider_name: str, stage: str, e: Exception, reflection: str = None):
     JOURNAL.mkdir(parents=True, exist_ok=True)
-    fail_path = JOURNAL / f"FAILED-{datetime.now(timezone.utc).strftime('%Y-%m-%dT%H%M%S')}.md"
+    now = now_local()
+    filename = journal_filename(now, failed=True)
+    fail_path = JOURNAL / filename
     reflection_note = ""
     if reflection:
         reflection_note = (
@@ -554,7 +619,7 @@ def write_failure_record(provider_name: str, stage: str, e: Exception, reflectio
         )
     fail_path.write_text(
         f"# Wake FAILED\n\n"
-        f"**Attempted:** {datetime.now(timezone.utc).isoformat()}\n"
+        f"**Attempted:** {format_display_time(now)} (Pacific time)\n"
         f"**Provider:** {provider_name}\n"
         f"**Failed during:** {stage}\n"
         f"**Error:** {type(e).__name__}: {e}\n\n"
@@ -574,10 +639,15 @@ def main():
 
     provider = get_provider(provider_name, model)
 
+    # One consistent "now" for the whole wake — used in the prompt context
+    # shown to the model, the journal header, and the filename, so they
+    # can't drift out of sync with each other.
+    now = now_local()
+
     # Pass 1: reflect, before doing or writing anything.
     try:
         reflection = provider.generate(
-            build_reflection_prompt(),
+            build_reflection_prompt(now),
             "Write your reflection now, in plain prose. This is not the "
             "journal entry — just your honest synthesis before acting.",
         )
@@ -601,20 +671,20 @@ def main():
 
     try:
         output = provider.generate(
-            build_journal_prompt(reflection, config.get("enable_pull_requests", False)),
+            build_journal_prompt(reflection, now, config.get("enable_pull_requests", False)),
             user_prompt,
         )
     except Exception as e:
         write_failure_record(provider_name, "journal", e, reflection=reflection)
         return 1
 
-    # Apply any identity.md / commitments.json self-edits the model
-    # included in its output, then append the outcome (applied/rejected)
-    # to the journal text so it's part of the permanent record.
+    # Apply any identity.md / commitments.json / blog.html self-edits the
+    # model included in its output, then append the outcome
+    # (applied/rejected) to the journal text so it's part of the record.
     self_edit_notes = apply_self_edits(output, config)
     output_with_notes = output + self_edit_notes
 
-    path = write_journal_entry(reflection, output_with_notes, provider_name)
+    path = write_journal_entry(now, reflection, output_with_notes, provider_name)
 
     print(f"Wake complete. Journal entry written: {path}")
     if self_edit_notes:
