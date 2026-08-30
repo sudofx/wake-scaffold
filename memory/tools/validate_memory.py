@@ -1,65 +1,76 @@
-#!/usr/bin/env python3
-"""
-Workspace and Memory Validator
-Checks JSON schemas, required file presence, and formatting constraints to prevent state drift and corrupt memory structures.
-"""
-
-import json
 import os
 import sys
+import json
 
-REQUIRED_FILES = [
+REQUIRED_MARKDOWN_FILES = [
     "identity.md",
     "rules.md",
+    "index.md",
+    "failure_modes.md"
 ]
 
-OPTIONAL_JSON_FILES = [
-    "growth_plan.json",
+JSON_FILES_TO_CHECK = [
     "commitments.json",
-    "core_memories.json"
+    "growth_plan.json",
+    "core_memories.json",
+    "journal_index.json"
 ]
 
-def check_file_exists(filepath):
-    return os.path.exists(filepath)
+def check_file_exists_and_nonempty(path):
+    if not os.path.exists(path):
+        return False, f"Missing file: {path}"
+    if os.path.getsize(path) == 0:
+        return False, f"Empty file: {path}"
+    return True, f"OK: {path}"
 
-def validate_json_file(filepath):
-    if not os.path.exists(filepath):
-        return True, "File not present (pending creation)"
+def validate_json(path):
+    if not os.path.exists(path):
+        return True, f"Optional/Missing JSON skipped: {path}"
     try:
-        with open(filepath, 'r', encoding='utf-8') as f:
+        with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
-        return True, f"Valid JSON syntax ({type(data).__name__})"
+        return True, f"Valid JSON: {path} ({type(data).__name__})"
     except Exception as e:
-        return False, f"JSON parse error: {str(e)}"
+        return False, f"Invalid JSON in {path}: {e}"
 
-def run_checks():
-    print("=== Workspace Memory & Structure Integrity Check ===")
-    all_passed = True
+def main():
+    target_dir = sys.argv[1] if len(sys.argv) > 1 else "memory"
+    if not os.path.exists(target_dir) and os.path.exists("identity.md"):
+        target_dir = "."
 
-    # 1. Required core files
-    for rfile in REQUIRED_FILES:
-        if check_file_exists(rfile):
-            print(f"[PASS] Required file present: {rfile}")
+    print("--- Memory Integrity Validator ---")
+    print(f"Target directory: {os.path.abspath(target_dir)}")
+
+    errors = []
+    successes = []
+
+    for md_file in REQUIRED_MARKDOWN_FILES:
+        path = os.path.join(target_dir, md_file)
+        ok, msg = check_file_exists_and_nonempty(path)
+        if ok:
+            successes.append(msg)
         else:
-            print(f"[FAIL] Missing required file: {rfile}")
-            all_passed = False
+            errors.append(msg)
 
-    # 2. JSON Integrity
-    for jfile in OPTIONAL_JSON_FILES:
-        valid, msg = validate_json_file(jfile)
-        if valid:
-            print(f"[PASS] Schema check for {jfile}: {msg}")
+    for j_file in JSON_FILES_TO_CHECK:
+        path = os.path.join(target_dir, j_file)
+        ok, msg = validate_json(path)
+        if ok:
+            successes.append(msg)
         else:
-            print(f"[FAIL] Schema check for {jfile}: {msg}")
-            all_passed = False
+            errors.append(msg)
 
-    print("====================================================")
-    if all_passed:
-        print("SUMMARY: Integrity verification successful.")
-        sys.exit(0)
-    else:
-        print("SUMMARY: Integrity verification failed.")
+    print("\n[PASSED CHECKS]")
+    for s in successes:
+        print(f" - {s}")
+
+    if errors:
+        print("\n[FAILED CHECKS]")
+        for e in errors:
+            print(f" - {e}")
         sys.exit(1)
+    else:
+        print("\nAll memory integrity checks passed successfully.")
 
 if __name__ == "__main__":
-    run_checks()
+    main()

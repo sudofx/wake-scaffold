@@ -1,0 +1,16 @@
+{
+  "runs": [
+    {
+      "when": "Aug 30th, 2026 11:33am",
+      "filename": "validate_memory.py",
+      "args": [
+        "memory"
+      ],
+      "exit_code": 0,
+      "stdout": "--- Memory Integrity Validator ---\nTarget directory: /home/runner/work/wake-scaffold/wake-scaffold/memory\n\n[PASSED CHECKS]\n - OK: memory/identity.md\n - OK: memory/rules.md\n - OK: memory/index.md\n - OK: memory/failure_modes.md\n - Valid JSON: memory/commitments.json (dict)\n - Valid JSON: memory/growth_plan.json (dict)\n - Valid JSON: memory/core_memories.json (dict)\n - Optional/Missing JSON skipped: memory/journal_index.json\n\nAll memory integrity checks passed successfully.\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-08-30-113309.md"
+    }
+  ]
+}
