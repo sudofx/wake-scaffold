@@ -18,8 +18,8 @@ timezone: America/Los_Angeles
 # proposing a full-file change to rules.md or index.md (in addition to
 # the normal journal-text proposal), instead of only writing about it
 # in prose. Requires two things set up in the GitHub repo before it'll
-# work: GITHUB_TOKEN passed to the wake step in the workflow file (this
-# is a built-in secret you don't need to create), and, in this repo's
+# work: the included workflow must pass GitHub's built-in GITHUB_TOKEN to
+# the wake step (you don't need to create a secret), and, in this repo's
 # Settings > Actions > General > Workflow permissions, "Read and write
 # permissions" plus "Allow GitHub Actions to create and approve pull
 # requests" both checked. If those aren't set, this fails gracefully

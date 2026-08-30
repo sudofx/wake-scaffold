@@ -265,6 +265,15 @@ def extract_block(text: str, tag: str) -> str | None:
 MAX_FIELD_LEN = 2000
 MAX_ADDS_PER_WAKE = 5
 ALLOWED_STATUSES = {"open", "in_progress", "blocked", "closed"}
+# A closed commitment is final. A blocked commitment may resume once work can
+# continue, but no transition reopens a completed item or moves active work
+# back to its unstarted state.
+ALLOWED_STATUS_TRANSITIONS = {
+    "open": {"in_progress", "blocked", "closed"},
+    "in_progress": {"blocked", "closed"},
+    "blocked": {"in_progress", "closed"},
+    "closed": set(),
+}
 
 
 def apply_identity_update(raw_json: str) -> list[str]:
@@ -412,6 +421,13 @@ def apply_commitments_update(raw_json: str) -> list[str]:
         match = next((c for c in commitments if c.get("id") == cid), None)
         if not match:
             notes.append(f"SKIPPED status_change: id {cid!r} not found.")
+            continue
+        current_status = match.get("status")
+        if new_status not in ALLOWED_STATUS_TRANSITIONS.get(current_status, set()):
+            notes.append(
+                f"SKIPPED status_change for {cid!r}: {current_status!r} -> "
+                f"{new_status!r} is not a forward status transition."
+            )
             continue
         match["status"] = new_status
         match.setdefault("status_history", []).append(
@@ -613,8 +629,12 @@ def load_blog_posts() -> dict:
         return {"posts": []}
     try:
         return json.loads(path.read_text())
-    except json.JSONDecodeError:
-        return {"posts": []}  # corrupted -> treat as empty rather than crash
+    except json.JSONDecodeError as e:
+        # Never treat corruption as an empty source of truth: the next append
+        # would overwrite every existing post with a new one-item list.
+        raise ValueError(
+            f"blog_posts.json is corrupted; repair it before adding posts ({e})."
+        ) from e
 
 
 def render_blog_html(data: dict) -> str:
@@ -674,7 +694,10 @@ def apply_blog_post(raw_json: str, now: datetime, journal_fname: str) -> list[st
                 "content (e.g. <p> tags), not a full page — no <html> or "
                 "<!DOCTYPE>. No post added."]
 
-    data = load_blog_posts()
+    try:
+        data = load_blog_posts()
+    except ValueError as e:
+        return [f"REJECTED blog-post: {e} No post added."]
     stamp = filename_stamp(now)
     post = {
         "id": f"post-{stamp}",
@@ -700,12 +723,21 @@ def load_core_memories() -> dict:
         return {"memories": []}
     try:
         return json.loads(path.read_text())
-    except json.JSONDecodeError:
-        return {"memories": []}
+    except json.JSONDecodeError as e:
+        # As with blog posts, an append after silently substituting an empty
+        # collection would erase the existing append-only history.
+        raise ValueError(
+            f"core_memories.json is corrupted; repair it before adding memories ({e})."
+        ) from e
 
 
 def format_core_memories_for_prompt() -> str:
-    data = load_core_memories()
+    try:
+        data = load_core_memories()
+    except ValueError as e:
+        # Surface the problem to the model without allowing a later write to
+        # discard the unreadable source file.
+        return f"[{e}]"
     memories = data.get("memories", [])
     if not memories:
         return "None recorded yet."
@@ -744,7 +776,10 @@ def apply_core_memory_add(raw_json: str, now: datetime, journal_fname: str) -> l
         return [f"REJECTED core-memory-add: 'weight' must be low/medium/high, "
                 f"got {weight!r}. Nothing added."]
 
-    data = load_core_memories()
+    try:
+        data = load_core_memories()
+    except ValueError as e:
+        return [f"REJECTED core-memory-add: {e} Nothing added."]
     memories = data.setdefault("memories", [])
     if len(memories) >= MAX_CORE_MEMORIES:
         return [f"REJECTED core-memory-add: already at the cap of "
@@ -846,7 +881,12 @@ def write_journal_entry(now: datetime, filename: str, reflection: str, model_out
 
 def write_failure_record(provider_name: str, stage: str, e: Exception, reflection: str = None):
     JOURNAL.mkdir(parents=True, exist_ok=True)
-    now = now_local()
+    try:
+        now = now_local()
+    except Exception:
+        # Startup can fail while parsing config.yaml or its timezone. Keep a
+        # durable failure record anyway, using the documented default zone.
+        now = datetime.now(ZoneInfo("America/Los_Angeles"))
     filename = journal_filename(now, failed=True)
     fail_path = JOURNAL / filename
     reflection_note = ""
@@ -872,11 +912,19 @@ def write_failure_record(provider_name: str, stage: str, e: Exception, reflectio
 
 
 def main():
-    config = load_config()
-    provider_name = config.get("provider", "gemini")
-    model = config.get("model")
+    provider_name = "unknown"
+    try:
+        config = load_config()
+        provider_name = config.get("provider", "gemini")
+        model = config.get("model")
+        provider = get_provider(provider_name, model)
 
-    provider = get_provider(provider_name, model)
+        # Compute the authoritative time during startup so malformed timezone
+        # configuration is captured as a durable startup failure too.
+        now = now_local()
+    except Exception as e:
+        write_failure_record(provider_name, "startup", e)
+        return 1
 
     # One consistent "now" for the whole wake — used in the prompt context
     # shown to the model, the journal header, and the filename, so they
@@ -884,7 +932,6 @@ def main():
     # also computed once here (not inside write_journal_entry) so that
     # any blog post or core memory added during this wake can correctly
     # link back to the exact file this entry will be saved as.
-    now = now_local()
     journal_fname = journal_filename(now, failed=False)
 
     # Pass 1: reflect, before doing or writing anything.

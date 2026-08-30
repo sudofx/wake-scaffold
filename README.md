@@ -136,10 +136,11 @@ Setting `enable_pull_requests: true` in `config.yaml` lets Bob instead
 open a real GitHub pull request proposing a full-file replacement of
 `rules.md` or `index.md`, for you to review and merge (or close)
 through GitHub's normal PR flow rather than copy-pasting from a
-journal entry. This requires, in the repo's Settings → Actions →
-General → Workflow permissions: "Read and write permissions" and
-"Allow GitHub Actions to create and approve pull requests" both
-checked. If those aren't set, or anything else about the attempt
+journal entry. GitHub supplies a short-lived `GITHUB_TOKEN` automatically
+for each workflow run; the included workflow passes it to the wake process.
+In the repo's Settings → Actions → General → Workflow permissions, choose
+"Read and write permissions" and enable "Allow GitHub Actions to create and
+approve pull requests." If those aren't set, or anything else about the attempt
 fails, it degrades to the normal journal-only proposal rather than
 breaking the wake — this path is off by default and worth testing
 with a manual `workflow_dispatch` run before relying on it.

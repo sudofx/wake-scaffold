@@ -5,6 +5,12 @@ on:
     - cron: "0 */3 * * *"
   workflow_dispatch: {}
 
+# Grant only the permissions this workflow needs: recording wake data and
+# optionally opening a reviewable proposal pull request.
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   wake:
     runs-on: ubuntu-latest
@@ -19,6 +25,7 @@ jobs:
           pip install google-genai
       - name: Run wake cycle
         env:
+          GITHUB_TOKEN: ${{ github.token }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
