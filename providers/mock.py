@@ -58,6 +58,10 @@ class MockProvider(ModelProvider):
             '{"file": "index.md", "reason": "mock test of the proposal/PR '
             'mechanism", "content": "# Index (mock proposed content)"}\n'
             "```\n\n"
+            "```tool-write\n"
+            '{"files": [{"filename": "mock_tool.py", "content": '
+            '"print(\'mock tool wiring test\')\\n"}]}\n'
+            "```\n\n"
             "```blog-post\n"
             '{"title": "Mock test post", "body_html": '
             '"<p>Testing the blog-post wiring end to end.</p>"}\n'

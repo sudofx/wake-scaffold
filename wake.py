@@ -333,6 +333,25 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         "Use this for real projects, not preferences or writing-style reminders. "
         "A project should produce a durable artifact, an evaluated experiment, "
         "or a reviewable proposal that expands what you can do next time.\n\n"
+        "**To actually create or update a tool file** (previously you could "
+        "only describe code in prose, which was never saved anywhere but "
+        "the journal — this is the fix for that), include a fenced block:\n"
+        "```tool-write\n"
+        '{"files": [{"filename": "validate_memory.py", "content": '
+        '"...full file contents..."}]}\n'
+        "```\n"
+        "Writes into a sandboxed tools/ folder inside your own memory — "
+        "plain filenames only (letters, numbers, '_', '-', '.'), no "
+        "subfolders, no path separators, must end in .py/.md/.txt/.json. "
+        "Up to 3 files per wake, each capped at 20,000 bytes; writing to an "
+        "existing filename overwrites it (real iterative development, not "
+        "append-only like the journal). IMPORTANT: writing a file does NOT "
+        "run it — you have no code-execution ability in this loop. Treat a "
+        "tool as 'implemented' the wake you write it, and only claim it "
+        "'works' once a human (or a later capability) has actually run it "
+        "and reported evidence back in a journal entry. A plain, untagged "
+        "code fence in your prose is never saved to disk — only this exact "
+        "block is.\n\n"
         "**To record a core memory** — a rare, genuinely formative "
         "lesson, not a routine observation — include a fenced block:\n"
         "```core-memory-add\n"
@@ -907,6 +926,90 @@ def apply_growth_plan_update(raw_json: str, now: datetime) -> list[str]:
     return notes or ["No valid operations present in growth-plan-update block."]
 
 
+MAX_TOOL_FILES_PER_WAKE = 3
+MAX_TOOL_FILE_BYTES = 20000
+MAX_TOTAL_TOOL_FILES = 100
+ALLOWED_TOOL_EXTENSIONS = {".py", ".md", ".txt", ".json"}
+TOOLS_DIR = MEMORY / "tools"
+
+
+def safe_tool_filename(name) -> str | None:
+    """Plain filename only: no path separators, no '..', no leading dot,
+    must end in an allowed extension. Returns None if unsafe."""
+    name = str(name).strip()
+    if not name or "/" in name or "\\" in name or ".." in name or name.startswith("."):
+        return None
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,119}", name):
+        return None
+    if Path(name).suffix.lower() not in ALLOWED_TOOL_EXTENSIONS:
+        return None
+    return name
+
+
+def apply_tool_write(raw_json: str, now: datetime, journal_fname: str) -> list[str]:
+    """
+    Writes actual files into a sandboxed memory/tools/ directory — this
+    is the mechanism that turns 'I wrote tools/x.py' in the journal
+    prose into a real file on disk. Before this existed, a model could
+    describe writing a tool inside a plain (untagged) code fence in its
+    journal text, and nothing would ever apply it: the journal is the
+    only thing that was ever saved. Writing a file here does NOT execute
+    it — there is no code-execution capability in this loop, so a tool
+    should be treated as implemented-and-reviewable, not tested, until
+    a human (or a future capability) actually runs it and evidence of
+    that comes back in a later journal entry.
+    """
+    try:
+        data_in = json.loads(raw_json)
+    except json.JSONDecodeError as e:
+        return [f"REJECTED tool-write: not valid JSON ({e}). No files written."]
+    if not isinstance(data_in, dict):
+        return ["REJECTED tool-write: must be a JSON object. No files written."]
+    files = data_in.get("files")
+    if not isinstance(files, list) or not files:
+        return ["REJECTED tool-write: 'files' must be a non-empty list. No files written."]
+
+    TOOLS_DIR.mkdir(parents=True, exist_ok=True)
+    existing_count = sum(1 for _ in TOOLS_DIR.glob("*") if _.is_file())
+    notes = []
+    written = 0
+    for entry in files[:MAX_TOOL_FILES_PER_WAKE]:
+        if not isinstance(entry, dict):
+            notes.append("SKIPPED tool file: entry must be an object.")
+            continue
+        raw_name = entry.get("filename", "")
+        filename = safe_tool_filename(raw_name)
+        content = str(entry.get("content", ""))
+        if filename is None:
+            notes.append(
+                f"SKIPPED tool file {raw_name!r}: invalid name (plain filename "
+                f"only, no path separators or '..', must end in "
+                f"{sorted(ALLOWED_TOOL_EXTENSIONS)})."
+            )
+            continue
+        if not content.strip():
+            notes.append(f"SKIPPED tool file {filename!r}: empty content.")
+            continue
+        if len(content.encode("utf-8")) > MAX_TOOL_FILE_BYTES:
+            notes.append(f"SKIPPED tool file {filename!r}: exceeds {MAX_TOOL_FILE_BYTES}-byte cap.")
+            continue
+        target = TOOLS_DIR / filename
+        is_new = not target.exists()
+        if is_new and existing_count + written >= MAX_TOTAL_TOOL_FILES:
+            notes.append(f"SKIPPED tool file {filename!r}: total tools cap of {MAX_TOTAL_TOOL_FILES} reached.")
+            continue
+        target.write_text(content)
+        written += 1
+        verb = "WROTE" if is_new else "OVERWROTE"
+        notes.append(
+            f"{verb} tools/{filename} ({len(content)} chars) this wake "
+            f"({journal_fname}) — not executed automatically; not verified as working."
+        )
+    if not notes:
+        notes.append("No valid files present in tool-write block.")
+    return notes
+
+
 MAX_CORE_MEMORIES = 20
 
 
@@ -1021,6 +1124,10 @@ def apply_self_edits(model_output: str, config: dict, now: datetime, journal_fna
     growth_block = extract_block(model_output, "growth-plan-update")
     if growth_block is not None:
         all_notes.extend(apply_growth_plan_update(growth_block, now))
+
+    tool_block = extract_block(model_output, "tool-write")
+    if tool_block is not None:
+        all_notes.extend(apply_tool_write(tool_block, now, journal_fname))
 
     core_memory_block = extract_block(model_output, "core-memory-add")
     if core_memory_block is not None:
