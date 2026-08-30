@@ -81,3 +81,39 @@ TOOL RUN HISTORY as evidence.
 **Status:** mitigated — still relies on the agent choosing to follow the
 instruction rather than a hard mechanical block on premature "complete"
 claims; revisit if this recurs a third time.
+
+---
+
+### Mode 3: Blog post treated as optional, so it silently never fired
+**Discovered:** Aug 30th, 2026, session 2026-08-30-113309
+**What happened:** Across every real wake so far (this identity's, not
+just `bob_v1`'s), no blog post was ever written, even in the wake that
+successfully wrote and ran a real tool. Nothing was broken — the
+`blog-post` mechanism itself worked fine when tested directly. The
+agent was simply following the rules and prompt as originally written:
+`rules.md` said a post was optional and should only happen after
+"a concrete result worth sharing," and the prompt echoed that. The
+agent's own judgment about what counted as "worth sharing" never
+crossed that bar, wake after wake.
+**Why it happened:** The policy itself, not a code defect: "optional,
+gated on the agent's own judgment of significance" is a policy that
+predictably converges on silence for a cautious, evidence-conservative
+agent — which is exactly the posture the rest of `rules.md` deliberately
+cultivates. The two goals were in tension and the cautious one won by
+default.
+**Fix:** Changed `rules.md` to require a blog post every wake, written
+in the agent's own developing voice (explicitly distinct from the
+literal journal register), reporting exactly what happened without
+inflating it. Backed this with a mechanical safety net in
+`apply_self_edits`: if a wake's model output has no `blog-post` block,
+a plain, honest fallback post is auto-composed from that wake's own
+actual self-edit notes (no invention) and published anyway, with a
+visible `WARNING` in the system note so a missed post is never silent.
+Also added a same-shape mechanical warning (not a hard block) when a
+wake includes no `tool-write` or `tool-run` at all, since `rules.md` now
+requires hands-on tool work every wake too.
+**Status:** mitigated — the fallback guarantees a post appears every
+wake even in the worst case; the open question is whether the agent
+reliably writes its own genuine post instead of leaning on the fallback,
+which should show up in `blog_posts.json` titles ("Wake notes — ..." is
+the fallback's signature) if it doesn't.

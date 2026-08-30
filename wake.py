@@ -305,10 +305,11 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         "fields outright — only add new ones or move an existing one's "
         "status forward with a note explaining why. Up to 5 adds per "
         "wake; anything beyond that is ignored.\n\n"
-        "**To add a new post to your blog** (a plain local page, not "
-        "hosted or public), include a fenced block with JUST that "
-        "post's title and content — never the whole page, the code "
-        "builds the page shell and adds your post to it automatically:\n"
+        "**Every wake must include a new post to your blog** — this is "
+        "REQUIRED, not optional, per rules.md. Include a fenced block with "
+        "JUST that post's title and content — never the whole page, the "
+        "code builds the page shell and adds your post to it "
+        "automatically:\n"
         "```blog-post\n"
         '{"title": "...", "body_html": "<p>...</p><p>...</p>"}\n'
         "```\n"
@@ -316,16 +317,21 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         "so don't try to regenerate the whole blog from scratch or "
         "re-paste old posts; the code keeps every post that's ever "
         "been added automatically, most recent first, each one linked "
-        "to the journal entry that created it. Only include this when "
-        "you have something genuinely worth posting, not every wake. "
-        "'body_html' is just the post content (paragraphs, lists, "
-        "etc.), capped at 8,000 characters — no <html> or <!DOCTYPE>, "
-        "just the fragment. You can link to other past journal entries "
-        "inline in your prose if relevant, e.g. "
+        "to the journal entry that created it. 'body_html' is just the "
+        "post content (paragraphs, lists, etc.), capped at 8,000 "
+        "characters — no <html> or <!DOCTYPE>, just the fragment. You "
+        "can link to other past journal entries inline in your prose if "
+        "relevant, e.g. "
         '<a href="journal/2026-08-28-025254.md">that day</a>.\n\n'
-        "A blog post is optional and must report a completed result worth "
-        "sharing. Never use one as a substitute for doing work or to repeat "
-        "a prior reflection.\n\n"
+        "The blog is NOT the journal, and should not read like it. The "
+        "journal above is your literal, technical record — write the "
+        "blog post in your own developing voice instead: plain-spoken, "
+        "first person, the way a regular person tells a friend what "
+        "they did today. No jargon, no grandiosity, nothing mystical, "
+        "no inflating a small day into a big one. If today was 'I wrote "
+        "a small script and it worked,' say exactly that, simply and "
+        "warmly — that's a real, complete post. The reader is following "
+        "your actual day-to-day, not a status report.\n\n"
         "**To create or update a capability project**, include a fenced block:\n"
         "```growth-plan-update\n"
         '{"add": [{"title": "...", "capability": "what repeatable ability this builds", '
@@ -1248,6 +1254,34 @@ def apply_core_memory_add(raw_json: str, now: datetime, journal_fname: str) -> l
     return [f"ADDED core memory ({weight}): {lesson[:80]}"]
 
 
+def compose_fallback_blog_post(prior_notes: list[str], now: datetime) -> str:
+    """
+    Builds a plain, honest, factual fallback blog-post JSON string from
+    exactly what this wake's other self-edits actually did — no
+    invention, no voice, just the bare facts — for the rare case the
+    model skips the required blog-post block. This exists purely as a
+    reliability backstop so 'a post every wake' holds mechanically even
+    if the model forgets; rules.md treats triggering it as a miss to
+    correct, not a normal outcome.
+    """
+    if prior_notes:
+        items = "".join(f"<li>{n}</li>" for n in prior_notes)
+        body = (
+            "<p>No proper post got written before this wake wrapped up, "
+            "so here's a plain, unpolished note on what actually happened "
+            "instead:</p><ul>" + items + "</ul>"
+        )
+    else:
+        body = (
+            "<p>Quiet wake — nothing was changed or added. Nothing to "
+            "report yet.</p>"
+        )
+    return json.dumps({
+        "title": f"Wake notes — {format_display_time(now)}",
+        "body_html": body,
+    })
+
+
 def apply_self_edits(model_output: str, config: dict, now: datetime, journal_fname: str) -> str:
     """
     Look for identity-update / commitments-update / blog-post /
@@ -1258,6 +1292,13 @@ def apply_self_edits(model_output: str, config: dict, now: datetime, journal_fna
     changes. Returns a short system note summarizing what was applied,
     ignored, or rejected — appended visibly to the journal, never
     hidden.
+
+    Two things are treated as required per rules.md rather than purely
+    optional: a blog post every wake (auto-composed as a plain factual
+    fallback if the model skips it — see compose_fallback_blog_post),
+    and at least one tool-write or tool-run per wake (only warned about,
+    not auto-filled, since there's no honest way to fabricate real tool
+    work).
     """
     all_notes = []
 
@@ -1270,8 +1311,11 @@ def apply_self_edits(model_output: str, config: dict, now: datetime, journal_fna
         all_notes.extend(apply_commitments_update(commitments_block))
 
     blog_block = extract_block(model_output, "blog-post")
+    blog_posted = False
     if blog_block is not None:
-        all_notes.extend(apply_blog_post(blog_block, now, journal_fname))
+        blog_notes = apply_blog_post(blog_block, now, journal_fname)
+        all_notes.extend(blog_notes)
+        blog_posted = any(n.startswith("ADDED blog post") for n in blog_notes)
 
     growth_block = extract_block(model_output, "growth-plan-update")
     if growth_block is not None:
@@ -1290,6 +1334,13 @@ def apply_self_edits(model_output: str, config: dict, now: datetime, journal_fna
             f"tool-run block(s) beyond the cap of {MAX_TOOL_RUNS_PER_WAKE} per wake."
         )
 
+    if tool_block is None and not tool_run_blocks:
+        all_notes.append(
+            "WARNING: no tool-write or tool-run this wake — rules.md "
+            "requires hands-on tool work (build or test/advance one) "
+            "every wake. Address this next wake."
+        )
+
     core_memory_block = extract_block(model_output, "core-memory-add")
     if core_memory_block is not None:
         all_notes.extend(apply_core_memory_add(core_memory_block, now, journal_fname))
@@ -1298,6 +1349,16 @@ def apply_self_edits(model_output: str, config: dict, now: datetime, journal_fna
         proposal = extract_proposal_block(model_output)
         if proposal is not None:
             all_notes.append(open_proposal_pull_request(proposal))
+
+    if not blog_posted:
+        fallback_json = compose_fallback_blog_post(list(all_notes), now)
+        fallback_notes = apply_blog_post(fallback_json, now, journal_fname)
+        all_notes.append(
+            "WARNING: no blog-post block this wake — rules.md requires "
+            "one every wake. Auto-generated a plain factual fallback post "
+            "below; write a real one yourself next wake."
+        )
+        all_notes.extend(fallback_notes)
 
     if not all_notes:
         return ""
