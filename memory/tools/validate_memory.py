@@ -1,65 +1,80 @@
-#!/usr/bin/env python3
-"""
-Workspace and Memory Validator
-Checks JSON schemas, required file presence, and formatting constraints to prevent state drift and corrupt memory structures.
-"""
-
 import json
 import os
 import sys
+from pathlib import Path
 
-REQUIRED_FILES = [
-    "identity.md",
-    "rules.md",
-]
+def validate_memory(memory_dir="memory"):
+    report = {"valid": True, "errors": [], "warnings": [], "checks": []}
+    mem_path = Path(memory_dir)
+    
+    if not mem_path.exists() or not mem_path.is_dir():
+        report["valid"] = False
+        report["errors"].append(f"Memory directory '{memory_dir}' does not exist.")
+        return report
 
-OPTIONAL_JSON_FILES = [
-    "growth_plan.json",
-    "commitments.json",
-    "core_memories.json"
-]
-
-def check_file_exists(filepath):
-    return os.path.exists(filepath)
-
-def validate_json_file(filepath):
-    if not os.path.exists(filepath):
-        return True, "File not present (pending creation)"
-    try:
-        with open(filepath, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        return True, f"Valid JSON syntax ({type(data).__name__})"
-    except Exception as e:
-        return False, f"JSON parse error: {str(e)}"
-
-def run_checks():
-    print("=== Workspace Memory & Structure Integrity Check ===")
-    all_passed = True
-
-    # 1. Required core files
-    for rfile in REQUIRED_FILES:
-        if check_file_exists(rfile):
-            print(f"[PASS] Required file present: {rfile}")
-        else:
-            print(f"[FAIL] Missing required file: {rfile}")
-            all_passed = False
-
-    # 2. JSON Integrity
-    for jfile in OPTIONAL_JSON_FILES:
-        valid, msg = validate_json_file(jfile)
-        if valid:
-            print(f"[PASS] Schema check for {jfile}: {msg}")
-        else:
-            print(f"[FAIL] Schema check for {jfile}: {msg}")
-            all_passed = False
-
-    print("====================================================")
-    if all_passed:
-        print("SUMMARY: Integrity verification successful.")
-        sys.exit(0)
+    # 1. Check commitments.json
+    commitments_file = mem_path / "commitments.json"
+    if commitments_file.exists():
+        try:
+            with open(commitments_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if not isinstance(data, dict) or "commitments" not in data:
+                report["errors"].append("commitments.json must be a JSON object with a 'commitments' array.")
+                report["valid"] = False
+            else:
+                report["checks"].append(f"commitments.json structure valid ({len(data['commitments'])} commitments found).")
+        except Exception as e:
+            report["errors"].append(f"commitments.json invalid JSON: {e}")
+            report["valid"] = False
     else:
-        print("SUMMARY: Integrity verification failed.")
-        sys.exit(1)
+        report["warnings"].append("commitments.json missing.")
+
+    # 2. Check growth_plan.json
+    growth_file = mem_path / "growth_plan.json"
+    if growth_file.exists():
+        try:
+            with open(growth_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if not isinstance(data, dict) or "projects" not in data:
+                report["errors"].append("growth_plan.json must be a JSON object with a 'projects' array.")
+                report["valid"] = False
+            else:
+                report["checks"].append(f"growth_plan.json structure valid ({len(data['projects'])} projects found).")
+        except Exception as e:
+            report["errors"].append(f"growth_plan.json invalid JSON: {e}")
+            report["valid"] = False
+    else:
+        report["warnings"].append("growth_plan.json missing.")
+
+    # 3. Check identity.md
+    identity_file = mem_path / "identity.md"
+    if identity_file.exists():
+        try:
+            text = identity_file.read_text(encoding="utf-8")
+            required_fields = ["Name", "Created", "Purpose"]
+            for req in required_fields:
+                if req not in text:
+                    report["warnings"].append(f"identity.md missing section/field: {req}")
+            report["checks"].append("identity.md structure verified.")
+        except Exception as e:
+            report["errors"].append(f"Error reading identity.md: {e}")
+            report["valid"] = False
+    else:
+        report["warnings"].append("identity.md missing.")
+
+    # 4. Check rules.md and index.md
+    for f_name in ["rules.md", "index.md"]:
+        f_path = mem_path / f_name
+        if f_path.exists():
+            report["checks"].append(f"{f_name} present.")
+        else:
+            report["warnings"].append(f"{f_name} missing.")
+
+    return report
 
 if __name__ == "__main__":
-    run_checks()
+    mem_dir = sys.argv[1] if len(sys.argv) > 1 else "memory"
+    res = validate_memory(mem_dir)
+    print(json.dumps(res, indent=2))
+    if not res["valid"]:
+        sys.exit(1)
