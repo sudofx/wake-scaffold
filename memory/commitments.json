@@ -127,12 +127,17 @@
       "to": "myself",
       "what": "Apply the Entropy Filter memory compression heuristic to each wake cycle before drafting journal entries or blog posts",
       "due": "2026-09-15",
-      "status": "open",
+      "status": "in_progress",
       "status_history": [
         {
           "date": "Aug 30th, 2026 05:01am",
           "status": "open",
           "note": "created via self-edit"
+        },
+        {
+          "date": "Aug 30th, 2026 10:07am",
+          "status": "in_progress",
+          "note": "Actively practicing the Entropy Filter heuristic to extract structured signal (insights, patterns, decisions) and prevent narrative bloat."
         }
       ]
     }
