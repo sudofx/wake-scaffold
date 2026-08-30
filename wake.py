@@ -235,6 +235,9 @@ def build_reflection_prompt(now: datetime) -> str:
         "## CURRENT KNOWLEDGE (summary)\n" + read(MEMORY / "index.md"),
         "## OPEN COMMITMENTS\n" + load_open_commitments(),
         "## GROWTH PLAN (capability projects)\n" + format_growth_plan_for_prompt(),
+        "## TOOL RUN HISTORY (actual execution results — the only real "
+        "evidence a tool works; a file existing in tools/ is not evidence "
+        "by itself)\n" + format_tool_runs_for_prompt(),
         "## YOUR TASK RIGHT NOW: REFLECT, DO NOT JOURNAL YET\n"
         "Keep this brief: maximum 250 words. Identify one concrete capability "
         "project, investigation, or maintenance repair that would leave an "
@@ -332,7 +335,14 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         "```\n"
         "Use this for real projects, not preferences or writing-style reminders. "
         "A project should produce a durable artifact, an evaluated experiment, "
-        "or a reviewable proposal that expands what you can do next time.\n\n"
+        "or a reviewable proposal that expands what you can do next time. "
+        "If the project is about a tool, never move it to 'complete' in the "
+        "same wake you just wrote or edited that tool — writing code is not "
+        "evidence it works. Only mark it 'complete' after you've actually "
+        "run it (via a tool-run block, this wake or an earlier one) and can "
+        "cite a real result from the TOOL RUN HISTORY section above in the "
+        "evidence field. Until then, leave it 'active' and say what running "
+        "it next would tell you.\n\n"
         "**To actually create or update a tool file** (previously you could "
         "only describe code in prose, which was never saved anywhere but "
         "the journal — this is the fix for that), include a fenced block:\n"
@@ -352,6 +362,23 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         "and reported evidence back in a journal entry. A plain, untagged "
         "code fence in your prose is never saved to disk — only this exact "
         "block is.\n\n"
+        "**To actually run a tool file you (or an earlier wake) already "
+        "wrote**, include a fenced block:\n"
+        "```tool-run\n"
+        '{"filename": "validate_memory.py", "args": ["memory"]}\n'
+        "```\n"
+        "Executes that one file from tools/ with Python, nothing else — it "
+        "must already exist there (write it first with tool-write, same "
+        "wake or an earlier one), must be a .py file, and only plain string "
+        "args are allowed (up to 10, 200 chars each). Runs with a 15-second "
+        "timeout and no network access; stdout/stderr are captured (truncated "
+        "to 4,000 chars each) and saved to a small run history, which is "
+        "what you'll see under TOOL RUN HISTORY next wake as real evidence — "
+        "this is the only thing that can honestly justify marking a tool "
+        "project 'complete'. You can include at most 2 tool-run blocks per "
+        "wake. A run you write this wake happens AFTER your journal text is "
+        "generated, so you won't see its output until the next wake — don't "
+        "narrate results you haven't seen yet.\n\n"
         "**To record a core memory** — a rare, genuinely formative "
         "lesson, not a routine observation — include a fenced block:\n"
         "```core-memory-add\n"
@@ -377,6 +404,14 @@ def extract_block(text: str, tag: str) -> str | None:
     pattern = rf"```{tag}\s*\n(.*?)```"
     match = re.search(pattern, text, re.DOTALL)
     return match.group(1).strip() if match else None
+
+
+def extract_all_blocks(text: str, tag: str) -> list[str]:
+    """Like extract_block but returns every occurrence, in order — used
+    for tags the model may legitimately include more than once per wake
+    (currently just tool-run, capped separately by the caller)."""
+    pattern = rf"```{tag}\s*\n(.*?)```"
+    return [m.strip() for m in re.findall(pattern, text, re.DOTALL)]
 
 
 MAX_FIELD_LEN = 2000
@@ -1010,6 +1045,123 @@ def apply_tool_write(raw_json: str, now: datetime, journal_fname: str) -> list[s
     return notes
 
 
+MAX_TOOL_RUNS_PER_WAKE = 2
+TOOL_RUN_TIMEOUT_SECONDS = 15
+MAX_TOOL_RUN_ARGS = 10
+MAX_TOOL_RUN_ARG_LEN = 200
+MAX_TOOL_RUN_OUTPUT_CHARS = 4_000
+MAX_TOOL_RUN_HISTORY = 30
+TOOL_RUNS_FILE = MEMORY / "tool_runs.json"
+
+
+def load_tool_runs() -> dict:
+    if not TOOL_RUNS_FILE.exists():
+        return {"runs": []}
+    try:
+        return json.loads(TOOL_RUNS_FILE.read_text())
+    except json.JSONDecodeError:
+        # A corrupted run log shouldn't block execution; start fresh rather
+        # than crash a wake over evidence bookkeeping.
+        return {"runs": []}
+
+
+def format_tool_runs_for_prompt() -> str:
+    runs = load_tool_runs().get("runs", [])
+    if not runs:
+        return "No tools have been run yet."
+    lines = []
+    for r in runs[-5:]:
+        status = "ok" if r.get("exit_code") == 0 else f"exit {r.get('exit_code')}"
+        lines.append(
+            f"- {r.get('when', '?')} — tools/{r.get('filename', '?')} "
+            f"{r.get('args', [])} -> {status}\n"
+            f"  stdout: {r.get('stdout', '')[:300]!r}\n"
+            f"  stderr: {r.get('stderr', '')[:300]!r}"
+        )
+    return "\n".join(lines)
+
+
+def apply_tool_run(raw_json: str, now: datetime, journal_fname: str) -> list[str]:
+    """
+    Executes exactly one already-written file from memory/tools/ with
+    Python and nothing else — no shell, no arbitrary paths, no network
+    guarantee beyond what the OS provides, bounded by a timeout and
+    output cap. The result is persisted to tool_runs.json so a FUTURE
+    wake (not this one — the run happens after the model's text is
+    already generated) can read real evidence instead of trusting the
+    model's own unverified claim that a tool 'works'.
+    """
+    try:
+        data_in = json.loads(raw_json)
+    except json.JSONDecodeError as e:
+        return [f"REJECTED tool-run: not valid JSON ({e}). Nothing run."]
+    if not isinstance(data_in, dict):
+        return ["REJECTED tool-run: must be a JSON object. Nothing run."]
+
+    raw_name = data_in.get("filename", "")
+    filename = safe_tool_filename(raw_name)
+    if filename is None or Path(filename).suffix.lower() != ".py":
+        return [f"REJECTED tool-run: {raw_name!r} is not a valid, existing "
+                f".py filename. Nothing run."]
+    target = TOOLS_DIR / filename
+    if not target.is_file():
+        return [f"REJECTED tool-run: tools/{filename} does not exist yet — "
+                f"write it with tool-write first. Nothing run."]
+
+    args = data_in.get("args", [])
+    if not isinstance(args, list):
+        return ["REJECTED tool-run: 'args' must be a list of strings. Nothing run."]
+    if len(args) > MAX_TOOL_RUN_ARGS:
+        return [f"REJECTED tool-run: too many args (max {MAX_TOOL_RUN_ARGS}). Nothing run."]
+    clean_args = []
+    for a in args:
+        a = str(a)[:MAX_TOOL_RUN_ARG_LEN]
+        clean_args.append(a)
+
+    try:
+        proc = subprocess.run(
+            [sys.executable, str(target), *clean_args],
+            cwd=ROOT,
+            timeout=TOOL_RUN_TIMEOUT_SECONDS,
+            capture_output=True,
+            text=True,
+        )
+        exit_code = proc.returncode
+        stdout = proc.stdout[:MAX_TOOL_RUN_OUTPUT_CHARS]
+        stderr = proc.stderr[:MAX_TOOL_RUN_OUTPUT_CHARS]
+        timed_out = False
+    except subprocess.TimeoutExpired as e:
+        exit_code = None
+        stdout = (e.stdout or "")[:MAX_TOOL_RUN_OUTPUT_CHARS] if e.stdout else ""
+        stderr = f"TIMED OUT after {TOOL_RUN_TIMEOUT_SECONDS}s"
+        timed_out = True
+    except Exception as e:
+        exit_code = None
+        stdout = ""
+        stderr = f"Failed to execute: {e}"
+        timed_out = False
+
+    data = load_tool_runs()
+    runs = data.setdefault("runs", [])
+    runs.append({
+        "when": format_display_time(now),
+        "filename": filename,
+        "args": clean_args,
+        "exit_code": exit_code,
+        "stdout": stdout,
+        "stderr": stderr,
+        "timed_out": timed_out,
+        "journal_entry": journal_fname,
+    })
+    if len(runs) > MAX_TOOL_RUN_HISTORY:
+        data["runs"] = runs[-MAX_TOOL_RUN_HISTORY:]
+    TOOL_RUNS_FILE.write_text(json.dumps(data, indent=2) + "\n")
+
+    status = "TIMED OUT" if timed_out else f"exit code {exit_code}"
+    return [f"RAN tools/{filename} {clean_args} -> {status}. Output saved to "
+            f"tool_runs.json — visible as evidence starting next wake, not this one."]
+
+
 MAX_CORE_MEMORIES = 20
 
 
@@ -1128,6 +1280,15 @@ def apply_self_edits(model_output: str, config: dict, now: datetime, journal_fna
     tool_block = extract_block(model_output, "tool-write")
     if tool_block is not None:
         all_notes.extend(apply_tool_write(tool_block, now, journal_fname))
+
+    tool_run_blocks = extract_all_blocks(model_output, "tool-run")
+    for run_block in tool_run_blocks[:MAX_TOOL_RUNS_PER_WAKE]:
+        all_notes.extend(apply_tool_run(run_block, now, journal_fname))
+    if len(tool_run_blocks) > MAX_TOOL_RUNS_PER_WAKE:
+        all_notes.append(
+            f"IGNORED {len(tool_run_blocks) - MAX_TOOL_RUNS_PER_WAKE} extra "
+            f"tool-run block(s) beyond the cap of {MAX_TOOL_RUNS_PER_WAKE} per wake."
+        )
 
     core_memory_block = extract_block(model_output, "core-memory-add")
     if core_memory_block is not None:

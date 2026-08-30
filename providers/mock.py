@@ -62,6 +62,9 @@ class MockProvider(ModelProvider):
             '{"files": [{"filename": "mock_tool.py", "content": '
             '"print(\'mock tool wiring test\')\\n"}]}\n'
             "```\n\n"
+            "```tool-run\n"
+            '{"filename": "mock_tool.py", "args": []}\n'
+            "```\n\n"
             "```blog-post\n"
             '{"title": "Mock test post", "body_html": '
             '"<p>Testing the blog-post wiring end to end.</p>"}\n'

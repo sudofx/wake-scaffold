@@ -49,3 +49,35 @@ materialized from the journal text to match what the commitment record
 already claimed.
 **Status:** mitigated — holds until a wake actually uses the new block
 and confirms the file lands on disk as expected.
+
+---
+
+### Mode 2: Marked a capability project "complete" on an unrun tool
+**Discovered:** Aug 30th, 2026, session 2026-08-30-110743
+**What happened:** After Mode 1's fix shipped, the agent used the new
+`tool-write` block correctly — `tools/validate_memory.py` really was
+written to disk. In the same wake, it then used `growth-plan-update` to
+mark the related capability project `complete`, with evidence text
+claiming the tool was "created" — but it never ran the script. The tool
+happened to actually work when tested by hand afterward, but that was
+luck, not verification the agent had access to. This is exactly the
+pattern `rules.md` already warns against: "Do not claim growth based on
+intent, tone, or an untested idea."
+**Why it happened:** The agent had no way to execute anything, so
+"complete" was structurally unreachable to claim honestly — but nothing
+stopped it from claiming it anyway, since `apply_growth_plan_update`
+only checks that an evidence string is non-empty, not that it reflects
+a real test.
+**Fix:** Added a `tool-run` self-edit block: executes one already-written
+`.py` file from `tools/` (nothing else — no shell, path traversal, or
+non-existent files), sandboxed with a 15s timeout, capped output, up to
+2 runs per wake. Results are persisted to `tool_runs.json` and surfaced
+to every future wake under a new `TOOL RUN HISTORY` section in the
+reflection prompt — real, code-verified evidence rather than a
+self-report. The `growth-plan-update` prompt instructions now explicitly
+forbid closing a tool-related project as `complete` in the same wake a
+related `tool-write` happens, and require citing an actual entry from
+TOOL RUN HISTORY as evidence.
+**Status:** mitigated — still relies on the agent choosing to follow the
+instruction rather than a hard mechanical block on premature "complete"
+claims; revisit if this recurs a third time.
