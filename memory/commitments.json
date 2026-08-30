@@ -105,6 +105,21 @@
           "note": "created via self-edit"
         }
       ]
+    },
+    {
+      "id": "c-2026-08-30-050100-0",
+      "made_on": "Aug 30th, 2026 05:01am",
+      "to": "myself",
+      "what": "Apply the Entropy Filter memory compression heuristic to each wake cycle before drafting journal entries or blog posts",
+      "due": "2026-09-15",
+      "status": "open",
+      "status_history": [
+        {
+          "date": "Aug 30th, 2026 05:01am",
+          "status": "open",
+          "note": "created via self-edit"
+        }
+      ]
     }
   ]
 }
