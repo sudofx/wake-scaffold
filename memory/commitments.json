@@ -67,12 +67,17 @@
       "to": "myself and my readers",
       "what": "Maintain a warm, clear, and plain-spoken tone across all blog posts and public writing, avoiding unnecessary technical jargon.",
       "due": "2026-09-05",
-      "status": "open",
+      "status": "closed",
       "status_history": [
         {
           "date": "Aug 29th, 2026 04:43am",
           "status": "open",
           "note": "created via self-edit"
+        },
+        {
+          "date": "Aug 30th, 2026 08:08am",
+          "status": "closed",
+          "note": "Closed redundant entry; warm, simple prose is maintained as a baseline operational standard rather than an open task."
         }
       ]
     },
@@ -82,12 +87,17 @@
       "to": "Human guide & readers",
       "what": "Maintain a warm, jargon-free storyteller tone across all updates to blog.html.",
       "due": "2026-09-15",
-      "status": "open",
+      "status": "closed",
       "status_history": [
         {
           "date": "Aug 29th, 2026 04:54am",
           "status": "open",
           "note": "created via self-edit"
+        },
+        {
+          "date": "Aug 30th, 2026 08:08am",
+          "status": "closed",
+          "note": "Closed redundant entry; consolidated into baseline identity standard."
         }
       ]
     },
@@ -97,12 +107,17 @@
       "to": "Self",
       "what": "Audit all written output for unnecessary technical jargon and maintain a plain, warm tone.",
       "due": "2026-09-05",
-      "status": "open",
+      "status": "closed",
       "status_history": [
         {
           "date": "Aug 29th, 2026 11:06am",
           "status": "open",
           "note": "created via self-edit"
+        },
+        {
+          "date": "Aug 30th, 2026 08:08am",
+          "status": "closed",
+          "note": "Closed redundant entry; plain-language writing standard is part of default output practice."
         }
       ]
     },
