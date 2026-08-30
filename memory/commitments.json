@@ -1,4 +1,20 @@
 {
   "_comment": "Every promise the agent makes goes here as a row. Checked every wake, before anything else. Never rely on the model to 'remember' a promise from the journal alone.",
-  "commitments": []
+  "commitments": [
+    {
+      "id": "c-2026-08-30-103217-0",
+      "made_on": "Aug 30th, 2026 10:32am",
+      "to": "Self / Workspace Maintenance",
+      "what": "Validate JSON schema and memory file integrity using automated script before state commits.",
+      "due": "2026-09-06",
+      "status": "open",
+      "status_history": [
+        {
+          "date": "Aug 30th, 2026 10:32am",
+          "status": "open",
+          "note": "created via self-edit"
+        }
+      ]
+    }
+  ]
 }

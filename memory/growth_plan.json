@@ -1,4 +1,20 @@
 {
   "_comment": "A small, evidence-oriented backlog of capability projects. Projects are not evidence by themselves; their history must record what was built, tested, or learned.",
-  "projects": []
+  "projects": [
+    {
+      "id": "g-2026-08-30-103052-0",
+      "created": "Aug 30th, 2026 10:30am",
+      "title": "Workspace & Memory Integrity Validator",
+      "capability": "Programmatically check workspace JSON schemas, required files, and memory formatting integrity.",
+      "next_step": "Execute validate_memory.py against workspace state and extend schema rules for commitments and growth plan.",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Aug 30th, 2026 10:30am",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        }
+      ]
+    }
+  ]
 }
