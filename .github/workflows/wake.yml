@@ -35,6 +35,7 @@ jobs:
         run: |
           git config user.name "wake-bot"
           git config user.email "wake-bot@users.noreply.github.com"
-          git add memory/
+          # Include the active identity and any archived memory_<name>/ histories.
+          git add --all -- memory 'memory_*'
           git diff --quiet --cached || git commit -m "Wake cycle: $(date -u +%Y-%m-%d-%H%M%S)"
           git push

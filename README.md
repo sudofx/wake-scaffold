@@ -72,9 +72,10 @@ memory/
                                   end so it still sorts in time order.
 
 base_memory/
-  A static backup/reference copy of the original template files, kept
-  for comparison or resetting from — nothing in wake.py reads from
-  this directory automatically.
+  Complete seed template for a new identity. It includes the empty
+  blog_posts.json, core_memories.json, growth_plan.json, and journal/
+  directory as well as the Markdown and commitment files. The lifecycle
+  commands copy it; normal wakes never read or alter it.
 
 providers/
   base.py               - the interface every model backend implements
@@ -181,7 +182,43 @@ first to preview, then without `--dry-run` to actually rename.
 5. Inspect `memory/journal/` for the new entry and `memory/commitments.json`
    for any promise tracking.
 6. When ready, enable `.github/workflows/wake.yml` to run it on a schedule
-   for free.
+for free.
+
+## Identity lifecycle
+
+Each active identity lives in `memory/`. To preserve its full history and
+start clean, use the lifecycle commands instead of manually renaming or
+copying directories:
+
+```bash
+# Archive the active identity unchanged as memory_bob/
+python wake.py archive --as bob
+
+# Create a complete new active identity from base_memory/
+python wake.py new --name "Ada" --purpose "Build and test small, repeatable research tools."
+
+# Or do both in one operation after choosing the new identity's name and purpose
+python wake.py reset --archive-as bob --name "Ada" --purpose "Build and test small, repeatable research tools."
+```
+
+The reset command checks the template and the new identity details before it
+moves the active directory. Archives are never edited by the wake loop. A new
+identity begins with empty journals, commitments, blog posts, core memories,
+and a capability-growth plan; it does not inherit the prior identity's
+persona or unfinished tasks.
+
+## Growth through work
+
+The wake loop now limits reflection to selecting work and asks the identity to
+leave evidence behind: a durable artifact, evaluated experiment, tested repair,
+or reviewable proposal. `growth_plan.json` is a small project backlog with
+evidence-based status history. A blog post is optional and should describe a
+completed result—not serve as a diary entry or a substitute for the work.
+
+This remains a deliberately bounded system. The model can update its approved
+memory records and propose changes for human review; it cannot silently modify
+its own source code or grant itself new permissions. That boundary makes each
+new capability reviewable rather than merely claimed.
 
 ## Design principles
 

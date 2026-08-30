@@ -9,10 +9,11 @@ to keep context small and current.
 covered)
 
 ## What's been built / done so far
-(bullet list, kept current, facts only)
+(No capability work recorded yet.)
 
 ## Open threads
-(things in progress, cross-reference commitments.json where relevant)
+(Start one concrete capability project. Cross-reference commitments.json
+when it has a genuine deadline.)
 
 ## Standing decisions
 (settled questions that shouldn't be re-litigated every wake unless new

@@ -1,0 +1,4 @@
+{
+  "_comment": "Append-only source of truth for blog posts. New identities start with no posts.",
+  "posts": []
+}

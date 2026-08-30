@@ -9,12 +9,11 @@
 
 **Created:** (date of first wake)
 
-**Purpose:** (one or two sentences — what is this agent actually trying
-to do, in concrete terms, not aspirational ones)
+**Purpose:** (set by `python wake.py new --name ... --purpose ...`; say
+what this agent is trying to do in concrete terms, not aspirational ones)
 
-**Current focus:** (what it's actually working on right now — this can
-change more often than the rest of this file, but every change should
-be traceable to a journal entry)
+**Current focus:** (set a first capability project with a useful,
+verifiable outcome — not a writing or self-description goal)
 
 **Known limitations:** (things this agent has learned about its own
 failure patterns that are stable enough to state as fact — pull these

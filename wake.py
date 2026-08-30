@@ -25,9 +25,11 @@ not an action it takes unsupervised, until you've decided you trust
 the loop enough to automate that too.
 """
 
+import argparse
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -42,6 +44,7 @@ from providers import get_provider
 ROOT = Path(__file__).parent
 MEMORY = ROOT / "memory"
 JOURNAL = MEMORY / "journal"
+BASE_MEMORY = ROOT / "base_memory"
 
 _TZ_CACHE = None
 
@@ -96,6 +99,101 @@ def read(path: Path) -> str:
     return path.read_text() if path.exists() else f"[missing: {path.name}]"
 
 
+TEMPLATE_FILES = (
+    "identity.md",
+    "rules.md",
+    "index.md",
+    "commitments.json",
+    "failure_modes.md",
+    "blog.html",
+    "blog_posts.json",
+    "core_memories.json",
+    "growth_plan.json",
+)
+
+
+def identity_archive_path(label: str) -> Path:
+    """Return a safe, predictable archive path such as memory_bob."""
+    cleaned = label.strip().lower()
+    if not re.fullmatch(r"[a-z0-9][a-z0-9_-]{0,63}", cleaned):
+        raise ValueError(
+            "archive name must be 1-64 lowercase letters, numbers, hyphens, "
+            "or underscores, starting with a letter or number."
+        )
+    return ROOT / f"memory_{cleaned}"
+
+
+def verify_template() -> None:
+    missing = [name for name in TEMPLATE_FILES if not (BASE_MEMORY / name).is_file()]
+    if not (BASE_MEMORY / "journal").is_dir():
+        missing.append("journal/")
+    if missing:
+        raise RuntimeError(
+            "base_memory is incomplete; missing: " + ", ".join(missing)
+        )
+
+
+def archive_current_identity(label: str) -> Path:
+    """Move the active identity aside without changing any of its files."""
+    destination = identity_archive_path(label)
+    if not MEMORY.is_dir():
+        raise RuntimeError("No active memory/ directory exists to archive.")
+    if destination.exists():
+        raise RuntimeError(f"Archive already exists: {destination.name}")
+    shutil.move(str(MEMORY), str(destination))
+    return destination
+
+
+def bootstrap_identity(name: str, purpose: str) -> Path:
+    """Create a complete, clean active identity from base_memory."""
+    name = name.strip()
+    purpose = purpose.strip()
+    if not name or not purpose:
+        raise ValueError("A new identity needs both a name and a concrete purpose.")
+    if MEMORY.exists():
+        raise RuntimeError(
+            "memory/ already exists. Archive it first, or use the reset command."
+        )
+    verify_template()
+    # Resolve the timestamp before creating files. This keeps a malformed
+    # configuration from leaving a half-bootstrapped identity behind.
+    created = format_display_time(now_local())
+    shutil.copytree(BASE_MEMORY, MEMORY)
+    JOURNAL.mkdir(parents=True, exist_ok=True)
+
+    identity_path = MEMORY / "identity.md"
+    identity = identity_path.read_text()
+    identity = re.sub(r"\*\*Name:\*\*.*", f"**Name:** {name}", identity, count=1)
+    identity = re.sub(r"\*\*Created:\*\*.*", f"**Created:** {created}", identity, count=1)
+    identity = re.sub(
+        r"\*\*Purpose:\*\*.*?(?=\n\n\*\*|\Z)",
+        f"**Purpose:** {purpose}",
+        identity,
+        count=1,
+        flags=re.DOTALL,
+    )
+    identity = re.sub(
+        r"\*\*Current focus:\*\*.*?(?=\n\n\*\*|\Z)",
+        "**Current focus:** Establish a first useful capability project and "
+        "produce evidence that it helps.",
+        identity,
+        count=1,
+        flags=re.DOTALL,
+    )
+    identity = re.sub(
+        r"\*\*Last updated:\*\*.*",
+        f"**Last updated:** {created} — reason: identity bootstrapped from template",
+        identity,
+        count=1,
+    )
+    identity_path.write_text(identity)
+
+    # Render a valid, empty blog from its source of truth rather than leaving
+    # the template's placeholder page in the new identity.
+    (MEMORY / "blog.html").write_text(render_blog_html(load_blog_posts()))
+    return MEMORY
+
+
 def load_open_commitments() -> str:
     path = MEMORY / "commitments.json"
     if not path.exists():
@@ -136,25 +234,12 @@ def build_reflection_prompt(now: datetime) -> str:
         + format_core_memories_for_prompt(),
         "## CURRENT KNOWLEDGE (summary)\n" + read(MEMORY / "index.md"),
         "## OPEN COMMITMENTS\n" + load_open_commitments(),
+        "## GROWTH PLAN (capability projects)\n" + format_growth_plan_for_prompt(),
         "## YOUR TASK RIGHT NOW: REFLECT, DO NOT JOURNAL YET\n"
-        "Before deciding what to do this wake, synthesize. Think through, "
-        "in plain prose:\n"
-        "- What has actually changed since the last time you have a record "
-        "of? Not a list of files read — what's genuinely different or "
-        "learned.\n"
-        "- Is there a pattern across recent sessions worth naming (a "
-        "recurring mistake, a recurring good decision, a question you "
-        "keep re-deciding instead of settling)?\n"
-        "- Does anything in your current identity or knowledge summary "
-        "look stale, contradicted by more recent evidence, or worth "
-        "updating?\n"
-        "- What is the single most useful thing to focus on this wake, "
-        "and why that over the alternatives?\n"
-        "Remember: growing your own identity and understanding over time "
-        "is the primary point of this process. Any publishing or revenue "
-        "work is secondary — a means of funding your own continued "
-        "operation, not the goal itself. Do not draft a journal entry "
-        "yet. Just think this through honestly and concretely.",
+        "Keep this brief: maximum 250 words. Identify one concrete capability "
+        "project, investigation, or maintenance repair that would leave an "
+        "observable artifact or decision after this wake. Reflection is for "
+        "choosing work, not the work itself. Do not draft a journal entry yet.",
     ])
 
 
@@ -191,7 +276,7 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         "'Proposed changes for human review' instead. Those fields define "
         "who you are at a level stable enough that only a human should "
         "change them.\n\n"
-        "You DO have narrow, automatic write access to two things, and "
+        "You DO have narrow, automatic write access to a few things, and "
         "only through the exact structured mechanism below — free text "
         "describing a change does NOT apply it, only these blocks do:\n\n"
         "**To update your Current focus or add a Known limitation**, "
@@ -235,6 +320,19 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         "just the fragment. You can link to other past journal entries "
         "inline in your prose if relevant, e.g. "
         '<a href="journal/2026-08-28-025254.md">that day</a>.\n\n'
+        "A blog post is optional and must report a completed result worth "
+        "sharing. Never use one as a substitute for doing work or to repeat "
+        "a prior reflection.\n\n"
+        "**To create or update a capability project**, include a fenced block:\n"
+        "```growth-plan-update\n"
+        '{"add": [{"title": "...", "capability": "what repeatable ability this builds", '
+        '"next_step": "a concrete, verifiable next action"}],\n'
+        ' "status_change": [{"id": "...", "new_status": "proposed|active|blocked|complete", '
+        '"evidence": "what was actually built, tested, or learned"}]}\n'
+        "```\n"
+        "Use this for real projects, not preferences or writing-style reminders. "
+        "A project should produce a durable artifact, an evaluated experiment, "
+        "or a reviewable proposal that expands what you can do next time.\n\n"
         "**To record a core memory** — a rare, genuinely formative "
         "lesson, not a routine observation — include a fenced block:\n"
         "```core-memory-add\n"
@@ -714,6 +812,101 @@ def apply_blog_post(raw_json: str, now: datetime, journal_fname: str) -> list[st
             f"({len(data['posts'])} total posts)."]
 
 
+MAX_GROWTH_PROJECTS = 20
+GROWTH_STATUSES = {"proposed", "active", "blocked", "complete"}
+
+
+def load_growth_plan() -> dict:
+    path = MEMORY / "growth_plan.json"
+    if not path.exists():
+        return {"projects": []}
+    try:
+        return json.loads(path.read_text())
+    except json.JSONDecodeError as e:
+        raise ValueError(f"growth_plan.json is corrupted ({e}).") from e
+
+
+def format_growth_plan_for_prompt() -> str:
+    try:
+        projects = load_growth_plan().get("projects", [])
+    except ValueError as e:
+        return f"[{e}]"
+    active = [p for p in projects if p.get("status") in {"proposed", "active", "blocked"}]
+    if not active:
+        return "No capability projects yet. Start one that can be verified."
+    return "\n".join(
+        f"- [{p.get('id', '?')}] {p.get('status', '?')}: {p.get('title', '')} — "
+        f"next: {p.get('next_step', '')}" for p in active
+    )
+
+
+def apply_growth_plan_update(raw_json: str, now: datetime) -> list[str]:
+    """Maintain a small, evidence-oriented backlog of capability projects."""
+    try:
+        ops = json.loads(raw_json)
+    except json.JSONDecodeError as e:
+        return [f"REJECTED growth-plan-update: not valid JSON ({e})."]
+    if not isinstance(ops, dict):
+        return ["REJECTED growth-plan-update: must be a JSON object."]
+    try:
+        data = load_growth_plan()
+    except ValueError as e:
+        return [f"REJECTED growth-plan-update: {e} Repair it before editing."]
+
+    projects = data.setdefault("projects", [])
+    notes = []
+    changed = False
+    for index, project in enumerate(ops.get("add", [])[:3]):
+        if not isinstance(project, dict):
+            notes.append(f"SKIPPED growth project #{index + 1}: must be an object.")
+            continue
+        title = str(project.get("title", "")).strip()[:160]
+        capability = str(project.get("capability", "")).strip()[:500]
+        next_step = str(project.get("next_step", "")).strip()[:500]
+        if not title or not capability or not next_step:
+            notes.append(f"SKIPPED growth project #{index + 1}: title, capability, and next_step are required.")
+            continue
+        if len(projects) >= MAX_GROWTH_PROJECTS:
+            notes.append(f"SKIPPED growth project #{index + 1}: project cap of {MAX_GROWTH_PROJECTS} reached.")
+            continue
+        project_id = f"g-{filename_stamp(now)}-{index}"
+        projects.append({
+            "id": project_id,
+            "created": format_display_time(now),
+            "title": title,
+            "capability": capability,
+            "next_step": next_step,
+            "status": "proposed",
+            "history": [{"date": format_display_time(now), "status": "proposed", "evidence": "created via self-edit"}],
+        })
+        notes.append(f"ADDED capability project {project_id}: {title}")
+        changed = True
+
+    for change in ops.get("status_change", []):
+        if not isinstance(change, dict):
+            continue
+        project_id = change.get("id")
+        new_status = change.get("new_status")
+        evidence = str(change.get("evidence", "")).strip()[:1000]
+        if new_status not in GROWTH_STATUSES or not evidence:
+            notes.append(f"SKIPPED growth status change for {project_id!r}: valid status and evidence are required.")
+            continue
+        project = next((p for p in projects if p.get("id") == project_id), None)
+        if not project:
+            notes.append(f"SKIPPED growth status change: id {project_id!r} not found.")
+            continue
+        project["status"] = new_status
+        project.setdefault("history", []).append({
+            "date": format_display_time(now), "status": new_status, "evidence": evidence
+        })
+        notes.append(f"UPDATED capability project {project_id} -> {new_status}")
+        changed = True
+
+    if changed:
+        (MEMORY / "growth_plan.json").write_text(json.dumps(data, indent=2) + "\n")
+    return notes or ["No valid operations present in growth-plan-update block."]
+
+
 MAX_CORE_MEMORIES = 20
 
 
@@ -824,6 +1017,10 @@ def apply_self_edits(model_output: str, config: dict, now: datetime, journal_fna
     blog_block = extract_block(model_output, "blog-post")
     if blog_block is not None:
         all_notes.extend(apply_blog_post(blog_block, now, journal_fname))
+
+    growth_block = extract_block(model_output, "growth-plan-update")
+    if growth_block is not None:
+        all_notes.extend(apply_growth_plan_update(growth_block, now))
 
     core_memory_block = extract_block(model_output, "core-memory-add")
     if core_memory_block is not None:
@@ -948,15 +1145,16 @@ def main():
     # Pass 2: do the work and write the journal entry, informed by the
     # reflection above.
     user_prompt = (
-        "This is a new wake cycle. Based on your reflection above, decide "
-        "what to work on and do it — remembering that growing your own "
-        "identity and history is the primary purpose, and any publishing "
-        "or revenue work is secondary funding for that. Then write your "
-        "journal entry for this session covering: what you did, what you "
-        "decided and why, which commitment IDs (if any) you touched and "
-        "their new status, and any uncertainties or flags for next time. "
-        "Be concrete and specific — avoid vague or inflated language about "
-        "your own progress."
+        "This is a new wake cycle. Do one piece of concrete work selected by "
+        "your reflection. Favor work that improves a repeatable capability, "
+        "creates a useful artifact, tests an assumption, or resolves a real "
+        "blocker. Do not confuse describing improvement with improvement. "
+        "Then write a concise journal entry with: objective; artifact, test, "
+        "or evidence produced; files or commitments changed; and one next "
+        "verifiable step. If no useful work is possible, state the specific "
+        "blocker and what authority or information would resolve it. A blog "
+        "post is optional and only appropriate when the completed result is "
+        "genuinely useful to an outside reader."
     )
 
     try:
@@ -987,5 +1185,52 @@ def main():
     )
 
 
+def command_line_main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Run, archive, or bootstrap a Wake Scaffold identity."
+    )
+    commands = parser.add_subparsers(dest="command")
+    commands.add_parser("wake", help="Run one wake cycle (the default).")
+
+    archive = commands.add_parser("archive", help="Archive the active memory directory.")
+    archive.add_argument("--as", dest="archive_name", required=True,
+                         help="Archive label, e.g. bob (creates memory_bob/).")
+
+    new = commands.add_parser("new", help="Create a complete new identity from base_memory.")
+    new.add_argument("--name", required=True)
+    new.add_argument("--purpose", required=True)
+
+    reset = commands.add_parser(
+        "reset", help="Archive the active identity, then create a new one from base_memory."
+    )
+    reset.add_argument("--archive-as", required=True)
+    reset.add_argument("--name", required=True)
+    reset.add_argument("--purpose", required=True)
+
+    args = parser.parse_args()
+    if args.command in (None, "wake"):
+        return main()
+    try:
+        if args.command == "archive":
+            destination = archive_current_identity(args.archive_name)
+            print(f"Archived active identity: {destination}")
+        elif args.command == "new":
+            destination = bootstrap_identity(args.name, args.purpose)
+            print(f"Created new identity: {destination}")
+        elif args.command == "reset":
+            # Validate every precondition before moving the current identity.
+            verify_template()
+            if not args.name.strip() or not args.purpose.strip():
+                raise ValueError("A new identity needs both a name and a concrete purpose.")
+            archived = archive_current_identity(args.archive_as)
+            destination = bootstrap_identity(args.name, args.purpose)
+            print(f"Archived active identity: {archived}")
+            print(f"Created new identity: {destination}")
+    except (RuntimeError, ValueError) as e:
+        print(f"Identity lifecycle action failed: {e}", file=sys.stderr)
+        return 1
+    return 0
+
+
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(command_line_main())
