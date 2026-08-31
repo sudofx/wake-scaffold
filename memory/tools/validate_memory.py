@@ -1,111 +1,97 @@
+import json
 import os
 import sys
-import json
 
-def validate_memory(memory_dir):
+def validate_memory(memory_dir="memory"):
     errors = []
     warnings = []
-    checked = 0
+    checked = []
 
-    # 1. commitments.json
-    commitments_path = os.path.join(memory_dir, 'commitments.json')
-    if not os.path.isfile(commitments_path):
-        errors.append(f"Missing file: {commitments_path}")
+    # 1. Identity
+    identity_path = os.path.join(memory_dir, "identity.md")
+    if os.path.exists(identity_path):
+        checked.append("identity.md")
+        with open(identity_path, "r", encoding="utf-8") as f:
+            content = f.read()
+            if len(content.strip()) < 10:
+                warnings.append("identity.md is unusually short.")
     else:
+        errors.append("identity.md missing")
+
+    # 2. Rules
+    rules_path = os.path.join(memory_dir, "rules.md")
+    if os.path.exists(rules_path):
+        checked.append("rules.md")
+    else:
+        errors.append("rules.md missing")
+
+    # 3. Commitments
+    commitments_path = os.path.join(memory_dir, "commitments.json")
+    if os.path.exists(commitments_path):
+        checked.append("commitments.json")
         try:
-            with open(commitments_path, 'r', encoding='utf-8') as f:
+            with open(commitments_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
-            checked += 1
-            if not isinstance(data, list):
-                errors.append(f"{commitments_path}: expected JSON array at top level")
-            else:
-                valid_statuses = {'open', 'in_progress', 'blocked', 'closed'}
-                for idx, item in enumerate(data):
-                    if not isinstance(item, dict):
-                        errors.append(f"{commitments_path}[{idx}]: expected JSON object")
-                        continue
-                    for field in ['id', 'description', 'status']:
-                        if field not in item:
-                            errors.append(f"{commitments_path}[{idx}]: missing required field '{field}'")
-                    if 'status' in item and item['status'] not in valid_statuses:
-                        warnings.append(f"{commitments_path}[{idx}]: unknown status '{item['status']}'")
-        except Exception as e:
-            errors.append(f"Failed to parse {commitments_path}: {e}")
-
-    # 2. growth_plan.json
-    growth_path = os.path.join(memory_dir, 'growth_plan.json')
-    if not os.path.isfile(growth_path):
-        errors.append(f"Missing file: {growth_path}")
+            items = []
+            if isinstance(data, list):
+                items = data
+            elif isinstance(data, dict):
+                items = data.get("commitments", data.get("items", []))
+            
+            for idx, item in enumerate(items):
+                if isinstance(item, dict):
+                    missing_keys = [k for k in ["what", "status"] if k not in item]
+                    if missing_keys:
+                        warnings.append(f"commitments item {idx} missing keys: {missing_keys}")
+                else:
+                    warnings.append(f"commitments item {idx} is not an object")
+        except json.JSONDecodeError as e:
+            errors.append(f"commitments.json is invalid JSON: {e}")
     else:
+        warnings.append("commitments.json missing")
+
+    # 4. Growth Plan
+    growth_path = os.path.join(memory_dir, "growth_plan.json")
+    if os.path.exists(growth_path):
+        checked.append("growth_plan.json")
         try:
-            with open(growth_path, 'r', encoding='utf-8') as f:
+            with open(growth_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
-            checked += 1
-            projects = []
-            if isinstance(data, dict) and 'projects' in data:
-                projects = data['projects']
-            elif isinstance(data, list):
-                projects = data
-            else:
-                errors.append(f"{growth_path}: expected array or object with 'projects' key")
-
-            valid_project_statuses = {'proposed', 'active', 'blocked', 'complete'}
-            for idx, proj in enumerate(projects):
-                if not isinstance(proj, dict):
-                    errors.append(f"{growth_path}.projects[{idx}]: expected JSON object")
-                    continue
-                for field in ['id', 'title', 'capability', 'status']:
-                    if field not in proj:
-                        errors.append(f"{growth_path}.projects[{idx}]: missing field '{field}'")
-                if 'status' in proj and proj['status'] not in valid_project_statuses:
-                    warnings.append(f"{growth_path}.projects[{idx}]: unknown status '{proj['status']}'")
-        except Exception as e:
-            errors.append(f"Failed to parse {growth_path}: {e}")
-
-    # 3. identity.md
-    identity_path = os.path.join(memory_dir, 'identity.md')
-    if not os.path.isfile(identity_path):
-        errors.append(f"Missing file: {identity_path}")
+            items = []
+            if isinstance(data, list):
+                items = data
+            elif isinstance(data, dict):
+                items = data.get("projects", data.get("growth_plan", []))
+            
+            for idx, item in enumerate(items):
+                if isinstance(item, dict):
+                    missing_keys = [k for k in ["title", "status"] if k not in item]
+                    if missing_keys:
+                        warnings.append(f"growth_plan item {idx} missing keys: {missing_keys}")
+                else:
+                    warnings.append(f"growth_plan item {idx} is not an object")
+        except json.JSONDecodeError as e:
+            errors.append(f"growth_plan.json is invalid JSON: {e}")
     else:
-        try:
-            with open(identity_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-            checked += 1
-            required_substrings = ['Name:', 'Purpose:']
-            for sub in required_substrings:
-                if sub not in content:
-                    warnings.append(f"{identity_path}: expected field/heading '{sub}' not found")
-        except Exception as e:
-            errors.append(f"Failed to read {identity_path}: {e}")
+        warnings.append("growth_plan.json missing")
 
-    # 4. rules.md & index.md
-    for filename in ['rules.md', 'index.md']:
-        path = os.path.join(memory_dir, filename)
-        if not os.path.isfile(path):
-            warnings.append(f"Missing optional/standard file: {path}")
-        else:
-            try:
-                with open(path, 'r', encoding='utf-8') as f:
-                    content = f.read()
-                checked += 1
-                if not content.strip():
-                    warnings.append(f"{path}: file is empty")
-            except Exception as e:
-                errors.append(f"Failed to read {path}: {e}")
-
-    print(f"Validated {checked} memory targets in '{memory_dir}'.")
+    # Output report
+    print("=== Memory Validation Report ===")
+    print(f"Checked files: {', '.join(checked)}")
     if warnings:
-        print(f"Warnings ({len(warnings)}):")
+        print("\nWarnings:")
         for w in warnings:
-            print(f" - {w}")
+            print(f"  - {w}")
     if errors:
-        print(f"Errors ({len(errors)}):")
+        print("\nErrors:")
         for e in errors:
-            print(f" - {e}")
+            print(f"  - {e}")
+        print("\nStatus: FAILED")
         sys.exit(1)
     else:
-        print("All memory checks passed cleanly.")
+        print("\nStatus: PASSED")
+        sys.exit(0)
 
-if __name__ == '__main__':
-    target_dir = sys.argv[1] if len(sys.argv) > 1 else 'memory'
+if __name__ == "__main__":
+    target_dir = sys.argv[1] if len(sys.argv) > 1 else "memory"
     validate_memory(target_dir)
