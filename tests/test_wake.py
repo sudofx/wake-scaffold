@@ -72,24 +72,45 @@ class BlogFallbackTests(WakeTestCase):
 
     def test_fallback_triggers_when_model_skips_blog_post(self):
         model_output = (
-            "## What I did\nSome real work happened, but no blog-post "
-            "block was included this time.\n"
+            "```commitments-update\n"
+            "not valid json on purpose\n"
+            "```\n"
         )
         result = wake.apply_self_edits(model_output, {}, FIXED_NOW, "test-journal.md")
 
         self.assertIn("WARNING: no blog-post block this wake", result)
         self.assertIn("ADDED blog post", result)
+        self.assertIn("WARNING: no tool-write or tool-run this wake", result)
 
         posts = self.blog_posts()
         self.assertEqual(len(posts), 1, "fallback should add exactly one post")
         self.assertTrue(posts[0]["title"].startswith("Wake notes —"))
-        # No tool-write/tool-run block was included either, so the
-        # fallback post reports that miss too — it's not a "nothing
-        # happened" post, it's an honest summary of what actually did.
-        self.assertIn("no tool-write or tool-run this wake", posts[0]["body_html"])
+        # Real (if rejected) activity happened this wake, so the fallback
+        # post should report it rather than claim a quiet wake.
+        self.assertIn("REJECTED commitments-update", posts[0]["body_html"])
+        self.assertNotIn("Quiet wake", posts[0]["body_html"])
 
         blog_html = (self.memory / "blog.html").read_text()
         self.assertIn("Wake notes —", blog_html, "blog.html must be re-rendered to include the fallback post")
+
+    def test_truly_quiet_wake_gets_generic_fallback_message(self):
+        """A wake where literally nothing applied (no self-edit blocks of
+        any kind, including no tool work) should hit the genuinely
+        empty branch of compose_fallback_blog_post — "Quiet wake,
+        nothing to report" — rather than a warning being mistaken for
+        something having happened. This was previously unreachable: the
+        missing-tool-work warning was appended to all_notes before the
+        fallback check ran, so prior_notes was never actually empty."""
+        model_output = "## What I did\nAbsolutely nothing this wake — pure smoke test.\n"
+        result = wake.apply_self_edits(model_output, {}, FIXED_NOW, "test-journal.md")
+
+        posts = self.blog_posts()
+        self.assertEqual(len(posts), 1)
+        self.assertIn("Quiet wake", posts[0]["body_html"])
+        self.assertIn("Nothing to report yet", posts[0]["body_html"])
+        # The tool-work warning must still land in the overall journal
+        # notes, just not inside the fallback post body itself.
+        self.assertIn("WARNING: no tool-write or tool-run this wake", result)
 
     def test_fallback_summarizes_other_self_edits_when_present(self):
         model_output = (

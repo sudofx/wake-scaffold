@@ -1571,12 +1571,14 @@ def apply_self_edits(model_output: str, config: dict, now: datetime, journal_fna
             f"tool-run block(s) beyond the cap of {MAX_TOOL_RUNS_PER_WAKE} per wake."
         )
 
-    if tool_block is None and not tool_run_blocks:
-        all_notes.append(
-            "WARNING: no tool-write or tool-run this wake — rules.md "
-            "requires hands-on tool work (build or test/advance one) "
-            "every wake. Address this next wake."
-        )
+    # Held back rather than appended immediately: the missing-tool-work
+    # warning is a comment on the *absence* of a note, not a note about
+    # something that happened. If it were appended here, prior_notes
+    # below would always be non-empty (either this warning, or a real
+    # tool-write/tool-run note), and compose_fallback_blog_post's
+    # "quiet wake, nothing happened" branch could never actually fire —
+    # it would be unreachable no matter how quiet the wake really was.
+    missing_tool_work = tool_block is None and not tool_run_blocks
 
     core_memory_block = extract_block(model_output, "core-memory-add")
     if core_memory_block is not None:
@@ -1596,6 +1598,13 @@ def apply_self_edits(model_output: str, config: dict, now: datetime, journal_fna
             "below; write a real one yourself next wake."
         )
         all_notes.extend(fallback_notes)
+
+    if missing_tool_work:
+        all_notes.append(
+            "WARNING: no tool-write or tool-run this wake — rules.md "
+            "requires hands-on tool work (build or test/advance one) "
+            "every wake. Address this next wake."
+        )
 
     if not all_notes:
         return ""
