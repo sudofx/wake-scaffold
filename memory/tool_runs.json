@@ -35,6 +35,18 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-08-31-093535.md"
+    },
+    {
+      "when": "Aug 31st, 2026 04:19pm",
+      "filename": "validate_memory.py",
+      "args": [
+        "memory"
+      ],
+      "exit_code": 1,
+      "stdout": "VALIDATION FAILED:\n- Directory not found: memory\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-08-31-161931.md"
     }
   ]
 }
