@@ -1,8 +1,8 @@
 name: Wake Cycle
 
 on:
-  schedule:
-    - cron: "0 */3 * * *"
+  # schedule:
+  #   - cron: "0 */3 * * *"
   workflow_dispatch: {}
 
 # Grant only the permissions this workflow needs: recording wake data and
