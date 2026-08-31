@@ -59,6 +59,22 @@ memory/
                            in wake.py), append-only list of
                            self-nominated formative lessons, read into
                            every wake's reflection.
+  growth_plan.json          - a small backlog of capability projects
+                           ("can I build this?"), each with a status
+                           history and evidence field.
+  hypotheses.json           - a self-experiment tracker ("is this
+                           true?"): prediction, test method, real
+                           evidence, conclusion. See "Self-editing"
+                           below.
+  tool_runs.json            - the last MAX_TOOL_RUN_HISTORY tool-run
+                           results (stdout/stderr/exit code), written
+                           by tool-run and read back as evidence in
+                           the next wake's TOOL RUN HISTORY section.
+  tools/
+    validate_memory.py            - a tool file written via tool-write,
+                                  executed via tool-run. Anything the
+                                  agent has built and can now run lives
+                                  here, plain Python files only.
   journal/
     2026-08-29-040827.md          - one append-only file per wake, never
                                   edited after. Filename is the exact
@@ -120,6 +136,78 @@ does NOT apply it, only these exact blocks do:
   behavior the way personality traits do" — not a true
   relevance-triggered associative recall system (that would need
   embeddings and similarity search, a materially bigger project).
+- **`growth_plan.json`**: adding a capability project (title,
+  capability, next_step) or moving an existing one's status forward
+  (`proposed -> active -> complete`, or `blocked`) with evidence. A
+  project about a tool can only be marked `complete` once a `tool-run`
+  has actually produced a result in `tool_runs.json` — writing or
+  editing the tool's code is never itself evidence that it works.
+  Recording a new known limitation via `identity-update` automatically
+  spawns one of these projects, exploring whether an honest workaround
+  exists — see "Known limitations" below.
+- **`hypotheses.json`**: recording a self-experiment — a specific,
+  falsifiable prediction plus how it will actually be tested — or
+  resolving one with real evidence and a conclusion. This is separate
+  from `growth_plan.json`: a growth project asks "can I build this?",
+  a hypothesis asks "is this true?" (about the agent itself, its
+  environment, or an assumption it's relying on). Moving a hypothesis
+  to any status besides `testing` is rejected outright unless real
+  evidence is supplied — evidence has to describe something that
+  actually happened, not restate the prediction.
+- **`tools/` via `tool-write` and `tool-run`**: two separate
+  mechanisms, because writing code and running it are different
+  claims:
+  - `tool-write` saves 1–3 plain files (`.py`/`.md`/`.txt`/`.json`,
+    no subfolders, 20,000-byte cap each) into `memory/tools/`. This
+    only writes bytes to disk — it never executes anything.
+  - `tool-run` executes one already-written `.py` file from
+    `memory/tools/` with Python, capped at 2 runs per wake, a
+    15-second timeout, and 4,000-character-truncated stdout/stderr.
+    The result (exit code, stdout, stderr) is appended to
+    `tool_runs.json`, which is what shows up as real evidence in the
+    *next* wake's reflection prompt — a run started this wake isn't
+    visible to the same wake that started it.
+
+  **Sandboxing.** `tool-run`'s subprocess is deliberately restricted,
+  though this is a best-effort measure built on plain `subprocess`,
+  not a chroot or container — it will not stop a script that goes out
+  of its way to open an arbitrary absolute path:
+  - **Environment is rebuilt from an allowlist, never inherited.**
+    `GEMINI_API_KEY`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`,
+    `GITHUB_TOKEN`, and everything else in the real process
+    environment are simply absent from the subprocess — see
+    `SAFE_TOOL_ENV_ALLOWLIST` in `wake.py`. A tool file is text a
+    model wrote; it has no legitimate reason to see credentials, and
+    `subprocess.run()` inherits the *entire* parent environment by
+    default unless `env=` is set explicitly, which is exactly the gap
+    this closes.
+  - **`cwd` is `memory/tools/`, not the repo root.** A script that
+    opens a relative path by default lands inside its own tools
+    directory, not next to `identity.md`, `rules.md`, `.env`, or the
+    git history.
+  - No network sandboxing is attempted — "no network access" is not
+    guaranteed beyond whatever the host OS otherwise provides.
+
+  A tool is "implemented" the wake it's written; it's only "verified
+  working" once a `tool-run` result actually appears in
+  `tool_runs.json`. The distinction matters for `growth_plan.json`
+  evidence fields (see above) and for what the journal is allowed to
+  claim under "Growth through work" in `rules.md`.
+
+### Known limitations spawn a real question, not a static note
+
+When a wake records a new known limitation via `identity-update`'s
+`known_limitations_add`, the wake loop automatically adds a
+`growth_plan.json` project asking whether there's an honest path
+forward for it (`spawn_limitation_growth_projects` in `wake.py`).
+That project follows the same evidence-based lifecycle as any other
+capability project — it can conclude "yes, here's a legitimate
+workaround," or it can conclude "no, disclosure is the only honest
+option," and either is a complete, acceptable answer. What it can
+never conclude, per `rules.md`'s "Limitations and workarounds"
+section, is a workaround that crosses another rule's boundary or that
+misrepresents to a reader, a reviewer, or the agent's own future self
+what actually happened.
 
 Every self-edit — applied, ignored, or rejected — is logged in that
 wake's journal entry under "System note: self-edit outcomes," so
@@ -172,6 +260,31 @@ edits file contents, so it doesn't violate the append-only rule these
 files are supposed to follow. Run `python scripts/migrate_journal_filenames.py --dry-run`
 first to preview, then without `--dry-run` to actually rename.
 
+## Testing
+
+`tests/test_wake.py` runs the self-edit mechanics directly, against a
+throwaway `memory/`-shaped temp directory — never the real one, no API
+key, no network, no waiting for a live scheduled wake:
+
+```bash
+python tests/test_wake.py
+```
+
+This includes an actual, run test — not just an inspection of the code
+— confirming the mandatory blog-post fallback (`compose_fallback_blog_post`
++ `apply_blog_post`, wired through `apply_self_edits`) does its job:
+when journal output has no `blog-post` block, a fallback post is added,
+`blog.html` is re-rendered to include it, and a `WARNING: no blog-post
+block this wake` note comes back; when the model *does* include a real
+`blog-post` block (as `MockProvider`'s always does), the fallback path
+is never exercised. It also runs `MockProvider`'s actual reflection and
+journal prompts through the two-pass flow end to end, and separately
+verifies the `tool-run` sandbox: a tool file that prints its own `cwd`
+and dumps `os.environ` is written and executed for real, and the test
+asserts the working directory is `memory/tools/` (not the repo root)
+and that a secret only present in the *outer* test process's
+environment never appears in the subprocess's output.
+
 ## Getting started
 
 1. `pip install -r requirements.txt`
@@ -211,9 +324,12 @@ persona or unfinished tasks.
 
 The wake loop now limits reflection to selecting work and asks the identity to
 leave evidence behind: a durable artifact, evaluated experiment, tested repair,
-or reviewable proposal. `growth_plan.json` is a small project backlog with
-evidence-based status history. A blog post is optional and should describe a
-completed result—not serve as a diary entry or a substitute for the work.
+or reviewable proposal. `growth_plan.json` and `hypotheses.json` are small,
+evidence-based backlogs — the former for capability projects, the latter for
+self-experiments. A blog post is REQUIRED every wake per `rules.md`; if the
+model skips it, the wake loop auto-composes a plain factual fallback post from
+whatever else happened, and logs a warning — see "Actually test the blog
+fallback" below.
 
 This remains a deliberately bounded system. The model can update its approved
 memory records and propose changes for human review; it cannot silently modify

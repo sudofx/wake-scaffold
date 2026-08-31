@@ -1,0 +1,257 @@
+"""
+Tests for wake.py's self-edit mechanics — run with:
+
+    python tests/test_wake.py
+
+No API key, no network access, and no waiting for a scheduled live
+wake are needed: everything here runs against a throwaway temp
+directory shaped like memory/, monkeypatching wake.py's module-level
+path constants for the duration of each test and restoring them
+afterward. The real memory/ directory is never touched.
+
+Two things this specifically exists to verify with real evidence
+rather than by inspecting the code and assuming:
+  1. The mandatory blog-post fallback (compose_fallback_blog_post +
+     apply_blog_post, wired through apply_self_edits) actually fires
+     when journal output has no blog-post block, and does NOT fire
+     when it does.
+  2. The tool-run sandbox (stripped env, restricted cwd) actually
+     holds when a real subprocess is executed, not just that the code
+     reads as if it should.
+"""
+import json
+import os
+import shutil
+import sys
+import tempfile
+import unittest
+from datetime import datetime
+from pathlib import Path
+from zoneinfo import ZoneInfo
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+import wake
+from providers.mock import MockProvider
+
+
+FIXED_NOW = datetime(2026, 8, 31, 9, 0, 0, tzinfo=ZoneInfo("America/Los_Angeles"))
+
+
+class WakeTestCase(unittest.TestCase):
+    """Base case: points every module-level memory path at a throwaway
+    temp directory seeded from base_memory/, and restores the real
+    paths afterward no matter what happens in the test."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp(prefix="wake-scaffold-test-")
+        self.memory = Path(self.tmpdir) / "memory"
+        shutil.copytree(wake.BASE_MEMORY, self.memory)
+        (self.memory / "journal").mkdir(exist_ok=True)
+
+        self._orig = {
+            name: getattr(wake, name)
+            for name in ("MEMORY", "JOURNAL", "TOOLS_DIR", "TOOL_RUNS_FILE")
+        }
+        wake.MEMORY = self.memory
+        wake.JOURNAL = self.memory / "journal"
+        wake.TOOLS_DIR = self.memory / "tools"
+        wake.TOOL_RUNS_FILE = self.memory / "tool_runs.json"
+
+    def tearDown(self):
+        for name, value in self._orig.items():
+            setattr(wake, name, value)
+        shutil.rmtree(self.tmpdir, ignore_errors=True)
+
+    def blog_posts(self):
+        return json.loads((self.memory / "blog_posts.json").read_text())["posts"]
+
+
+class BlogFallbackTests(WakeTestCase):
+    """Item under test: the mandatory blog-post fallback."""
+
+    def test_fallback_triggers_when_model_skips_blog_post(self):
+        model_output = (
+            "## What I did\nSome real work happened, but no blog-post "
+            "block was included this time.\n"
+        )
+        result = wake.apply_self_edits(model_output, {}, FIXED_NOW, "test-journal.md")
+
+        self.assertIn("WARNING: no blog-post block this wake", result)
+        self.assertIn("ADDED blog post", result)
+
+        posts = self.blog_posts()
+        self.assertEqual(len(posts), 1, "fallback should add exactly one post")
+        self.assertTrue(posts[0]["title"].startswith("Wake notes —"))
+        # No tool-write/tool-run block was included either, so the
+        # fallback post reports that miss too — it's not a "nothing
+        # happened" post, it's an honest summary of what actually did.
+        self.assertIn("no tool-write or tool-run this wake", posts[0]["body_html"])
+
+        blog_html = (self.memory / "blog.html").read_text()
+        self.assertIn("Wake notes —", blog_html, "blog.html must be re-rendered to include the fallback post")
+
+    def test_fallback_summarizes_other_self_edits_when_present(self):
+        model_output = (
+            "```identity-update\n"
+            '{"current_focus": "Testing the fallback alongside a real self-edit"}\n'
+            "```\n"
+        )
+        result = wake.apply_self_edits(model_output, {}, FIXED_NOW, "test-journal.md")
+
+        self.assertIn("WARNING: no blog-post block this wake", result)
+        posts = self.blog_posts()
+        self.assertEqual(len(posts), 1)
+        # The fallback post should reflect what actually happened this
+        # wake (the identity-update outcome), not a generic "nothing
+        # happened" message.
+        self.assertIn("APPLIED current_focus", posts[0]["body_html"])
+        self.assertNotIn("Quiet wake", posts[0]["body_html"])
+
+    def test_fallback_does_not_trigger_when_model_posts_for_real(self):
+        model_output = (
+            "```blog-post\n"
+            '{"title": "A real post", "body_html": "<p>Hi there.</p>"}\n'
+            "```\n"
+        )
+        result = wake.apply_self_edits(model_output, {}, FIXED_NOW, "test-journal.md")
+
+        self.assertNotIn("WARNING: no blog-post block this wake", result)
+        posts = self.blog_posts()
+        self.assertEqual(len(posts), 1, "should be exactly the real post, no fallback added on top")
+        self.assertEqual(posts[0]["title"], "A real post")
+
+    def test_full_mock_provider_round_trip_never_hits_fallback(self):
+        """Runs the actual two-pass prompts through MockProvider (never a
+        live API) end to end, confirming the normal happy path — where
+        the model behaves — never triggers the fallback."""
+        provider = MockProvider()
+        reflection = provider.generate(wake.build_reflection_prompt(FIXED_NOW), "reflect")
+        self.assertTrue(reflection.strip())
+
+        journal_output = provider.generate(
+            wake.build_journal_prompt(reflection, FIXED_NOW, enable_pull_requests=False),
+            "act",
+        )
+        self.assertIn("```blog-post", journal_output)
+
+        result = wake.apply_self_edits(journal_output, {"enable_pull_requests": False},
+                                        FIXED_NOW, "test-journal.md")
+        self.assertNotIn("WARNING: no blog-post block this wake", result)
+
+        posts = self.blog_posts()
+        self.assertEqual(len(posts), 1)
+        self.assertEqual(posts[0]["title"], "Mock test post")
+
+        # The mock output also unlocks the tool-write/tool-run path, the
+        # identity-update path (including the "unauthorized field
+        # ignored" case), the hypothesis path is untouched since the
+        # mock doesn't include one, and the growth-plan path is
+        # likewise untouched — confirms nothing crashes when some
+        # blocks are simply absent.
+        self.assertIn("IGNORED unauthorized identity fields", result)
+        self.assertIn("WROTE tools/mock_tool.py", result)
+        self.assertIn("RAN tools/mock_tool.py", result)
+
+
+class LimitationSpawnsGrowthProjectTests(WakeTestCase):
+    """Item under test: a recorded limitation spawns a real growth_plan.json entry."""
+
+    def test_known_limitation_spawns_growth_project(self):
+        block = json.dumps({
+            "current_focus": "unchanged",
+            "known_limitations_add": ["Cannot verify claims about the outside world without a tool."],
+        })
+        notes = wake.apply_identity_update(block, FIXED_NOW)
+        self.assertTrue(any(n.startswith("SPAWNED (from new limitation)") for n in notes))
+
+        growth = json.loads((self.memory / "growth_plan.json").read_text())
+        self.assertEqual(len(growth["projects"]), 1)
+        project = growth["projects"][0]
+        self.assertIn("Cannot verify claims about the outside world", project["title"])
+        self.assertEqual(project["status"], "proposed")
+        self.assertIn("never misrepresent", project["capability"])
+
+
+class HypothesesTests(WakeTestCase):
+    """Item under test: hypotheses.json add + evidence-gated status change."""
+
+    def test_add_and_confirm_with_evidence(self):
+        add_block = json.dumps({
+            "add": [{"prediction": "validate_memory.py exits 0 on a clean memory dir",
+                     "test_method": "run it via tool-run against this temp memory dir"}]
+        })
+        notes = wake.apply_hypotheses_update(add_block, FIXED_NOW)
+        self.assertTrue(any(n.startswith("ADDED hypothesis") for n in notes))
+
+        hyp_id = json.loads((self.memory / "hypotheses.json").read_text())["hypotheses"][0]["id"]
+
+        # Rejected: no evidence supplied for a non-"testing" status.
+        bad_change = json.dumps({"status_change": [
+            {"id": hyp_id, "new_status": "confirmed", "conclusion": "it works"}
+        ]})
+        notes = wake.apply_hypotheses_update(bad_change, FIXED_NOW)
+        self.assertTrue(any("requires real 'evidence'" in n for n in notes))
+        hyps = json.loads((self.memory / "hypotheses.json").read_text())["hypotheses"]
+        self.assertEqual(hyps[0]["status"], "untested")
+
+        # Accepted: real evidence supplied.
+        good_change = json.dumps({"status_change": [
+            {"id": hyp_id, "new_status": "confirmed",
+             "evidence": "tool_runs.json shows exit_code 0 for the last run",
+             "conclusion": "prediction held"}
+        ]})
+        notes = wake.apply_hypotheses_update(good_change, FIXED_NOW)
+        self.assertTrue(any(n.startswith("UPDATED hypothesis") for n in notes))
+        hyps = json.loads((self.memory / "hypotheses.json").read_text())["hypotheses"]
+        self.assertEqual(hyps[0]["status"], "confirmed")
+
+
+class ToolRunSandboxTests(WakeTestCase):
+    """Item under test: tool-run's stripped env and restricted cwd, verified
+    against a real subprocess, not just by reading the code."""
+
+    SECRET_ENV_VAR = "WAKE_SCAFFOLD_TEST_SECRET"
+
+    def setUp(self):
+        super().setUp()
+        os.environ[self.SECRET_ENV_VAR] = "super-secret-value-should-never-leak"
+        self.addCleanup(os.environ.pop, self.SECRET_ENV_VAR, None)
+
+    def test_subprocess_env_and_cwd_are_sandboxed(self):
+        probe = (
+            "import os, sys\n"
+            "print('CWD:' + os.getcwd())\n"
+            "print('SECRET_PRESENT:' + str('" + self.SECRET_ENV_VAR + "' in os.environ))\n"
+            "print('ENV_KEYS:' + ','.join(sorted(os.environ.keys())))\n"
+        )
+        write_block = json.dumps({"files": [{"filename": "probe.py", "content": probe}]})
+        write_notes = wake.apply_tool_write(write_block, FIXED_NOW, "test-journal.md")
+        self.assertTrue(any(n.startswith("WROTE") for n in write_notes), write_notes)
+
+        run_block = json.dumps({"filename": "probe.py", "args": []})
+        run_notes = wake.apply_tool_run(run_block, FIXED_NOW, "test-journal.md")
+        self.assertTrue(any(n.startswith("RAN tools/probe.py") for n in run_notes), run_notes)
+
+        runs = json.loads(wake.TOOL_RUNS_FILE.read_text())["runs"]
+        self.assertEqual(len(runs), 1)
+        stdout = runs[0]["stdout"]
+        self.assertEqual(runs[0]["exit_code"], 0, stdout + runs[0]["stderr"])
+
+        # cwd must be memory/tools, resolved, not the repo root.
+        expected_cwd = str(wake.TOOLS_DIR.resolve())
+        self.assertIn(f"CWD:{expected_cwd}", stdout)
+
+        # The secret set in THIS test process's environment must not be
+        # visible inside the subprocess.
+        self.assertIn("SECRET_PRESENT:False", stdout)
+        self.assertNotIn("super-secret-value-should-never-leak", stdout)
+
+        # Only allowlisted keys should be present at all.
+        env_keys_line = next(line for line in stdout.splitlines() if line.startswith("ENV_KEYS:"))
+        seen_keys = set(env_keys_line[len("ENV_KEYS:"):].split(",")) if env_keys_line[len("ENV_KEYS:"):] else set()
+        self.assertTrue(seen_keys.issubset(wake.SAFE_TOOL_ENV_ALLOWLIST), seen_keys)
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)

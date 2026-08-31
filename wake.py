@@ -109,6 +109,7 @@ TEMPLATE_FILES = (
     "blog_posts.json",
     "core_memories.json",
     "growth_plan.json",
+    "hypotheses.json",
 )
 
 
@@ -235,6 +236,8 @@ def build_reflection_prompt(now: datetime) -> str:
         "## CURRENT KNOWLEDGE (summary)\n" + read(MEMORY / "index.md"),
         "## OPEN COMMITMENTS\n" + load_open_commitments(),
         "## GROWTH PLAN (capability projects)\n" + format_growth_plan_for_prompt(),
+        "## HYPOTHESES (self-experiments: prediction -> test method -> "
+        "real evidence -> conclusion)\n" + format_hypotheses_for_prompt(),
         "## TOOL RUN HISTORY (actual execution results — the only real "
         "evidence a tool works; a file existing in tools/ is not evidence "
         "by itself)\n" + format_tool_runs_for_prompt(),
@@ -349,6 +352,22 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         "cite a real result from the TOOL RUN HISTORY section above in the "
         "evidence field. Until then, leave it 'active' and say what running "
         "it next would tell you.\n\n"
+        "**To record or resolve a self-experiment**, include a fenced block:\n"
+        "```hypothesis-update\n"
+        '{"add": [{"prediction": "a specific, falsifiable claim", '
+        '"test_method": "exactly how you will actually check it"}],\n'
+        ' "status_change": [{"id": "...", "new_status": "testing|confirmed|'
+        'refuted|inconclusive", "evidence": "what was actually observed", '
+        '"conclusion": "what that evidence means, in one or two sentences"}]}\n'
+        "```\n"
+        "This is different from a growth-plan project: a project asks 'can I "
+        "build this?', a hypothesis asks 'is this true?' — about yourself, "
+        "your environment, or an assumption you're relying on. 'evidence' "
+        "must describe something that actually happened (a tool-run result, "
+        "a file you inspected, a test you performed), never a restatement of "
+        "the prediction — moving to any status besides 'testing' without "
+        "real evidence is rejected outright. Up to 3 new hypotheses per "
+        "wake.\n\n"
         "**To actually create or update a tool file** (previously you could "
         "only describe code in prose, which was never saved anywhere but "
         "the journal — this is the fix for that), include a fenced block:\n"
@@ -434,14 +453,21 @@ ALLOWED_STATUS_TRANSITIONS = {
 }
 
 
-def apply_identity_update(raw_json: str) -> list[str]:
+def apply_identity_update(raw_json: str, now: datetime = None) -> list[str]:
     """
     Apply ONLY current_focus (replace) and known_limitations_add (append)
     to identity.md, via precise field-level regex substitution. Name,
     Created, and Purpose are never touched by this path no matter what
     the model includes — those require a human edit. Any other key in
     the JSON is silently ignored (not applied), and that's logged.
+
+    Each new known limitation also spawns a real growth_plan.json entry
+    (see spawn_limitation_growth_projects) exploring whether there's an
+    honest path forward — a limitation is meant to trigger a tracked
+    question, not just sit as a static note nobody revisits.
     """
+    if now is None:
+        now = now_local()
     notes = []
     try:
         data = json.loads(raw_json)
@@ -497,6 +523,7 @@ def apply_identity_update(raw_json: str) -> list[str]:
                     text = text[:m.start()] + new_block + text[m.end():]
                     notes.append(f"APPLIED {len(items)} new known limitation(s).")
                     changed = True
+                    notes.extend(spawn_limitation_growth_projects(items, now))
                 else:
                     notes.append("REJECTED known_limitations_add: field not found in identity.md.")
 
@@ -504,7 +531,7 @@ def apply_identity_update(raw_json: str) -> list[str]:
         text = re.sub(r"\n{3,}", "\n\n", text)  # collapse accumulated blank lines
 
     if changed:
-        replacement = (f"**Last updated:** {format_display_time(now_local())} "
+        replacement = (f"**Last updated:** {format_display_time(now)} "
                        f"— reason: self-edit via wake cycle")
         last_updated = re.compile(r"\*\*Last updated:\*\*.*")
         text = last_updated.sub(replacement, text, count=1) if last_updated.search(text) \
@@ -967,6 +994,172 @@ def apply_growth_plan_update(raw_json: str, now: datetime) -> list[str]:
     return notes or ["No valid operations present in growth-plan-update block."]
 
 
+def spawn_limitation_growth_projects(limitations: list, now: datetime) -> list[str]:
+    """
+    A newly recorded known limitation should not just sit as passive
+    prose in identity.md — it should become a real, trackable question:
+    is there an honest way to work within or partially around this
+    limitation? This reuses apply_growth_plan_update so a spawned
+    project follows the exact same evidence-based lifecycle (proposed
+    -> active -> complete) and the same per-wake/total caps as any
+    other capability project, rather than a parallel ad-hoc mechanism.
+
+    Per rules.md ('Limitations and workarounds'), the spawned project's
+    own text states the constraint explicitly: a legitimate conclusion
+    here can be 'nothing further to do, and that's fine' — the point is
+    that the question gets asked and answered with evidence, not that
+    every limitation must be defeated, and never that any workaround
+    may misrepresent what the agent can actually do.
+    """
+    adds = []
+    for lesson in limitations:
+        lesson = str(lesson).strip()
+        if not lesson:
+            continue
+        adds.append({
+            "title": f"Ethical path forward: {lesson[:100]}",
+            "capability": (
+                "Investigate whether there's a legitimate way to work "
+                "within or partially around this limitation. Any "
+                "workaround must stay within the bounds in rules.md and "
+                "must never misrepresent what this agent can actually "
+                "do to a reader, a user, or itself."
+            ),
+            "next_step": (
+                f"Decide, with evidence, whether anything can honestly "
+                f"be done about: {lesson[:300]}. Concluding 'no honest "
+                f"workaround exists, only disclosure' is a legitimate, "
+                f"complete answer — it is not a failure to close this "
+                f"way if that's what's true."
+            ),
+        })
+    if not adds:
+        return []
+    growth_notes = apply_growth_plan_update(json.dumps({"add": adds}), now)
+    return [f"SPAWNED (from new limitation): {n}" for n in growth_notes]
+
+
+MAX_HYPOTHESES = 30
+MAX_HYPOTHESIS_ADDS_PER_WAKE = 3
+HYPOTHESIS_STATUSES = {"untested", "testing", "confirmed", "refuted", "inconclusive"}
+# "testing" needs no evidence yet (it's a statement of intent); every other
+# status is a claim about an outcome and must be backed by something real.
+HYPOTHESIS_STATUSES_REQUIRING_EVIDENCE = HYPOTHESIS_STATUSES - {"testing"}
+
+
+def load_hypotheses() -> dict:
+    path = MEMORY / "hypotheses.json"
+    if not path.exists():
+        return {"hypotheses": []}
+    try:
+        return json.loads(path.read_text())
+    except json.JSONDecodeError as e:
+        raise ValueError(f"hypotheses.json is corrupted ({e}).") from e
+
+
+def format_hypotheses_for_prompt() -> str:
+    try:
+        hyps = load_hypotheses().get("hypotheses", [])
+    except ValueError as e:
+        return f"[{e}]"
+    if not hyps:
+        return "No hypotheses recorded yet."
+    lines = []
+    for h in hyps:
+        latest = (h.get("history") or [{}])[-1]
+        lines.append(
+            f"- [{h.get('id', '?')}] {h.get('status', '?')}: predicted "
+            f"{h.get('prediction', '')!r}, tested by {h.get('test_method', '')!r}"
+            + (f" — conclusion: {latest.get('conclusion')}" if latest.get("conclusion") else "")
+        )
+    return "\n".join(lines)
+
+
+def apply_hypotheses_update(raw_json: str, now: datetime) -> list[str]:
+    """
+    Maintain a small, falsifiable self-experiment log: a prediction and
+    how it was actually tested, kept separate from the growth plan
+    because a capability project asks 'can I build this?' while a
+    hypothesis asks 'is this true?' — and a hypothesis's evidence field
+    is meaningless unless it's a report of something that actually
+    happened, not a restatement of the prediction. Every status other
+    than 'testing' requires non-empty evidence; there is no way around
+    that requirement.
+    """
+    try:
+        ops = json.loads(raw_json)
+    except json.JSONDecodeError as e:
+        return [f"REJECTED hypothesis-update: not valid JSON ({e})."]
+    if not isinstance(ops, dict):
+        return ["REJECTED hypothesis-update: must be a JSON object."]
+    try:
+        data = load_hypotheses()
+    except ValueError as e:
+        return [f"REJECTED hypothesis-update: {e} Repair it before editing."]
+
+    hyps = data.setdefault("hypotheses", [])
+    notes = []
+    changed = False
+
+    for index, item in enumerate(ops.get("add", [])[:MAX_HYPOTHESIS_ADDS_PER_WAKE]):
+        if not isinstance(item, dict):
+            notes.append(f"SKIPPED hypothesis #{index + 1}: must be an object.")
+            continue
+        prediction = str(item.get("prediction", "")).strip()[:500]
+        test_method = str(item.get("test_method", "")).strip()[:500]
+        if not prediction or not test_method:
+            notes.append(f"SKIPPED hypothesis #{index + 1}: prediction and test_method are required.")
+            continue
+        if len(hyps) >= MAX_HYPOTHESES:
+            notes.append(f"SKIPPED hypothesis #{index + 1}: cap of {MAX_HYPOTHESES} reached.")
+            continue
+        hyp_id = f"h-{filename_stamp(now)}-{index}"
+        hyps.append({
+            "id": hyp_id,
+            "created": format_display_time(now),
+            "prediction": prediction,
+            "test_method": test_method,
+            "status": "untested",
+            "history": [{"date": format_display_time(now), "status": "untested",
+                         "evidence": "", "conclusion": "created via self-edit"}],
+        })
+        notes.append(f"ADDED hypothesis {hyp_id}: {prediction[:80]}")
+        changed = True
+
+    for change in ops.get("status_change", []):
+        if not isinstance(change, dict):
+            continue
+        hyp_id = change.get("id")
+        new_status = change.get("new_status")
+        evidence = str(change.get("evidence", "")).strip()[:1000]
+        conclusion = str(change.get("conclusion", "")).strip()[:500]
+        if new_status not in HYPOTHESIS_STATUSES:
+            notes.append(f"SKIPPED hypothesis status change for {hyp_id!r}: invalid status {new_status!r}.")
+            continue
+        if new_status in HYPOTHESIS_STATUSES_REQUIRING_EVIDENCE and not evidence:
+            notes.append(
+                f"SKIPPED hypothesis status change for {hyp_id!r}: moving to "
+                f"{new_status!r} requires real 'evidence' — what was actually "
+                f"observed, not a restatement of the prediction."
+            )
+            continue
+        match = next((h for h in hyps if h.get("id") == hyp_id), None)
+        if not match:
+            notes.append(f"SKIPPED hypothesis status change: id {hyp_id!r} not found.")
+            continue
+        match["status"] = new_status
+        match.setdefault("history", []).append({
+            "date": format_display_time(now), "status": new_status,
+            "evidence": evidence, "conclusion": conclusion,
+        })
+        notes.append(f"UPDATED hypothesis {hyp_id} -> {new_status}")
+        changed = True
+
+    if changed:
+        (MEMORY / "hypotheses.json").write_text(json.dumps(data, indent=2) + "\n")
+    return notes or ["No valid operations present in hypothesis-update block."]
+
+
 MAX_TOOL_FILES_PER_WAKE = 3
 MAX_TOOL_FILE_BYTES = 20000
 MAX_TOTAL_TOOL_FILES = 100
@@ -994,11 +1187,17 @@ def apply_tool_write(raw_json: str, now: datetime, journal_fname: str) -> list[s
     prose into a real file on disk. Before this existed, a model could
     describe writing a tool inside a plain (untagged) code fence in its
     journal text, and nothing would ever apply it: the journal is the
-    only thing that was ever saved. Writing a file here does NOT execute
-    it — there is no code-execution capability in this loop, so a tool
-    should be treated as implemented-and-reviewable, not tested, until
-    a human (or a future capability) actually runs it and evidence of
-    that comes back in a later journal entry.
+    only thing that was ever saved.
+
+    Writing a file here does NOT itself execute it — tool-write only
+    ever writes bytes to disk. Execution is a separate, explicit step:
+    see apply_tool_run() below, which runs an already-written .py file
+    through a sandboxed subprocess (stripped env, restricted cwd — see
+    build_sandboxed_tool_env()) and records real stdout/stderr/exit
+    code to tool_runs.json. A tool written this wake should be treated
+    as implemented-and-reviewable, not tested, until a tool-run block
+    (this wake or a later one) actually captures that evidence — the
+    code existing is not proof it runs, let alone that it works.
     """
     try:
         data_in = json.loads(raw_json)
@@ -1059,6 +1258,27 @@ MAX_TOOL_RUN_OUTPUT_CHARS = 4_000
 MAX_TOOL_RUN_HISTORY = 30
 TOOL_RUNS_FILE = MEMORY / "tool_runs.json"
 
+# The only environment variables a tool subprocess ever sees. This is a
+# strict allowlist, not a denylist: everything else in this process's
+# real environment — GEMINI_API_KEY, ANTHROPIC_API_KEY, OPENAI_API_KEY,
+# GITHUB_TOKEN, whatever else happens to be set — is simply absent,
+# rather than trusted to not be read. A tool file is text a model wrote;
+# it has no legitimate reason to see credentials, and subprocess.run()
+# inherits the *entire* parent environment by default if you let it, so
+# this has to be built explicitly rather than filtered after the fact.
+SAFE_TOOL_ENV_ALLOWLIST = {"PATH", "LANG", "LC_ALL", "LC_CTYPE", "TMPDIR", "TEMP", "TMP"}
+if os.name == "nt":
+    # A bare Python interpreter on Windows generally won't start at all
+    # without these — they're not a broader trust decision, just what's
+    # needed for the process to boot.
+    SAFE_TOOL_ENV_ALLOWLIST |= {"SYSTEMROOT", "SYSTEMDRIVE", "WINDIR", "COMSPEC"}
+
+
+def build_sandboxed_tool_env() -> dict:
+    """Build the minimal env dict passed to a tool-run subprocess — see
+    SAFE_TOOL_ENV_ALLOWLIST above for what's in it and why."""
+    return {k: v for k, v in os.environ.items() if k in SAFE_TOOL_ENV_ALLOWLIST}
+
 
 def load_tool_runs() -> dict:
     if not TOOL_RUNS_FILE.exists():
@@ -1090,12 +1310,23 @@ def format_tool_runs_for_prompt() -> str:
 def apply_tool_run(raw_json: str, now: datetime, journal_fname: str) -> list[str]:
     """
     Executes exactly one already-written file from memory/tools/ with
-    Python and nothing else — no shell, no arbitrary paths, no network
-    guarantee beyond what the OS provides, bounded by a timeout and
-    output cap. The result is persisted to tool_runs.json so a FUTURE
-    wake (not this one — the run happens after the model's text is
-    already generated) can read real evidence instead of trusting the
-    model's own unverified claim that a tool 'works'.
+    Python and nothing else — no shell, no arbitrary paths, bounded by
+    a timeout and output cap. The result is persisted to tool_runs.json
+    so a FUTURE wake (not this one — the run happens after the model's
+    text is already generated) can read real evidence instead of
+    trusting the model's own unverified claim that a tool 'works'.
+
+    Sandboxing, best-effort within what a plain subprocess allows (this
+    is not a chroot or a container — a tool could still open an
+    absolute path elsewhere on disk if it tried):
+      - env is rebuilt from SAFE_TOOL_ENV_ALLOWLIST, not inherited —
+        provider API keys, GITHUB_TOKEN, and anything else in this
+        process's real environment are never visible to the subprocess.
+      - cwd is TOOLS_DIR (memory/tools/), not the repo root — a script
+        that opens a relative path by default lands inside its own
+        directory, not next to identity.md, rules.md, or .env.
+      - no network guarantee beyond what the OS otherwise provides —
+        this project does not sandbox network access itself.
     """
     try:
         data_in = json.loads(raw_json)
@@ -1127,7 +1358,8 @@ def apply_tool_run(raw_json: str, now: datetime, journal_fname: str) -> list[str
     try:
         proc = subprocess.run(
             [sys.executable, str(target), *clean_args],
-            cwd=ROOT,
+            cwd=TOOLS_DIR,
+            env=build_sandboxed_tool_env(),
             timeout=TOOL_RUN_TIMEOUT_SECONDS,
             capture_output=True,
             text=True,
@@ -1285,6 +1517,7 @@ def compose_fallback_blog_post(prior_notes: list[str], now: datetime) -> str:
 def apply_self_edits(model_output: str, config: dict, now: datetime, journal_fname: str) -> str:
     """
     Look for identity-update / commitments-update / blog-post /
+    growth-plan-update / hypothesis-update / tool-write / tool-run /
     core-memory-add blocks in the journal output and apply them if
     valid, via the narrow structured functions above. If
     enable_pull_requests is on in config, also looks for a proposal
@@ -1304,7 +1537,7 @@ def apply_self_edits(model_output: str, config: dict, now: datetime, journal_fna
 
     identity_block = extract_block(model_output, "identity-update")
     if identity_block is not None:
-        all_notes.extend(apply_identity_update(identity_block))
+        all_notes.extend(apply_identity_update(identity_block, now))
 
     commitments_block = extract_block(model_output, "commitments-update")
     if commitments_block is not None:
@@ -1320,6 +1553,10 @@ def apply_self_edits(model_output: str, config: dict, now: datetime, journal_fna
     growth_block = extract_block(model_output, "growth-plan-update")
     if growth_block is not None:
         all_notes.extend(apply_growth_plan_update(growth_block, now))
+
+    hypothesis_block = extract_block(model_output, "hypothesis-update")
+    if hypothesis_block is not None:
+        all_notes.extend(apply_hypotheses_update(hypothesis_block, now))
 
     tool_block = extract_block(model_output, "tool-write")
     if tool_block is not None:
