@@ -35,7 +35,14 @@ jobs:
         run: |
           git config user.name "wake-bot"
           git config user.email "wake-bot@users.noreply.github.com"
-          # Include the active identity and any archived memory_<name>/ histories.
-          git add --all -- memory 'memory_*'
+          # Include the active identity and any archived memory_<name>/
+          # histories. nullglob makes memory_* expand to nothing (not a
+          # literal, unmatched string) when no archive exists yet — a
+          # literal 'memory_*' pathspec passed straight to `git add`
+          # fails with "did not match any files" the first time this
+          # runs, before any identity has ever been archived.
+          shopt -s nullglob
+          archives=(memory_*)
+          git add --all -- memory "${archives[@]}"
           git diff --quiet --cached || git commit -m "Wake cycle: $(date -u +%Y-%m-%d-%H%M%S)"
           git push
