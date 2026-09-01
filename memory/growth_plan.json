@@ -20,6 +20,21 @@
           "evidence": "Constructed validate_memory.py and queued tool-run execution."
         }
       ]
+    },
+    {
+      "id": "g-2026-08-31-224322-0",
+      "created": "Aug 31st, 2026 10:43pm",
+      "title": "Automated workspace integrity validator",
+      "capability": "Ability to verify that all core memory and state files exist and contain valid JSON/Markdown",
+      "next_step": "Inspect tool_runs.json stdout next wake to verify all workspace integrity checks pass",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Aug 31st, 2026 10:43pm",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        }
+      ]
     }
   ]
 }
