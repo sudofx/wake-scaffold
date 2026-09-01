@@ -1,8 +1,13 @@
 name: Wake Cycle
 
 on:
+  # 5x/day = 10 model calls/day (reflection + journal per wake), against
+  # Gemini free tier's 20/day cap. Was 8x/day (16 calls, only 4 of margin) —
+  # confirmed too tight on 2026-09-01: a handful of manual test runs on top
+  # of the schedule triggered real 429 RESOURCE_EXHAUSTED errors. This
+  # leaves a 10-call margin per day for manual runs, 503 stragglers, etc.
   schedule:
-    - cron: "0 1,4,7,10,13,16,19,22 * * *"
+    - cron: "0 2,7,11,15,19 * * *"
   workflow_dispatch: {}
 
 # Grant only the permissions this workflow needs: recording wake data and
