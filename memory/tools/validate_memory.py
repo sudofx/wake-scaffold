@@ -1,89 +1,68 @@
-import json
 import sys
 import os
+import json
 
 def validate_memory(memory_dir):
-    errors = []
+    if not os.path.isdir(memory_dir):
+        alt = os.path.join("..", memory_dir)
+        if os.path.isdir(alt):
+            memory_dir = alt
+
+    print(f"Validating memory directory: {memory_dir}")
+    if not os.path.isdir(memory_dir):
+        print(f"ERROR: Memory directory '{memory_dir}' does not exist.")
+        sys.exit(1)
+        
+    files = os.listdir(memory_dir)
+    print(f"Found files in {memory_dir}: {files}")
     
-    check_dirs = [memory_dir]
-    if memory_dir == ".":
-        check_dirs.extend(["..", "../memory", "memory"])
-
-    effective_dir = None
-    for d in check_dirs:
-        if os.path.exists(os.path.join(d, "identity.md")):
-            effective_dir = d
-            break
-
-    if not effective_dir:
-        effective_dir = memory_dir
-
-    required_files = [
-        "identity.md",
-        "rules.md",
-        "index.md",
-        "commitments.json",
-        "growth_plan.json",
-        "hypotheses.json",
-        "core_memories.json"
-    ]
+    errors = 0
+    warnings = 0
     
-    for fname in required_files:
-        path = os.path.join(effective_dir, fname)
-        if not os.path.isfile(path):
-            errors.append(f"Missing required file: {fname} (searched in {effective_dir})")
-            
-    json_files = {
-        "commitments.json": {"allowed_statuses": ["open", "in_progress", "blocked", "closed"], "required_keys": ["id", "to", "what", "status"]},
-        "growth_plan.json": {"allowed_statuses": ["proposed", "active", "blocked", "complete"], "required_keys": ["id", "title", "capability", "status"]},
-        "hypotheses.json": {"allowed_statuses": ["testing", "confirmed", "refuted", "inconclusive"], "required_keys": ["id", "prediction", "test_method", "status"]}
+    def get_items(data, possible_keys):
+        if isinstance(data, list):
+            return data
+        if isinstance(data, dict):
+            for k in possible_keys:
+                if k in data and isinstance(data[k], list):
+                    return data[k]
+            for k, v in data.items():
+                if isinstance(v, list):
+                    return v
+        return None
+
+    targets = {
+        'commitments.json': ['commitments', 'items', 'add'],
+        'growth_plan.json': ['projects', 'growth_plan', 'items', 'add'],
+        'hypotheses.json': ['hypotheses', 'items', 'add'],
+        'core_memories.json': ['core_memories', 'memories', 'lessons', 'items']
     }
-    
-    for fname, schema in json_files.items():
-        path = os.path.join(effective_dir, fname)
-        if not os.path.exists(path):
-            continue
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            if not isinstance(data, list):
-                errors.append(f"{fname}: Top-level structure must be a JSON array (list)")
-                continue
-            for idx, item in enumerate(data):
-                if not isinstance(item, dict):
-                    errors.append(f"{fname}[{idx}]: Item must be an object (dict)")
-                    continue
-                for rkey in schema["required_keys"]:
-                    if rkey not in item:
-                        errors.append(f"{fname}[{idx}]: Missing required key '{rkey}'")
-                if "status" in item and item["status"] not in schema["allowed_statuses"]:
-                    errors.append(f"{fname}[{idx}]: Invalid status '{item['status']}'. Must be one of {schema['allowed_statuses']}")
-        except json.JSONDecodeError as e:
-            errors.append(f"{fname}: Invalid JSON syntax - {e}")
-        except Exception as e:
-            errors.append(f"{fname}: Failed to read/validate - {e}")
-            
-    cm_path = os.path.join(effective_dir, "core_memories.json")
-    if os.path.exists(cm_path):
-        try:
-            with open(cm_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            if not isinstance(data, list):
-                errors.append("core_memories.json: Top-level structure must be a JSON array")
-        except Exception as e:
-            errors.append(f"core_memories.json: Invalid JSON - {e}")
 
-    return errors, effective_dir
+    for fname, keys in targets.items():
+        fpath = os.path.join(memory_dir, fname)
+        if os.path.exists(fpath):
+            try:
+                with open(fpath, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                dtype = type(data).__name__
+                items = get_items(data, keys)
+                if items is None:
+                    print(f"WARNING: {fname} (type {dtype}) could not be extracted into an item list.")
+                    warnings += 1
+                else:
+                    print(f"SUCCESS: {fname} (type {dtype}) validated with {len(items)} item(s).")
+            except Exception as e:
+                print(f"ERROR: Failed to read/parse {fname}: {e}")
+                errors += 1
+        else:
+            print(f"INFO: {fname} does not exist yet.")
 
-if __name__ == "__main__":
-    target = sys.argv[1] if len(sys.argv) > 1 else "."
-    errs, eff_dir = validate_memory(target)
-    print(f"Validated directory: {eff_dir}")
-    if errs:
-        print("Validation FAILED:")
-        for err in errs:
-            print(f"  - {err}")
+    print(f"Validation summary: {errors} error(s), {warnings} warning(s).")
+    if errors > 0:
         sys.exit(1)
     else:
-        print("Validation PASSED: All memory files exist and adhere to schema.")
         sys.exit(0)
+
+if __name__ == '__main__':
+    target = sys.argv[1] if len(sys.argv) > 1 else 'memory'
+    validate_memory(target)

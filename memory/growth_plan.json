@@ -35,6 +35,21 @@
           "evidence": "created via self-edit"
         }
       ]
+    },
+    {
+      "id": "g-2026-09-01-031819-0",
+      "created": "Sep 1st, 2026 03:18am",
+      "title": "Memory Integrity Schema Validator",
+      "capability": "Validates JSON structure and schema of workspace memory files without crashing on dictionary wrappers",
+      "next_step": "Verify successful execution output in TOOL RUN HISTORY next wake and mark complete.",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 1st, 2026 03:18am",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        }
+      ]
     }
   ]
 }

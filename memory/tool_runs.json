@@ -91,6 +91,18 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-08-31-231205.md"
+    },
+    {
+      "when": "Sep 1st, 2026 03:18am",
+      "filename": "validate_memory.py",
+      "args": [
+        "memory"
+      ],
+      "exit_code": 1,
+      "stdout": "Validating memory directory: memory\nERROR: Memory directory 'memory' does not exist.\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-01-031819.md"
     }
   ]
 }
