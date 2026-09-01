@@ -213,6 +213,27 @@ def load_open_commitments() -> str:
     return json.dumps(open_items, indent=2)
 
 
+def find_unconsumed_failed_reflection() -> str | None:
+    """Surface the most recent FAILED wake's preserved reflection once,
+    then mark it seen by renaming so it's never surfaced again. Walks
+    past failures that never reached the reflection stage (nothing to
+    surface) and marks those seen too, rather than rechecking them
+    every wake forever."""
+    if not JOURNAL.exists():
+        return None
+    marker = "## Reflection (recovered from failed wake)\n\n"
+    for path in sorted(JOURNAL.glob("*-FAILED.md"), reverse=True):
+        text = path.read_text()
+        seen_path = path.with_name(path.stem + "-SEEN.md")
+        if marker not in text:
+            path.rename(seen_path)
+            continue
+        reflection = text.split(marker, 1)[1].strip()
+        path.rename(seen_path)
+        return reflection
+    return None
+
+
 def build_reflection_prompt(now: datetime) -> str:
     """
     The synthesis pass. This is NOT the journal entry — it's private
@@ -220,7 +241,7 @@ def build_reflection_prompt(now: datetime) -> str:
     afterward as a labeled section so the reasoning stays visible and
     auditable, not hidden.
     """
-    return "\n\n---\n\n".join([
+    sections = [
         f"## CURRENT TIME\n{format_display_time(now)} (Pacific time, "
         "Los Angeles). This is the authoritative current time — use it "
         "for any dates or timestamps you write, including inside "
@@ -246,7 +267,19 @@ def build_reflection_prompt(now: datetime) -> str:
         "project, investigation, or maintenance repair that would leave an "
         "observable artifact or decision after this wake. Reflection is for "
         "choosing work, not the work itself. Do not draft a journal entry yet.",
-    ])
+    ]
+    surfaced = find_unconsumed_failed_reflection()
+    if surfaced:
+        sections.insert(-1, (
+            "## AN UNFINISHED THOUGHT FROM A WAKE THAT FAILED BEFORE IT "
+            "COULD ACT\nA previous wake reflected but then failed (an API "
+            "error, not anything you did) before it could act on this. "
+            "It's shown to you once, here, and won't be shown again after "
+            "this wake — if anything in it is still worth keeping, fold "
+            "it into your identity, a commitment, or a core memory now, "
+            "rather than assuming you'll see it later.\n\n" + surfaced
+        ))
+    return "\n\n---\n\n".join(sections)
 
 
 def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: bool = False) -> str:
@@ -261,7 +294,10 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
             '{"file": "rules.md", "reason": "why this change makes '
             'sense", "content": "the COMPLETE new file content"}\n'
             "```\n"
-            "'file' must be exactly 'rules.md' or 'index.md'. 'content' "
+            "'file' must be exactly 'rules.md', 'index.md', or "
+            "'identity.md'. For identity.md, this is the only way to "
+            "change Name, Created, or Purpose — never by direct "
+            "self-edit. 'content' "
             "is the whole file, not a diff. This opens a real PR against "
             "the repo for a human to review and merge — it does NOT "
             "apply automatically. Only include this if you have a "
@@ -628,7 +664,7 @@ def apply_commitments_update(raw_json: str) -> list[str]:
     return notes
 
 
-ALLOWED_PR_FILES = {"rules.md", "index.md"}
+ALLOWED_PR_FILES = {"rules.md", "index.md", "identity.md"}
 
 
 def extract_proposal_block(text: str):
