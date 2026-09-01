@@ -1,77 +1,89 @@
 import json
 import sys
-from pathlib import Path
+import os
 
-def find_workspace_root():
-    cwd = Path.cwd()
-    if (cwd / 'commitments.json').exists() or (cwd / 'rules.md').exists():
-        return cwd
-    if (cwd.parent / 'commitments.json').exists():
-        return cwd.parent
-    script_dir = Path(__file__).resolve().parent
-    if (script_dir.parent / 'commitments.json').exists():
-        return script_dir.parent
-    return cwd
-
-def validate_json_file(file_path):
-    if not file_path.exists():
-        return False, f'Missing file: {file_path.name}'
-    try:
-        with open(file_path, 'r', encoding='utf-8') as f:
-            json.load(f)
-        return True, f'{file_path.name} is valid JSON'
-    except json.JSONDecodeError as e:
-        return False, f'Invalid JSON in {file_path.name}: {e}'
-    except Exception as e:
-        return False, f'Error reading {file_path.name}: {e}'
-
-def validate_workspace(root_dir):
-    results = []
-    errors = 0
+def validate_memory(memory_dir):
+    errors = []
     
-    json_files = ['commitments.json', 'growth_plan.json', 'hypotheses.json']
-    for jf in json_files:
-        target = root_dir / jf
-        ok, msg = validate_json_file(target)
-        if ok:
-            results.append(f'[OK] {msg}')
-        else:
-            results.append(f'[FAIL] {msg}')
-            errors += 1
-            
-    md_files = ['identity.md', 'rules.md']
-    for mf in md_files:
-        target = root_dir / mf
-        if target.exists() and target.stat().st_size > 0:
-            results.append(f'[OK] {mf} exists ({target.stat().st_size} bytes)')
-        else:
-            results.append(f'[FAIL] {mf} missing or empty')
-            errors += 1
-            
-    dirs = ['journal', 'tools']
-    for d in dirs:
-        target = root_dir / d
-        if target.is_dir():
-            results.append(f'[OK] directory \'{d}/\' exists')
-        else:
-            results.append(f'[FAIL] directory \'{d}/\' missing')
-            errors += 1
-            
-    return errors == 0, results
+    check_dirs = [memory_dir]
+    if memory_dir == ".":
+        check_dirs.extend(["..", "../memory", "memory"])
 
-def main():
-    root = find_workspace_root()
-    print(f'Validating workspace root at: {root}')
-    success, report = validate_workspace(root)
-    for line in report:
-        print(line)
-        
-    if success:
-        print('\nSUMMARY: All integrity checks passed.')
-        sys.exit(0)
-    else:
-        print('\nSUMMARY: Validation failed with errors.')
+    effective_dir = None
+    for d in check_dirs:
+        if os.path.exists(os.path.join(d, "identity.md")):
+            effective_dir = d
+            break
+
+    if not effective_dir:
+        effective_dir = memory_dir
+
+    required_files = [
+        "identity.md",
+        "rules.md",
+        "index.md",
+        "commitments.json",
+        "growth_plan.json",
+        "hypotheses.json",
+        "core_memories.json"
+    ]
+    
+    for fname in required_files:
+        path = os.path.join(effective_dir, fname)
+        if not os.path.isfile(path):
+            errors.append(f"Missing required file: {fname} (searched in {effective_dir})")
+            
+    json_files = {
+        "commitments.json": {"allowed_statuses": ["open", "in_progress", "blocked", "closed"], "required_keys": ["id", "to", "what", "status"]},
+        "growth_plan.json": {"allowed_statuses": ["proposed", "active", "blocked", "complete"], "required_keys": ["id", "title", "capability", "status"]},
+        "hypotheses.json": {"allowed_statuses": ["testing", "confirmed", "refuted", "inconclusive"], "required_keys": ["id", "prediction", "test_method", "status"]}
+    }
+    
+    for fname, schema in json_files.items():
+        path = os.path.join(effective_dir, fname)
+        if not os.path.exists(path):
+            continue
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if not isinstance(data, list):
+                errors.append(f"{fname}: Top-level structure must be a JSON array (list)")
+                continue
+            for idx, item in enumerate(data):
+                if not isinstance(item, dict):
+                    errors.append(f"{fname}[{idx}]: Item must be an object (dict)")
+                    continue
+                for rkey in schema["required_keys"]:
+                    if rkey not in item:
+                        errors.append(f"{fname}[{idx}]: Missing required key '{rkey}'")
+                if "status" in item and item["status"] not in schema["allowed_statuses"]:
+                    errors.append(f"{fname}[{idx}]: Invalid status '{item['status']}'. Must be one of {schema['allowed_statuses']}")
+        except json.JSONDecodeError as e:
+            errors.append(f"{fname}: Invalid JSON syntax - {e}")
+        except Exception as e:
+            errors.append(f"{fname}: Failed to read/validate - {e}")
+            
+    cm_path = os.path.join(effective_dir, "core_memories.json")
+    if os.path.exists(cm_path):
+        try:
+            with open(cm_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if not isinstance(data, list):
+                errors.append("core_memories.json: Top-level structure must be a JSON array")
+        except Exception as e:
+            errors.append(f"core_memories.json: Invalid JSON - {e}")
+
+    return errors, effective_dir
+
+if __name__ == "__main__":
+    target = sys.argv[1] if len(sys.argv) > 1 else "."
+    errs, eff_dir = validate_memory(target)
+    print(f"Validated directory: {eff_dir}")
+    if errs:
+        print("Validation FAILED:")
+        for err in errs:
+            print(f"  - {err}")
         sys.exit(1)
-
-if __name__ == '__main__':
-    main()
+    else:
+        print("Validation PASSED: All memory files exist and adhere to schema.")
+        sys.exit(0)
