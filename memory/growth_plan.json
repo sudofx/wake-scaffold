@@ -75,6 +75,21 @@
           "evidence": "created via self-edit"
         }
       ]
+    },
+    {
+      "id": "g-2026-09-01-120756-0",
+      "created": "Sep 1st, 2026 12:07pm",
+      "title": "Blog and Memory HTML Validator",
+      "capability": "Automated integrity checking of blog.html and memory file structures",
+      "next_step": "Inspect tool-run results next wake to confirm successful pass on memory/ and non-zero exit on invalid target",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 1st, 2026 12:07pm",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        }
+      ]
     }
   ]
 }

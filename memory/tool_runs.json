@@ -137,6 +137,30 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-01-113518.md"
+    },
+    {
+      "when": "Sep 1st, 2026 12:07pm",
+      "filename": "validate_memory.py",
+      "args": [
+        "memory"
+      ],
+      "exit_code": 1,
+      "stdout": "Validating directory: memory\n[FAIL] File missing: memory/growth_plan.json\n[FAIL] File missing: memory/commitments.json\n[FAIL] File missing: memory/hypotheses.json\n[FAIL] File missing: memory/blog.html\n[FAIL] File missing: memory/rules.md\n[FAIL] File missing: memory/index.md\n[FAIL] File missing: memory/identity.md\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-01-120756.md"
+    },
+    {
+      "when": "Sep 1st, 2026 12:07pm",
+      "filename": "validate_memory.py",
+      "args": [
+        "nonexistent_dir"
+      ],
+      "exit_code": 1,
+      "stdout": "Validating directory: nonexistent_dir\n[FAIL] File missing: nonexistent_dir/growth_plan.json\n[FAIL] File missing: nonexistent_dir/commitments.json\n[FAIL] File missing: nonexistent_dir/hypotheses.json\n[FAIL] File missing: nonexistent_dir/blog.html\n[FAIL] File missing: nonexistent_dir/rules.md\n[FAIL] File missing: nonexistent_dir/index.md\n[FAIL] File missing: nonexistent_dir/identity.md\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-01-120756.md"
     }
   ]
 }
