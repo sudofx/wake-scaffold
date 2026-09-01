@@ -32,6 +32,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -1719,6 +1720,72 @@ def write_failure_record(provider_name: str, stage: str, e: Exception, reflectio
     return fail_path
 
 
+def _is_transient_provider_error(e: Exception) -> bool:
+    """503 (model overloaded) and 429 (rate/quota) are worth a short
+    retry — the server itself is saying "not now, try shortly." Anything
+    else (bad API key, malformed request, network DNS failure, etc.)
+    will just fail the exact same way again, so don't burn wake time
+    retrying it."""
+    text = str(e)
+    return any(marker in text for marker in ("503", "429", "UNAVAILABLE", "RESOURCE_EXHAUSTED"))
+
+
+def _extract_retry_delay(e: Exception, default: float) -> float:
+    """Pull a server-suggested retry delay (in seconds) out of a
+    provider error message, if one is present. Gemini's 429 responses
+    include both a structured RetryInfo (`'retryDelay': '11s'`) and a
+    prose echo ("Please retry in 11.01s"); either form matches here.
+    Plain 503 overload errors don't include a delay at all, so this
+    falls back to `default` (exponential backoff) in that case.
+
+    Caveat: a short retryDelay does NOT distinguish a genuine short-term
+    rate limit from a daily quota that happens to report a small delay
+    anyway. Retrying honors what the server said; it doesn't guarantee
+    the retry will succeed if the daily cap is actually exhausted — that
+    case is expected to be caught by max_retries in generate_with_retry
+    below, which fails the wake rather than looping for hours.
+    """
+    text = str(e)
+    match = re.search(r"retryDelay['\"]?\s*:\s*['\"]?(\d+(?:\.\d+)?)s", text)
+    if not match:
+        match = re.search(r"retry in\s+(\d+(?:\.\d+)?)s", text, re.IGNORECASE)
+    if match:
+        return float(match.group(1))
+    return default
+
+
+def generate_with_retry(
+    provider,
+    system_prompt: str,
+    user_prompt: str,
+    max_retries: int = 2,
+    max_wait: float = 90.0,
+) -> str:
+    """provider.generate(), retrying transient (503/429) errors using
+    the server's own suggested delay when it provides one, else
+    exponential backoff. Each individual wait is capped at max_wait so
+    one huge server-suggested delay can't stall a GitHub Actions job;
+    total attempts are capped at max_retries + 1 so a genuinely
+    exhausted daily quota still fails the wake promptly (in seconds,
+    not the hours until the quota resets) instead of hanging.
+    """
+    attempt = 0
+    while True:
+        try:
+            return provider.generate(system_prompt, user_prompt)
+        except Exception as e:
+            if attempt >= max_retries or not _is_transient_provider_error(e):
+                raise
+            delay = min(_extract_retry_delay(e, default=5.0 * (2 ** attempt)), max_wait)
+            print(
+                f"Transient provider error ({type(e).__name__}), retrying in "
+                f"{delay:.1f}s (attempt {attempt + 1}/{max_retries})...",
+                file=sys.stderr,
+            )
+            time.sleep(delay)
+            attempt += 1
+
+
 def main():
     provider_name = "unknown"
     try:
@@ -1744,7 +1811,8 @@ def main():
 
     # Pass 1: reflect, before doing or writing anything.
     try:
-        reflection = provider.generate(
+        reflection = generate_with_retry(
+            provider,
             build_reflection_prompt(now),
             "Write your reflection now, in plain prose. This is not the "
             "journal entry — just your honest synthesis before acting.",
@@ -1769,7 +1837,8 @@ def main():
     )
 
     try:
-        output = provider.generate(
+        output = generate_with_retry(
+            provider,
             build_journal_prompt(reflection, now, config.get("enable_pull_requests", False)),
             user_prompt,
         )
