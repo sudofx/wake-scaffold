@@ -27,6 +27,7 @@ import tempfile
 import unittest
 from datetime import datetime
 from pathlib import Path
+from unittest.mock import patch
 from zoneinfo import ZoneInfo
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -272,6 +273,83 @@ class ToolRunSandboxTests(WakeTestCase):
         env_keys_line = next(line for line in stdout.splitlines() if line.startswith("ENV_KEYS:"))
         seen_keys = set(env_keys_line[len("ENV_KEYS:"):].split(",")) if env_keys_line[len("ENV_KEYS:"):] else set()
         self.assertTrue(seen_keys.issubset(wake.SAFE_TOOL_ENV_ALLOWLIST), seen_keys)
+
+
+class _ScriptedProvider:
+    """Raises a scripted sequence of exceptions, then returns a fixed
+    string once the sequence is exhausted. Used to exercise
+    generate_with_retry without touching a real network call."""
+
+    def __init__(self, exceptions):
+        self.exceptions = list(exceptions)
+        self.calls = 0
+
+    def generate(self, system_prompt, user_prompt):
+        self.calls += 1
+        if self.exceptions:
+            raise self.exceptions.pop(0)
+        return "ok"
+
+
+class RetryTests(unittest.TestCase):
+    """generate_with_retry: real evidence, not just reading the code,
+    that it (a) retries transient 503/429 errors and eventually
+    succeeds, (b) honors a server-supplied retryDelay when present,
+    (c) never sleeps for non-transient errors, and (d) still gives up
+    and raises once max_retries is exhausted — so a genuinely dead
+    daily quota fails the wake in seconds, not hours."""
+
+    def test_retries_transient_error_then_succeeds(self):
+        provider = _ScriptedProvider([
+            Exception("ServerError: 503 UNAVAILABLE. model overloaded"),
+        ])
+        with patch("wake.time.sleep") as mock_sleep:
+            result = wake.generate_with_retry(provider, "sys", "user")
+        self.assertEqual(result, "ok")
+        self.assertEqual(provider.calls, 2)
+        mock_sleep.assert_called_once()
+
+    def test_honors_server_supplied_retry_delay(self):
+        provider = _ScriptedProvider([
+            Exception(
+                "ClientError: 429 RESOURCE_EXHAUSTED. {'error': {'message': "
+                "'Please retry in 41.886700264s.', 'details': [{'@type': "
+                "'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': "
+                "'41s'}]}}"
+            ),
+        ])
+        with patch("wake.time.sleep") as mock_sleep:
+            result = wake.generate_with_retry(provider, "sys", "user")
+        self.assertEqual(result, "ok")
+        mock_sleep.assert_called_once_with(41.0)
+
+    def test_does_not_retry_non_transient_error(self):
+        provider = _ScriptedProvider([ValueError("GEMINI_API_KEY not set")])
+        with patch("wake.time.sleep") as mock_sleep:
+            with self.assertRaises(ValueError):
+                wake.generate_with_retry(provider, "sys", "user")
+        mock_sleep.assert_not_called()
+        self.assertEqual(provider.calls, 1)
+
+    def test_gives_up_after_max_retries(self):
+        always_fails = [
+            Exception("ServerError: 503 UNAVAILABLE. still overloaded")
+            for _ in range(5)
+        ]
+        provider = _ScriptedProvider(always_fails)
+        with patch("wake.time.sleep") as mock_sleep:
+            with self.assertRaises(Exception):
+                wake.generate_with_retry(provider, "sys", "user", max_retries=2)
+        self.assertEqual(provider.calls, 3)  # initial attempt + 2 retries
+        self.assertEqual(mock_sleep.call_count, 2)
+
+    def test_delay_capped_by_max_wait(self):
+        provider = _ScriptedProvider([
+            Exception("429 RESOURCE_EXHAUSTED. retry in 500s"),
+        ])
+        with patch("wake.time.sleep") as mock_sleep:
+            wake.generate_with_retry(provider, "sys", "user", max_wait=90.0)
+        mock_sleep.assert_called_once_with(90.0)
 
 
 if __name__ == "__main__":
