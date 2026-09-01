@@ -1,95 +1,84 @@
-import os
 import sys
+import os
 import json
 
-def find_memory_dir():
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    candidates = [
-        os.path.join(script_dir, "..", "memory"),
-        os.path.join(os.getcwd(), "memory"),
-        os.path.join(script_dir, ".."),
-        os.getcwd()
-    ]
-    for c in candidates:
-        if os.path.exists(c) and os.path.isdir(c):
-            for test_file in ["commitments.json", "growth_plan.json", "hypotheses.json", "core_memories.json"]:
-                if os.path.exists(os.path.join(c, test_file)):
-                    return os.path.abspath(c)
-    mem_dir = os.path.abspath(os.path.join(script_dir, "..", "memory"))
-    if os.path.exists(mem_dir):
-        return mem_dir
-    return os.path.abspath(os.path.join(script_dir, ".."))
-
-def validate_json_file(path):
-    if not os.path.exists(path):
-        return False, f"File not found: {path}"
+def validate_json_file(filepath):
+    if not os.path.exists(filepath):
+        print(f"MISSING: {filepath}")
+        return False, None
     try:
-        with open(path, "r", encoding="utf-8") as f:
+        with open(filepath, 'r', encoding='utf-8') as f:
             data = json.load(f)
+        print(f"OK (valid JSON): {filepath}")
         return True, data
     except Exception as e:
-        return False, f"JSON parse error: {str(e)}"
+        print(f"INVALID JSON: {filepath} - Error: {e}")
+        return False, None
 
-def validate_commitments(path):
-    ok, res = validate_json_file(path)
-    if not ok:
-        return False, res
-    items = res if isinstance(res, list) else res.get("commitments", res.get("add", [])) if isinstance(res, dict) else []
-    if not isinstance(items, list):
-        return False, "Commitments data is not a list"
-    return True, f"Validated {len(items)} commitment entries"
+def validate_commitments(data):
+    if not isinstance(data, list):
+        print("FAIL: commitments.json should be a list")
+        return False
+    valid = True
+    for idx, item in enumerate(data):
+        if not isinstance(item, dict):
+            print(f"FAIL: commitments.json item {idx} is not an object")
+            valid = False
+            continue
+        for req in ["id", "to", "what", "due", "status"]:
+            if req not in item:
+                print(f"FAIL: commitments.json item {idx} missing key '{req}'")
+                valid = False
+    if valid:
+        print(f"OK: commitments.json has {len(data)} valid entries")
+    return valid
 
-def validate_growth_plan(path):
-    ok, res = validate_json_file(path)
-    if not ok:
-        return False, res
-    items = res if isinstance(res, list) else res.get("projects", res.get("growth_plan", [])) if isinstance(res, dict) else []
-    if not isinstance(items, list):
-        return False, "Growth plan data is not a list"
-    return True, f"Validated {len(items)} growth plan entries"
-
-def validate_hypotheses(path):
-    ok, res = validate_json_file(path):
-    if not ok:
-        return False, res
-    items = res if isinstance(res, list) else res.get("hypotheses", []) if isinstance(res, dict) else []
-    if not isinstance(items, list):
-        return False, "Hypotheses data is not a list"
-    return True, f"Validated {len(items)} hypothesis entries"
+def validate_growth_plan(data):
+    if not isinstance(data, dict):
+        print("FAIL: growth_plan.json should be a dictionary/object")
+        return False
+    projects = data.get("projects", [])
+    if not isinstance(projects, list):
+        print("FAIL: growth_plan.json 'projects' key should be a list")
+        return False
+    valid = True
+    for idx, item in enumerate(projects):
+        if not isinstance(item, dict):
+            print(f"FAIL: growth_plan.json project {idx} is not an object")
+            valid = False
+            continue
+        for req in ["id", "title", "capability", "next_step", "status"]:
+            if req not in item:
+                print(f"FAIL: growth_plan.json project {idx} missing key '{req}'")
+                valid = False
+    if valid:
+        print(f"OK: growth_plan.json has {len(projects)} projects verified")
+    return valid
 
 def main():
-    target_dir = find_memory_dir()
-    print(f"Target memory directory resolved to: {target_dir}")
+    target_dir = sys.argv[1] if len(sys.argv) > 1 else "."
+    print(f"Validating memory files in directory: {target_dir}")
     
     files_to_check = {
         "commitments.json": validate_commitments,
-        "growth_plan.json": validate_growth_plan,
-        "hypotheses.json": validate_hypotheses,
+        "growth_plan.json": validate_growth_plan
     }
     
     all_ok = True
-    for fname, validator in files_to_check.items():
-        fpath = os.path.join(target_dir, fname)
-        if not os.path.exists(fpath):
-            alt_path = os.path.join(os.path.dirname(target_dir), fname)
-            if os.path.exists(alt_path):
-                fpath = alt_path
-            else:
-                print(f"[SKIP] {fname}: File not found at {fpath}")
-                continue
-        
-        ok, msg = validator(fpath)
-        if ok:
-            print(f"[PASS] {fname}: {msg}")
-        else:
-            print(f"[FAIL] {fname}: {msg}")
+    for filename, validator in files_to_check.items():
+        path = os.path.join(target_dir, filename)
+        ok, data = validate_json_file(path)
+        if ok and data is not None and validator:
+            if not validator(data):
+                all_ok = False
+        elif not ok:
             all_ok = False
 
     if all_ok:
-        print("Memory validation completed successfully.")
+        print("SUCCESS: Memory validation passed all checks.")
         sys.exit(0)
     else:
-        print("Memory validation encountered failures.")
+        print("FAILURE: Memory validation found issues.")
         sys.exit(1)
 
 if __name__ == "__main__":
