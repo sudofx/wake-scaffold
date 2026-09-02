@@ -1,68 +1,102 @@
 import json
-import os
 import sys
+from pathlib import Path
 
-def validate_json_file(filepath):
-    if not os.path.exists(filepath):
-        print(f"File not found: {filepath}")
-        return None
-    try:
-        with open(filepath, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        print(f"Successfully parsed JSON from {filepath}")
-        return data
-    except Exception as e:
-        print(f"Error parsing JSON from {filepath}: {e}")
-        return None
-
-def validate_commitments(base_dir):
-    path = os.path.join(base_dir, "commitments.json")
-    if not os.path.exists(path):
-        print(f"Missing {path}")
-        return False
-    data = validate_json_file(path)
-    if data is None:
-        return False
+def find_memory_dir(given_path=None):
+    candidates = []
+    if given_path:
+        p = Path(given_path)
+        candidates.extend([p, Path.cwd() / p, Path.cwd().parent / p])
     
-    commitments = []
-    if isinstance(data, list):
-        commitments = data
-    elif isinstance(data, dict):
-        if "commitments" in data and isinstance(data["commitments"], list):
-            commitments = data["commitments"]
-        else:
-            commitments = [data]
-    else:
-        print(f"Invalid commitments structure in {path}: {type(data)}")
+    candidates.extend([
+        Path.cwd(),
+        Path.cwd() / "memory",
+        Path.cwd().parent,
+        Path.cwd().parent / "memory"
+    ])
+
+    for cand in candidates:
+        if cand.is_dir():
+            if (cand / "commitments.json").exists() or (cand / "identity.md").exists():
+                return cand.resolve()
+    
+    return Path.cwd().resolve()
+
+def validate_json_file(file_path, expected_type=None):
+    if not file_path.exists():
+        print(f"MISSING: {file_path.name}")
+        return False
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if expected_type and not isinstance(data, expected_type):
+            print(f"INVALID SCHEMA: {file_path.name} expected {expected_type.__name__}, got {type(data).__name__}")
+            return False
+        item_count = len(data) if isinstance(data, (list, dict)) else 0
+        print(f"OK: {file_path.name} (valid JSON, {item_count} items)")
+        return True
+    except Exception as e:
+        print(f"ERROR parsing {file_path.name}: {e}")
         return False
 
-    print(f"Validated commitments in {path} (count: {len(commitments)})")
-    return True
-
-def validate_json_list_or_dict(base_dir, filename):
-    path = os.path.join(base_dir, filename)
-    if os.path.exists(path):
-        data = validate_json_file(path)
-        if data is None:
-            return False
-        print(f"Validated {filename}")
-    return True
+def validate_text_file(file_path):
+    if not file_path.exists():
+        print(f"MISSING: {file_path.name}")
+        return False
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        print(f"OK: {file_path.name} ({len(content)} chars)")
+        return True
+    except Exception as e:
+        print(f"ERROR reading {file_path.name}: {e}")
+        return False
 
 def main():
-    target_dir = sys.argv[1] if len(sys.argv) > 1 else "memory"
-    print(f"Validating memory directory: {target_dir}")
-    
-    ok = True
-    ok = validate_commitments(target_dir) and ok
-    ok = validate_json_list_or_dict(target_dir, "core_memories.json") and ok
-    ok = validate_json_list_or_dict(target_dir, "growth_plan.json") and ok
-    ok = validate_json_list_or_dict(target_dir, "hypotheses.json") and ok
+    given_arg = sys.argv[1] if len(sys.argv) > 1 else None
+    mem_dir = find_memory_dir(given_arg)
+    print(f"Validating memory directory at: {mem_dir}")
 
-    if not ok:
-        print("Validation FAILED")
-        sys.exit(1)
+    json_files = {
+        "commitments.json": list,
+        "growth_plan.json": list,
+        "hypotheses.json": list,
+        "core_memories.json": list,
+    }
     
-    print("Validation PASSED successfully")
+    text_files = ["identity.md", "index.md", "rules.md"]
+
+    success = True
+
+    for jf, exp_type in json_files.items():
+        p = mem_dir / jf
+        if p.exists():
+            if not validate_json_file(p, exp_type):
+                success = False
+        else:
+            alt_p = Path.cwd() / jf
+            if alt_p.exists():
+                if not validate_json_file(alt_p, exp_type):
+                    success = False
+            else:
+                print(f"OPTIONAL/MISSING: {jf}")
+
+    for tf in text_files:
+        p = mem_dir / tf
+        if p.exists():
+            if not validate_text_file(p):
+                success = False
+        else:
+            alt_p = Path.cwd() / tf:
+                if not validate_text_file(alt_p):
+                    success = False
+
+    if success:
+        print("SUCCESS: Memory validation passed.")
+        sys.exit(0)
+    else:
+        print("FAILURE: Memory validation encountered errors.")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
