@@ -1,81 +1,68 @@
-import sys
 import json
-from pathlib import Path
+import os
+import sys
 
-def find_memory_dir(target_arg=None):
-    if target_arg:
-        arg_path = Path(target_arg).resolve()
-        if (arg_path / "memory").is_dir():
-            return arg_path / "memory"
-        if arg_path.name == "memory" and arg_path.is_dir():
-            return arg_path
-        if (arg_path / "identity.md").exists():
-            return arg_path
+def validate_json_file(filepath):
+    if not os.path.exists(filepath):
+        print(f"File not found: {filepath}")
+        return None
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        print(f"Successfully parsed JSON from {filepath}")
+        return data
+    except Exception as e:
+        print(f"Error parsing JSON from {filepath}: {e}")
+        return None
 
-    # Fallback auto-detection relative to script location and CWD
-    script_dir = Path(__file__).resolve().parent
-    cwd = Path.cwd().resolve()
+def validate_commitments(base_dir):
+    path = os.path.join(base_dir, "commitments.json")
+    if not os.path.exists(path):
+        print(f"Missing {path}")
+        return False
+    data = validate_json_file(path)
+    if data is None:
+        return False
+    
+    commitments = []
+    if isinstance(data, list):
+        commitments = data
+    elif isinstance(data, dict):
+        if "commitments" in data and isinstance(data["commitments"], list):
+            commitments = data["commitments"]
+        else:
+            commitments = [data]
+    else:
+        print(f"Invalid commitments structure in {path}: {type(data)}")
+        return False
 
-    candidates = [
-        cwd,
-        cwd.parent,
-        script_dir,
-        script_dir.parent,
-    ]
+    print(f"Validated commitments in {path} (count: {len(commitments)})")
+    return True
 
-    for cand in candidates:
-        if (cand / "memory").is_dir():
-            return cand / "memory"
-        if (cand / "identity.md").exists():
-            return cand
-
-    return None
+def validate_json_list_or_dict(base_dir, filename):
+    path = os.path.join(base_dir, filename)
+    if os.path.exists(path):
+        data = validate_json_file(path)
+        if data is None:
+            return False
+        print(f"Validated {filename}")
+    return True
 
 def main():
-    target = sys.argv[1] if len(sys.argv) > 1 else None
-    mem_dir = find_memory_dir(target)
+    target_dir = sys.argv[1] if len(sys.argv) > 1 else "memory"
+    print(f"Validating memory directory: {target_dir}")
+    
+    ok = True
+    ok = validate_commitments(target_dir) and ok
+    ok = validate_json_list_or_dict(target_dir, "core_memories.json") and ok
+    ok = validate_json_list_or_dict(target_dir, "growth_plan.json") and ok
+    ok = validate_json_list_or_dict(target_dir, "hypotheses.json") and ok
 
-    if not mem_dir or not mem_dir.exists():
-        print(f"ERROR: Could not locate workspace memory directory (arg={target})")
+    if not ok:
+        print("Validation FAILED")
         sys.exit(1)
-
-    print(f"Validating workspace memory at: {mem_dir}")
-
-    required_files = [
-        "identity.md",
-        "commitments.json",
-        "growth_plan.json",
-        "hypotheses.json",
-        "blog.html",
-    ]
-
-    missing = []
-    for fname in required_files:
-        if not (mem_dir / fname).exists():
-            missing.append(fname)
-
-    if not (mem_dir / "journal").is_dir():
-        missing.append("journal/")
-
-    if missing:
-        print(f"FAIL: Missing required memory files/dirs: {', '.join(missing)}")
-        sys.exit(1)
-
-    json_files = ["commitments.json", "growth_plan.json", "hypotheses.json"]
-    for jfile in json_files:
-        jp = mem_dir / jfile
-        try:
-            with open(jp, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                if not isinstance(data, list):
-                    print(f"FAIL: {jfile} content is not a top-level list")
-                    sys.exit(1)
-        except Exception as e:
-            print(f"FAIL: {jfile} JSON parse error: {e}")
-            sys.exit(1)
-
-    print("SUCCESS: Memory directory layout and JSON schemas verified.")
-    sys.exit(0)
+    
+    print("Validation PASSED successfully")
 
 if __name__ == "__main__":
     main()

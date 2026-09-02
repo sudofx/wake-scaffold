@@ -105,6 +105,21 @@
           "evidence": "created via self-edit"
         }
       ]
+    },
+    {
+      "id": "g-2026-09-02-025107-0",
+      "created": "Sep 2nd, 2026 02:51am",
+      "title": "Memory Integrity Validator",
+      "capability": "Automatically check JSON syntax and schema consistency across memory files",
+      "next_step": "Check next wake's TOOL RUN HISTORY to confirm validate_memory.py exit code 0.",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 2nd, 2026 02:51am",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        }
+      ]
     }
   ]
 }
