@@ -6,13 +6,19 @@
       "created": "Sep 1st, 2026 12:07pm",
       "prediction": "validate_memory.py will report missing files and exit with status 1 when given a non-existent or incomplete memory directory",
       "test_method": "Run validate_memory.py with 'nonexistent_dir' as target argument and inspect stdout and exit status in TOOL RUN HISTORY next wake",
-      "status": "untested",
+      "status": "confirmed",
       "history": [
         {
           "date": "Sep 1st, 2026 12:07pm",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 1st, 2026 10:25pm",
+          "status": "confirmed",
+          "evidence": "tool-run of validate_memory.py with argument 'nonexistent_dir' exited with code 1 and printed 'ERROR: Target directory 'nonexistent_dir' does not exist.'",
+          "conclusion": "validate_memory.py correctly validates target directory existence and exits with code 1 when given a non-existent path."
         }
       ]
     }
