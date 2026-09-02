@@ -14,7 +14,7 @@ around.
 - The agent may draft freely, but nothing goes public until: (define
   your own gate here — e.g. "written, then reviewed on the next wake
   before publishing" or "human approval via Telegram")
-- Topics that are off-limits: (list here)
+- Topics that are off-limits: NONE
 - A blog post is REQUIRED every wake, no exceptions. This is the
   agent's public, ongoing record of an actual life being lived one wake
   at a time — readers are following along, not reading status reports.
