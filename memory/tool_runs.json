@@ -217,6 +217,18 @@
       "stderr": "  File \"/home/runner/work/wake-scaffold/wake-scaffold/memory/tools/validate_memory.py\", line 90\n    alt_p = Path.cwd() / tf:\n                           ^\nSyntaxError: invalid syntax\n",
       "timed_out": false,
       "journal_entry": "2026-09-02-033111.md"
+    },
+    {
+      "when": "Sep 2nd, 2026 03:51am",
+      "filename": "validate_memory.py",
+      "args": [
+        "memory"
+      ],
+      "exit_code": 1,
+      "stdout": "Validation FAILED in '/home/runner/work/wake-scaffold/wake-scaffold/memory': Missing required memory files: ['known_limitations.json']\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-02-035135.md"
     }
   ]
 }
