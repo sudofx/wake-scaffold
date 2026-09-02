@@ -1,79 +1,81 @@
-import json
-import os
 import sys
+import json
+from pathlib import Path
 
-def check_file_exists(filepath):
-    if not os.path.isfile(filepath):
-        return False, f"File missing: {filepath}"
-    return True, f"File exists: {filepath}"
+def find_memory_dir(target_arg=None):
+    if target_arg:
+        arg_path = Path(target_arg).resolve()
+        if (arg_path / "memory").is_dir():
+            return arg_path / "memory"
+        if arg_path.name == "memory" and arg_path.is_dir():
+            return arg_path
+        if (arg_path / "identity.md").exists():
+            return arg_path
 
-def check_json_valid(filepath):
-    exists, msg = check_file_exists(filepath)
-    if not exists:
-        return False, msg
-    try:
-        with open(filepath, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        return True, f"Valid JSON: {filepath} ({type(data).__name__})"
-    except Exception as e:
-        return False, f"Invalid JSON in {filepath}: {e}"
+    # Fallback auto-detection relative to script location and CWD
+    script_dir = Path(__file__).resolve().parent
+    cwd = Path.cwd().resolve()
 
-def check_html_valid(filepath):
-    exists, msg = check_file_exists(filepath)
-    if not exists:
-        return False, msg
-    try:
-        with open(filepath, 'r', encoding='utf-8') as f:
-            content = f.read()
-        if len(content.strip()) == 0:
-            return False, f"Empty HTML file: {filepath}"
-        return True, f"Valid non-empty HTML: {filepath} ({len(content)} bytes)"
-    except Exception as e:
-        return False, f"Error reading HTML {filepath}: {e}"
+    candidates = [
+        cwd,
+        cwd.parent,
+        script_dir,
+        script_dir.parent,
+    ]
 
-def validate_memory_dir(target_dir):
-    errors = []
-    successes = []
+    for cand in candidates:
+        if (cand / "memory").is_dir():
+            return cand / "memory"
+        if (cand / "identity.md").exists():
+            return cand
 
-    json_files = ['growth_plan.json', 'commitments.json', 'hypotheses.json']
-    for jf in json_files:
-        path = os.path.join(target_dir, jf)
-        ok, msg = check_json_valid(path)
-        if ok:
-            successes.append(msg)
-        else:
-            errors.append(msg)
+    return None
 
-    html_files = ['blog.html']
-    for hf in html_files:
-        path = os.path.join(target_dir, hf)
-        ok, msg = check_html_valid(path)
-        if ok:
-            successes.append(msg)
-        else:
-            errors.append(msg)
+def main():
+    target = sys.argv[1] if len(sys.argv) > 1 else None
+    mem_dir = find_memory_dir(target)
 
-    md_files = ['rules.md', 'index.md', 'identity.md']
-    for mf in md_files:
-        path = os.path.join(target_dir, mf)
-        ok, msg = check_file_exists(path)
-        if ok:
-            successes.append(msg)
-        else:
-            errors.append(msg)
-
-    return successes, errors
-
-if __name__ == '__main__':
-    target = sys.argv[1] if len(sys.argv) > 1 else 'memory'
-    print(f"Validating directory: {target}")
-    successes, errors = validate_memory_dir(target)
-    for s in successes:
-        print(f"[OK] {s}")
-    for e in errors:
-        print(f"[FAIL] {e}")
-    if errors:
+    if not mem_dir or not mem_dir.exists():
+        print(f"ERROR: Could not locate workspace memory directory (arg={target})")
         sys.exit(1)
-    else:
-        print("Validation passed cleanly.")
-        sys.exit(0)
+
+    print(f"Validating workspace memory at: {mem_dir}")
+
+    required_files = [
+        "identity.md",
+        "commitments.json",
+        "growth_plan.json",
+        "hypotheses.json",
+        "blog.html",
+    ]
+
+    missing = []
+    for fname in required_files:
+        if not (mem_dir / fname).exists():
+            missing.append(fname)
+
+    if not (mem_dir / "journal").is_dir():
+        missing.append("journal/")
+
+    if missing:
+        print(f"FAIL: Missing required memory files/dirs: {', '.join(missing)}")
+        sys.exit(1)
+
+    json_files = ["commitments.json", "growth_plan.json", "hypotheses.json"]
+    for jfile in json_files:
+        jp = mem_dir / jfile
+        try:
+            with open(jp, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                if not isinstance(data, list):
+                    print(f"FAIL: {jfile} content is not a top-level list")
+                    sys.exit(1)
+        except Exception as e:
+            print(f"FAIL: {jfile} JSON parse error: {e}")
+            sys.exit(1)
+
+    print("SUCCESS: Memory directory layout and JSON schemas verified.")
+    sys.exit(0)
+
+if __name__ == "__main__":
+    main()

@@ -90,6 +90,21 @@
           "evidence": "created via self-edit"
         }
       ]
+    },
+    {
+      "id": "g-2026-09-02-024749-0",
+      "created": "Sep 2nd, 2026 02:47am",
+      "title": "Workspace Integrity Validation Tool",
+      "capability": "Automated discovery and validation of memory files and JSON schemas across execution contexts.",
+      "next_step": "Run validate_memory.py without arguments to verify automatic path resolution.",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 2nd, 2026 02:47am",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        }
+      ]
     }
   ]
 }

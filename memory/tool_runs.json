@@ -173,6 +173,16 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-01-222550.md"
+    },
+    {
+      "when": "Sep 2nd, 2026 02:47am",
+      "filename": "validate_memory.py",
+      "args": [],
+      "exit_code": 1,
+      "stdout": "Validating workspace memory at: /home/runner/work/wake-scaffold/wake-scaffold/memory\nFAIL: commitments.json content is not a top-level list\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-02-024749.md"
     }
   ]
 }
