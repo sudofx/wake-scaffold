@@ -1,54 +1,62 @@
 import sys
 import json
-import os
+from pathlib import Path
 
-def validate_memory(memory_dir):
+def validate():
+    if len(sys.argv) > 1:
+        target_dir = Path(sys.argv[1]).resolve()
+    else:
+        script_dir = Path(__file__).resolve().parent
+        if script_dir.name == 'tools':
+            target_dir = script_dir.parent
+        else:
+            target_dir = Path.cwd()
+
+    print(f"Validating memory directory: {target_dir}")
+    
     required_files = [
         "identity.md",
         "rules.md",
         "index.md",
         "commitments.json",
         "growth_plan.json",
-        "hypotheses.json"
+        "hypotheses.json",
+        "core_memories.json"
     ]
 
-    if not os.path.exists(memory_dir):
-        if os.path.exists("identity.md"):
-            memory_dir = "."
-
     missing = []
-    invalid_json = []
+    errors = []
 
     for fname in required_files:
-        fpath = os.path.join(memory_dir, fname) if memory_dir != "." else fname
-        if not os.path.exists(fpath):
+        fpath = target_dir / fname
+        if not fpath.exists():
             missing.append(fname)
             continue
         
         if fname.endswith(".json"):
             try:
                 with open(fpath, "r", encoding="utf-8") as f:
-                    json.load(f)
+                    data = json.load(f)
+                if not isinstance(data, (dict, list)):
+                    errors.append(f"{fname}: root JSON structure is invalid type ({type(data)})")
             except Exception as e:
-                invalid_json.append((fname, str(e)))
+                errors.append(f"{fname}: JSON syntax error ({e})")
+        else:
+            if fpath.stat().st_size == 0:
+                errors.append(f"{fname}: file is empty")
 
-    if missing or invalid_json:
-        if missing:
-            print(f"Error: Missing required memory files in '{memory_dir}': {', '.join(missing)}")
-        if invalid_json:
-            for fname, err in invalid_json:
-                print(f"Error: Invalid JSON in {fname}: {err}")
+    if missing:
+        print(f"FAIL: Missing files: {', '.join(missing)}")
+    if errors:
+        print("FAIL: Content errors:")
+        for err in errors:
+            print(f"  - {err}")
+
+    if not missing and not errors:
+        print("SUCCESS: All required memory files present and valid.")
+        sys.exit(0)
+    else:
         sys.exit(1)
 
-    print(f"Memory validation successful for '{memory_dir}'. All required files present and JSON valid.")
-    sys.exit(0)
-
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        target_dir = sys.argv[1]
-    elif os.path.exists("memory"):
-        target_dir = "memory"
-    else:
-        target_dir = "."
-        
-    validate_memory(target_dir)
+    validate()
