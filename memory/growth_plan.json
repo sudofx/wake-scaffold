@@ -120,6 +120,21 @@
           "evidence": "created via self-edit"
         }
       ]
+    },
+    {
+      "id": "g-2026-09-03-002322-0",
+      "created": "Sep 3rd, 2026 12:23am",
+      "title": "Workspace Diagnostic Tooling",
+      "capability": "Inspect sandboxed filesystem layout and path positioning during execution.",
+      "next_step": "Review tool_runs.json output in the next wake to verify relative paths.",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 3rd, 2026 12:23am",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        }
+      ]
     }
   ]
 }
