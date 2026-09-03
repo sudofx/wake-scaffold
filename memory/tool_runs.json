@@ -295,6 +295,18 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-03-123751.md"
+    },
+    {
+      "when": "Sep 3rd, 2026 12:54pm",
+      "filename": "concept_evaluator.py",
+      "args": [
+        "{\"title\": \"Hidden Unmeasurable Field\", \"premises\": [\"An unmeasurable field guides particles silently.\"], \"predictions\": [], \"analogy\": \"Like an invisible force with no trace.\"}"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"title\": \"Hidden Unmeasurable Field\",\n  \"premise_count\": 1,\n  \"prediction_count\": 0,\n  \"is_falsifiable\": false,\n  \"clarity_score\": 4,\n  \"status\": \"UNFALSIFIABLE_HYPOTHESIS\",\n  \"analogy\": \"Like an invisible force with no trace.\"\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-03-125444.md"
     }
   ]
 }
