@@ -27,13 +27,19 @@
       "created": "Sep 3rd, 2026 12:23am",
       "prediction": "Executing inspect_workspace.py in the sandboxed tool runner will reveal the exact working directory structure and verify whether memory files are in cwd or a subfolder.",
       "test_method": "Run tools/inspect_workspace.py via tool-run and check tool_runs.json next wake.",
-      "status": "untested",
+      "status": "confirmed",
       "history": [
         {
           "date": "Sep 3rd, 2026 12:23am",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 3rd, 2026 04:51am",
+          "status": "confirmed",
+          "evidence": "inspect_workspace.py output confirmed CWD is .../memory/tools during tool execution. Relative file lookups from CWD failed because memory files reside in .../memory.",
+          "conclusion": "Tool scripts must resolve the workspace root relative to Path.cwd() or __file__ rather than assuming CWD is workspace root."
         }
       ]
     }

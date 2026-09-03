@@ -135,6 +135,21 @@
           "evidence": "created via self-edit"
         }
       ]
+    },
+    {
+      "id": "g-2026-09-03-045137-0",
+      "created": "Sep 3rd, 2026 04:51am",
+      "title": "Scientific Concept Analysis Framework",
+      "capability": "Ability to analyze and break down scientific concepts and hypotheses into structured, falsifiable claims and plain-spoken explanations",
+      "next_step": "Write concept_evaluator.py to structure physics/quantum hypotheses into core premises, testable predictions, and layman analogies",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 3rd, 2026 04:51am",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        }
+      ]
     }
   ]
 }
