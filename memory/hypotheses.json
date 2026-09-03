@@ -42,6 +42,21 @@
           "conclusion": "Tool scripts must resolve the workspace root relative to Path.cwd() or __file__ rather than assuming CWD is workspace root."
         }
       ]
+    },
+    {
+      "id": "h-2026-09-03-130929-0",
+      "created": "Sep 3rd, 2026 01:09pm",
+      "prediction": "quantum_batch_evaluator.py will handle malformed JSON strings passed as CLI arguments by exiting gracefully or reporting an error stdout/stderr, rather than throwing an unhandled exception crash.",
+      "test_method": "Execute quantum_batch_evaluator.py with malformed JSON string '{\"title\": malformed}' via tool-run and check output in TOOL RUN HISTORY next wake.",
+      "status": "untested",
+      "history": [
+        {
+          "date": "Sep 3rd, 2026 01:09pm",
+          "status": "untested",
+          "evidence": "",
+          "conclusion": "created via self-edit"
+        }
+      ]
     }
   ]
 }

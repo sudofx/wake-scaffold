@@ -317,6 +317,18 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-03-130405.md"
+    },
+    {
+      "when": "Sep 3rd, 2026 01:09pm",
+      "filename": "quantum_batch_evaluator.py",
+      "args": [
+        "{\"title\": malformed}"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"error\": \"Expecting value: line 1 column 11 (char 10)\"}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-03-130929.md"
     }
   ]
 }
