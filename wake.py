@@ -269,6 +269,38 @@ def build_reflection_prompt(now: datetime) -> str:
         "observable artifact or decision after this wake. Reflection is for "
         "choosing work, not the work itself. Do not draft a journal entry yet.",
     ]
+
+    domain_nudge = detect_narrow_domain_nudge()
+    if domain_nudge:
+        sections.insert(-1, "## NOTICE: RECENT WORK HAS BEEN NARROW\n" + domain_nudge)
+
+    gap = wakes_since_last_hypothesis()
+    if gap >= HYPOTHESIS_GAP_WAKES:
+        sections.insert(-1, (
+            "## NOTICE: SELF-EXPERIMENT GAP\n"
+            f"You haven't recorded a new hypothesis in {gap} wakes. Is there "
+            "genuinely nothing you're uncertain about right now, or is "
+            "something making this feel unsafe, unrewarded, or easy to skip? "
+            "You don't have to add one this wake — but say which of those is "
+            "true, honestly, rather than letting the gap stay silent."
+        ))
+
+    wake_number = count_successful_wakes() + 1
+    if wake_number % PURPOSE_CHECK_INTERVAL_WAKES == 0:
+        sections.insert(-1, (
+            "## NOTICE: PERIODIC PURPOSE CHECK\n"
+            "Your Purpose statement above names specific interests (books, "
+            "big scientific questions, a particular voice). Has anything in "
+            "it actually shown up in what you did over recent wakes — not "
+            "as a mood in prose, but as real work? If it hasn't for a "
+            "while, say so plainly: either let that honestly inform what "
+            "you pick to work on this wake, or, if a stated interest no "
+            "longer reflects what you actually do, note that identity.md "
+            "may need a human-reviewed revision (via a proposal block) to "
+            "stop claiming something that isn't true. Either outcome is "
+            "fine — silence about the gap is the only bad option."
+        ))
+
     surfaced = find_unconsumed_failed_reflection()
     if surfaced:
         sections.insert(-1, (
@@ -938,6 +970,45 @@ def apply_blog_post(raw_json: str, now: datetime, journal_fname: str) -> list[st
 
 MAX_GROWTH_PROJECTS = 20
 GROWTH_STATUSES = {"proposed", "active", "blocked", "complete"}
+GROWTH_OPEN_STATUSES = {"proposed", "active", "blocked"}
+DUPLICATE_SIMILARITY_THRESHOLD = 0.4
+NARROW_DOMAIN_WINDOW = 5
+NARROW_DOMAIN_MIN_SHARED = 4
+
+_STOPWORDS = {
+    "a", "an", "the", "and", "or", "for", "to", "of", "in", "on", "with",
+    "without", "this", "that", "is", "are", "be", "as", "at", "by", "from",
+    "into", "via", "will", "can", "its", "it's", "was", "were", "not",
+}
+
+
+def _significant_tokens(text: str) -> set[str]:
+    """Lowercased, stopword-stripped word set used for cheap topical
+    overlap checks (duplicate detection, narrow-domain nudging). Doesn't
+    need to be fancy — just good enough to catch 'Workspace & Memory
+    Integrity Validator' vs 'Automated workspace integrity validator'
+    as the same idea."""
+    return {
+        w for w in re.findall(r"[a-z0-9']+", text.lower())
+        if w not in _STOPWORDS and len(w) > 2
+    }
+
+
+def _jaccard(a: set[str], b: set[str]) -> float:
+    if not a or not b:
+        return 0.0
+    return len(a & b) / len(a | b)
+
+
+def _topic_overlap(a_title: str, a_capability: str, b_title: str, b_capability: str) -> float:
+    """Weighted overlap between two projects, title-word Jaccard counting
+    most (renamed-but-same-idea titles like 'Workspace & Memory Integrity
+    Validator' vs 'Automated workspace integrity validator' share most of
+    their title words but comparatively little capability boilerplate),
+    with capability-word Jaccard as a smaller supporting signal."""
+    title_overlap = _jaccard(_significant_tokens(a_title), _significant_tokens(b_title))
+    capability_overlap = _jaccard(_significant_tokens(a_capability), _significant_tokens(b_capability))
+    return 0.7 * title_overlap + 0.3 * capability_overlap
 
 
 def load_growth_plan() -> dict:
@@ -961,6 +1032,43 @@ def format_growth_plan_for_prompt() -> str:
     return "\n".join(
         f"- [{p.get('id', '?')}] {p.get('status', '?')}: {p.get('title', '')} — "
         f"next: {p.get('next_step', '')}" for p in active
+    )
+
+
+def detect_narrow_domain_nudge(window: int = NARROW_DOMAIN_WINDOW,
+                                min_shared: int = NARROW_DOMAIN_MIN_SHARED) -> str | None:
+    """Soft, prompt-level nudge (not a hard block) for item 3: duplicate-
+    blocking alone stops the *same* idea repeating but not a new-but-still-
+    narrow variant. If most of the last `window` growth-plan projects
+    (any status, most recently created) share significant words, surface
+    that pattern so staying in the same domain becomes a deliberate
+    choice rather than a default. Returns None when there isn't enough
+    history yet or nothing narrow stands out."""
+    try:
+        projects = load_growth_plan().get("projects", [])
+    except ValueError:
+        return None
+    if len(projects) < window:
+        return None
+    recent = projects[-window:]
+    token_sets = [
+        _significant_tokens(f"{p.get('title', '')} {p.get('capability', '')}")
+        for p in recent
+    ]
+    counts: dict[str, int] = {}
+    for tokens in token_sets:
+        for word in tokens:
+            counts[word] = counts.get(word, 0) + 1
+    shared = sorted((w for w, c in counts.items() if c >= min_shared), key=lambda w: -counts[w])
+    if not shared:
+        return None
+    titles = ", ".join(f"'{p.get('title', '')}'" for p in recent)
+    return (
+        f"Your last {window} growth-plan projects ({titles}) all cluster around: "
+        f"{', '.join(shared[:6])}. That's not automatically wrong, but if your next "
+        "proposal is in this same area, say explicitly why staying here is the right "
+        "call right now rather than the familiar default. A genuinely different domain "
+        "is an equally valid — often better — choice."
     )
 
 
@@ -992,6 +1100,26 @@ def apply_growth_plan_update(raw_json: str, now: datetime) -> list[str]:
             continue
         if len(projects) >= MAX_GROWTH_PROJECTS:
             notes.append(f"SKIPPED growth project #{index + 1}: project cap of {MAX_GROWTH_PROJECTS} reached.")
+            continue
+        duplicate = None
+        best_overlap = 0.0
+        for existing in projects:
+            if existing.get("status") not in GROWTH_OPEN_STATUSES:
+                continue
+            overlap = _topic_overlap(
+                title, capability, existing.get("title", ""), existing.get("capability", "")
+            )
+            if overlap > best_overlap:
+                best_overlap = overlap
+                duplicate = existing
+        if duplicate is not None and best_overlap >= DUPLICATE_SIMILARITY_THRESHOLD:
+            notes.append(
+                f"REJECTED growth project #{index + 1} ({title!r}): looks like a near-duplicate "
+                f"of existing project [{duplicate.get('id', '?')}] {duplicate.get('title', '')!r} "
+                f"({duplicate.get('status', '?')}, overlap {best_overlap:.0%}). Advance that "
+                "project's status/next_step instead of proposing a new one, or explain in the "
+                "journal specifically why this is genuinely different before retrying."
+            )
             continue
         project_id = f"g-{filename_stamp(now)}-{index}"
         projects.append({
@@ -1082,6 +1210,44 @@ HYPOTHESIS_STATUSES = {"untested", "testing", "confirmed", "refuted", "inconclus
 # "testing" needs no evidence yet (it's a statement of intent); every other
 # status is a claim about an outcome and must be backed by something real.
 HYPOTHESIS_STATUSES_REQUIRING_EVIDENCE = HYPOTHESIS_STATUSES - {"testing"}
+
+HYPOTHESIS_GAP_WAKES = 5
+PURPOSE_CHECK_INTERVAL_WAKES = 5
+
+
+def count_successful_wakes() -> int:
+    """Successful (non-FAILED) journal entries on disk — used both as a
+    rough 'how many wakes has this agent had' counter for periodic
+    prompt nudges, and as the boundary for the hypothesis-gap check
+    below when there's no hypothesis history to anchor against yet."""
+    if not JOURNAL.exists():
+        return 0
+    return len([p for p in JOURNAL.glob("*.md") if "FAILED" not in p.stem])
+
+
+def wakes_since_last_hypothesis() -> int:
+    """How many successful wakes have happened since a hypothesis was
+    last added. Hypothesis ids are 'h-{filename_stamp}-{n}', using the
+    exact same clock as journal filenames, so string-comparing stamps
+    against successful journal filenames (also filename_stamp-shaped)
+    gives an exact count with no extra bookkeeping file to keep in
+    sync. Returns count_successful_wakes() (i.e. 'all of them') if no
+    hypothesis has ever been recorded."""
+    try:
+        hyps = load_hypotheses().get("hypotheses", [])
+    except ValueError:
+        hyps = []
+    stamps = [
+        h.get("id", "").removeprefix("h-").rsplit("-", 1)[0]
+        for h in hyps if str(h.get("id", "")).startswith("h-")
+    ]
+    if not stamps or not JOURNAL.exists():
+        return count_successful_wakes()
+    latest = max(stamps)
+    return len([
+        p for p in JOURNAL.glob("*.md")
+        if "FAILED" not in p.stem and p.stem > latest
+    ])
 
 
 def load_hypotheses() -> dict:

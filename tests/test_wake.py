@@ -195,6 +195,126 @@ class LimitationSpawnsGrowthProjectTests(WakeTestCase):
         self.assertIn("never misrepresent", project["capability"])
 
 
+class GrowthPlanDuplicateTests(WakeTestCase):
+    """Item under test: near-duplicate growth-plan proposals are rejected
+    at the mechanism level, not just discouraged in prose (HANDOFF item 2)."""
+
+    def test_near_duplicate_title_is_rejected_with_pointer_to_existing_id(self):
+        first = json.dumps({"add": [{
+            "title": "Workspace & Memory Integrity Validator",
+            "capability": "Programmatically check workspace JSON schemas and memory formatting integrity.",
+            "next_step": "Run it.",
+        }]})
+        notes = wake.apply_growth_plan_update(first, FIXED_NOW)
+        self.assertTrue(any(n.startswith("ADDED capability project") for n in notes))
+        existing_id = json.loads((self.memory / "growth_plan.json").read_text())["projects"][0]["id"]
+
+        second = json.dumps({"add": [{
+            "title": "Automated workspace integrity validator",
+            "capability": "Ability to verify that all core memory and state files exist and contain valid JSON/Markdown",
+            "next_step": "Run it too.",
+        }]})
+        notes = wake.apply_growth_plan_update(second, FIXED_NOW)
+        self.assertTrue(any(n.startswith("REJECTED growth project") for n in notes), notes)
+        self.assertTrue(any(existing_id in n for n in notes), notes)
+        projects = json.loads((self.memory / "growth_plan.json").read_text())["projects"]
+        self.assertEqual(len(projects), 1, "the near-duplicate must not have been appended")
+
+    def test_genuinely_different_project_is_accepted(self):
+        first = json.dumps({"add": [{
+            "title": "Memory Integrity Validator",
+            "capability": "Validate JSON structure of workspace memory files.",
+            "next_step": "Run it.",
+        }]})
+        wake.apply_growth_plan_update(first, FIXED_NOW)
+
+        second = json.dumps({"add": [{
+            "title": "Blog RSS Feed Generator",
+            "capability": "Produce a valid RSS feed from blog_posts.json for external readers.",
+            "next_step": "Write feed.py and run it against the current blog_posts.json.",
+        }]})
+        notes = wake.apply_growth_plan_update(second, FIXED_NOW)
+        self.assertTrue(any(n.startswith("ADDED capability project") for n in notes), notes)
+        projects = json.loads((self.memory / "growth_plan.json").read_text())["projects"]
+        self.assertEqual(len(projects), 2)
+
+    def test_duplicate_check_ignores_closed_projects(self):
+        first = json.dumps({"add": [{
+            "title": "Memory Integrity Validator",
+            "capability": "Validate JSON structure of workspace memory files.",
+            "next_step": "Run it.",
+        }]})
+        wake.apply_growth_plan_update(first, FIXED_NOW)
+        existing_id = json.loads((self.memory / "growth_plan.json").read_text())["projects"][0]["id"]
+        wake.apply_growth_plan_update(json.dumps({"status_change": [
+            {"id": existing_id, "new_status": "complete", "evidence": "Ran it, works."}
+        ]}), FIXED_NOW)
+
+        second = json.dumps({"add": [{
+            "title": "Memory Integrity Validator v2",
+            "capability": "Validate JSON structure of workspace memory files.",
+            "next_step": "Run it.",
+        }]})
+        notes = wake.apply_growth_plan_update(second, FIXED_NOW)
+        self.assertTrue(any(n.startswith("ADDED capability project") for n in notes), notes)
+
+
+class NarrowDomainNudgeTests(WakeTestCase):
+    """Item under test: soft prompt-level nudge when recent growth-plan
+    history clusters in one domain (HANDOFF item 3)."""
+
+    def _add_project(self, title, capability):
+        wake.apply_growth_plan_update(json.dumps({"add": [{
+            "title": title, "capability": capability, "next_step": "next",
+        }]}), FIXED_NOW)
+
+    def test_no_nudge_with_too_little_history(self):
+        self._add_project("Memory Validator", "Validate memory JSON files.")
+        self.assertIsNone(wake.detect_narrow_domain_nudge())
+
+    def test_nudge_fires_when_recent_projects_cluster(self):
+        # Each title distinct enough to dodge the duplicate check, but all
+        # sharing "memory"/"validator"/"validate" as a topic.
+        titles = [
+            ("Memory Integrity Validator", "Validate JSON structure of workspace memory files."),
+            ("Blog RSS Feed Generator", "Produce a valid RSS feed from blog_posts.json."),
+            ("Deep Memory Schema Validator", "Item-level schema validation for memory files."),
+            ("Workspace Memory Validation Tool", "Discover and validate memory files across contexts."),
+            ("Memory File Validator Extension", "Extend validation coverage to more memory files."),
+        ]
+        for title, capability in titles:
+            self._add_project(title, capability)
+        nudge = wake.detect_narrow_domain_nudge()
+        self.assertIsNotNone(nudge)
+        self.assertIn("memory", nudge.lower())
+
+
+class HypothesisGapTests(WakeTestCase):
+    """Item under test: a silent hypothesis gap is surfaced, not just left
+    quiet (HANDOFF item 4)."""
+
+    def _touch_journal(self, stamp, failed=False):
+        suffix = "-FAILED.md" if failed else ".md"
+        (self.memory / "journal" / f"{stamp}{suffix}").write_text("entry")
+
+    def test_gap_counts_successful_wakes_since_last_hypothesis(self):
+        wake.apply_hypotheses_update(json.dumps({"add": [
+            {"prediction": "x", "test_method": "y"}
+        ]}), datetime(2026, 8, 30, 10, 0, 0, tzinfo=FIXED_NOW.tzinfo))
+        # Three successful wakes after the hypothesis, one failed wake
+        # (should not count), all with later filename stamps.
+        for stamp in ("2026-08-30-110000", "2026-08-30-120000", "2026-08-30-130000"):
+            self._touch_journal(stamp)
+        self._touch_journal("2026-08-30-140000", failed=True)
+        self.assertEqual(wake.wakes_since_last_hypothesis(), 3)
+
+    def test_gap_is_total_successful_wakes_when_no_hypothesis_ever_recorded(self):
+        for stamp in ("2026-08-30-110000", "2026-08-30-120000"):
+            self._touch_journal(stamp)
+        self._touch_journal("2026-08-30-130000", failed=True)
+        self.assertEqual(wake.wakes_since_last_hypothesis(), 2)
+
+
 class HypothesesTests(WakeTestCase):
     """Item under test: hypotheses.json add + evidence-gated status change."""
 
