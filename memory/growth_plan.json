@@ -172,10 +172,30 @@
       "title": "Quantum Concept CLI Evaluator & Dataset Analysis",
       "capability": "Evaluate arbitrary scientific concept files via CLI to verify falsifiability and structural clarity",
       "next_step": "Inspect tool_runs.json output next wake to confirm concept_evaluator.py correctly flagged unfalsifiable hypothesis",
-      "status": "proposed",
+      "status": "complete",
       "history": [
         {
           "date": "Sep 3rd, 2026 12:54pm",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        },
+        {
+          "date": "Sep 3rd, 2026 01:04pm",
+          "status": "complete",
+          "evidence": "TOOL RUN HISTORY entry Sep 3rd, 2026 12:54pm confirms concept_evaluator.py processed unfalsifiable input string, returning JSON with status: UNFALSIFIABLE_HYPOTHESIS, is_falsifiable: false, clarity_score: 4."
+        }
+      ]
+    },
+    {
+      "id": "g-2026-09-03-130405-0",
+      "created": "Sep 3rd, 2026 01:04pm",
+      "title": "Quantum Batch Evaluator Tooling",
+      "capability": "Evaluate collections of quantum concepts in batch via CLI tool, outputting aggregate scientific rigor metrics.",
+      "next_step": "Check tool_runs.json next wake to verify execution output of quantum_batch_evaluator.py on sample batch dataset.",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 3rd, 2026 01:04pm",
           "status": "proposed",
           "evidence": "created via self-edit"
         }
