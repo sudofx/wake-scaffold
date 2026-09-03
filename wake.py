@@ -47,6 +47,13 @@ MEMORY = ROOT / "memory"
 JOURNAL = MEMORY / "journal"
 BASE_MEMORY = ROOT / "base_memory"
 
+# Marks the boundary between the reflection and the work in a combined
+# single-call response (see build_combined_prompt). Must match the
+# literal copy of this constant in providers/mock.py — they can't share
+# an import without a circular dependency (wake.py already imports
+# providers).
+WAKE_SPLIT_MARKER = "===WAKE-JOURNAL-BEGINS==="
+
 _TZ_CACHE = None
 
 
@@ -490,6 +497,74 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         "prose before any block you include — the reasoning is saved in "
         "the journal even though it isn't itself machine-applied.",
     ])
+
+
+def build_combined_prompt(now: datetime, enable_pull_requests: bool = False) -> str:
+    """
+    Single-call version of the wake: reflect and do the work in one
+    generate() instead of two. This exists purely as a reliability/cost
+    optimization against a squeezed free-tier quota — see HANDOFF.md —
+    not a change in what's being asked of the model. It reuses
+    build_reflection_prompt and build_journal_prompt's exact content
+    rather than duplicating ~150 lines of instructions:
+      - build_reflection_prompt(now) supplies identity/rules/index/
+        commitments/growth-plan/hypotheses/tool-history context, with
+        its final "reflect, then stop" instruction swapped for one that
+        continues into the work after WAKE_SPLIT_MARKER.
+      - build_journal_prompt's static work instructions (capability
+        boundary through the self-edit block formats) are pulled out
+        by splitting on "## CAPABILITY BOUNDARY", since that part
+        doesn't depend on the reflection text — a dummy "" reflection
+        is passed in just to generate that text, then discarded.
+    """
+    two_pass_task = (
+        "## YOUR TASK RIGHT NOW: REFLECT, DO NOT JOURNAL YET\n"
+        "Keep this brief: maximum 250 words. Identify one concrete capability "
+        "project, investigation, or maintenance repair that would leave an "
+        "observable artifact or decision after this wake. Reflection is for "
+        "choosing work, not the work itself. Do not draft a journal entry yet."
+    )
+    combined_task = (
+        "## YOUR TASK RIGHT NOW: REFLECT, THEN ACT IN THIS SAME RESPONSE\n"
+        "First, write your reflection in plain prose — maximum 250 words. "
+        "Identify one concrete capability project, investigation, or "
+        "maintenance repair that would leave an observable artifact or "
+        "decision after this wake. This is honest synthesis before acting, "
+        "not the work itself.\n\n"
+        f"Then, on its own line, write exactly this and nothing else on "
+        f"that line:\n{WAKE_SPLIT_MARKER}\n\n"
+        "Then do that work and write a concise journal entry for it, "
+        "following the rules and instructions below. Do not skip the "
+        "marker line, and do not blend the reflection and the journal "
+        "entry together — they are split apart from each other afterward, "
+        "so anything written before the marker is treated as reflection "
+        "only and won't appear in the journal record of what you did."
+    )
+    reflect_part = build_reflection_prompt(now).replace(two_pass_task, combined_task, 1)
+
+    journal_boundary = "## CAPABILITY BOUNDARY"
+    dummy_journal = build_journal_prompt("", now, enable_pull_requests)
+    work_instructions = journal_boundary + dummy_journal.split(journal_boundary, 1)[1]
+
+    return reflect_part + "\n\n---\n\n" + work_instructions
+
+
+def split_combined_output(raw_output: str) -> tuple[str, str]:
+    """
+    Splits a combined single-call response back into (reflection,
+    work_output) on WAKE_SPLIT_MARKER. If the model skips the marker,
+    the whole response becomes the work output and the gap is recorded
+    plainly in the reflection slot instead of silently guessing which
+    part is which.
+    """
+    if WAKE_SPLIT_MARKER in raw_output:
+        reflection, _, work_output = raw_output.partition(WAKE_SPLIT_MARKER)
+        return reflection.strip(), work_output.strip()
+    return (
+        "(No split marker found this wake — the model merged reflection "
+        "and work into one block instead of separating them as asked.)",
+        raw_output.strip(),
+    )
 
 
 def extract_block(text: str, tag: str) -> str | None:
@@ -1854,22 +1929,65 @@ def write_journal_entry(now: datetime, filename: str, reflection: str, model_out
     return path
 
 
-def write_failure_record(provider_name: str, stage: str, e: Exception, reflection: str = None):
+def run_offline_fallback(now: datetime, journal_fname: str) -> list[str]:
+    """
+    When the model call fails outright (all fallback models and
+    retries exhausted), this still gives the wake something real to
+    show for itself instead of a bare error record: it runs the
+    already-written, already-tested tools/validate_memory.py — no
+    model call, no API cost, and the exit code/output are genuine
+    evidence rather than fabricated reflection or journal prose. This
+    is mechanical housekeeping, not a stand-in for the model's own
+    thinking, so it doesn't cross into the performative-continuity
+    pattern this project is trying to avoid.
+    """
+    if not (TOOLS_DIR / "validate_memory.py").is_file():
+        return ["No offline fallback available this wake: "
+                "tools/validate_memory.py doesn't exist yet."]
+    return apply_tool_run(
+        json.dumps({"filename": "validate_memory.py", "args": []}),
+        now, journal_fname,
+    )
+
+
+def write_failure_record(
+    provider_name: str,
+    stage: str,
+    e: Exception,
+    reflection: str = None,
+    fallback_notes: list[str] = None,
+    now: datetime = None,
+    filename: str = None,
+):
     JOURNAL.mkdir(parents=True, exist_ok=True)
-    try:
-        now = now_local()
-    except Exception:
-        # Startup can fail while parsing config.yaml or its timezone. Keep a
-        # durable failure record anyway, using the documented default zone.
-        now = datetime.now(ZoneInfo("America/Los_Angeles"))
-    filename = journal_filename(now, failed=True)
+    if now is None:
+        try:
+            now = now_local()
+        except Exception:
+            # Startup can fail while parsing config.yaml or its timezone.
+            # Keep a durable failure record anyway, using the documented
+            # default zone.
+            now = datetime.now(ZoneInfo("America/Los_Angeles"))
+    if filename is None:
+        filename = journal_filename(now, failed=True)
     fail_path = JOURNAL / filename
     reflection_note = ""
     if reflection:
+        # Only ever populated by pre-merge failure records still in
+        # history (see find_unconsumed_failed_reflection) — the combined
+        # single-call design has no partial-success state to recover.
         reflection_note = (
             "\nThe reflection pass DID succeed before this failure — "
             "preserved below so that work isn't lost:\n\n"
             "## Reflection (recovered from failed wake)\n\n" + reflection.strip() + "\n"
+        )
+    fallback_note = ""
+    if fallback_notes:
+        fallback_note = (
+            "\n## Offline fallback (no model call, $0 cost)\n"
+            "The model call itself failed, but this wake still ran a "
+            "real, deterministic check so the cycle wasn't a total "
+            "loss:\n\n" + "\n".join(f"- {n}" for n in fallback_notes) + "\n"
         )
     fail_path.write_text(
         f"# Wake FAILED\n\n"
@@ -1879,7 +1997,8 @@ def write_failure_record(provider_name: str, stage: str, e: Exception, reflectio
         f"**Error:** {type(e).__name__}: {e}\n\n"
         f"No journal entry was produced this wake. Check credentials, "
         f"rate limits, and provider status before the next scheduled run."
-        f"{reflection_note}\n"
+        f"{reflection_note}"
+        f"{fallback_note}\n"
     )
     print(f"Wake FAILED during {stage} — see {fail_path}", file=sys.stderr)
     print(f"{type(e).__name__}: {e}", file=sys.stderr)
@@ -1958,7 +2077,13 @@ def main():
         config = load_config()
         provider_name = config.get("provider", "gemini")
         model = config.get("model")
-        provider = get_provider(provider_name, model)
+        # Gemini-only, ignored by every other provider (see get_provider):
+        # free-tier daily quota is tracked per model, so a 429/503 on the
+        # primary model doesn't mean the account is out of requests, just
+        # that model's own bucket is — trying a separate free model costs
+        # nothing. See config.yaml for the default list.
+        fallback_models = config.get("gemini_fallback_models")
+        provider = get_provider(provider_name, model, fallback_models=fallback_models)
 
         # Compute the authoritative time during startup so malformed timezone
         # configuration is captured as a durable startup failure too.
@@ -1975,42 +2100,40 @@ def main():
     # link back to the exact file this entry will be saved as.
     journal_fname = journal_filename(now, failed=False)
 
-    # Pass 1: reflect, before doing or writing anything.
+    # Single call: reflect and do the work in the same response, split
+    # apart afterward on WAKE_SPLIT_MARKER. This used to be two separate
+    # generate() calls; against a squeezed free-tier quota that meant two
+    # independent chances to hit a 429/503 per wake instead of one — see
+    # HANDOFF.md for the failure-rate math that motivated the merge.
     try:
-        reflection = generate_with_retry(
+        raw_output = generate_with_retry(
             provider,
-            build_reflection_prompt(now),
-            "Write your reflection now, in plain prose. This is not the "
-            "journal entry — just your honest synthesis before acting.",
+            build_combined_prompt(now, config.get("enable_pull_requests", False)),
+            "This is a new wake cycle. Write your reflection, then the "
+            "exact marker line, then do one piece of concrete work "
+            "selected by that reflection and write a concise journal "
+            "entry for it — all in this one response, in that order. "
+            "Favor work that improves a repeatable capability, creates a "
+            "useful artifact, tests an assumption, or resolves a real "
+            "blocker. Do not confuse describing improvement with "
+            "improvement. The journal entry should cover: objective; "
+            "artifact, test, or evidence produced; files or commitments "
+            "changed; and one next verifiable step. If no useful work is "
+            "possible, state the specific blocker and what authority or "
+            "information would resolve it. A blog post is optional and "
+            "only appropriate when the completed result is genuinely "
+            "useful to an outside reader.",
         )
     except Exception as e:
-        write_failure_record(provider_name, "reflection", e)
-        return 1
-
-    # Pass 2: do the work and write the journal entry, informed by the
-    # reflection above.
-    user_prompt = (
-        "This is a new wake cycle. Do one piece of concrete work selected by "
-        "your reflection. Favor work that improves a repeatable capability, "
-        "creates a useful artifact, tests an assumption, or resolves a real "
-        "blocker. Do not confuse describing improvement with improvement. "
-        "Then write a concise journal entry with: objective; artifact, test, "
-        "or evidence produced; files or commitments changed; and one next "
-        "verifiable step. If no useful work is possible, state the specific "
-        "blocker and what authority or information would resolve it. A blog "
-        "post is optional and only appropriate when the completed result is "
-        "genuinely useful to an outside reader."
-    )
-
-    try:
-        output = generate_with_retry(
-            provider,
-            build_journal_prompt(reflection, now, config.get("enable_pull_requests", False)),
-            user_prompt,
+        fail_fname = journal_filename(now, failed=True)
+        fallback_notes = run_offline_fallback(now, fail_fname)
+        write_failure_record(
+            provider_name, "generate", e,
+            fallback_notes=fallback_notes, now=now, filename=fail_fname,
         )
-    except Exception as e:
-        write_failure_record(provider_name, "journal", e, reflection=reflection)
         return 1
+
+    reflection, output = split_combined_output(raw_output)
 
     # Apply any identity.md / commitments.json / blog-post / core-memory
     # self-edits the model included in its output, then append the

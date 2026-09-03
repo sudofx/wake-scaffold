@@ -1,14 +1,23 @@
-def get_provider(name: str, model: str = None):
+def get_provider(name: str, model: str = None, fallback_models: list[str] = None):
     """
     Factory: returns a ModelProvider instance for the given backend
     name. This is the single place that knows about all providers —
     everything else in the project just calls generate().
+
+    fallback_models is Gemini-specific (per-model free-tier quota
+    buckets — see providers/gemini.py) and silently ignored by every
+    other provider.
     """
     name = name.lower()
 
     if name == "gemini":
         from .gemini import GeminiProvider
-        return GeminiProvider(model=model) if model else GeminiProvider()
+        kwargs = {}
+        if model:
+            kwargs["model"] = model
+        if fallback_models:
+            kwargs["fallback_models"] = fallback_models
+        return GeminiProvider(**kwargs)
 
     if name == "anthropic":
         from .anthropic import AnthropicProvider

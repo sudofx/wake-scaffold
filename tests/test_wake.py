@@ -175,6 +175,48 @@ class BlogFallbackTests(WakeTestCase):
         self.assertIn("WROTE tools/mock_tool.py", result)
         self.assertIn("RAN tools/mock_tool.py", result)
 
+    def test_full_mock_provider_combined_round_trip_never_hits_fallback(self):
+        """Same coverage as the two-pass test above, but for the single-
+        call combined path (build_combined_prompt / split_combined_output)
+        — confirms the merge didn't drop or corrupt any of the work
+        instructions the two-pass version relied on."""
+        provider = MockProvider()
+        raw_output = provider.generate(
+            wake.build_combined_prompt(FIXED_NOW, enable_pull_requests=False),
+            "reflect then act",
+        )
+
+        reflection, journal_output = wake.split_combined_output(raw_output)
+        self.assertTrue(reflection.strip())
+        self.assertNotIn(wake.WAKE_SPLIT_MARKER, reflection)
+        self.assertNotIn(wake.WAKE_SPLIT_MARKER, journal_output)
+        self.assertIn("```blog-post", journal_output)
+
+        result = wake.apply_self_edits(journal_output, {"enable_pull_requests": False},
+                                        FIXED_NOW, "test-journal.md")
+        self.assertNotIn("WARNING: no blog-post block this wake", result)
+
+        posts = self.blog_posts()
+        self.assertEqual(len(posts), 1)
+        self.assertEqual(posts[0]["title"], "Mock test post")
+        self.assertIn("IGNORED unauthorized identity fields", result)
+        self.assertIn("WROTE tools/mock_tool.py", result)
+        self.assertIn("RAN tools/mock_tool.py", result)
+
+    def test_split_combined_output_falls_back_gracefully_without_marker(self):
+        """If the model ever skips the marker, the whole response should
+        become the work output rather than raising or silently dropping
+        text."""
+        reflection, work = wake.split_combined_output("no marker anywhere in this text")
+        self.assertIn("No split marker found", reflection)
+        self.assertEqual(work, "no marker anywhere in this text")
+
+    def test_split_combined_output_splits_on_marker(self):
+        raw = f"my reflection\n\n{wake.WAKE_SPLIT_MARKER}\n\nmy journal entry"
+        reflection, work = wake.split_combined_output(raw)
+        self.assertEqual(reflection, "my reflection")
+        self.assertEqual(work, "my journal entry")
+
 
 class LimitationSpawnsGrowthProjectTests(WakeTestCase):
     """Item under test: a recorded limitation spawns a real growth_plan.json entry."""
@@ -313,6 +355,44 @@ class HypothesisGapTests(WakeTestCase):
             self._touch_journal(stamp)
         self._touch_journal("2026-08-30-130000", failed=True)
         self.assertEqual(wake.wakes_since_last_hypothesis(), 2)
+
+
+class OfflineFallbackTests(WakeTestCase):
+    """Item under test: run_offline_fallback and write_failure_record's
+    fallback_notes wiring — the $0, no-model-call path that runs when
+    generate() fails outright, verified against a real subprocess run
+    and a real failure file, not just by reading the code."""
+
+    def test_offline_fallback_reports_unavailable_when_no_tool_exists(self):
+        notes = wake.run_offline_fallback(FIXED_NOW, "test-journal-FAILED.md")
+        self.assertTrue(any("No offline fallback available" in n for n in notes), notes)
+
+    def test_offline_fallback_runs_validate_memory_and_records_it(self):
+        validator = (
+            "import sys\n"
+            "print('offline fallback probe ran')\n"
+            "sys.exit(0)\n"
+        )
+        write_block = json.dumps({"files": [{"filename": "validate_memory.py", "content": validator}]})
+        write_notes = wake.apply_tool_write(write_block, FIXED_NOW, "test-journal.md")
+        self.assertTrue(any(n.startswith("WROTE") for n in write_notes), write_notes)
+
+        notes = wake.run_offline_fallback(FIXED_NOW, "test-journal-FAILED.md")
+        self.assertTrue(any(n.startswith("RAN tools/validate_memory.py") for n in notes), notes)
+
+        runs = json.loads(wake.TOOL_RUNS_FILE.read_text())["runs"]
+        self.assertEqual(runs[-1]["exit_code"], 0)
+        self.assertIn("offline fallback probe ran", runs[-1]["stdout"])
+
+    def test_write_failure_record_includes_fallback_notes(self):
+        path = wake.write_failure_record(
+            "gemini", "generate", RuntimeError("503 UNAVAILABLE"),
+            fallback_notes=["RAN tools/validate_memory.py [] -> exit code 0."],
+            now=FIXED_NOW, filename="test-journal-FAILED.md",
+        )
+        text = path.read_text()
+        self.assertIn("Offline fallback (no model call, $0 cost)", text)
+        self.assertIn("RAN tools/validate_memory.py", text)
 
 
 class HypothesesTests(WakeTestCase):
@@ -470,6 +550,97 @@ class RetryTests(unittest.TestCase):
         with patch("wake.time.sleep") as mock_sleep:
             wake.generate_with_retry(provider, "sys", "user", max_wait=90.0)
         mock_sleep.assert_called_once_with(90.0)
+
+
+class GeminiFallbackTests(unittest.TestCase):
+    """GeminiProvider: real evidence that a transient error on one model
+    moves on to try the next free model (a separate quota bucket) rather
+    than giving up, that a non-transient error does NOT trigger that
+    fallback, and that the original error surfaces once every model is
+    exhausted. No real network or credentials involved — google.genai is
+    replaced with a fake module for the duration of each test."""
+
+    def setUp(self):
+        os.environ["GEMINI_API_KEY"] = "test-key"
+        self.addCleanup(os.environ.pop, "GEMINI_API_KEY", None)
+        sys.modules.pop("providers.gemini", None)
+        self.addCleanup(sys.modules.pop, "google", None)
+        self.addCleanup(sys.modules.pop, "google.genai", None)
+        self.addCleanup(sys.modules.pop, "providers.gemini", None)
+
+    def _install_fake_genai(self, generate_side_effect):
+        import types
+
+        class FakeResponse:
+            def __init__(self, text):
+                self.text = text
+
+        class FakeModels:
+            def __init__(self):
+                self.calls = []
+
+            def generate_content(self, model, contents, config):
+                self.calls.append(model)
+                result = generate_side_effect(model)
+                if isinstance(result, Exception):
+                    raise result
+                return FakeResponse(result)
+
+        class FakeClient:
+            def __init__(self, api_key):
+                self.models = FakeModels()
+
+        fake_genai = types.ModuleType("google.genai")
+        fake_genai.Client = FakeClient
+        fake_google = types.ModuleType("google")
+        fake_google.genai = fake_genai
+        sys.modules["google"] = fake_google
+        sys.modules["google.genai"] = fake_genai
+        return fake_genai
+
+    def test_falls_back_to_next_model_on_transient_error(self):
+        def side_effect(model):
+            if model == "gemini-3.6-flash":
+                return RuntimeError("429 RESOURCE_EXHAUSTED: quota")
+            return f"ok from {model}"
+
+        self._install_fake_genai(side_effect)
+        from providers.gemini import GeminiProvider
+        provider = GeminiProvider(fallback_models=["gemini-3.5-flash", "gemini-3.1-flash-lite"])
+        result = provider.generate("sys", "user")
+
+        self.assertEqual(result, "ok from gemini-3.5-flash")
+        # Confirms it actually tried the primary model first, then moved
+        # to the fallback — not just that the fallback alone was called.
+        self.assertEqual(provider.client.models.calls, ["gemini-3.6-flash", "gemini-3.5-flash"])
+
+    def test_does_not_fall_back_on_non_transient_error(self):
+        def side_effect(model):
+            return RuntimeError("400 INVALID_ARGUMENT: malformed request")
+
+        self._install_fake_genai(side_effect)
+        from providers.gemini import GeminiProvider
+        provider = GeminiProvider(fallback_models=["gemini-3.5-flash"])
+        with self.assertRaises(RuntimeError):
+            provider.generate("sys", "user")
+
+    def test_raises_last_error_when_every_model_exhausted(self):
+        def side_effect(model):
+            return RuntimeError(f"503 UNAVAILABLE: {model} overloaded")
+
+        self._install_fake_genai(side_effect)
+        from providers.gemini import GeminiProvider
+        provider = GeminiProvider(fallback_models=["gemini-3.5-flash"])
+        with self.assertRaises(RuntimeError) as ctx:
+            provider.generate("sys", "user")
+        # Last model tried should be the one named in the surfaced error.
+        self.assertIn("gemini-3.5-flash", str(ctx.exception))
+
+    def test_default_and_explicit_fallback_models_are_deduplicated(self):
+        self._install_fake_genai(lambda model: "ok")
+        from providers.gemini import GeminiProvider
+        provider = GeminiProvider(model="gemini-3.5-flash", fallback_models=["gemini-3.5-flash", "gemini-3.1-flash-lite"])
+        self.assertEqual(provider.models, ["gemini-3.5-flash", "gemini-3.1-flash-lite"])
 
 
 if __name__ == "__main__":

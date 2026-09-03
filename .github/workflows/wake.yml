@@ -7,7 +7,7 @@ on:
   # of the schedule triggered real 429 RESOURCE_EXHAUSTED errors. This
   # leaves a 10-call margin per day for manual runs, 503 stragglers, etc.
   schedule:
-    - cron: "0 2,7,11,15,19 * * *"
+    - cron: "42 2,7,11,15,19,22,0 * * *"
   workflow_dispatch: {}
 
 # Grant only the permissions this workflow needs: recording wake data and

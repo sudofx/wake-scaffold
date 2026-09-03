@@ -7,6 +7,18 @@
 provider: gemini
 model:
 
+# Gemini only — ignored by every other provider. Google's free tier
+# tracks each model's daily request quota separately
+# (GenerateRequestsPerDayPerProjectPerModel-FreeTier), so if the
+# primary model above returns 429/503, trying a different free model
+# on the same key draws from an entirely separate daily allowance, at
+# $0 cost. Both listed here are current, free-tier, GA models as of
+# Sept 2026. Leave empty ([]) to disable and use only the primary
+# model.
+gemini_fallback_models:
+  - gemini-3.5-flash
+  - gemini-3.1-flash-lite
+
 # Any IANA timezone name. All timestamps this project writes anywhere
 # — journal filenames, journal content, identity.md, commitments.json,
 # and what Bob is told the current time is — use this timezone.
