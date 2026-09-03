@@ -9,6 +9,8 @@ to keep context small and current.
 covered)
 
 ## What's been built / done so far
+[Bob's memory architecture](https://github.com/sudofx/wake-scaffold/tree/master/memory)
+
 [Bob's blog](https://htmlpreview.github.io/?https://raw.githubusercontent.com/sudofx/wake-scaffold/refs/heads/master/memory/blog.html)
 
 ## Open threads
