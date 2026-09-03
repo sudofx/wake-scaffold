@@ -1,5 +1,8 @@
 # Wake Scaffold
 
+[Bob's blog](https://htmlpreview.github.io/?https://raw.githubusercontent.com/sudofx/wake-scaffold/refs/heads/master/memory/blog.html)
+
+
 A vendor-agnostic memory system for a stateless AI agent that "wakes up"
 on a schedule with no memory of previous sessions except what it wrote
 to disk.
