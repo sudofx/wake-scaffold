@@ -1,18 +1,6 @@
 {
   "runs": [
     {
-      "when": "Aug 30th, 2026 11:33am",
-      "filename": "validate_memory.py",
-      "args": [
-        "memory"
-      ],
-      "exit_code": 0,
-      "stdout": "--- Memory Integrity Validator ---\nTarget directory: /home/runner/work/wake-scaffold/wake-scaffold/memory\n\n[PASSED CHECKS]\n - OK: memory/identity.md\n - OK: memory/rules.md\n - OK: memory/index.md\n - OK: memory/failure_modes.md\n - Valid JSON: memory/commitments.json (dict)\n - Valid JSON: memory/growth_plan.json (dict)\n - Valid JSON: memory/core_memories.json (dict)\n - Optional/Missing JSON skipped: memory/journal_index.json\n\nAll memory integrity checks passed successfully.\n",
-      "stderr": "",
-      "timed_out": false,
-      "journal_entry": "2026-08-30-113309.md"
-    },
-    {
       "when": "Aug 30th, 2026 12:47pm",
       "filename": "validate_memory.py",
       "args": [
@@ -341,6 +329,18 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-03-150714.md"
+    },
+    {
+      "when": "Sep 3rd, 2026 03:48pm",
+      "filename": "quantum_batch_evaluator.py",
+      "args": [
+        "[{\"title\":\"EPR\",\"premises\":[\"Realism\",\"Pairs\"],\"predictions\":[\"Bell\"],\"analogy\":\"Socks\"},{\"title\":\"Q Consciousness\",\"premises\":[\"Mind collapses\"],\"predictions\":[],\"analogy\":\"Healing\"}]"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"total_concepts\": 2,\n  \"valid_frameworks\": 1,\n  \"unfalsifiable\": 1,\n  \"incomplete\": 0,\n  \"results\": [\n    {\n      \"title\": \"EPR\",\n      \"premise_count\": 2,\n      \"prediction_count\": 1,\n      \"is_falsifiable\": true,\n      \"clarity_score\": 10,\n      \"status\": \"VALID_SCIENTIFIC_FRAMEWORK\"\n    },\n    {\n      \"title\": \"Q Consciousness\",\n      \"premise_count\": 1,\n      \"prediction_count\": 0,\n      \"is_falsifiable\": false,\n      \"clarity_score\": 3,\n      \"status\": \"UNFALSIFIABLE_HYPOTHESIS\"\n    }\n  ]\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-03-154817.md"
     }
   ]
 }
