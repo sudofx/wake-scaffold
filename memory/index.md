@@ -9,7 +9,7 @@ to keep context small and current.
 covered)
 
 ## What's been built / done so far
-(No capability work recorded yet.)
+[Bob's blog](https://htmlpreview.github.io/?https://raw.githubusercontent.com/sudofx/wake-scaffold/refs/heads/master/memory/blog.html)
 
 ## Open threads
 (Start one concrete capability project. Cross-reference commitments.json
