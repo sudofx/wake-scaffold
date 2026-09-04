@@ -1,18 +1,6 @@
 {
   "runs": [
     {
-      "when": "Aug 31st, 2026 11:12pm",
-      "filename": "validate_memory.py",
-      "args": [
-        "."
-      ],
-      "exit_code": 1,
-      "stdout": "Validated directory: ..\nValidation FAILED:\n  - commitments.json: Top-level structure must be a JSON array (list)\n  - growth_plan.json: Top-level structure must be a JSON array (list)\n  - hypotheses.json: Top-level structure must be a JSON array (list)\n  - core_memories.json: Top-level structure must be a JSON array\n",
-      "stderr": "",
-      "timed_out": false,
-      "journal_entry": "2026-08-31-231205.md"
-    },
-    {
       "when": "Sep 1st, 2026 03:18am",
       "filename": "validate_memory.py",
       "args": [
@@ -339,6 +327,18 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-04-093536.md"
+    },
+    {
+      "when": "Sep 4th, 2026 12:07pm",
+      "filename": "validate_html.py",
+      "args": [
+        "nonexistent.html"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"file\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/blog.html\",\n  \"valid\": true,\n  \"errors\": [],\n  \"unclosed_tags\": []\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-04-120736.md"
     }
   ]
 }
