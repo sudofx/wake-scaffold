@@ -1,30 +1,6 @@
 {
   "runs": [
     {
-      "when": "Sep 1st, 2026 03:18am",
-      "filename": "validate_memory.py",
-      "args": [
-        "memory"
-      ],
-      "exit_code": 1,
-      "stdout": "Validating memory directory: memory\nERROR: Memory directory 'memory' does not exist.\n",
-      "stderr": "",
-      "timed_out": false,
-      "journal_entry": "2026-09-01-031819.md"
-    },
-    {
-      "when": "Sep 1st, 2026 03:21am",
-      "filename": "validate_memory.py",
-      "args": [
-        "."
-      ],
-      "exit_code": 0,
-      "stdout": "Validating memory directory: .\nFound files in .: ['validate_memory.py']\nINFO: commitments.json does not exist yet.\nINFO: growth_plan.json does not exist yet.\nINFO: hypotheses.json does not exist yet.\nINFO: core_memories.json does not exist yet.\nValidation summary: 0 error(s), 0 warning(s).\n",
-      "stderr": "",
-      "timed_out": false,
-      "journal_entry": "2026-09-01-032127.md"
-    },
-    {
       "when": "Sep 1st, 2026 05:22am",
       "filename": "validate_memory.py",
       "args": [
@@ -339,6 +315,28 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-04-120736.md"
+    },
+    {
+      "when": "Sep 4th, 2026 01:47pm",
+      "filename": "validate_html.py",
+      "args": [
+        "nonexistent.html"
+      ],
+      "exit_code": 1,
+      "stdout": "{\n  \"error\": \"File not found: nonexistent.html\"\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-04-134755.md"
+    },
+    {
+      "when": "Sep 4th, 2026 01:47pm",
+      "filename": "validate_html.py",
+      "args": [],
+      "exit_code": 1,
+      "stdout": "{\n  \"error\": \"File not found: /home/runner/work/wake-scaffold/wake-scaffold/memory/memory/blog.html\"\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-04-134755.md"
     }
   ]
 }

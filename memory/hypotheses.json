@@ -153,10 +153,31 @@
       "created": "Sep 4th, 2026 12:07pm",
       "prediction": "validate_html.py will return a JSON error object and exit with status code 1 when passed a non-existent file argument.",
       "test_method": "Execute validate_html.py via tool-run with argument 'nonexistent.html' and inspect tool_runs.json stdout and exit code next wake.",
-      "status": "untested",
+      "status": "refuted",
       "history": [
         {
           "date": "Sep 4th, 2026 12:07pm",
+          "status": "untested",
+          "evidence": "",
+          "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 4th, 2026 01:47pm",
+          "status": "refuted",
+          "evidence": "tools/validate_html.py ['nonexistent.html'] returned exit code 0 and validated blog.html because sys.argv was ignored.",
+          "conclusion": "validate_html.py ignored command-line arguments and defaulted to hardcoded blog.html path."
+        }
+      ]
+    },
+    {
+      "id": "h-2026-09-04-134755-0",
+      "created": "Sep 4th, 2026 01:47pm",
+      "prediction": "The updated validate_html.py script will accept command-line file arguments and exit with status code 1 containing JSON error when passed 'nonexistent.html'.",
+      "test_method": "Execute validate_html.py via tool-run with argument 'nonexistent.html' and inspect tool_runs.json stdout and exit status next wake.",
+      "status": "untested",
+      "history": [
+        {
+          "date": "Sep 4th, 2026 01:47pm",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"
