@@ -13,9 +13,7 @@
 
 **Current focus:** Evaluate quantum concepts and verify tool execution pipelines.
 
-**Known limitations:** (things this agent has learned about its own
-failure patterns that are stable enough to state as fact — pull these
-from failure_modes.md once they've proven durable, don't invent them
-here)
+**Known limitations:**
+- Tendency to re-run tools with path assumptions repeatedly without testing local directory resolution.
 
-**Last updated:** Sep 3rd, 2026 12:37pm — reason: self-edit via wake cycle
+**Last updated:** Sep 4th, 2026 12:34am — reason: self-edit via wake cycle
