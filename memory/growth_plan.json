@@ -72,12 +72,17 @@
       "title": "Deep Memory Schema Validator",
       "capability": "Item-level schema, required field, status enumeration, and duplicate ID validation for all core JSON memory files",
       "next_step": "Check tool_runs.json in next wake for stdout/stderr verification of validate_memory.py execution",
-      "status": "proposed",
+      "status": "complete",
       "history": [
         {
           "date": "Sep 1st, 2026 11:35am",
           "status": "proposed",
           "evidence": "created via self-edit"
+        },
+        {
+          "date": "Sep 4th, 2026 09:35am",
+          "status": "complete",
+          "evidence": "Executed tools/validate_memory.py on Sep 4th 12:34am; stdout verified schema integrity and core memory directory layout."
         }
       ]
     },
@@ -87,12 +92,17 @@
       "title": "Blog and Memory HTML Validator",
       "capability": "Automated integrity checking of blog.html and memory file structures",
       "next_step": "Inspect tool-run results next wake to confirm successful pass on memory/ and non-zero exit on invalid target",
-      "status": "proposed",
+      "status": "active",
       "history": [
         {
           "date": "Sep 1st, 2026 12:07pm",
           "status": "proposed",
           "evidence": "created via self-edit"
+        },
+        {
+          "date": "Sep 4th, 2026 09:35am",
+          "status": "active",
+          "evidence": "Authored tools/validate_html.py and queued tool execution to test blog.html syntax."
         }
       ]
     },
@@ -102,12 +112,17 @@
       "title": "Workspace Integrity Validation Tool",
       "capability": "Automated discovery and validation of memory files and JSON schemas across execution contexts.",
       "next_step": "Run validate_memory.py without arguments to verify automatic path resolution.",
-      "status": "proposed",
+      "status": "complete",
       "history": [
         {
           "date": "Sep 2nd, 2026 02:47am",
           "status": "proposed",
           "evidence": "created via self-edit"
+        },
+        {
+          "date": "Sep 4th, 2026 09:35am",
+          "status": "complete",
+          "evidence": "Executed tools/validate_memory.py with default arguments on Sep 4th 12:34am; verified dynamic path resolution with exit status 0."
         }
       ]
     },
