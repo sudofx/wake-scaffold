@@ -24,3 +24,19 @@ evidence appears — e.g. "pricing model: X", "publishing cadence: Y")
 ## Known unknowns
 (things this agent has explicitly flagged as uncertain and not yet
 resolved)
+
+## Developer Requests
+1. **Known limitations, 2026-09-04:** `identity.md`'s Known limitations
+   is still unfilled. Real evidence already exists: `validate_memory.py`
+   has failed (exit code 1) on 15 of its 22 recorded runs in
+   `tool_runs.json` — a genuine, durable pattern worth naming as a real
+   limitation (e.g. a tendency to re-run a broken tool rather than
+   debug root cause) rather than inventing one. Your call whether/how
+   to record it, but the evidence is sitting there unused.
+2. **Point the evaluator at yourself, 2026-09-04:** `concept_evaluator.py`
+   / `quantum_batch_evaluator.py` have only been run against quantum
+   concepts so far. Consider running the same falsifiability check
+   against one of your own growth-plan or hypothesis submissions before
+   logging it, or against an idea from a different domain (psychology,
+   something Carnegie-adjacent) to see if the framework actually
+   generalizes or if it's quietly quantum-specific.

@@ -1353,6 +1353,33 @@ def format_hypotheses_for_prompt() -> str:
     return "\n".join(lines)
 
 
+def falsifiability_signal(prediction: str, test_method: str) -> tuple[bool, str]:
+    """
+    A lightweight heuristic in the same spirit as Bob's own
+    concept_evaluator.py: does this read like a real, checkable claim,
+    or an impression nothing could disconfirm? Deliberately never
+    blocks a hypothesis outright — this heuristic is too fuzzy to
+    trust as a hard gate and a false rejection would be worse than a
+    missed warning. It only attaches a visible flag so a vague
+    hypothesis doesn't slip in looking rigorous.
+    """
+    text = (prediction + " " + test_method).lower()
+    has_checkable_language = any(kw in text for kw in [
+        "will", "should", "exit code", "return", "output", "raise",
+        "fail", "succeed", "equal", "greater", "less than", "within",
+        "contain", "match", "status", "detect", "measure", "observe",
+        "reproduce", "confirm", "refute",
+    ])
+    too_short = len(prediction.strip()) < 20
+    if too_short or not has_checkable_language:
+        return False, (
+            "this reads more like an impression than a checkable claim — "
+            "no concrete outcome, number, or observable result named that "
+            "could confirm or refute it"
+        )
+    return True, ""
+
+
 def apply_hypotheses_update(raw_json: str, now: datetime) -> list[str]:
     """
     Maintain a small, falsifiable self-experiment log: a prediction and
@@ -1402,6 +1429,12 @@ def apply_hypotheses_update(raw_json: str, now: datetime) -> list[str]:
                          "evidence": "", "conclusion": "created via self-edit"}],
         })
         notes.append(f"ADDED hypothesis {hyp_id}: {prediction[:80]}")
+        is_falsifiable, reason = falsifiability_signal(prediction, test_method)
+        if not is_falsifiable:
+            notes.append(
+                f"WARNING on {hyp_id}: {reason}. Consider revising to name "
+                f"a specific, checkable outcome before testing it."
+            )
         changed = True
 
     for change in ops.get("status_change", []):
