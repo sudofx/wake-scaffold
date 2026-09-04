@@ -90,13 +90,19 @@
       "created": "Sep 3rd, 2026 06:21pm",
       "prediction": "validate_memory.py using Path(__file__).resolve().parent.parent path resolution will locate the workspace memory directory and pass all JSON syntax checks with exit code 0 when run from the sandboxed tool runner.",
       "test_method": "Execute tools/validate_memory.py via tool-run with empty arguments and check stdout and exit status in TOOL RUN HISTORY next wake.",
-      "status": "untested",
+      "status": "confirmed",
       "history": [
         {
           "date": "Sep 3rd, 2026 06:21pm",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 4th, 2026 12:39am",
+          "status": "confirmed",
+          "evidence": "validate_memory.py executed successfully with exit code 0 and reported valid: true in tool_runs.json on Sep 4 12:34am.",
+          "conclusion": "Path(__file__).resolve().parent.parent successfully locates workspace memory directory regardless of execution CWD."
         }
       ]
     },

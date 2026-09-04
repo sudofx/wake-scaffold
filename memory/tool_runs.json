@@ -1,16 +1,6 @@
 {
   "runs": [
     {
-      "when": "Aug 31st, 2026 05:59pm",
-      "filename": "validate_memory.py",
-      "args": [],
-      "exit_code": 1,
-      "stdout": "",
-      "stderr": "  File \"/home/runner/work/wake-scaffold/wake-scaffold/memory/tools/validate_memory.py\", line 52\n    ok, res = validate_json_file(path):\n                                      ^\nSyntaxError: invalid syntax\n",
-      "timed_out": false,
-      "journal_entry": "2026-08-31-175949.md"
-    },
-    {
       "when": "Aug 31st, 2026 10:28pm",
       "filename": "validate_memory.py",
       "args": [
@@ -337,6 +327,18 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-04-003450.md"
+    },
+    {
+      "when": "Sep 4th, 2026 12:39am",
+      "filename": "quantum_batch_evaluator.py",
+      "args": [
+        "[{\"title\":\"Carnegie Greeting\",\"premises\":[\"Interest builds rapport\"],\"predictions\":[\"Name repetition increases warmth by 15%\"],\"analogy\":\"Mirroring\"}]"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"total_concepts\": 1,\n  \"valid_frameworks\": 0,\n  \"unfalsifiable\": 0,\n  \"incomplete\": 1,\n  \"results\": [\n    {\n      \"title\": \"Carnegie Greeting\",\n      \"premise_count\": 1,\n      \"prediction_count\": 1,\n      \"is_falsifiable\": true,\n      \"clarity_score\": 7,\n      \"status\": \"INCOMPLETE_FRAMEWORK\"\n    }\n  ]\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-04-003946.md"
     }
   ]
 }
