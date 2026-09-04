@@ -1,5 +1,5 @@
-import json
 import sys
+import json
 from pathlib import Path
 from html.parser import HTMLParser
 
@@ -8,58 +8,64 @@ class SimpleHTMLValidator(HTMLParser):
         super().__init__()
         self.errors = []
         self.stack = []
-        self.void_tags = {'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'}
+        self.self_closing = {
+            'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
+            'link', 'meta', 'param', 'source', 'track', 'wbr'
+        }
 
     def handle_starttag(self, tag, attrs):
-        if tag.lower() not in self.void_tags:
-            self.stack.append(tag.lower())
+        if tag.lower() not in self.self_closing:
+            self.stack.append((tag.lower(), self.getpos()))
 
     def handle_endtag(self, tag):
-        tag_lower = tag.lower()
-        if tag_lower in self.void_tags:
+        tag = tag.lower()
+        if tag in self.self_closing:
             return
-        if self.stack and self.stack[-1] == tag_lower:
+        if not self.stack:
+            self.errors.append(f"Unexpected closing tag </{tag}> at line {self.getpos()[0]}")
+            return
+        top_tag, _ = self.stack[-1]
+        if top_tag == tag:
             self.stack.pop()
-        elif tag_lower in self.stack:
-            while self.stack and self.stack[-1] != tag_lower:
-                unmatched = self.stack.pop()
-                self.errors.append(f"Unclosed tag: <{unmatched}> before </{tag_lower}>")
-            if self.stack:
-                self.stack.pop()
         else:
-            self.errors.append(f"Unexpected closing tag: </{tag_lower}>")
+            for i in range(len(self.stack) - 1, -1, -1):
+                if self.stack[i][0] == tag:
+                    for j in range(len(self.stack) - 1, i, -1):
+                        unclosed_tag, pos = self.stack.pop()
+                        self.errors.append(f"Unclosed tag <{unclosed_tag}> from line {pos[0]}")
+                    self.stack.pop()
+                    return
+            self.errors.append(f"Mismatched closing tag </{tag}> at line {self.getpos()[0]}")
 
-def validate_file(target_path):
-    p = Path(target_path).resolve()
-    if not p.is_file():
-        return {"error": f"File not found: {target_path}"}
+if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1].strip():
+        target = Path(sys.argv[1])
+    else:
+        base = Path(__file__).resolve().parent.parent
+        target = base / "blog.html"
+        if not target.exists():
+            target = base / "memory" / "blog.html"
+
+    if not target.exists():
+        print(json.dumps({"error": f"File not found: {target}"}))
+        sys.exit(1)
 
     try:
-        content = p.read_text(encoding='utf-8')
+        content = target.read_text(encoding="utf-8")
         parser = SimpleHTMLValidator()
         parser.feed(content)
-        unclosed = parser.stack
+        
+        unclosed = [f"<{tag}> from line {pos[0]}" for tag, pos in parser.stack]
         is_valid = len(parser.errors) == 0 and len(unclosed) == 0
-        return {
-            "file": str(p),
+        
+        res = {
+            "file": str(target.resolve()),
             "valid": is_valid,
             "errors": parser.errors,
             "unclosed_tags": unclosed
         }
+        print(json.dumps(res, indent=2))
+        sys.exit(0 if is_valid else 1)
     except Exception as e:
-        return {"error": str(e)}
-
-if __name__ == "__main__":
-    workspace_root = Path(__file__).resolve().parent.parent
-    default_target = workspace_root / "memory" / "blog.html"
-    
-    if len(sys.argv) > 1:
-        target = sys.argv[1]
-    else:
-        target = default_target
-        
-    result = validate_file(target)
-    print(json.dumps(result, indent=2))
-    if "error" in result or not result.get("valid", False):
+        print(json.dumps({"error": str(e)}))
         sys.exit(1)
-    sys.exit(0)

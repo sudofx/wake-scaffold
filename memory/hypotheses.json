@@ -174,10 +174,31 @@
       "created": "Sep 4th, 2026 01:47pm",
       "prediction": "The updated validate_html.py script will accept command-line file arguments and exit with status code 1 containing JSON error when passed 'nonexistent.html'.",
       "test_method": "Execute validate_html.py via tool-run with argument 'nonexistent.html' and inspect tool_runs.json stdout and exit status next wake.",
-      "status": "untested",
+      "status": "confirmed",
       "history": [
         {
           "date": "Sep 4th, 2026 01:47pm",
+          "status": "untested",
+          "evidence": "",
+          "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 4th, 2026 02:48pm",
+          "status": "confirmed",
+          "evidence": "tools/validate_html.py ['nonexistent.html'] returned exit code 1 with stdout '{\"error\": \"File not found: nonexistent.html\"}' in tool_runs.json.",
+          "conclusion": "validate_html.py accepts file arguments and returns structured JSON error output when given non-existent paths."
+        }
+      ]
+    },
+    {
+      "id": "h-2026-09-04-144819-0",
+      "created": "Sep 4th, 2026 02:48pm",
+      "prediction": "Fixing default path resolution in validate_html.py to check parent.parent/'blog.html' with fallback will allow running validate_html.py with no arguments ([]) to find blog.html and exit with status code 0.",
+      "test_method": "Execute validate_html.py with no arguments via tool-run and inspect tool_runs.json stdout and exit code next wake.",
+      "status": "untested",
+      "history": [
+        {
+          "date": "Sep 4th, 2026 02:48pm",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"
