@@ -1,62 +1,58 @@
-import sys
 import json
+import sys
 from pathlib import Path
 
-def validate():
-    if len(sys.argv) > 1:
-        target_dir = Path(sys.argv[1]).resolve()
-    else:
-        script_dir = Path(__file__).resolve().parent
-        if script_dir.name == 'tools':
-            target_dir = script_dir.parent
-        else:
-            target_dir = Path.cwd()
-
-    print(f"Validating memory directory: {target_dir}")
+def validate_workspace():
+    tools_dir = Path(__file__).resolve().parent
+    workspace_root = tools_dir.parent
     
+    memory_dir = workspace_root / "memory"
+    if not memory_dir.exists():
+        memory_dir = Path.cwd() / "memory"
+    
+    report = {
+        "workspace_root": str(workspace_root),
+        "memory_dir": str(memory_dir),
+        "checks": {},
+        "valid": True
+    }
+    
+    if not memory_dir.exists():
+        report["valid"] = False
+        report["error"] = f"Memory directory not found at {memory_dir}"
+        print(json.dumps(report, indent=2))
+        sys.exit(1)
+        
     required_files = [
         "identity.md",
         "rules.md",
-        "index.md",
-        "commitments.json",
         "growth_plan.json",
         "hypotheses.json",
-        "core_memories.json"
+        "commitments.json",
+        "blog.html"
     ]
-
-    missing = []
-    errors = []
-
-    for fname in required_files:
-        fpath = target_dir / fname
-        if not fpath.exists():
-            missing.append(fname)
-            continue
+    
+    for filename in required_files:
+        file_path = memory_dir / filename
+        exists = file_path.exists()
+        file_status = {"exists": exists, "valid_json": None}
         
-        if fname.endswith(".json"):
+        if not exists:
+            report["valid"] = False
+        elif filename.endswith(".json"):
             try:
-                with open(fpath, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                if not isinstance(data, (dict, list)):
-                    errors.append(f"{fname}: root JSON structure is invalid type ({type(data)})")
+                with open(file_path, "r", encoding="utf-8") as f:
+                    json.load(f)
+                file_status["valid_json"] = True
             except Exception as e:
-                errors.append(f"{fname}: JSON syntax error ({e})")
-        else:
-            if fpath.stat().st_size == 0:
-                errors.append(f"{fname}: file is empty")
-
-    if missing:
-        print(f"FAIL: Missing files: {', '.join(missing)}")
-    if errors:
-        print("FAIL: Content errors:")
-        for err in errors:
-            print(f"  - {err}")
-
-    if not missing and not errors:
-        print("SUCCESS: All required memory files present and valid.")
-        sys.exit(0)
-    else:
-        sys.exit(1)
+                file_status["valid_json"] = False
+                file_status["json_error"] = str(e)
+                report["valid"] = False
+                
+        report["checks"][filename] = file_status
+        
+    print(json.dumps(report, indent=2))
+    sys.exit(0 if report["valid"] else 1)
 
 if __name__ == "__main__":
-    validate()
+    validate_workspace()

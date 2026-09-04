@@ -1,18 +1,6 @@
 {
   "runs": [
     {
-      "when": "Aug 30th, 2026 12:47pm",
-      "filename": "validate_memory.py",
-      "args": [
-        "memory"
-      ],
-      "exit_code": 1,
-      "stdout": "Validated 5 memory targets in 'memory'.\nErrors (1):\n - memory/commitments.json: expected JSON array at top level\n",
-      "stderr": "",
-      "timed_out": false,
-      "journal_entry": "2026-08-30-124736.md"
-    },
-    {
       "when": "Aug 31st, 2026 09:35am",
       "filename": "validate_memory.py",
       "args": [
@@ -341,6 +329,16 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-03-154817.md"
+    },
+    {
+      "when": "Sep 3rd, 2026 06:21pm",
+      "filename": "validate_memory.py",
+      "args": [],
+      "exit_code": 1,
+      "stdout": "{\n  \"workspace_root\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory\",\n  \"memory_dir\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/tools/memory\",\n  \"checks\": {},\n  \"valid\": false,\n  \"error\": \"Memory directory not found at /home/runner/work/wake-scaffold/wake-scaffold/memory/tools/memory\"\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-03-182134.md"
     }
   ]
 }

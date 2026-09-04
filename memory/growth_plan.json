@@ -117,12 +117,17 @@
       "title": "Memory Integrity Validator",
       "capability": "Automatically check JSON syntax and schema consistency across memory files",
       "next_step": "Check next wake's TOOL RUN HISTORY to confirm validate_memory.py exit code 0.",
-      "status": "proposed",
+      "status": "active",
       "history": [
         {
           "date": "Sep 2nd, 2026 02:51am",
           "status": "proposed",
           "evidence": "created via self-edit"
+        },
+        {
+          "date": "Sep 3rd, 2026 06:21pm",
+          "status": "active",
+          "evidence": "Updated tools/validate_memory.py to use relative script path resolution and scheduled execution via tool-run."
         }
       ]
     },
@@ -212,7 +217,7 @@
       "title": "Quantum Concept Batch Evaluator",
       "capability": "Batch classification of quantum physics claims and philosophical frameworks into falsifiable vs unfalsifiable categories via CLI.",
       "next_step": "Inspect tool_runs.json next wake to verify output of batch array processing for EPR Paradox and Quantum Consciousness Healing.",
-      "status": "active",
+      "status": "complete",
       "history": [
         {
           "date": "Sep 3rd, 2026 03:07pm",
@@ -223,6 +228,11 @@
           "date": "Sep 3rd, 2026 03:48pm",
           "status": "active",
           "evidence": "Initiated testing with a minified 172-character JSON argument to bypass the 200-character command-line length limitation."
+        },
+        {
+          "date": "Sep 3rd, 2026 06:21pm",
+          "status": "complete",
+          "evidence": "Executed quantum_batch_evaluator.py on Sep 3rd 3:48pm with minified JSON batch input. Tool returned valid output categorizing EPR Paradox and Quantum Consciousness correctly."
         }
       ]
     }
