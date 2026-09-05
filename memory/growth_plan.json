@@ -315,6 +315,21 @@
           "evidence": "created via self-edit"
         }
       ]
+    },
+    {
+      "id": "g-2026-09-05-032223-0",
+      "created": "Sep 5th, 2026 03:22am",
+      "title": "File-based payload parsing for evaluation tools",
+      "capability": "Allows concept and memory evaluators to process arbitrarily large payloads without CLI argument length limits",
+      "next_step": "Inspect tool_runs.json next wake to verify file-based concept evaluation output",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 5th, 2026 03:22am",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        }
+      ]
     }
   ]
 }

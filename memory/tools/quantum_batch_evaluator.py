@@ -1,63 +1,53 @@
 import sys
 import json
+import os
 
 def evaluate_concept(item):
     title = item.get("title", "Untitled")
     premises = item.get("premises", [])
     predictions = item.get("predictions", [])
     
-    is_falsifiable = len(predictions) > 0
-    clarity_score = min(10, max(1, len(premises) * 3 + len(predictions) * 4))
+    is_falsifiable = len(predictions) > 0 and len(premises) > 0
     
-    if not predictions:
-        status = "UNFALSIFIABLE_HYPOTHESIS"
-    elif len(premises) >= 2 and len(predictions) >= 1:
+    if is_falsifiable:
         status = "VALID_SCIENTIFIC_FRAMEWORK"
     else:
-        status = "INCOMPLETE_FRAMEWORK"
+        status = "UNFALSIFIABLE_OR_INCOMPLETE"
         
     return {
         "title": title,
-        "premise_count": len(premises),
-        "prediction_count": len(predictions),
-        "is_falsifiable": is_falsifiable,
-        "clarity_score": clarity_score,
-        "status": status
+        "status": status,
+        "premises_count": len(premises),
+        "predictions_count": len(predictions)
     }
 
-def process_batch(items):
-    results = [evaluate_concept(item) for item in items]
-    summary = {
-        "total_concepts": len(results),
-        "valid_frameworks": sum(1 for r in results if r["status"] == "VALID_SCIENTIFIC_FRAMEWORK"),
-        "unfalsifiable": sum(1 for r in results if r["status"] == "UNFALSIFIABLE_HYPOTHESIS"),
-        "incomplete": sum(1 for r in results if r["status"] == "INCOMPLETE_FRAMEWORK"),
-        "results": results
-    }
-    return summary
+def main():
+    if len(sys.argv) < 2:
+        print(json.dumps({"error": "No input provided"}))
+        sys.exit(1)
+        
+    arg = sys.argv[1]
+    data = None
+    
+    if os.path.exists(arg) or arg.endswith('.json'):
+        try:
+            with open(arg, 'r') as f:
+                data = json.load(f)
+        except Exception as e:
+            print(json.dumps({"error": f"Failed to read file {arg}: {str(e)}"}))
+            sys.exit(1)
+    else:
+        try:
+            data = json.loads(arg)
+        except Exception as e:
+            print(json.dumps({"error": f"Failed to parse JSON string: {str(e)}"}))
+            sys.exit(1)
+            
+    if isinstance(data, dict):
+        data = [data]
+        
+    results = [evaluate_concept(item) for item in data]
+    print(json.dumps(results, indent=2))
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        raw_input = sys.argv[1]
-        try:
-            data = json.loads(raw_input)
-            if isinstance(data, list):
-                print(json.dumps(process_batch(data), indent=2))
-            else:
-                print(json.dumps(process_batch([data]), indent=2))
-        except Exception as e:
-            print(json.dumps({"error": str(e)}))
-    else:
-        sample_batch = [
-            {
-                "title": "Quantum Entanglement Bell Test",
-                "premises": ["Entangled particle pairs share quantum states.", "Local realism predicts inequality bound."],
-                "predictions": ["Violation of Bell inequality in spin polarization measurement."]
-            },
-            {
-                "title": "Consciousness Collapse Premise",
-                "premises": ["Human consciousness causes wave function collapse."],
-                "predictions": []
-            }
-        ]
-        print(json.dumps(process_batch(sample_batch), indent=2))
+    main()
