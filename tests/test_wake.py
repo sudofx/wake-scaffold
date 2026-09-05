@@ -643,5 +643,160 @@ class GeminiFallbackTests(unittest.TestCase):
         self.assertEqual(provider.models, ["gemini-3.5-flash", "gemini-3.1-flash-lite"])
 
 
+class TemporalContextTests(WakeTestCase):
+    """wakes_today()/build_temporal_context() — Bob wakes many times a
+    day, so 'today' has to be derived from real journal filenames, not
+    assumed."""
+
+    def test_wakes_today_excludes_other_days_and_failed_entries(self):
+        (self.memory / "journal" / "2026-08-31-060000.md").write_text("x")
+        (self.memory / "journal" / "2026-08-31-090000.md").write_text("x")
+        # Earlier today but failed — should not count.
+        (self.memory / "journal" / "2026-08-31-070000-FAILED.md").write_text("x")
+        # Successful, but the previous calendar day — should not count.
+        (self.memory / "journal" / "2026-08-30-235900.md").write_text("x")
+
+        result = wake.wakes_today(FIXED_NOW)
+
+        self.assertEqual(len(result), 2)
+        # Oldest first.
+        self.assertLess(result[0], result[1])
+        self.assertEqual(result[0].hour, 6)
+        self.assertEqual(result[1].hour, 9)
+
+    def test_build_temporal_context_first_wake_of_day(self):
+        context = wake.build_temporal_context(FIXED_NOW)
+        self.assertIn("first wake today", context)
+        self.assertIn("this wake", context)
+
+    def test_build_temporal_context_reports_prior_wake_count(self):
+        (self.memory / "journal" / "2026-08-31-060000.md").write_text("x")
+        context = wake.build_temporal_context(FIXED_NOW)
+        self.assertIn("already woken 1 time(s) today", context)
+
+    def test_build_temporal_context_nudges_past_review_hour(self):
+        late = FIXED_NOW.replace(hour=22)
+        context = wake.build_temporal_context(late)
+        self.assertIn("review hour", context)
+
+
+class HypothesesFormattingTests(WakeTestCase):
+    """format_hypotheses_for_prompt() should show every unresolved
+    hypothesis in full but cap resolved ones to the 3 most recent."""
+
+    def _add(self, prediction: str, now: datetime = FIXED_NOW) -> str:
+        block = json.dumps({"add": [
+            {"prediction": prediction, "test_method": "inspect a file"}
+        ]})
+        wake.apply_hypotheses_update(block, now)
+        hyps = json.loads((self.memory / "hypotheses.json").read_text())["hypotheses"]
+        return hyps[-1]["id"]
+
+    def _resolve(self, hyp_id: str, status: str):
+        block = json.dumps({"status_change": [
+            {"id": hyp_id, "new_status": status, "evidence": "observed x", "conclusion": "y"}
+        ]})
+        wake.apply_hypotheses_update(block, FIXED_NOW)
+
+    def test_shows_all_unresolved_and_caps_resolved_to_three(self):
+        # Each add uses a distinct second so hypothesis ids (derived from
+        # filename_stamp) don't collide within this single test.
+        from datetime import timedelta
+        times = iter(FIXED_NOW + timedelta(seconds=i) for i in range(1, 20))
+
+        # Two unresolved: one left untested, one moved to testing.
+        untested_id = self._add("prediction A", next(times))
+        testing_id = self._add("prediction B", next(times))
+        self._resolve(testing_id, "testing")
+
+        # Five resolved hypotheses, in order.
+        resolved_ids = []
+        for i in range(5):
+            hid = self._add(f"resolved prediction {i}", next(times))
+            self._resolve(hid, "confirmed")
+            resolved_ids.append(hid)
+
+        formatted = wake.format_hypotheses_for_prompt()
+
+        self.assertIn(untested_id, formatted)
+        self.assertIn(testing_id, formatted)
+        # Only the last 3 resolved should be shown.
+        for hid in resolved_ids[:2]:
+            self.assertNotIn(hid, formatted)
+        for hid in resolved_ids[2:]:
+            self.assertIn(hid, formatted)
+        self.assertIn("2 earlier resolved hypothesis(es) not shown", formatted)
+
+    def test_no_omission_note_when_three_or_fewer_resolved(self):
+        from datetime import timedelta
+        times = iter(FIXED_NOW + timedelta(seconds=i) for i in range(1, 10))
+        for i in range(2):
+            hid = self._add(f"prediction {i}", next(times))
+            self._resolve(hid, "refuted")
+        formatted = wake.format_hypotheses_for_prompt()
+        self.assertNotIn("not shown", formatted)
+
+
+class IdentityLifecycleTests(unittest.TestCase):
+    """archive_current_identity()'s index.md self-link rewrite and the
+    auto-maintained IDENTITIES.md registry — uses a throwaway ROOT so
+    the real repo's IDENTITIES.md and memory_*/ archives are never
+    touched."""
+
+    def setUp(self):
+        self.tmproot = Path(tempfile.mkdtemp(prefix="wake-scaffold-root-"))
+        shutil.copy(wake.ROOT / "config.yaml", self.tmproot / "config.yaml")
+        self._orig = {
+            name: getattr(wake, name)
+            for name in ("ROOT", "MEMORY", "JOURNAL", "IDENTITIES_FILE")
+        }
+        wake.ROOT = self.tmproot
+        wake.MEMORY = self.tmproot / "memory"
+        wake.JOURNAL = wake.MEMORY / "journal"
+        wake.IDENTITIES_FILE = self.tmproot / "IDENTITIES.md"
+
+    def tearDown(self):
+        for name, value in self._orig.items():
+            setattr(wake, name, value)
+        shutil.rmtree(self.tmproot, ignore_errors=True)
+
+    def test_bootstrap_adds_active_row_to_identities_file(self):
+        wake.bootstrap_identity("Ada", "Test bootstrapping.")
+        text = wake.IDENTITIES_FILE.read_text()
+        self.assertIn("| Ada | active | `memory/` |", text)
+
+    def test_archive_rewrites_index_md_self_link_and_marks_archived(self):
+        wake.bootstrap_identity("Ada", "Test archiving.")
+        old_url = wake.htmlpreview_url("memory/blog.html")
+        # Seed index.md with the stale self-link a real identity would have.
+        index_path = wake.MEMORY / "index.md"
+        index_path.write_text(f"## What's been built\n\n[blog]({old_url})\n")
+
+        destination = wake.archive_current_identity("ada_v1")
+
+        new_url = wake.htmlpreview_url("memory_ada_v1/blog.html")
+        archived_text = (destination / "index.md").read_text()
+        self.assertIn(new_url, archived_text)
+        self.assertNotIn(old_url, archived_text)
+
+        identities_text = wake.IDENTITIES_FILE.read_text()
+        self.assertIn("| Ada | archived | `memory_ada_v1/` |", identities_text)
+        self.assertIn(new_url, identities_text)
+
+    def test_archive_never_touches_journal_or_blog_posts(self):
+        wake.bootstrap_identity("Ada", "Test immutability.")
+        wake.JOURNAL.mkdir(parents=True, exist_ok=True)
+        (wake.JOURNAL / "2026-08-31-090000.md").write_text("original content")
+        original_blog_posts = (wake.MEMORY / "blog_posts.json").read_text()
+
+        destination = wake.archive_current_identity("ada_v2")
+
+        self.assertEqual(
+            (destination / "journal" / "2026-08-31-090000.md").read_text(),
+            "original content",
+        )
+        self.assertEqual((destination / "blog_posts.json").read_text(), original_blog_posts)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
