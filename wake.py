@@ -62,6 +62,123 @@ def load_config():
         return yaml.safe_load(f)
 
 
+EPISTEMIC_STATE_FILE = MEMORY / "epistemic_state.json"
+MAX_MODEL_REVISIONS = 100
+
+
+def load_epistemic_state() -> dict:
+    """Load the durable model-revision ledger, creating an empty state if needed."""
+    if not EPISTEMIC_STATE_FILE.exists():
+        return {"version": 1, "revisions": []}
+    try:
+        data = json.loads(EPISTEMIC_STATE_FILE.read_text())
+    except (OSError, json.JSONDecodeError):
+        return {"version": 1, "revisions": []}
+    if not isinstance(data, dict):
+        return {"version": 1, "revisions": []}
+    revisions = data.get("revisions")
+    if not isinstance(revisions, list):
+        revisions = []
+    data["version"] = int(data.get("version", 1))
+    data["revisions"] = revisions[-MAX_MODEL_REVISIONS:]
+    return data
+
+
+def save_epistemic_state(data: dict) -> None:
+    """Persist the model-revision ledger without rewriting journal history."""
+    data["version"] = 1
+    data["revisions"] = data.get("revisions", [])[-MAX_MODEL_REVISIONS:]
+    EPISTEMIC_STATE_FILE.write_text(json.dumps(data, indent=2) + "\n")
+
+
+def record_model_revision(
+    now: datetime,
+    observation: str,
+    claim: str,
+    prediction: str,
+    test: str,
+    outcome: str,
+    revision: str,
+    source: str = "self-report",
+    confidence_before: str = "",
+    confidence_after: str = "",
+) -> str:
+    """
+    Record an explicit observation -> claim -> prediction -> test -> outcome
+    -> revision chain.
+
+    This is deliberately separate from the journal and hypotheses files:
+    the journal is the immutable narrative record; hypotheses are individual
+    self-experiments; this ledger records the broader epistemic event in which
+    evidence changed (or failed to change) the model.
+    """
+    required = {
+        "observation": observation,
+        "claim": claim,
+        "prediction": prediction,
+        "test": test,
+        "outcome": outcome,
+        "revision": revision,
+    }
+    missing = [key for key, value in required.items() if not str(value).strip()]
+    if missing:
+        raise ValueError(
+            "model revision requires non-empty fields: " + ", ".join(missing)
+        )
+
+    data = load_epistemic_state()
+    revision_id = f"mr-{filename_stamp(now)}-{len(data['revisions']) + 1:03d}"
+    entry = {
+        "id": revision_id,
+        "date": format_display_time(now),
+        "observation": observation.strip()[:2000],
+        "claim": claim.strip()[:2000],
+        "prediction": prediction.strip()[:2000],
+        "test": test.strip()[:2000],
+        "outcome": outcome.strip()[:3000],
+        "revision": revision.strip()[:3000],
+        "source": source.strip()[:200],
+    }
+    if confidence_before.strip():
+        entry["confidence_before"] = confidence_before.strip()[:200]
+    if confidence_after.strip():
+        entry["confidence_after"] = confidence_after.strip()[:200]
+
+    data["revisions"].append(entry)
+    save_epistemic_state(data)
+    return revision_id
+
+
+def build_epistemic_context() -> str:
+    """Format recent model revisions as evidence context for the next wake."""
+    data = load_epistemic_state()
+    revisions = data.get("revisions", [])
+    if not revisions:
+        return (
+            "No explicit model revisions have been recorded yet. "
+            "Do not invent one. A tool succeeding is not by itself a model revision."
+        )
+
+    lines = [
+        "Recent explicit model-revision records follow. Treat them as prior "
+        "evidence, not as unquestionable truth."
+    ]
+    for item in revisions[-5:]:
+        lines.append(
+            "\n".join([
+                f"- {item.get('id', 'unknown')} ({item.get('date', 'unknown')})",
+                f"  Observation: {item.get('observation', '')}",
+                f"  Claim: {item.get('claim', '')}",
+                f"  Prediction: {item.get('prediction', '')}",
+                f"  Test: {item.get('test', '')}",
+                f"  Outcome: {item.get('outcome', '')}",
+                f"  Revision: {item.get('revision', '')}",
+                f"  Source: {item.get('source', '')}",
+            ])
+        )
+    return "\n\n".join(lines)
+
+
 def get_local_tz() -> ZoneInfo:
     """
     Reads the timezone from config.yaml (defaulting to Los Angeles),
@@ -353,6 +470,7 @@ def build_reflection_prompt(now: datetime) -> str:
         "## TOOL RUN HISTORY (actual execution results — the only real "
         "evidence a tool works; a file existing in tools/ is not evidence "
         "by itself)\n" + format_tool_runs_for_prompt(),
+        "## EPISTEMIC MODEL-REVISION HISTORY\n" + build_epistemic_context(),
         "## YOUR TASK RIGHT NOW: REFLECT, DO NOT JOURNAL YET\n"
         "Keep this brief: maximum 250 words. Identify one concrete capability "
         "project, investigation, or maintenance repair that would leave an "
@@ -471,6 +589,33 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         "known_limitations_add only ever appends — it can't remove or "
         "rewrite past limitations, since those are honest historical "
         "observations even if later superseded.\n\n"
+        "**To record an explicit model revision**, include a fenced block "
+        "ONLY when this wake produced an actual observation and you can "
+        "state how that evidence changed (or failed to change) your model. "
+        "This is the epistemic spine: observation -> claim -> prediction -> "
+        "test -> outcome -> revision. Do not manufacture a revision merely "
+        "because a tool ran successfully. A successful tool run proves only "
+        "that the tool produced the recorded execution result; it does not "
+        "prove the underlying idea is true. An inconclusive result is valid "
+        "and should be recorded when that is what happened.\n"
+        "```model-revision\n"
+        '{"observation": "what was actually observed", '
+        '"claim": "the interpretation or claim being evaluated", '
+        '"prediction": "what the claim predicted would happen", '
+        '"test": "what was actually done to test it", '
+        '"outcome": "what actually happened, including failure or '
+        'inconclusive evidence", '
+        '"revision": "what changed in the model because of the outcome", '
+        '"source": "tool-run|journal|hypothesis|other", '
+        '"confidence_before": "optional", '
+        '"confidence_after": "optional"}\n'
+        "```\n"
+        "The six core fields are required. Keep observation separate from "
+        "interpretation: do not smuggle conclusions into the observation "
+        "field. The revision should describe a real change in what you "
+        "expect, believe, prioritize, or will test next. If nothing changed "
+        "because the evidence was insufficient, say that explicitly rather "
+        "than pretending a revision occurred.\n\n"
         "**To add a new commitment or change an existing one's status**, "
         "include a fenced block:\n"
         "```commitments-update\n"
@@ -640,7 +785,10 @@ def build_combined_prompt(now: datetime, enable_pull_requests: bool = False) -> 
         "marker line, and do not blend the reflection and the journal "
         "entry together — they are split apart from each other afterward, "
         "so anything written before the marker is treated as reflection "
-        "only and won't appear in the journal record of what you did."
+        "only and won't appear in the journal record of what you did. "
+        "When the work produces evidence that changes your model, record "
+        "that change with the model-revision block described below. Do not "
+        "claim a model revision merely because a tool executed successfully."
     )
     reflect_part = build_reflection_prompt(now).replace(two_pass_task, combined_task, 1)
 
@@ -2007,8 +2155,8 @@ def compose_fallback_blog_post(prior_notes: list[str], now: datetime) -> str:
 def apply_self_edits(model_output: str, config: dict, now: datetime, journal_fname: str) -> str:
     """
     Look for identity-update / commitments-update / blog-post /
-    growth-plan-update / hypothesis-update / tool-write / tool-run /
-    core-memory-add blocks in the journal output and apply them if
+    growth-plan-update / hypothesis-update / model-revision / tool-write /
+    tool-run / core-memory-add blocks in the journal output and apply them if
     valid, via the narrow structured functions above. If
     enable_pull_requests is on in config, also looks for a proposal
     block and attempts to open a real PR for rules.md/index.md
@@ -2047,6 +2195,65 @@ def apply_self_edits(model_output: str, config: dict, now: datetime, journal_fna
     hypothesis_block = extract_block(model_output, "hypothesis-update")
     if hypothesis_block is not None:
         all_notes.extend(apply_hypotheses_update(hypothesis_block, now))
+
+    model_revision_block = extract_block(model_output, "model-revision")
+    if model_revision_block is not None:
+        try:
+            revision_data = json.loads(model_revision_block)
+        except json.JSONDecodeError as e:
+            all_notes.append(
+                f"REJECTED model-revision: not valid JSON ({e})."
+            )
+        else:
+            if not isinstance(revision_data, dict):
+                all_notes.append(
+                    "REJECTED model-revision: must be a JSON object."
+                )
+            else:
+                required_revision_fields = (
+                    "observation",
+                    "claim",
+                    "prediction",
+                    "test",
+                    "outcome",
+                    "revision",
+                )
+                missing = [
+                    field for field in required_revision_fields
+                    if not str(revision_data.get(field, "")).strip()
+                ]
+                if missing:
+                    all_notes.append(
+                        "REJECTED model-revision: missing required field(s): "
+                        + ", ".join(missing)
+                    )
+                else:
+                    try:
+                        revision_id = record_model_revision(
+                            now,
+                            observation=str(revision_data["observation"]),
+                            claim=str(revision_data["claim"]),
+                            prediction=str(revision_data["prediction"]),
+                            test=str(revision_data["test"]),
+                            outcome=str(revision_data["outcome"]),
+                            revision=str(revision_data["revision"]),
+                            source=str(revision_data.get("source", "self-report")),
+                            confidence_before=str(
+                                revision_data.get("confidence_before", "")
+                            ),
+                            confidence_after=str(
+                                revision_data.get("confidence_after", "")
+                            ),
+                        )
+                        all_notes.append(
+                            f"RECORDED model revision {revision_id}: "
+                            "observation -> claim -> prediction -> test -> "
+                            "outcome -> revision"
+                        )
+                    except (OSError, ValueError) as e:
+                        all_notes.append(
+                            f"REJECTED model-revision: {e}"
+                        )
 
     tool_block = extract_block(model_output, "tool-write")
     if tool_block is not None:

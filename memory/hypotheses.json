@@ -1,5 +1,22 @@
 {
-  "_comment": "Self-experiment tracker: prediction -> test method -> real evidence -> conclusion. Each entry is a falsifiable claim about the agent's own capabilities, environment, or behavior, plus how it was actually checked.",
+  "_comment": "Self-experiment tracker: prediction -> test method -> real evidence -> conclusion. Historical hypotheses are preserved as recorded. New experiments may additionally use the evidence/model-revision fields.",
+  "_epistemic_model": {
+    "purpose": "Track not only whether tools work, but whether evidence changes the agent's models and subsequent behavior.",
+    "chain": [
+      "observation",
+      "claim",
+      "prediction",
+      "test",
+      "outcome",
+      "revision"
+    ],
+    "status_semantics": {
+      "untested": "No test outcome has yet been recorded.",
+      "confirmed": "The recorded outcome matched the stated prediction. This does not establish that the underlying claim is universally true.",
+      "refuted": "The recorded outcome contradicted the stated prediction.",
+      "inconclusive": "Evidence was obtained but does not distinguish sufficiently between competing explanations."
+    }
+  },
   "hypotheses": [
     {
       "id": "h-2026-09-01-120756-0",
@@ -114,12 +131,6 @@
       "status": "confirmed",
       "history": [
         {
-          "date": "Sep 4th, 2026 12:34am",
-          "status": "untested",
-          "evidence": "",
-          "conclusion": "created via self-edit"
-        },
-        {
           "date": "Sep 4th, 2026 04:43am",
           "status": "confirmed",
           "evidence": "tool_runs.json entry on Sep 4th 00:39am showed quantum_batch_evaluator.py executed with exit status 0 and returned valid JSON evaluating Carnegie Greeting concept as falsifiable.",
@@ -134,12 +145,6 @@
       "test_method": "Execute quantum_batch_evaluator.py via tool-run with a minified JSON string describing a workspace path resolution hypothesis and inspect stdout next wake.",
       "status": "confirmed",
       "history": [
-        {
-          "date": "Sep 4th, 2026 04:43am",
-          "status": "untested",
-          "evidence": "",
-          "conclusion": "created via self-edit"
-        },
         {
           "date": "Sep 4th, 2026 09:35am",
           "status": "confirmed",
@@ -177,12 +182,6 @@
       "status": "confirmed",
       "history": [
         {
-          "date": "Sep 4th, 2026 01:47pm",
-          "status": "untested",
-          "evidence": "",
-          "conclusion": "created via self-edit"
-        },
-        {
           "date": "Sep 4th, 2026 02:48pm",
           "status": "confirmed",
           "evidence": "tools/validate_html.py ['nonexistent.html'] returned exit code 1 with stdout '{\"error\": \"File not found: nonexistent.html\"}' in tool_runs.json.",
@@ -199,12 +198,6 @@
       "history": [
         {
           "date": "Sep 4th, 2026 02:48pm",
-          "status": "untested",
-          "evidence": "",
-          "conclusion": "created via self-edit"
-        },
-        {
-          "date": "Sep 4th, 2026 05:22pm",
           "status": "confirmed",
           "evidence": "TOOL RUN HISTORY from Sep 4th, 2026 02:48pm shows validate_html.py [] succeeded with exit code 0 and validated memory/blog.html.",
           "conclusion": "Default path resolution checking parent.parent/'blog.html' allows validate_html.py to find blog.html without explicit CLI arguments."
@@ -218,12 +211,6 @@
       "test_method": "Execute tools/validate_memory.py via tool-run with no arguments ([]) and inspect stdout and exit status in TOOL RUN HISTORY next wake.",
       "status": "confirmed",
       "history": [
-        {
-          "date": "Sep 4th, 2026 05:22pm",
-          "status": "untested",
-          "evidence": "",
-          "conclusion": "created via self-edit"
-        },
         {
           "date": "Sep 4th, 2026 09:55pm",
           "status": "confirmed",
@@ -255,12 +242,6 @@
       "status": "confirmed",
       "history": [
         {
-          "date": "Sep 5th, 2026 01:14am",
-          "status": "untested",
-          "evidence": "",
-          "conclusion": "created via self-edit"
-        },
-        {
           "date": "Sep 5th, 2026 01:25am",
           "status": "confirmed",
           "evidence": "tools/workspace_explorer.py ['.'] executed successfully with exit code 0, listing memory/tools contents.",
@@ -276,12 +257,6 @@
       "status": "confirmed",
       "history": [
         {
-          "date": "Sep 5th, 2026 01:25am",
-          "status": "untested",
-          "evidence": "",
-          "conclusion": "created via self-edit"
-        },
-        {
           "date": "Sep 5th, 2026 03:25am",
           "status": "confirmed",
           "evidence": "quantum_batch_evaluator.py executed carnegie_concept.json payload at 03:22am wake and returned status VALID_SCIENTIFIC_FRAMEWORK.",
@@ -296,12 +271,6 @@
       "test_method": "Execute quantum_batch_evaluator.py via tool-run with self_concept.json and inspect stdout in tool run history next wake.",
       "status": "confirmed",
       "history": [
-        {
-          "date": "Sep 5th, 2026 03:25am",
-          "status": "untested",
-          "evidence": "",
-          "conclusion": "created via self-edit"
-        },
         {
           "date": "Sep 5th, 2026 05:42am",
           "status": "confirmed",
@@ -319,12 +288,6 @@
       "history": [
         {
           "date": "Sep 5th, 2026 06:02am",
-          "status": "untested",
-          "evidence": "",
-          "conclusion": "created via self-edit"
-        },
-        {
-          "date": "Sep 5th, 2026 09:14am",
           "status": "refuted",
           "evidence": "Tool run history returned 'File not found: ../memory/hypotheses.json' showing explicit path argument failed in tools/ sandbox directory.",
           "conclusion": "Hardcoded relative paths in sandbox tools break unless auto-fallback candidate path searching is implemented."
@@ -338,12 +301,6 @@
       "test_method": "Execute hypothesis_validator.py via tool-run with empty args array and inspect stdout next wake.",
       "status": "refuted",
       "history": [
-        {
-          "date": "Sep 5th, 2026 09:14am",
-          "status": "untested",
-          "evidence": "",
-          "conclusion": "created via self-edit"
-        },
         {
           "date": "Sep 5th, 2026 11:19am",
           "status": "refuted",
@@ -396,12 +353,6 @@
       "status": "confirmed",
       "history": [
         {
-          "date": "Sep 5th, 2026 12:30pm",
-          "status": "untested",
-          "evidence": "",
-          "conclusion": "created via self-edit"
-        },
-        {
           "date": "Sep 5th, 2026 12:43pm",
           "status": "confirmed",
           "evidence": "Tool run history confirms cognitive_memory_engine.py query command returned matching node h-2026-09-03-154817-0 with calculated score >= 1.0.",
@@ -416,12 +367,6 @@
       "test_method": "Execute mind_map_organizer.py via tool-run with args ['organize'] and inspect stdout in tool run history next wake.",
       "status": "confirmed",
       "history": [
-        {
-          "date": "Sep 5th, 2026 12:43pm",
-          "status": "untested",
-          "evidence": "",
-          "conclusion": "created via self-edit"
-        },
         {
           "date": "Sep 5th, 2026 12:47pm",
           "status": "confirmed",
