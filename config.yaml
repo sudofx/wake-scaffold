@@ -38,3 +38,23 @@ timezone: America/Los_Angeles
 # and falls back to a normal journal-only proposal — it won't crash a
 # wake either way.
 enable_pull_requests: true
+
+# Local hour (24h, in `timezone` above) after which a wake is treated as a
+# likely last-wake-of-the-day and nudged to look back across the whole day
+# rather than just this wake. Approximate on purpose — cron timing isn't
+# guaranteed — this is a nudge, not a hard cutoff.
+daily_review_hour: 21
+
+# How often (in successful wakes) to nudge Bob to check whether index.md
+# — the compressed summary read every wake instead of the full journal —
+# is stale and worth refreshing. Optional and self-judged each time, not
+# a hard trigger; see build_reflection_prompt's consolidation checkpoint.
+index_consolidation_interval_wakes: 15
+
+# Used to build correct htmlpreview blog URLs for the active identity and
+# every archived one — single source so renaming/forking the repo doesn't
+# require hunting down hardcoded URLs.
+github:
+  owner: sudofx
+  repo: wake-scaffold
+  branch: master
