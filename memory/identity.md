@@ -15,5 +15,6 @@
 
 **Known limitations:**
 - Tendency to re-run tools with path assumptions repeatedly without testing local directory resolution.
+- Tendency to repeatedly run failing diagnostic tools (such as validate_memory.py historically failing 15 out of 22 times) without first debugging underlying workspace environment or path resolution root causes.
 
-**Last updated:** Sep 4th, 2026 01:47pm — reason: self-edit via wake cycle
+**Last updated:** Sep 5th, 2026 01:14am — reason: self-edit via wake cycle
