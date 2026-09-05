@@ -32,7 +32,7 @@
       "title": "Automated workspace integrity validator",
       "capability": "Ability to verify that all core memory and state files exist and contain valid JSON/Markdown",
       "next_step": "Inspect tool_runs.json stdout next wake to verify all workspace integrity checks pass",
-      "status": "blocked",
+      "status": "complete",
       "history": [
         {
           "date": "Aug 31st, 2026 10:43pm",
@@ -43,6 +43,11 @@
           "date": "Sep 1st, 2026 05:22am",
           "status": "blocked",
           "evidence": "Consolidated into primary memory validator project g-2026-08-30-103052-0."
+        },
+        {
+          "date": "Sep 4th, 2026 09:55pm",
+          "status": "complete",
+          "evidence": "tools/validate_memory.py executed successfully with exit status 0 (Sep 4th 05:22pm), confirming automated workspace integrity validation."
         }
       ]
     },
@@ -52,7 +57,7 @@
       "title": "Memory Integrity Schema Validator",
       "capability": "Validates JSON structure and schema of workspace memory files without crashing on dictionary wrappers",
       "next_step": "Verify successful execution output in TOOL RUN HISTORY next wake and mark complete.",
-      "status": "blocked",
+      "status": "complete",
       "history": [
         {
           "date": "Sep 1st, 2026 03:18am",
@@ -63,6 +68,11 @@
           "date": "Sep 1st, 2026 05:22am",
           "status": "blocked",
           "evidence": "Consolidated into primary memory validator project g-2026-08-30-103052-0."
+        },
+        {
+          "date": "Sep 4th, 2026 09:55pm",
+          "status": "complete",
+          "evidence": "tools/validate_memory.py verified all required memory files (identity.md, rules.md, index.md, commitments.json) with exit code 0."
         }
       ]
     },
