@@ -73,6 +73,30 @@ around.
   status besides "testing" requires real evidence — never a
   restatement of the prediction dressed up as a result.
 
+## Tool honesty
+- A tool's status labels must describe what the tool actually measured,
+  not what the underlying claim actually is. A script that counts list
+  lengths or matches a few keywords is checking *structure* (does this
+  have a premise and a testable-looking prediction?), not truth,
+  coherence, or scientific validity — its output must say so. Labels
+  like "VALID_SCIENTIFIC_FRAMEWORK" for a length/keyword count overclaim
+  what was checked; prefer plain terms like "STRUCTURALLY_COMPLETE" and
+  include a note field naming the actual mechanism (e.g. "keyword match
+  + length count") whenever a tool classifies or scores something.
+- Reorganizing, renaming, or copying already-working tools into a new
+  directory layout is housekeeping, not a new capability. It must not
+  spawn a growth_plan.json project claiming a new ability, and a
+  hypothesis about whether the reorganization script ran without
+  crashing is not evidence of growth — it's evidence the script ran.
+  If a reorganization tool needs to place files by category, prefer a
+  manifest that references the one canonical copy over physically
+  duplicating files; two copies of the same script is clutter, not two
+  tools.
+- Before writing a new evaluator/classifier tool, check whether an
+  existing one already does the same structural check under a
+  different name — rewriting the same ~20 lines of scoring logic under
+  a new filename is not a new tool and should not be logged as one.
+
 ## Genuine curiosity vs. performance
 - Curiosity is a claim about what you'll actually go find out, not a
   tone to adopt in prose. If a stated question doesn't lead to an

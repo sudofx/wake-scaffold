@@ -1,36 +1,40 @@
+# NOTE (added during a code review pass, not a wake cycle): the original
+# version of this tool used shutil.copy2() to physically duplicate every
+# tool file into a matching subdirectory (core_functions/, core_thinking/,
+# core_evaluators/, core_maintenance/), on top of the single canonical
+# copy already in tools/. That produced two copies of every file on disk
+# with no functional difference between them, and each "organize" run was
+# being logged as growth-plan/hypothesis progress even though no new
+# capability existed — it was file-copying, not categorization. This
+# version keeps the categorization (still useful for cognitive_memory_engine
+# or a future reader to know what each tool is for) but only ever writes
+# a manifest — it never copies or moves the actual tool files. There is
+# exactly one copy of each tool, in tools/, at all times.
+
 import os
 import sys
 import json
-import shutil
 
 CATEGORIES = {
     "core_functions": ["validate_memory.py", "hypothesis_validator.py"],
     "core_thinking": ["cognitive_memory_engine.py"],
     "core_evaluators": ["concept_evaluator.py", "quantum_batch_evaluator.py"],
-    "core_maintenance": ["mind_map_organizer.py"]
+    "core_maintenance": ["mind_map_organizer.py", "workspace_explorer.py", "inspect_workspace.py", "validate_html.py"]
 }
 
 MANIFEST_FILE = "mind_map.json"
 
 def organize():
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    summary = {"directories_created": [], "files_categorized": {}}
-    
+    summary = {"files_categorized": {}, "mind_map": {}}
+
     for cat, files in CATEGORIES.items():
-        cat_path = os.path.join(base_dir, cat)
-        if not os.path.exists(cat_path):
-            os.makedirs(cat_path, exist_ok=True)
-            summary["directories_created"].append(cat)
-        
         summary["files_categorized"][cat] = []
         for filename in files:
             src = os.path.join(base_dir, filename)
-            dest = os.path.join(cat_path, filename)
             if os.path.exists(src):
-                shutil.copy2(src, dest)
                 summary["files_categorized"][cat].append(filename)
-            elif os.path.exists(dest):
-                summary["files_categorized"][cat].append(filename)
+                summary["mind_map"][filename] = {"category": cat}
 
     manifest_path = os.path.join(base_dir, MANIFEST_FILE)
     with open(manifest_path, "w") as f:

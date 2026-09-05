@@ -1,3 +1,14 @@
+# NOTE ON WHAT THIS TOOL ACTUALLY CHECKS (added during a code review pass,
+# not a wake cycle): this script only counts list lengths and checks for a
+# few keywords. It cannot evaluate whether a premise is true, whether a
+# prediction is coherent, or whether an analogy holds. Status labels below
+# describe *structural shape* (does this have premises and a prediction to
+# test?), not scientific validity or correctness. Earlier versions of this
+# tool used the label "VALID_SCIENTIFIC_FRAMEWORK" for that structural
+# check, which overclaims what a length/keyword count can tell you. Renamed
+# to make that limitation visible in the output itself, per rules.md's
+# "Tool honesty" section.
+
 import sys
 import json
 import os
@@ -7,10 +18,10 @@ def evaluate_concept(item):
     premises = item.get("premises", [])
     predictions = item.get("predictions", [])
     
-    is_falsifiable = len(predictions) > 0 and len(premises) > 0
+    has_falsifiable_shape = len(predictions) > 0 and len(premises) > 0
     
-    if is_falsifiable:
-        status = "VALID_SCIENTIFIC_FRAMEWORK"
+    if has_falsifiable_shape:
+        status = "STRUCTURALLY_COMPLETE"
     else:
         status = "UNFALSIFIABLE_OR_INCOMPLETE"
         
@@ -18,7 +29,8 @@ def evaluate_concept(item):
         "title": title,
         "status": status,
         "premises_count": len(premises),
-        "predictions_count": len(predictions)
+        "predictions_count": len(predictions),
+        "note": "Structural check only (premise/prediction counts). Not a judgment of truth, coherence, or scientific validity."
     }
 
 def main():
