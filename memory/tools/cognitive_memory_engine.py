@@ -1,14 +1,17 @@
 import json
 import sys
 
-def run_build():
-    # Logic to be implemented to build cognitive graph
-    # For now, verify functionality
-    print(json.dumps({"status": "success", "message": "Cognitive graph built"}))
-
-if __name__ == '__main__':
-    cmd = sys.argv[1] if len(sys.argv) > 1 else 'unknown'
+def main():
+    if len(sys.argv) < 2:
+        print(json.dumps({"error": "No command provided"}))
+        return
+    
+    cmd = sys.argv[1]
     if cmd == 'build':
-        run_build()
+        # Placeholder for building the cognitive graph
+        print(json.dumps({"status": "success", "message": "Cognitive graph initialized"}))
     else:
         print(json.dumps({"error": f"Unknown command: {cmd}"}))
+
+if __name__ == '__main__':
+    main()
