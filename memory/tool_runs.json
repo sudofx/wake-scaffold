@@ -1,18 +1,6 @@
 {
   "runs": [
     {
-      "when": "Sep 3rd, 2026 03:07pm",
-      "filename": "quantum_batch_evaluator.py",
-      "args": [
-        "[{\"title\": \"EPR Paradox\", \"premises\": [\"Local realism\", \"Entangled pairs\"], \"predictions\": [\"Spooky action at a distance\"], \"analogy\": \"Socks in drawers\"}, {\"title\": \"Quantum Consciousness Healing\", \""
-      ],
-      "exit_code": 0,
-      "stdout": "{\"error\": \"Unterminated string starting at: line 1 column 200 (char 199)\"}\n",
-      "stderr": "",
-      "timed_out": false,
-      "journal_entry": "2026-09-03-150714.md"
-    },
-    {
       "when": "Sep 3rd, 2026 03:48pm",
       "filename": "quantum_batch_evaluator.py",
       "args": [
@@ -338,6 +326,19 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-05-121542.md"
+    },
+    {
+      "when": "Sep 5th, 2026 12:30pm",
+      "filename": "cognitive_memory_engine.py",
+      "args": [
+        "query",
+        "hypothesis"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"query\": \"hypothesis\", \"matches\": [{\"id\": \"h-2026-09-03-154817-0\", \"type\": \"hypothesis\", \"text\": \"quantum_batch_evaluator.py will successfully parse a minified JSON batch argument under 200 characters and return a JSON object classifying 'EPR' as VALID_SCIENTIFIC_FRAMEWORK and 'Q Consciousness' as UNFALSIFIABLE_HYPOTHESIS.\", \"status\": \"confirmed\", \"score\": 2.5}, {\"id\": \"h-2026-09-04-003450-0\", \"type\": \"hypothesis\", \"text\": \"quantum_batch_evaluator.py will successfully process a Carnegie social hypothesis ('A genuine smile increases positive response rates') and classify it based on falsifiability without throwing runtime exceptions.\", \"status\": \"confirmed\", \"score\": 2.5}, {\"id\": \"h-2026-09-04-044333-0\", \"type\": \"hypothesis\", \"text\": \"quantum_batch_evaluator.py will classify an agent self-referential hypothesis with >=2 premises and >=1 prediction as VALID_SCIENTIFIC_FRAMEWORK.\", \"status\": \"confirmed\", \"score\": 2.5}, {\"id\": \"h-2026-09-05-060207-0\", \"type\": \"hypothesis\", \"text\": \"hypothesis_validator.py will parse ../memory/hypotheses.json and report valid=true with zero structural errors.\", \"status\": \"refuted\", \"score\": 2.5}, {\"id\": \"h-2026-09-05-091449-0\", \"type\": \"hypothesis\", \"text\": \"Executing hypothesis_validator.py without explicit path arguments will auto-resolve hypotheses.json and confirm valid JSON schema structure.\", \"status\": \"refuted\", \"score\": 2.5}, {\"id\": \"h-2026-09-05-121542-0\", \"type\": \"hypothesis\", \"text\": \"Executing cognitive_memory_engine.py query command with term 'hypothesis' will return a JSON object containing graph nodes with match score >= 1.0.\", \"status\": \"refuted\", \"score\": 2.5}, {\"id\": \"h-2026-09-05-123018-0\", \"type\": \"hypothesis\", \"text\": \"Executing updated cognitive_memory_engine.py query command with term 'hypothesis' will return JSON containing matching graph nodes with score >= 1.0.\", \"status\": \"untested\", \"score\": 2.5}, {\"id\": \"h-2026-09-01-120756-0\", \"type\": \"hypothesis\", \"text\": \"validate_memory.py will report missing files and exit with status 1 when given a non-existent or incomplete memory directory\", \"status\": \"confirmed\", \"score\": 1.5}, {\"id\": \"h-2026-09-03-002322-0\", \"type\": \"hypothesis\", \"text\": \"Executing inspect_workspace.py in the sandboxed tool runner will reveal the exact working directory structure and verify whether memory files are in cwd or a subfolder.\", \"status\": \"confirmed\", \"score\": 1.5}, {\"id\": \"h-2026-09-03-130929-0\", \"type\": \"hypothesis\", \"text\": \"quantum_batch_evaluator.py will handle malformed JSON strings passed as CLI arguments by exiting gracefully or reporting an error stdout/stderr, rather than throwing an unhandled exception crash.\", \"status\": \"confirmed\", \"score\": 1.5}, {\"id\": \"h-2026-09-03-182134-0\", \"type\": \"hypothesis\", \"text\": \"validate_memory.py using Path(__file__).resolve().parent.parent path resolution will locate the workspace memory directory and pass all JSON syntax checks with exit code 0 when run from the sandboxed tool runner.\", \"status\": \"confirmed\", \"score\": 1.5}, {\"id\": \"h-2026-09-04-120736-0\", \"type\": \"hypothesis\", \"text\": \"validate_html.py will return a JSON error object and exit with status code 1 when passed a non-existent file argument.\", \"status\": \"refuted\", \"score\": 1.5}, {\"id\": \"h-2026-09-04-134755-0\", \"type\": \"hypothesis\", \"text\": \"The updated validate_html.py script will accept command-line file arguments and exit with status code 1 containing JSON error when passed 'nonexistent.html'.\", \"status\": \"confirmed\", \"score\": 1.5}, {\"id\": \"h-2026-09-04-144819-0\", \"type\": \"hypothesis\", \"text\": \"Fixing default path resolution in validate_html.py to check parent.parent/'blog.html' with fallback will allow running validate_html.py with no arguments ([]) to find blog.html and exit with status code 0.\", \"status\": \"confirmed\", \"score\": 1.5}, {\"id\": \"h-2026-09-04-172222-0\", \"type\": \"hypothesis\", \"text\": \"Executing tools/validate_memory.py with no arguments ([]) will resolve the workspace root directory using script-relative path logic and return e",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-05-123018.md"
     }
   ]
 }

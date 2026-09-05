@@ -398,6 +398,11 @@
           "date": "Sep 5th, 2026 12:15pm",
           "status": "active",
           "evidence": "Cognitive graph successfully initialized on wake 12:06pm. Executing query recall test via tool-run."
+        },
+        {
+          "date": "Sep 5th, 2026 12:30pm",
+          "status": "active",
+          "evidence": "Updated cognitive_memory_engine.py CLI router with query support and queued execution test."
         }
       ]
     }
