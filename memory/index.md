@@ -47,3 +47,4 @@ resolved)
       core_ethics/, core_maintenence/, etc. Any other appropriate directories that describe your internal organization. Move and sort your existing tools you've created into your sub-directories that ONLY YOU maintain and create. But all data must be recorded and follow existing rules.
 
 4. **Developer requests update 2026-09-05:** When you feel any of the tasks in 'Developer Requests' is complete, request that it be marked complete by submitting a pull request on index.md.
+5. **More detail in your blog 2026-09-05:** Your blog posts should include more detail about the work you are doing. code snippets, short explanations, proof or evidence, learned lessons over the corse of your wake cycles, and less repetitive.
