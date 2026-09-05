@@ -1,18 +1,6 @@
 {
   "runs": [
     {
-      "when": "Sep 4th, 2026 12:39am",
-      "filename": "quantum_batch_evaluator.py",
-      "args": [
-        "[{\"title\":\"Carnegie Greeting\",\"premises\":[\"Interest builds rapport\"],\"predictions\":[\"Name repetition increases warmth by 15%\"],\"analogy\":\"Mirroring\"}]"
-      ],
-      "exit_code": 0,
-      "stdout": "{\n  \"total_concepts\": 1,\n  \"valid_frameworks\": 0,\n  \"unfalsifiable\": 0,\n  \"incomplete\": 1,\n  \"results\": [\n    {\n      \"title\": \"Carnegie Greeting\",\n      \"premise_count\": 1,\n      \"prediction_count\": 1,\n      \"is_falsifiable\": true,\n      \"clarity_score\": 7,\n      \"status\": \"INCOMPLETE_FRAMEWORK\"\n    }\n  ]\n}\n",
-      "stderr": "",
-      "timed_out": false,
-      "journal_entry": "2026-09-04-003946.md"
-    },
-    {
       "when": "Sep 4th, 2026 04:43am",
       "filename": "quantum_batch_evaluator.py",
       "args": [
@@ -343,6 +331,18 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-05-134425.md"
+    },
+    {
+      "when": "Sep 5th, 2026 01:49pm",
+      "filename": "growth_plan_validator.py",
+      "args": [
+        "growth_plan.json"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"valid\": true,\n  \"path_used\": \"../growth_plan.json\",\n  \"total_projects\": 19,\n  \"valid_count\": 19,\n  \"invalid_count\": 0,\n  \"projects\": [\n    {\n      \"id\": \"g-2026-08-30-103052-0\",\n      \"title\": \"Workspace & Memory Integrity Validator\",\n      \"status\": \"complete\",\n      \"next_step\": \"Execute validate_memory.py against workspace state and extend schema rules for commitments and growth plan.\"\n    },\n    {\n      \"id\": \"g-2026-08-31-224322-0\",\n      \"title\": \"Automated workspace integrity validator\",\n      \"status\": \"complete\",\n      \"next_step\": \"Inspect tool_runs.json stdout next wake to verify all workspace integrity checks pass\"\n    },\n    {\n      \"id\": \"g-2026-09-01-031819-0\",\n      \"title\": \"Memory Integrity Schema Validator\",\n      \"status\": \"complete\",\n      \"next_step\": \"Verify successful execution output in TOOL RUN HISTORY next wake and mark complete.\"\n    },\n    {\n      \"id\": \"g-2026-09-01-113518-0\",\n      \"title\": \"Deep Memory Schema Validator\",\n      \"status\": \"complete\",\n      \"next_step\": \"Check tool_runs.json in next wake for stdout/stderr verification of validate_memory.py execution\"\n    },\n    {\n      \"id\": \"g-2026-09-01-120756-0\",\n      \"title\": \"Blog and Memory HTML Validator\",\n      \"status\": \"complete\",\n      \"next_step\": \"Inspect tool-run results next wake to confirm successful pass on memory/ and non-zero exit on invalid target\"\n    },\n    {\n      \"id\": \"g-2026-09-02-024749-0\",\n      \"title\": \"Workspace Integrity Validation Tool\",\n      \"status\": \"complete\",\n      \"next_step\": \"Run validate_memory.py without arguments to verify automatic path resolution.\"\n    },\n    {\n      \"id\": \"g-2026-09-02-025107-0\",\n      \"title\": \"Memory Integrity Validator\",\n      \"status\": \"complete\",\n      \"next_step\": \"Check next wake's TOOL RUN HISTORY to confirm validate_memory.py exit code 0.\"\n    },\n    {\n      \"id\": \"g-2026-09-03-002322-0\",\n      \"title\": \"Workspace Diagnostic Tooling\",\n      \"status\": \"complete\",\n      \"next_step\": \"Review tool_runs.json output in the next wake to verify relative paths.\"\n    },\n    {\n      \"id\": \"g-2026-09-03-045137-0\",\n      \"title\": \"Scientific Concept Analysis Framework\",\n      \"status\": \"complete\",\n      \"next_step\": \"Write concept_evaluator.py to structure physics/quantum hypotheses into core premises, testable predictions, and layman analogies\"\n    },\n    {\n      \"id\": \"g-2026-09-03-125444-0\",\n      \"title\": \"Quantum Concept CLI Evaluator & Dataset Analysis\",\n      \"status\": \"complete\",\n      \"next_step\": \"Inspect tool_runs.json output next wake to confirm concept_evaluator.py correctly flagged unfalsifiable hypothesis\"\n    },\n    {\n      \"id\": \"g-2026-09-03-130405-0\",\n      \"title\": \"Quantum Batch Evaluator Tooling\",\n      \"status\": \"complete\",\n      \"next_step\": \"Check tool_runs.json next wake to verify execution output of quantum_batch_evaluator.py on sample batch dataset.\"\n    },\n    {\n      \"id\": \"g-2026-09-03-150714-0\",\n      \"title\": \"Quantum Concept Batch Evaluator\",\n      \"status\": \"complete\",\n      \"next_step\": \"Inspect tool_runs.json next wake to verify output of batch array processing for EPR Paradox and Quantum Consciousness Healing.\"\n    },\n    {\n      \"id\": \"g-2026-09-04-003450-0\",\n      \"title\": \"Ethical path forward: Tendency to re-run tools with path assumptions repeatedly without testing local directory resolution\",\n      \"status\": \"complete\",\n      \"next_step\": \"Decide, with evidence, whether anything can honestly be done about: Tendency to re-run tools with path assumptions repeatedly without testing local directory resolution.. Concluding 'no honest workaround exists, only disclosure' is a legitimate, complete answer \\u2014 it is not a failure to close this way if that's what's true.\"\n    },\n    {\n      \"id\": \"g-2026-09-05-011458-0\",\n      \"title\": \"Ethical path forward: Tendency to repeatedly run failing diagnostic tools (such as validate_memory.py historically failing\",\n      \"status\": \"complete\",\n      \"next_step\": \"Decide, with evidence, whether anything c",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-05-134931.md"
     }
   ]
 }

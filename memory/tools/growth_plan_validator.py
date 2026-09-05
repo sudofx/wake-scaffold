@@ -1,61 +1,92 @@
+import sys
 import json
 import os
-import sys
 
-def validate_growth_plan(filepath):
-    candidate_paths = [
-        filepath,
-        os.path.join("..", filepath),
-        os.path.join("memory", filepath)
-    ]
-    target_path = None
-    for p in candidate_paths:
+def main():
+    if len(sys.argv) < 2:
+        print(json.dumps({"valid": False, "error": "No filename provided."}))
+        return
+
+    filepath = sys.argv[1]
+    paths_to_try = [filepath, os.path.join("..", filepath)]
+    data = None
+    path_used = None
+    for p in paths_to_try:
         if os.path.exists(p):
-            target_path = p
-            break
-            
-    if not target_path:
-        return {"valid": False, "error": f"File not found: {filepath}"}
-        
-    try:
-        with open(target_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-    except Exception as e:
-        return {"valid": False, "error": f"JSON parse error: {str(e)}"}
-        
-    if not isinstance(data, list):
-        return {"valid": False, "error": "Root JSON element must be an array of projects."}
-        
-    required_fields = ["id", "status", "title", "capability", "next_step"]
-    errors = []
-    counts = {"total": len(data), "active": 0, "complete": 0, "proposed": 0, "blocked": 0}
+            try:
+                with open(p, "r") as f:
+                    data = json.load(f)
+                path_used = p
+                break
+            except Exception as e:
+                print(json.dumps({"valid": False, "error": f"Failed to parse JSON in {p}: {str(e)}"}))
+                return
     
-    for idx, proj in enumerate(data):
-        if not isinstance(proj, dict):
-            errors.append(f"Item [{idx}] is not a JSON object.")
-            continue
-            
-        for f in required_fields:
-            if f not in proj or not proj[f]:
-                errors.append(f"Item [{idx}] missing required field: '{f}'")
-                
-        status = proj.get("status")
-        if status in counts:
-            counts[status] += 1
+    if data is None:
+        print(json.dumps({"valid": False, "error": f"File not found: {filepath}"}))
+        return
+
+    if isinstance(data, dict):
+        projects = None
+        if "projects" in data:
+            projects = data["projects"]
         else:
-            errors.append(f"Item [{idx}] has invalid status: '{status}'")
-            
-        if status == "complete" and not proj.get("evidence"):
-            errors.append(f"Item [{idx}] marked 'complete' but missing 'evidence' string.")
-            
-    return {
-        "valid": len(errors) == 0,
-        "path_used": target_path,
-        "summary": counts,
-        "errors": errors
-    }
+            # Treat dict values as projects if they look like objects
+            projects = [v for v in data.values() if isinstance(v, dict)]
+        
+        if not isinstance(projects, list):
+            print(json.dumps({
+                "valid": False, 
+                "error": "Could not locate a list of projects in the JSON object.",
+                "root_type": "dict",
+                "keys": list(data.keys())
+            }))
+            return
+    elif isinstance(data, list):
+        projects = data
+    else:
+        print(json.dumps({"valid": False, "error": f"Invalid JSON root type: {type(data).__name__}"}))
+        return
+
+    valid_projects = []
+    invalid_projects = []
+    errors = []
+
+    for idx, proj in enumerate(projects):
+        if not isinstance(proj, dict):
+            errors.append(f"Project at index {idx} is not an object.")
+            continue
+        
+        proj_id = proj.get("id") or proj.get("project_id") or f"unknown_{idx}"
+        status = proj.get("status") or proj.get("new_status") or "unknown"
+        
+        missing = []
+        for field in ["title", "capability", "next_step"]:
+            if field not in proj:
+                missing.append(field)
+        
+        if missing:
+            errors.append(f"Project {proj_id} is missing fields: {', '.join(missing)}")
+            invalid_projects.append(proj_id)
+        else:
+            valid_projects.append({
+                "id": proj_id,
+                "title": proj["title"],
+                "status": status,
+                "next_step": proj["next_step"]
+            })
+
+    is_valid = len(errors) == 0
+    print(json.dumps({
+        "valid": is_valid,
+        "path_used": path_used,
+        "total_projects": len(projects),
+        "valid_count": len(valid_projects),
+        "invalid_count": len(invalid_projects),
+        "projects": valid_projects,
+        "errors": errors,
+        "raw_keys_if_dict": list(data.keys()) if isinstance(data, dict) else None
+    }, indent=2))
 
 if __name__ == "__main__":
-    target = sys.argv[1] if len(sys.argv) > 1 else "growth_plan.json"
-    result = validate_growth_plan(target)
-    print(json.dumps(result, indent=2))
+    main()
