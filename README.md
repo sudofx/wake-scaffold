@@ -1,6 +1,8 @@
 # Wake Scaffold
 
-[Bob's blog](https://htmlpreview.github.io/?https://raw.githubusercontent.com/sudofx/wake-scaffold/refs/heads/master/memory/blog.html)
+See [`IDENTITIES.md`](IDENTITIES.md) for the current identity's blog and
+every archived identity's — it's the authoritative, self-updating list,
+so a link here would go stale the moment an identity is archived.
 
 
 A vendor-agnostic memory system for a stateless AI agent that "wakes up"
@@ -105,6 +107,32 @@ config.yaml              - provider/model choice, self-edit and pull
                            request settings
 .github/workflows/wake.yml - free cron trigger via GitHub Actions
 ```
+
+## Keeping the template in sync
+
+`memory/rules.md` (the active identity's copy) and `base_memory/rules.md`
+(the seed template every new identity is bootstrapped from) will drift
+over time, and that's expected — but not every drift should be resolved
+the same way. Before editing either file, diff them and ask which kind
+of change this is:
+
+- **Structural/mechanical** (a mechanism the wake loop itself enforces —
+  a block format, a cap, a required section, a hard constraint like
+  "never fabricate a human experience") must be applied to **both**
+  files, identically. If it's true of how the loop works, it should be
+  true for every identity that's ever bootstrapped from the template,
+  not just the current one.
+- **Voice/tone/persona** (how Bob's own Publishing section describes his
+  particular writing style — e.g. a specific voice a given identity has
+  developed) stays **only** in the active identity's `memory/rules.md`
+  and must **not** be pushed to `base_memory/rules.md`. A future
+  identity should start from a neutral template, not inherit a prior
+  identity's personality.
+
+When in doubt, ask: would this line make sense for an identity that
+hasn't been created yet? If yes, it's structural — sync it. If it only
+makes sense because of who Bob specifically has become, it's persona —
+leave it where it is.
 
 ## Self-editing
 
@@ -236,6 +264,42 @@ approve pull requests." If those aren't set, or anything else about the attempt
 fails, it degrades to the normal journal-only proposal rather than
 breaking the wake — this path is off by default and worth testing
 with a manual `workflow_dispatch` run before relying on it.
+
+## Memory compression: a two-tier system
+
+`core_memories.json` and `index.md` together are the compress/recall
+system that keeps a normal wake's context small and cheap, even as the
+journal grows indefinitely:
+
+- **Read every wake (small, bounded, cheap):** `core_memories.json`
+  (capped at `MAX_CORE_MEMORIES`, currently 20) and `index.md` (a
+  hand/proposal-edited summary, not auto-generated). These are what
+  `build_reflection_prompt` actually loads.
+- **Detail layer (retrievable by reference, not re-read wholesale):**
+  the full `journal/` history, `blog_posts.json`, and everything in
+  `tool_runs.json` beyond the last 5 entries. Nothing in this layer is
+  deleted or summarized away — it's just not reloaded into every
+  prompt. Journal links already embedded in blog posts and core
+  memories are how a reader (human or Bob) finds the detail when it's
+  actually needed.
+
+Because `index.md` is one of the few files Bob can only change via the
+human-reviewed proposal mechanism (the same protection as `rules.md`),
+nothing refreshes it automatically — it's easy for it to go stale
+without anyone noticing. `build_reflection_prompt` includes a periodic
+"MEMORY CONSOLIDATION CHECKPOINT" notice (see
+`index_consolidation_interval_wakes` in `config.yaml`, every 15 wakes
+by default) suggesting Bob check whether `index.md` still reflects
+recent developments and propose a refresh if not — this is a nudge,
+not a requirement, since consolidating a summary that's still accurate
+would just waste a wake.
+
+`format_hypotheses_for_prompt()` follows the same "read a bounded
+summary, not the whole history" principle: every open (`testing`)
+hypothesis is shown in full, but only the 3 most recently resolved
+ones, with a count of how many earlier resolved hypotheses are omitted
+— `hypotheses.json` itself keeps the full history, this only bounds
+what's re-read into every prompt.
 
 ## Timezone
 
