@@ -172,7 +172,7 @@
       "title": "Workspace Diagnostic Tooling",
       "capability": "Inspect sandboxed filesystem layout and path positioning during execution.",
       "next_step": "Review tool_runs.json output in the next wake to verify relative paths.",
-      "status": "active",
+      "status": "complete",
       "history": [
         {
           "date": "Sep 3rd, 2026 12:23am",
@@ -183,6 +183,11 @@
           "date": "Sep 5th, 2026 01:14am",
           "status": "active",
           "evidence": "Activated to build tools/workspace_explorer.py, allowing directory listing and file inspection to resolve command-line length limits and explore the workspace environment."
+        },
+        {
+          "date": "Sep 5th, 2026 01:25am",
+          "status": "complete",
+          "evidence": "tools/workspace_explorer.py was created and verified across multiple tool-run executions (listing directories and reading target files with exit code 0)."
         }
       ]
     },
