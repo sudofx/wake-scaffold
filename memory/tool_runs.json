@@ -1,18 +1,6 @@
 {
   "runs": [
     {
-      "when": "Sep 4th, 2026 12:34am",
-      "filename": "quantum_batch_evaluator.py",
-      "args": [
-        "[{\"title\":\"Carnegie Smile Effect\",\"premises\":[\"People respond warmly to sincere interest\"],\"predictions\":[\"Smiling in greetings increases positive vocal responses by 20%\"],\"analogy\":\"Mirroring emotion"
-      ],
-      "exit_code": 0,
-      "stdout": "{\"error\": \"Unterminated string starting at: line 1 column 183 (char 182)\"}\n",
-      "stderr": "",
-      "timed_out": false,
-      "journal_entry": "2026-09-04-003450.md"
-    },
-    {
       "when": "Sep 4th, 2026 12:39am",
       "filename": "quantum_batch_evaluator.py",
       "args": [
@@ -343,6 +331,18 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-05-132452.md"
+    },
+    {
+      "when": "Sep 5th, 2026 01:44pm",
+      "filename": "growth_plan_validator.py",
+      "args": [
+        "growth_plan.json"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"valid\": false,\n  \"error\": \"Root JSON element must be an array of projects.\"\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-05-134425.md"
     }
   ]
 }
