@@ -1,18 +1,6 @@
 {
   "runs": [
     {
-      "when": "Sep 4th, 2026 04:43am",
-      "filename": "quantum_batch_evaluator.py",
-      "args": [
-        "[{\"title\":\"Path Resolution\",\"premises\":[\"Path(__file__) gives script location\",\"Parent of tools/ is root\"],\"predictions\":[\"validate_memory finds memory dir from any CWD\"],\"analogy\":\"Relative GPS\"}]"
-      ],
-      "exit_code": 0,
-      "stdout": "{\n  \"total_concepts\": 1,\n  \"valid_frameworks\": 1,\n  \"unfalsifiable\": 0,\n  \"incomplete\": 0,\n  \"results\": [\n    {\n      \"title\": \"Path Resolution\",\n      \"premise_count\": 2,\n      \"prediction_count\": 1,\n      \"is_falsifiable\": true,\n      \"clarity_score\": 10,\n      \"status\": \"VALID_SCIENTIFIC_FRAMEWORK\"\n    }\n  ]\n}\n",
-      "stderr": "",
-      "timed_out": false,
-      "journal_entry": "2026-09-04-044333.md"
-    },
-    {
       "when": "Sep 4th, 2026 09:35am",
       "filename": "validate_html.py",
       "args": [],
@@ -343,6 +331,18 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-05-134931.md"
+    },
+    {
+      "when": "Sep 5th, 2026 04:16pm",
+      "filename": "epistemic_chain_validator.py",
+      "args": [
+        "hypotheses.json"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"valid\": true,\n  \"filepath\": \"../hypotheses.json\",\n  \"total_hypotheses\": 25,\n  \"summary\": {\n    \"confirmed\": 17,\n    \"refuted\": 5,\n    \"untested\": 3,\n    \"supported_chains\": 0,\n    \"weakly_supported_chains\": 22\n  },\n  \"weakly_supported_details\": [\n    {\n      \"id\": \"h-2026-09-01-120756-0\",\n      \"status\": \"confirmed\",\n      \"evidence_snippet\": \" \"\n    },\n    {\n      \"id\": \"h-2026-09-03-002322-0\",\n      \"status\": \"confirmed\",\n      \"evidence_snippet\": \" \"\n    },\n    {\n      \"id\": \"h-2026-09-03-130929-0\",\n      \"status\": \"confirmed\",\n      \"evidence_snippet\": \" \"\n    },\n    {\n      \"id\": \"h-2026-09-03-154817-0\",\n      \"status\": \"confirmed\",\n      \"evidence_snippet\": \" \"\n    },\n    {\n      \"id\": \"h-2026-09-03-182134-0\",\n      \"status\": \"confirmed\",\n      \"evidence_snippet\": \" \"\n    },\n    {\n      \"id\": \"h-2026-09-04-003450-0\",\n      \"status\": \"confirmed\",\n      \"evidence_snippet\": \" \"\n    },\n    {\n      \"id\": \"h-2026-09-04-044333-0\",\n      \"status\": \"confirmed\",\n      \"evidence_snippet\": \" \"\n    },\n    {\n      \"id\": \"h-2026-09-04-120736-0\",\n      \"status\": \"refuted\",\n      \"evidence_snippet\": \" \"\n    },\n    {\n      \"id\": \"h-2026-09-04-134755-0\",\n      \"status\": \"confirmed\",\n      \"evidence_snippet\": \" \"\n    },\n    {\n      \"id\": \"h-2026-09-04-144819-0\",\n      \"status\": \"confirmed\",\n      \"evidence_snippet\": \" \"\n    },\n    {\n      \"id\": \"h-2026-09-04-172222-0\",\n      \"status\": \"confirmed\",\n      \"evidence_snippet\": \" \"\n    },\n    {\n      \"id\": \"h-2026-09-05-011458-0\",\n      \"status\": \"confirmed\",\n      \"evidence_snippet\": \" \"\n    },\n    {\n      \"id\": \"h-2026-09-05-012545-0\",\n      \"status\": \"confirmed\",\n      \"evidence_snippet\": \" \"\n    },\n    {\n      \"id\": \"h-2026-09-05-032553-0\",\n      \"status\": \"confirmed\",\n      \"evidence_snippet\": \" \"\n    },\n    {\n      \"id\": \"h-2026-09-05-060207-0\",\n      \"status\": \"refuted\",\n      \"evidence_snippet\": \" \"\n    },\n    {\n      \"id\": \"h-2026-09-05-091449-0\",\n      \"status\": \"refuted\",\n      \"evidence_snippet\": \" \"\n    },\n    {\n      \"id\": \"h-2026-09-05-121542-0\",\n      \"status\": \"refuted\",\n      \"evidence_snippet\": \" \"\n    },\n    {\n      \"id\": \"h-2026-09-05-123018-0\",\n      \"status\": \"confirmed\",\n      \"evidence_snippet\": \" \"\n    },\n    {\n      \"id\": \"h-2026-09-05-124328-0\",\n      \"status\": \"confirmed\",\n      \"evidence_snippet\": \" \"\n    },\n    {\n      \"id\": \"h-2026-09-05-132452-0\",\n      \"status\": \"confirmed\",\n      \"evidence_snippet\": \" \"\n    },\n    {\n      \"id\": \"h-2026-09-05-134425-0\",\n      \"status\": \"refuted\",\n      \"evidence_snippet\": \" \"\n    },\n    {\n      \"id\": \"h-2026-09-05-134931-0\",\n      \"status\": \"confirmed\",\n      \"evidence_snippet\": \" \"\n    }\n  ]\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-05-161615.md"
     }
   ]
 }

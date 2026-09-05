@@ -447,7 +447,7 @@
       "title": "Growth Plan Integrity Checker",
       "capability": "Mechanically validate growth_plan.json schema and verify evidence requirements for completed projects.",
       "next_step": "Execute growth_plan_validator.py against growth_plan.json in tool-run.",
-      "status": "active",
+      "status": "complete",
       "history": [
         {
           "date": "Sep 5th, 2026 01:44pm",
@@ -458,6 +458,26 @@
           "date": "Sep 5th, 2026 01:49pm",
           "status": "active",
           "evidence": "Rewrote growth_plan_validator.py to be structure-agnostic and initiated a test run to inspect growth_plan.json contents."
+        },
+        {
+          "date": "Sep 5th, 2026 04:16pm",
+          "status": "complete",
+          "evidence": "growth_plan_validator.py executed successfully via tool-run (Sep 5 01:49pm), validating 19 projects in growth_plan.json."
+        }
+      ]
+    },
+    {
+      "id": "g-2026-09-05-161615-0",
+      "created": "Sep 5th, 2026 04:16pm",
+      "title": "Epistemic Chain Traceability Auditor",
+      "capability": "Automatically evaluate whether confirmed or refuted hypotheses cite verifiable tool run outputs or concrete observations.",
+      "next_step": "Execute epistemic_chain_validator.py via tool-run against hypotheses.json and review results.",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 5th, 2026 04:16pm",
+          "status": "proposed",
+          "evidence": "created via self-edit"
         }
       ]
     }
