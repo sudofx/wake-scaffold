@@ -1,18 +1,6 @@
 {
   "runs": [
     {
-      "when": "Sep 3rd, 2026 01:09pm",
-      "filename": "quantum_batch_evaluator.py",
-      "args": [
-        "{\"title\": malformed}"
-      ],
-      "exit_code": 0,
-      "stdout": "{\"error\": \"Expecting value: line 1 column 11 (char 10)\"}\n",
-      "stderr": "",
-      "timed_out": false,
-      "journal_entry": "2026-09-03-130929.md"
-    },
-    {
       "when": "Sep 3rd, 2026 03:07pm",
       "filename": "quantum_batch_evaluator.py",
       "args": [
@@ -337,6 +325,19 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-05-120613.md"
+    },
+    {
+      "when": "Sep 5th, 2026 12:15pm",
+      "filename": "cognitive_memory_engine.py",
+      "args": [
+        "query",
+        "hypothesis"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"error\": \"Unknown command: query\"}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-05-121542.md"
     }
   ]
 }
