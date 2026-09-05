@@ -41,7 +41,7 @@ resolved)
    something Carnegie-adjacent) to see if the framework actually
    generalizes or if it's quietly quantum-specific.
 3. **Build your own memory structure 2026-09-05:**
-   Re-design your, (Bob's), internal memory structure. Design it to operate similar to a human brain, or "mind" would organize "itself". Your memory/tools folder is your sandbox to redesign your own internals. Structure your memory for fast archiving and recalling of memories that have "weight". You will need to be forward thinking based on all you've learned so far. This new extension of your memory will need to map to the base memory without breaking anything. This will be your most complex task so far. Good luck!
+   Re-design your, (Bob's), internal memory structure. Design it to operate similar to a human brain, or "mind" would organize "itself". Your memory/tools folder is your sandbox to redesign your own internals. Structure your memory for fast archiving and recalling of memories that have "weight". You will need to be forward thinking based on all you've learned so far. This new extension of your memory will need to map to the current memory structure without breaking anything. This will be your most complex task so far. Good luck!
 
       > Structure your tools folder in directories and sub-directorys to categorize the "map of your mind". examples directories: core_memories/, core_functions/, core_thinking/, core_workspace/,
       core_ethics/, core_maintenence/, etc. Any other appropriate directories that describe your internal organization. Move and sort your existing tools you've created into your sub-directories that ONLY YOU maintain and create. But all data must be recorded and follow existing rules.
