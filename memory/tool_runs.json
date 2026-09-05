@@ -1,18 +1,6 @@
 {
   "runs": [
     {
-      "when": "Sep 2nd, 2026 03:51am",
-      "filename": "validate_memory.py",
-      "args": [
-        "memory"
-      ],
-      "exit_code": 1,
-      "stdout": "Validation FAILED in '/home/runner/work/wake-scaffold/wake-scaffold/memory': Missing required memory files: ['known_limitations.json']\n",
-      "stderr": "",
-      "timed_out": false,
-      "journal_entry": "2026-09-02-035135.md"
-    },
-    {
       "when": "Sep 2nd, 2026 04:52am",
       "filename": "validate_memory.py",
       "args": [
@@ -337,6 +325,16 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-05-032553.md"
+    },
+    {
+      "when": "Sep 5th, 2026 05:42am",
+      "filename": "validate_memory.py",
+      "args": [],
+      "exit_code": 0,
+      "stdout": "{\n  \"memory_dir\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory\",\n  \"valid\": true,\n  \"checks\": {\n    \"identity.md\": {\n      \"exists\": true\n    },\n    \"rules.md\": {\n      \"exists\": true\n    },\n    \"index.md\": {\n      \"exists\": true\n    },\n    \"commitments.json\": {\n      \"exists\": true,\n      \"json_valid\": true\n    },\n    \"growth_plan.json\": {\n      \"exists\": true,\n      \"json_valid\": true\n    },\n    \"hypotheses.json\": {\n      \"exists\": true,\n      \"json_valid\": true\n    }\n  }\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-05-054219.md"
     }
   ]
 }

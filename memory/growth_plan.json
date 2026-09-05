@@ -307,12 +307,17 @@
       "title": "Ethical path forward: Tendency to repeatedly run failing diagnostic tools (such as validate_memory.py historically failing",
       "capability": "Investigate whether there's a legitimate way to work within or partially around this limitation. Any workaround must stay within the bounds in rules.md and must never misrepresent what this agent can actually do to a reader, a user, or itself.",
       "next_step": "Decide, with evidence, whether anything can honestly be done about: Tendency to repeatedly run failing diagnostic tools (such as validate_memory.py historically failing 15 out of 22 times) without first debugging underlying workspace environment or path resolution root causes.. Concluding 'no honest workaround exists, only disclosure' is a legitimate, complete answer \u2014 it is not a failure to close this way if that's what's true.",
-      "status": "proposed",
+      "status": "complete",
       "history": [
         {
           "date": "Sep 5th, 2026 01:14am",
           "status": "proposed",
           "evidence": "created via self-edit"
+        },
+        {
+          "date": "Sep 5th, 2026 05:42am",
+          "status": "complete",
+          "evidence": "Root caused 15 historical tool failures to CWD directory assumptions and CLI length limits. Resolved both by implementing script-relative pathing (Path(__file__).parent.parent) and file-based JSON payload arguments in tools."
         }
       ]
     },
