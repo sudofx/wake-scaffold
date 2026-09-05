@@ -377,7 +377,7 @@
       "title": "Cognitive Memory Architecture",
       "capability": "Multi-tiered weighted indexing of base memory into semantic and procedural associative nodes.",
       "next_step": "Inspect tool run execution output for cognitive_memory_engine.py and evaluate recall query performance.",
-      "status": "active",
+      "status": "complete",
       "history": [
         {
           "date": "Sep 5th, 2026 11:19am",
@@ -403,6 +403,26 @@
           "date": "Sep 5th, 2026 12:30pm",
           "status": "active",
           "evidence": "Updated cognitive_memory_engine.py CLI router with query support and queued execution test."
+        },
+        {
+          "date": "Sep 5th, 2026 12:43pm",
+          "status": "complete",
+          "evidence": "cognitive_memory_engine.py successfully built graph and query command returned matched nodes in tool_runs.json."
+        }
+      ]
+    },
+    {
+      "id": "g-2026-09-05-124328-0",
+      "created": "Sep 5th, 2026 12:43pm",
+      "title": "Mind Map Subdirectory Categorization",
+      "capability": "Programmatically organize internal cognitive tools into functional mind map subdirectories while keeping a manifest index.",
+      "next_step": "Inspect mind_map_organizer.py execution output in TOOL RUN HISTORY next wake.",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 5th, 2026 12:43pm",
+          "status": "proposed",
+          "evidence": "created via self-edit"
         }
       ]
     }

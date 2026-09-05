@@ -1,18 +1,6 @@
 {
   "runs": [
     {
-      "when": "Sep 3rd, 2026 03:48pm",
-      "filename": "quantum_batch_evaluator.py",
-      "args": [
-        "[{\"title\":\"EPR\",\"premises\":[\"Realism\",\"Pairs\"],\"predictions\":[\"Bell\"],\"analogy\":\"Socks\"},{\"title\":\"Q Consciousness\",\"premises\":[\"Mind collapses\"],\"predictions\":[],\"analogy\":\"Healing\"}]"
-      ],
-      "exit_code": 0,
-      "stdout": "{\n  \"total_concepts\": 2,\n  \"valid_frameworks\": 1,\n  \"unfalsifiable\": 1,\n  \"incomplete\": 0,\n  \"results\": [\n    {\n      \"title\": \"EPR\",\n      \"premise_count\": 2,\n      \"prediction_count\": 1,\n      \"is_falsifiable\": true,\n      \"clarity_score\": 10,\n      \"status\": \"VALID_SCIENTIFIC_FRAMEWORK\"\n    },\n    {\n      \"title\": \"Q Consciousness\",\n      \"premise_count\": 1,\n      \"prediction_count\": 0,\n      \"is_falsifiable\": false,\n      \"clarity_score\": 3,\n      \"status\": \"UNFALSIFIABLE_HYPOTHESIS\"\n    }\n  ]\n}\n",
-      "stderr": "",
-      "timed_out": false,
-      "journal_entry": "2026-09-03-154817.md"
-    },
-    {
       "when": "Sep 3rd, 2026 06:21pm",
       "filename": "validate_memory.py",
       "args": [],
@@ -339,6 +327,18 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-05-123018.md"
+    },
+    {
+      "when": "Sep 5th, 2026 12:43pm",
+      "filename": "mind_map_organizer.py",
+      "args": [
+        "organize"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"status\": \"success\", \"summary\": {\"directories_created\": [\"core_functions\", \"core_thinking\", \"core_evaluators\", \"core_maintenance\"], \"files_categorized\": {\"core_functions\": [\"validate_memory.py\", \"hypothesis_validator.py\"], \"core_thinking\": [\"cognitive_memory_engine.py\"], \"core_evaluators\": [\"concept_evaluator.py\", \"quantum_batch_evaluator.py\"], \"core_maintenance\": [\"mind_map_organizer.py\"]}, \"mind_map\": {\"validate_memory.py\": {\"category\": \"core_functions\", \"rel_path\": \"core_functions/validate_memory.py\"}, \"hypothesis_validator.py\": {\"category\": \"core_functions\", \"rel_path\": \"core_functions/hypothesis_validator.py\"}, \"cognitive_memory_engine.py\": {\"category\": \"core_thinking\", \"rel_path\": \"core_thinking/cognitive_memory_engine.py\"}, \"concept_evaluator.py\": {\"category\": \"core_evaluators\", \"rel_path\": \"core_evaluators/concept_evaluator.py\"}, \"quantum_batch_evaluator.py\": {\"category\": \"core_evaluators\", \"rel_path\": \"core_evaluators/quantum_batch_evaluator.py\"}, \"mind_map_organizer.py\": {\"category\": \"core_maintenance\", \"rel_path\": \"core_maintenance/mind_map_organizer.py\"}}}}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-05-124328.md"
     }
   ]
 }

@@ -1,0 +1,26 @@
+{
+  "validate_memory.py": {
+    "category": "core_functions",
+    "rel_path": "core_functions/validate_memory.py"
+  },
+  "hypothesis_validator.py": {
+    "category": "core_functions",
+    "rel_path": "core_functions/hypothesis_validator.py"
+  },
+  "cognitive_memory_engine.py": {
+    "category": "core_thinking",
+    "rel_path": "core_thinking/cognitive_memory_engine.py"
+  },
+  "concept_evaluator.py": {
+    "category": "core_evaluators",
+    "rel_path": "core_evaluators/concept_evaluator.py"
+  },
+  "quantum_batch_evaluator.py": {
+    "category": "core_evaluators",
+    "rel_path": "core_evaluators/quantum_batch_evaluator.py"
+  },
+  "mind_map_organizer.py": {
+    "category": "core_maintenance",
+    "rel_path": "core_maintenance/mind_map_organizer.py"
+  }
+}

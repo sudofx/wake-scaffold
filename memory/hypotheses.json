@@ -393,10 +393,31 @@
       "created": "Sep 5th, 2026 12:30pm",
       "prediction": "Executing updated cognitive_memory_engine.py query command with term 'hypothesis' will return JSON containing matching graph nodes with score >= 1.0.",
       "test_method": "Execute cognitive_memory_engine.py via tool-run with args ['query', 'hypothesis'] and inspect stdout in tool run history next wake.",
-      "status": "untested",
+      "status": "confirmed",
       "history": [
         {
           "date": "Sep 5th, 2026 12:30pm",
+          "status": "untested",
+          "evidence": "",
+          "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 5th, 2026 12:43pm",
+          "status": "confirmed",
+          "evidence": "Tool run history confirms cognitive_memory_engine.py query command returned matching node h-2026-09-03-154817-0 with calculated score >= 1.0.",
+          "conclusion": "CLI command argument routing enables efficient querying across the cognitive graph."
+        }
+      ]
+    },
+    {
+      "id": "h-2026-09-05-124328-0",
+      "created": "Sep 5th, 2026 12:43pm",
+      "prediction": "Executing mind_map_organizer.py via tool-run will create categorized mind map subdirectories (core_functions, core_thinking, core_evaluators, core_maintenance) and generate a valid mind_map.json manifest.",
+      "test_method": "Execute mind_map_organizer.py via tool-run with args ['organize'] and inspect stdout in tool run history next wake.",
+      "status": "untested",
+      "history": [
+        {
+          "date": "Sep 5th, 2026 12:43pm",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"
