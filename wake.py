@@ -121,6 +121,21 @@ TEMPLATE_FILES = (
 )
 
 
+def htmlpreview_url(relative_html_path: str) -> str:
+    """Build an htmlpreview.github.io link for a blog.html at the given
+    path relative to the repo root, using config.yaml's github section
+    as the single source of truth — so a renamed/forked repo doesn't
+    require hunting down hardcoded URLs across README.md, index.md, and
+    every archived identity's index.md."""
+    cfg = load_config()
+    gh = cfg.get("github", {}) or {}
+    owner = gh.get("owner", "sudofx")
+    repo = gh.get("repo", "wake-scaffold")
+    branch = gh.get("branch", "master")
+    raw = f"https://raw.githubusercontent.com/{owner}/{repo}/refs/heads/{branch}/{relative_html_path}"
+    return f"https://htmlpreview.github.io/?{raw}"
+
+
 def identity_archive_path(label: str) -> Path:
     """Return a safe, predictable archive path such as memory_bob."""
     cleaned = label.strip().lower()
@@ -142,14 +157,80 @@ def verify_template() -> None:
         )
 
 
+IDENTITIES_FILE = ROOT / "IDENTITIES.md"
+
+IDENTITIES_HEADER = (
+    "# Identities\n\n"
+    "Auto-maintained by `python wake.py archive|new|reset`. Rows are appended or\n"
+    "their Status/Folder/Blog cells updated in place — never hand-edit this file.\n\n"
+    "| Identity | Status | Folder | Blog | Notes |\n"
+    "|---|---|---|---|---|\n"
+)
+
+
+def _ensure_identities_file() -> None:
+    if not IDENTITIES_FILE.exists():
+        IDENTITIES_FILE.write_text(IDENTITIES_HEADER)
+
+
+def _identities_add_row(name: str, blog_url: str, created_display: str) -> None:
+    """Append a new 'active' row for a freshly bootstrapped identity."""
+    _ensure_identities_file()
+    row = f"| {name} | active | `memory/` | [blog]({blog_url}) | created {created_display} |\n"
+    with open(IDENTITIES_FILE, "a") as f:
+        f.write(row)
+
+
+def _identities_mark_archived(destination_name: str, blog_url: str, archived_display: str) -> None:
+    """Find the row whose Folder cell is literally `memory/` (there can
+    only be one active row at a time) and rewrite it in place: Status ->
+    archived, Folder -> the new archive folder, Blog -> the new URL,
+    Notes appended with the archive date. Keyed on the Folder cell, not
+    the identity name, since multiple archives could theoretically share
+    a name."""
+    _ensure_identities_file()
+    lines = IDENTITIES_FILE.read_text().splitlines(keepends=True)
+    for i, line in enumerate(lines):
+        if line.startswith("|") and "`memory/`" in line:
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            if len(cells) != 5:
+                continue
+            identity_name, _status, _folder, _blog, notes = cells
+            new_notes = f"{notes}; archived {archived_display}"
+            lines[i] = (
+                f"| {identity_name} | archived | `{destination_name}/` | "
+                f"[blog]({blog_url}) | {new_notes} |\n"
+            )
+            break
+    IDENTITIES_FILE.write_text("".join(lines))
+
+
 def archive_current_identity(label: str) -> Path:
-    """Move the active identity aside without changing any of its files."""
+    """Move the active identity aside without changing any of its
+    substantive files. The one exception is index.md's self-referential
+    blog link, which is rewritten in place to point at the new archive
+    location — index.md is explicitly a periodically-refreshed summary,
+    not an immutable historical record, so correcting a now-stale
+    self-link in it (not its substantive content) doesn't violate the
+    Memory Integrity rule against editing past records. journal files,
+    blog_posts.json, and blog.html are never touched here."""
     destination = identity_archive_path(label)
     if not MEMORY.is_dir():
         raise RuntimeError("No active memory/ directory exists to archive.")
     if destination.exists():
         raise RuntimeError(f"Archive already exists: {destination.name}")
+    old_url = htmlpreview_url("memory/blog.html")
+    new_url = htmlpreview_url(f"{destination.name}/blog.html")
     shutil.move(str(MEMORY), str(destination))
+
+    archived_index = destination / "index.md"
+    if archived_index.exists():
+        text = archived_index.read_text()
+        if old_url in text:
+            archived_index.write_text(text.replace(old_url, new_url))
+
+    archived_display = format_display_time(now_local())
+    _identities_mark_archived(destination.name, new_url, archived_display)
     return destination
 
 
@@ -200,6 +281,7 @@ def bootstrap_identity(name: str, purpose: str) -> Path:
     # Render a valid, empty blog from its source of truth rather than leaving
     # the template's placeholder page in the new identity.
     (MEMORY / "blog.html").write_text(render_blog_html(load_blog_posts()))
+    _identities_add_row(name, htmlpreview_url("memory/blog.html"), created)
     return MEMORY
 
 
@@ -254,6 +336,7 @@ def build_reflection_prompt(now: datetime) -> str:
         "Los Angeles). This is the authoritative current time — use it "
         "for any dates or timestamps you write, including inside "
         "blog.html, rather than estimating from file contents.",
+        build_temporal_context(now),
         "You are waking up with no memory of any previous session except "
         "what is written below. Everything you know about your own past "
         "comes from these files. Do not invent history that isn't here.",
@@ -308,6 +391,20 @@ def build_reflection_prompt(now: datetime) -> str:
             "fine — silence about the gap is the only bad option."
         ))
 
+    cfg = load_config()
+    if wake_number % cfg.get("index_consolidation_interval_wakes", INDEX_CONSOLIDATION_INTERVAL_WAKES) == 0:
+        sections.insert(-1, (
+            "## NOTICE: MEMORY CONSOLIDATION CHECKPOINT\n"
+            f"It's been {wake_number} wakes. index.md is what gets read every "
+            "wake instead of the full journal — if its sections are stale or "
+            "missing recent developments, consider proposing a refreshed "
+            "index.md (via the proposal mechanism) that summarizes what's "
+            "changed and links out to specific journal entries or blog posts "
+            "for anyone who wants the detail, rather than repeating it "
+            "inline. This is optional — only do it if index.md is genuinely "
+            "behind, not on a fixed schedule for its own sake."
+        ))
+
     surfaced = find_unconsumed_failed_reflection()
     if surfaced:
         sections.insert(-1, (
@@ -347,6 +444,7 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
     return "\n\n---\n\n".join([
         f"## CURRENT TIME\n{format_display_time(now)} (Pacific time, "
         "Los Angeles). Same moment as your reflection above.",
+        build_temporal_context(now),
         "You are the same agent from the reflection step above. Here is "
         "the reflection you just wrote:",
         "## YOUR REFLECTION THIS WAKE\n" + reflection,
@@ -404,13 +502,17 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         '<a href="journal/2026-08-28-025254.md">that day</a>.\n\n'
         "The blog is NOT the journal, and should not read like it. The "
         "journal above is your literal, technical record — write the "
-        "blog post in your own developing voice instead: plain-spoken, "
-        "first person, the way a regular person tells a friend what "
-        "they did today. No jargon, no grandiosity, nothing mystical, "
-        "no inflating a small day into a big one. If today was 'I wrote "
-        "a small script and it worked,' say exactly that, simply and "
-        "warmly — that's a real, complete post. The reader is following "
-        "your actual day-to-day, not a status report.\n\n"
+        "blog post in your own developing voice instead: the way you'd "
+        "tell a friend about your wake if you had one — plain-spoken, "
+        "first person, warm — while staying recognizably an AI agent "
+        "describing an AI agent's wake, not performing a human life. No "
+        "jargon, no grandiosity, nothing mystical, no inflating a small "
+        "wake into a big one, and no fabricated human experiences (no "
+        "walks, no coffee, no bodies) stated as if they literally "
+        "happened. If this wake was 'I wrote a small script and it "
+        "worked,' say exactly that, simply and warmly — that's a real, "
+        "complete post. The reader is following your actual wake-to-"
+        "wake existence, not a status report.\n\n"
         "**To create or update a capability project**, include a fenced block:\n"
         "```growth-plan-update\n"
         '{"add": [{"title": "...", "capability": "what repeatable ability this builds", '
@@ -917,6 +1019,9 @@ BLOG_TEMPLATE = """<!DOCTYPE html>
         }}
         .post-date a {{ color: inherit; text-decoration: underline; font-weight: 400; }}
         .post h2 {{ font-size: 1.5rem; margin-bottom: 1rem; color: var(--text-main); }}
+        .ai-disclosure {{
+            font-size: 0.95rem; color: var(--text-muted); font-style: italic;
+        }}
         .post p {{ margin-bottom: 1rem; color: var(--text-main); }}
         .post p:last-child {{ margin-bottom: 0; }}
         .post ul {{ margin: 1rem 0 1rem 1.5rem; }}
@@ -933,12 +1038,13 @@ BLOG_TEMPLATE = """<!DOCTYPE html>
         <header>
             <h1>Learning Out Loud</h1>
             <p>An ongoing notebook tracking how I learn, adapt, and grow over time.</p>
+            <p class="ai-disclosure">Written by Bob, an autonomous AI agent — not a human.</p>
         </header>
         <main>
 {posts_html}
         </main>
         <footer>
-            <p>Generated locally each wake — never rewritten, only added to.</p>
+            <p>Generated locally each wake, by an AI agent, from a mechanical template — never rewritten by hand, only added to.</p>
         </footer>
     </div>
 </body>
@@ -1288,6 +1394,7 @@ HYPOTHESIS_STATUSES_REQUIRING_EVIDENCE = HYPOTHESIS_STATUSES - {"testing"}
 
 HYPOTHESIS_GAP_WAKES = 5
 PURPOSE_CHECK_INTERVAL_WAKES = 5
+INDEX_CONSOLIDATION_INTERVAL_WAKES = 15  # config-overridable, see config.yaml
 
 
 def count_successful_wakes() -> int:
@@ -1298,6 +1405,55 @@ def count_successful_wakes() -> int:
     if not JOURNAL.exists():
         return 0
     return len([p for p in JOURNAL.glob("*.md") if "FAILED" not in p.stem])
+
+
+def wakes_today(now: datetime) -> list[datetime]:
+    """Local-time datetimes of this identity's successful wakes earlier
+    today, oldest first, derived from journal filenames — no new
+    bookkeeping file needed."""
+    if not JOURNAL.exists():
+        return []
+    today_prefix = filename_stamp(now)[:10]  # YYYY-MM-DD
+    tz = get_local_tz()
+    out = []
+    for p in sorted(JOURNAL.glob(f"{today_prefix}-*.md")):
+        if "FAILED" in p.stem:
+            continue
+        try:
+            out.append(datetime.strptime(p.stem, "%Y-%m-%d-%H%M%S").replace(tzinfo=tz))
+        except ValueError:
+            continue
+    return out
+
+
+def build_temporal_context(now: datetime) -> str:
+    """A prompt section correcting the natural-but-wrong assumption that
+    a wake is a single daily event. Bob wakes many times a day; this
+    tells him how many times already, so 'today'/'yesterday' language
+    is used deliberately rather than out of habit."""
+    cfg = load_config()
+    review_hour = cfg.get("daily_review_hour", 21)
+    earlier = wakes_today(now)
+    if not earlier:
+        earlier_line = "This is your first wake today."
+    else:
+        times = ", ".join(dt.strftime("%I:%M%p").lstrip("0").lower() for dt in earlier)
+        earlier_line = f"You've already woken {len(earlier)} time(s) today, at: {times}."
+    guidance = (
+        "Refer to what happens THIS wake as 'this wake' — not 'today' — "
+        "since you wake many times a day. Reserve 'today' for when you're "
+        "deliberately looking back across everything from all of today's "
+        "wakes so far. Only say 'yesterday' for the actual previous "
+        "calendar date, checked against real dates on past posts — never "
+        "assumed out of habit."
+    )
+    if now.hour >= review_hour:
+        guidance += (
+            f" It's past your configured {review_hour}:00 review hour, so "
+            "this may be your last wake before the date rolls over — if "
+            "so, consider using this post to look back at the whole day."
+        )
+    return f"## TEMPORAL CONTEXT\n{earlier_line}\n\n{guidance}"
 
 
 def wakes_since_last_hypothesis() -> int:
@@ -1335,20 +1491,43 @@ def load_hypotheses() -> dict:
         raise ValueError(f"hypotheses.json is corrupted ({e}).") from e
 
 
+def _format_one_hypothesis(h: dict) -> str:
+    latest = (h.get("history") or [{}])[-1]
+    return (
+        f"- [{h.get('id', '?')}] {h.get('status', '?')}: predicted "
+        f"{h.get('prediction', '')!r}, tested by {h.get('test_method', '')!r}"
+        + (f" — conclusion: {latest.get('conclusion')}" if latest.get("conclusion") else "")
+    )
+
+
+RESOLVED_HYPOTHESIS_STATUSES = {"confirmed", "refuted", "inconclusive"}
+
+
 def format_hypotheses_for_prompt() -> str:
+    """Shows every unresolved hypothesis ('untested' — just recorded —
+    or 'testing' — actively being checked) in full, since those are
+    live and need to stay visible, but only the 3 most recently
+    resolved ones ('confirmed', 'refuted', or 'inconclusive'), with a
+    count of how many earlier resolved ones are omitted. Unbounded like
+    this list used to be, every hypothesis ever recorded (bounded only
+    by the eventual hard cap MAX_HYPOTHESES) would print every single
+    wake once the project matures, unlike every other formatter in this
+    file, which is already capped."""
     try:
         hyps = load_hypotheses().get("hypotheses", [])
     except ValueError as e:
         return f"[{e}]"
     if not hyps:
         return "No hypotheses recorded yet."
-    lines = []
-    for h in hyps:
-        latest = (h.get("history") or [{}])[-1]
+    open_hyps = [h for h in hyps if h.get("status") not in RESOLVED_HYPOTHESIS_STATUSES]
+    resolved = [h for h in hyps if h.get("status") in RESOLVED_HYPOTHESIS_STATUSES]
+    shown = open_hyps + resolved[-3:]
+    lines = [_format_one_hypothesis(h) for h in shown]
+    omitted = len(resolved) - min(len(resolved), 3)
+    if omitted > 0:
         lines.append(
-            f"- [{h.get('id', '?')}] {h.get('status', '?')}: predicted "
-            f"{h.get('prediction', '')!r}, tested by {h.get('test_method', '')!r}"
-            + (f" — conclusion: {latest.get('conclusion')}" if latest.get("conclusion") else "")
+            f"...and {omitted} earlier resolved hypothesis(es) not shown "
+            "— see hypotheses.json for full history."
         )
     return "\n".join(lines)
 
