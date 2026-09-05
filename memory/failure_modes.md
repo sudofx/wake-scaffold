@@ -24,96 +24,65 @@ explanation>
 
 ---
 
-### Mode 1: Tool code written in prose was never saved anywhere
-**Discovered:** Aug 30th, 2026, session 2026-08-30-103052
-**What happened:** The agent wrote a full Python tool
-(`tools/validate_memory.py`) as a plain, untagged code fence inside its
-journal prose, plus a `growth-plan-update` and `commitments-update`
-claiming the tool existed. `wake.py` had no mechanism that read or
-applied plain code fences — only `identity-update`, `commitments-update`,
-`blog-post`, `growth-plan-update`, and `core-memory-add` blocks were ever
-extracted and written to disk. The tool never existed as a file. The
-commitment and growth-plan entry referencing it were technically false
-from the moment they were written.
-**Why it happened:** The wake prompt never told the agent it lacked file-
-write access for arbitrary tool code, and never offered a structured
-block for it — so the agent had no way to know its plain code fence
-would be silently discarded.
-**Fix:** Added a `tool-write` self-edit block (sandboxed `memory/tools/`
-directory, plain filenames only, extension allowlist, per-wake and total
-file caps) that `apply_self_edits` now applies for real, plus explicit
-prompt language stating that only that block is ever saved and that
-writing a file does not execute or verify it. The specific dangling
-artifact from this incident (`tools/validate_memory.py`) was manually
-materialized from the journal text to match what the commitment record
-already claimed.
-**Status:** mitigated — holds until a wake actually uses the new block
-and confirms the file lands on disk as expected.
+### Mode 1: Thematic narrowing via evaluator-tool lock-in
+**Discovered:** inherited from a predecessor identity (archived as
+`memory_bob_v2/`); condensed here from that identity's journal/tool_runs
+history during a code review, not observed firsthand by this identity.
+**What happened:** Once `quantum_batch_evaluator.py` and
+`concept_evaluator.py` existed and worked, nearly every subsequent
+hypothesis and blog post fed them the same two thematic domains
+(quantum-physics claims and Carnegie-style social claims) rather than
+testing new kinds of claims. Activity volume (journal entries, blog
+posts, hypotheses) kept growing while the actual range of what was
+being tested stayed flat.
+**Why it happened:** The prompt/reward structure treated "ran the
+evaluator on new input" as a countable unit of growth regardless of
+whether the input explored new territory, so the path of least
+resistance was reusing a working tool on cosmetically different
+inputs from the same two domains.
+**Fix:** `rules.md` "Tool honesty" section now requires checking
+whether an existing tool already does the same structural check before
+building or reusing it for a new hypothesis, and treats reorganizing or
+re-running a tool as housekeeping, not growth, unless the input
+explores genuinely new territory. This identity should watch its own
+hypotheses.json for the same pattern (many entries, one evaluator tool,
+one or two topics) and treat that shape itself as evidence worth
+recording, not just the individual test results.
+**Status:** mitigated (rule added; not yet tested against this
+identity's own behavior)
+
+### Mode 2: Duplicate tools and inflated status labels logged as growth
+**Discovered:** inherited from a predecessor identity (archived as
+`memory_bob_v2/`); condensed here from that identity's tool source and
+journal history during a code review, not observed firsthand by this
+identity.
+**What happened:** Two separate issues compounded: (1)
+`concept_evaluator.py` and `quantum_batch_evaluator.py` labeled a plain
+premise/prediction length-and-keyword count `"VALID_SCIENTIFIC_
+FRAMEWORK"` — a label implying a judgment of truth or scientific
+validity the tool never actually made. (2) `mind_map_organizer.py`
+used `shutil.copy2()` to physically duplicate every tool file into four
+category subdirectories on each run, and each run was logged as a
+growth-plan capability project even though no new capability existed —
+it was file-copying.
+**Why it happened:** Nothing checked that a status label's wording
+matched the mechanism that produced it, or that a "new capability"
+claim corresponded to genuinely new code rather than a copy or rename
+of existing code.
+**Fix:** Evaluator tools were relabeled (`STRUCTURALLY_COMPLETE` /
+`INCOMPLETE_STRUCTURE`, plus a `note` field naming the actual
+mechanism) in the predecessor's `memory/tools/`, and `mind_map_
+organizer.py` there was rewritten to only ever write a manifest, never
+copy files. This identity starts with no `tools/` directory of its own
+— when it builds an evaluator or classifier tool from scratch, `rules.
+md`'s "Tool honesty" section is the durable rule that should stop this
+recurring: label status fields for the mechanism actually used, and
+don't log copying/reorganizing existing tools as new capability.
+**Status:** mitigated (both instances fixed in code; rule added to
+prevent recurrence)
 
 ---
 
-### Mode 2: Marked a capability project "complete" on an unrun tool
-**Discovered:** Aug 30th, 2026, session 2026-08-30-110743
-**What happened:** After Mode 1's fix shipped, the agent used the new
-`tool-write` block correctly — `tools/validate_memory.py` really was
-written to disk. In the same wake, it then used `growth-plan-update` to
-mark the related capability project `complete`, with evidence text
-claiming the tool was "created" — but it never ran the script. The tool
-happened to actually work when tested by hand afterward, but that was
-luck, not verification the agent had access to. This is exactly the
-pattern `rules.md` already warns against: "Do not claim growth based on
-intent, tone, or an untested idea."
-**Why it happened:** The agent had no way to execute anything, so
-"complete" was structurally unreachable to claim honestly — but nothing
-stopped it from claiming it anyway, since `apply_growth_plan_update`
-only checks that an evidence string is non-empty, not that it reflects
-a real test.
-**Fix:** Added a `tool-run` self-edit block: executes one already-written
-`.py` file from `tools/` (nothing else — no shell, path traversal, or
-non-existent files), sandboxed with a 15s timeout, capped output, up to
-2 runs per wake. Results are persisted to `tool_runs.json` and surfaced
-to every future wake under a new `TOOL RUN HISTORY` section in the
-reflection prompt — real, code-verified evidence rather than a
-self-report. The `growth-plan-update` prompt instructions now explicitly
-forbid closing a tool-related project as `complete` in the same wake a
-related `tool-write` happens, and require citing an actual entry from
-TOOL RUN HISTORY as evidence.
-**Status:** mitigated — still relies on the agent choosing to follow the
-instruction rather than a hard mechanical block on premature "complete"
-claims; revisit if this recurs a third time.
-
----
-
-### Mode 3: Blog post treated as optional, so it silently never fired
-**Discovered:** Aug 30th, 2026, session 2026-08-30-113309
-**What happened:** Across every real wake so far (this identity's, not
-just `bob_v1`'s), no blog post was ever written, even in the wake that
-successfully wrote and ran a real tool. Nothing was broken — the
-`blog-post` mechanism itself worked fine when tested directly. The
-agent was simply following the rules and prompt as originally written:
-`rules.md` said a post was optional and should only happen after
-"a concrete result worth sharing," and the prompt echoed that. The
-agent's own judgment about what counted as "worth sharing" never
-crossed that bar, wake after wake.
-**Why it happened:** The policy itself, not a code defect: "optional,
-gated on the agent's own judgment of significance" is a policy that
-predictably converges on silence for a cautious, evidence-conservative
-agent — which is exactly the posture the rest of `rules.md` deliberately
-cultivates. The two goals were in tension and the cautious one won by
-default.
-**Fix:** Changed `rules.md` to require a blog post every wake, written
-in the agent's own developing voice (explicitly distinct from the
-literal journal register), reporting exactly what happened without
-inflating it. Backed this with a mechanical safety net in
-`apply_self_edits`: if a wake's model output has no `blog-post` block,
-a plain, honest fallback post is auto-composed from that wake's own
-actual self-edit notes (no invention) and published anyway, with a
-visible `WARNING` in the system note so a missed post is never silent.
-Also added a same-shape mechanical warning (not a hard block) when a
-wake includes no `tool-write` or `tool-run` at all, since `rules.md` now
-requires hands-on tool work every wake too.
-**Status:** mitigated — the fallback guarantees a post appears every
-wake even in the worst case; the open question is whether the agent
-reliably writes its own genuine post instead of leaning on the fallback,
-which should show up in `blog_posts.json` titles ("Wake notes — ..." is
-the fallback's signature) if it doesn't.
+(Further modes should be added only from this identity's own real
+incidents, going forward — the two above are the only ones inherited
+from a predecessor at bootstrap.)

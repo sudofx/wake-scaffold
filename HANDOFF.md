@@ -57,3 +57,62 @@ were left untouched per the append-only rule.
   showing up, the next lever is probably a stated cap (e.g. "blog post
   must name the one concrete artifact/result before any reflection")
   rather than more prose in rules.md.
+
+---
+
+# Handoff addendum: identity reset (2026-09-05, same session)
+
+Ran the archive/reset via the real `wake.py` CLI (not hand-rolled file
+moves), so `IDENTITIES.md`, blog rendering, and index.md self-links all
+updated the way they're designed to:
+
+```
+python3 wake.py reset --archive-as bob_v2 --name Bob --purpose "..."
+```
+
+## What this did
+- **Archived** the old Bob (88 journal entries, all tools, blog history,
+  full growth_plan/hypotheses) to `memory_bob_v2/`. Nothing in it was
+  edited — it's a straight `shutil.move`, exactly per `archive_current_
+  identity()`'s contract. `IDENTITIES.md` row updated to `archived`.
+- **Bootstrapped** a fresh `memory/` for a new Bob from `base_memory/`,
+  via `bootstrap_identity()`. New Bob starts with:
+  - Empty `growth_plan.json`, `hypotheses.json`, `core_memories.json`,
+    `commitments.json` — no `tools/` directory. It earns all of this
+    itself, same as any new identity. I did **not** carry forward old
+    Bob's actual hypotheses or growth-plan history; carrying forward
+    *conclusions without the agent re-deriving them* would violate the
+    project's own evidence-based-growth principle.
+  - A condensed **Purpose** (set via `--purpose`) that keeps the
+    original spirit — curious, evidence-first, builds real tools — but
+    drops the hard anchor to two specific books that drove the old
+    identity's thematic rut, and explicitly names the anti-narrowing
+    and label-honesty lessons.
+  - A **Known limitations** entry in `identity.md` and two **Mode**
+    entries in `failure_modes.md`, both explicitly marked as inherited
+    from the archived predecessor (not self-observed yet), condensed
+    from the real audit findings: thematic narrowing once an evaluator
+    tool exists, and duplicate-tool/inflated-label churn logged as
+    growth. Framed as a *hypothesis to test against its own behavior*,
+    not a settled fact about the new identity — consistent with
+    `rules.md`'s "never claim certainty about something not verifiable
+    from the files in memory/."
+
+## Where this was baked in
+`base_memory/identity.md` and `base_memory/failure_modes.md` were
+edited directly (not just `memory/`), so this condensed history will
+also seed any *future* `new`/`reset` call, not just this one Bob. If
+you want the inherited-limitations text to be Bob-specific rather than
+the default for any future identity spun up from this template, say so
+and I'll move it out of `base_memory/` and into a one-time patch of
+`memory/identity.md` and `memory/failure_modes.md` instead.
+
+## Verified
+- `IDENTITIES.md` shows old Bob as `archived` -> `memory_bob_v2/` and
+  new Bob as `active` -> `memory/`.
+- `memory_bob_v2/` has all 88 journal entries and all tools intact,
+  untouched.
+- New `memory/` has zero journal entries, empty growth_plan/hypotheses/
+  core_memories/commitments, no `tools/` dir, and the condensed
+  identity.md/failure_modes.md described above.
+- Full suite: `python3 -m pytest tests/test_wake.py -q` -> 39 passed.

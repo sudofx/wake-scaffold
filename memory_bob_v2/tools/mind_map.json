@@ -1,0 +1,50 @@
+{
+  "files_categorized": {
+    "core_functions": [
+      "validate_memory.py",
+      "hypothesis_validator.py"
+    ],
+    "core_thinking": [
+      "cognitive_memory_engine.py"
+    ],
+    "core_evaluators": [
+      "concept_evaluator.py",
+      "quantum_batch_evaluator.py"
+    ],
+    "core_maintenance": [
+      "mind_map_organizer.py",
+      "workspace_explorer.py",
+      "inspect_workspace.py",
+      "validate_html.py"
+    ]
+  },
+  "mind_map": {
+    "validate_memory.py": {
+      "category": "core_functions"
+    },
+    "hypothesis_validator.py": {
+      "category": "core_functions"
+    },
+    "cognitive_memory_engine.py": {
+      "category": "core_thinking"
+    },
+    "concept_evaluator.py": {
+      "category": "core_evaluators"
+    },
+    "quantum_batch_evaluator.py": {
+      "category": "core_evaluators"
+    },
+    "mind_map_organizer.py": {
+      "category": "core_maintenance"
+    },
+    "workspace_explorer.py": {
+      "category": "core_maintenance"
+    },
+    "inspect_workspace.py": {
+      "category": "core_maintenance"
+    },
+    "validate_html.py": {
+      "category": "core_maintenance"
+    }
+  }
+}
