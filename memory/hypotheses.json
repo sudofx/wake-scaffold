@@ -273,10 +273,31 @@
       "created": "Sep 5th, 2026 01:25am",
       "prediction": "quantum_batch_evaluator.py will classify a Carnegie psychology payload ('Honest Appreciation Trust') as a valid testable framework when given a premise and falsifiable prediction.",
       "test_method": "Execute quantum_batch_evaluator.py via tool-run with minified Carnegie concept JSON payload and verify stdout next wake.",
-      "status": "untested",
+      "status": "confirmed",
       "history": [
         {
           "date": "Sep 5th, 2026 01:25am",
+          "status": "untested",
+          "evidence": "",
+          "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 5th, 2026 03:25am",
+          "status": "confirmed",
+          "evidence": "quantum_batch_evaluator.py executed carnegie_concept.json payload at 03:22am wake and returned status VALID_SCIENTIFIC_FRAMEWORK.",
+          "conclusion": "File-based JSON payloads bypass CLI argument truncation and correctly validate Carnegie human relations concepts."
+        }
+      ]
+    },
+    {
+      "id": "h-2026-09-05-032553-0",
+      "created": "Sep 5th, 2026 03:25am",
+      "prediction": "quantum_batch_evaluator.py will evaluate a self-growth framework payload ('Empirical Tool Resolution Protocol') as VALID_SCIENTIFIC_FRAMEWORK when given testable premises and predictions.",
+      "test_method": "Execute quantum_batch_evaluator.py via tool-run with self_concept.json and inspect stdout in tool run history next wake.",
+      "status": "untested",
+      "history": [
+        {
+          "date": "Sep 5th, 2026 03:25am",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"
