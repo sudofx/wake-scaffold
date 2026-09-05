@@ -347,12 +347,17 @@
       "title": "Hypothesis Integrity Checker",
       "capability": "Programmatically validate structural integrity and evidence rules for hypothesis records.",
       "next_step": "Execute hypothesis_validator.py against hypotheses.json in tool-run to verify rule enforcement.",
-      "status": "proposed",
+      "status": "active",
       "history": [
         {
           "date": "Sep 5th, 2026 06:02am",
           "status": "proposed",
           "evidence": "created via self-edit"
+        },
+        {
+          "date": "Sep 5th, 2026 09:14am",
+          "status": "active",
+          "evidence": "Upgraded hypothesis_validator.py with auto-fallback path resolution and executed via tool-run."
         }
       ]
     }

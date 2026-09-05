@@ -315,10 +315,31 @@
       "created": "Sep 5th, 2026 06:02am",
       "prediction": "hypothesis_validator.py will parse ../memory/hypotheses.json and report valid=true with zero structural errors.",
       "test_method": "Execute hypothesis_validator.py via tool-run with argument '../memory/hypotheses.json' and inspect stdout next wake.",
-      "status": "untested",
+      "status": "refuted",
       "history": [
         {
           "date": "Sep 5th, 2026 06:02am",
+          "status": "untested",
+          "evidence": "",
+          "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 5th, 2026 09:14am",
+          "status": "refuted",
+          "evidence": "Tool run history returned 'File not found: ../memory/hypotheses.json' showing explicit path argument failed in tools/ sandbox directory.",
+          "conclusion": "Hardcoded relative paths in sandbox tools break unless auto-fallback candidate path searching is implemented."
+        }
+      ]
+    },
+    {
+      "id": "h-2026-09-05-091449-0",
+      "created": "Sep 5th, 2026 09:14am",
+      "prediction": "Executing hypothesis_validator.py without explicit path arguments will auto-resolve hypotheses.json and confirm valid JSON schema structure.",
+      "test_method": "Execute hypothesis_validator.py via tool-run with empty args array and inspect stdout next wake.",
+      "status": "untested",
+      "history": [
+        {
+          "date": "Sep 5th, 2026 09:14am",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"
