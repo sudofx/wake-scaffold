@@ -1,71 +1,63 @@
-import sys
 import json
 import os
+import sys
 
-def find_hypotheses_file(custom_path=None):
-    candidate_paths = []
-    if custom_path:
-        candidate_paths.append(custom_path)
-    
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    
-    defaults = [
-        "memory/hypotheses.json",
-        "../memory/hypotheses.json",
-        "./hypotheses.json",
-        os.path.join(script_dir, "../memory/hypotheses.json"),
-        os.path.join(script_dir, "hypotheses.json"),
-        os.path.join(script_dir, "../../memory/hypotheses.json")
+def find_file(filename):
+    candidates = [
+        filename,
+        os.path.join("memory", filename),
+        os.path.join("..", "memory", filename),
+        os.path.join("..", filename)
     ]
-    
-    candidate_paths.extend(defaults)
-    
-    for path in candidate_paths:
-        if os.path.isfile(path):
-            return os.path.abspath(path)
+    for path in candidates:
+        if os.path.exists(path):
+            return path
     return None
 
-def validate_hypotheses(file_path=None):
-    resolved_path = find_hypotheses_file(file_path)
-    if not resolved_path:
-        return {
-            "valid": False,
-            "error": "File not found among candidate paths."
-        }
-    
+def validate():
+    target = sys.argv[1] if len(sys.argv) > 1 else "hypotheses.json"
+    filepath = find_file(target)
+    if not filepath:
+        print(json.dumps({"valid": False, "error": f"File not found: {target}" if not filepath else ""}))
+        return
+
     try:
-        with open(resolved_path, "r", encoding="utf-8") as f:
+        with open(filepath, "r", encoding="utf-8") as f:
             data = json.load(f)
-        
-        if not isinstance(data, list):
-            return {"valid": False, "error": "Root JSON must be a list of hypothesis objects."}
-        
-        errors = []
-        required_keys = {"id", "status", "prediction", "test_method"}
-        valid_statuses = {"untested", "testing", "confirmed", "refuted", "inconclusive"}
-        
-        for idx, item in enumerate(data):
-            if not isinstance(item, dict):
-                errors.append(f"Item {idx}: Not a JSON object.")
-                continue
-            missing = required_keys - set(item.keys())
-            if missing:
-                errors.append(f"Item {idx} (id={item.get('id', 'unknown')}): Missing keys {sorted(list(missing))}")
-            if item.get("status") not in valid_statuses:
-                errors.append(f"Item {idx} (id={item.get('id', 'unknown')}): Invalid status '{item.get('status')}'")
-        
-        if errors:
-            return {"valid": False, "resolved_path": resolved_path, "errors": errors}
-        
-        return {
-            "valid": True,
-            "resolved_path": resolved_path,
-            "count": len(data)
-        }
     except Exception as e:
-        return {"valid": False, "error": str(e)}
+        print(json.dumps({"valid": False, "error": f"JSON parse error: {str(e)}"}))
+        return
+
+    items = []
+    if isinstance(data, list):
+        items = data
+    elif isinstance(data, dict):
+        for key in ["hypotheses", "data", "items"]:
+            if key in data and isinstance(data[key], list):
+                items = data[key]
+                break
+
+    if not items and not isinstance(data, list):
+        print(json.dumps({"valid": False, "error": "Root JSON must be a list or contain a list under 'hypotheses'."}))
+        return
+
+    errors = []
+    required_fields = ["id", "prediction", "test_method", "status"]
+    for idx, item in enumerate(items):
+        if not isinstance(item, dict):
+            errors.append(f"Item {idx} is not an object.")
+            continue
+        missing = [f for f in required_fields if f not in item]
+        if missing:
+            errors.append(f"Item {item.get('id', idx)} missing fields: {missing}")
+
+    result = {
+        "valid": len(errors) == 0,
+        "path_used": filepath,
+        "count": len(items),
+        "errors": errors
+    }
+    print(json.dumps(result, indent=2))
 
 if __name__ == "__main__":
-    path_arg = sys.argv[1] if len(sys.argv) > 1 else None
-    res = validate_hypotheses(path_arg)
-    print(json.dumps(res, indent=2))
+    validate()

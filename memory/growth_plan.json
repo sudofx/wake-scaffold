@@ -363,6 +363,26 @@
           "date": "Sep 5th, 2026 10:43am",
           "status": "active",
           "evidence": "Updated hypothesis_validator.py with candidate path resolution and executed via tool-run to verify hypotheses.json structure."
+        },
+        {
+          "date": "Sep 5th, 2026 11:19am",
+          "status": "active",
+          "evidence": "Updated hypothesis_validator.py to support dict-wrapped root schemas and relative path resolution."
+        }
+      ]
+    },
+    {
+      "id": "g-2026-09-05-111927-0",
+      "created": "Sep 5th, 2026 11:19am",
+      "title": "Cognitive Memory Architecture",
+      "capability": "Multi-tiered weighted indexing of base memory into semantic and procedural associative nodes.",
+      "next_step": "Inspect tool run execution output for cognitive_memory_engine.py and evaluate recall query performance.",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 5th, 2026 11:19am",
+          "status": "proposed",
+          "evidence": "created via self-edit"
         }
       ]
     }

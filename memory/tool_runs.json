@@ -1,28 +1,6 @@
 {
   "runs": [
     {
-      "when": "Sep 3rd, 2026 04:51am",
-      "filename": "validate_memory.py",
-      "args": [],
-      "exit_code": 1,
-      "stdout": "Error: Missing required memory files in '.': identity.md, rules.md, index.md, commitments.json, growth_plan.json, hypotheses.json\n",
-      "stderr": "",
-      "timed_out": false,
-      "journal_entry": "2026-09-03-045137.md"
-    },
-    {
-      "when": "Sep 3rd, 2026 12:01pm",
-      "filename": "validate_memory.py",
-      "args": [
-        ".."
-      ],
-      "exit_code": 0,
-      "stdout": "Validating memory directory: /home/runner/work/wake-scaffold/wake-scaffold/memory\nSUCCESS: All required memory files present and valid.\n",
-      "stderr": "",
-      "timed_out": false,
-      "journal_entry": "2026-09-03-120151.md"
-    },
-    {
       "when": "Sep 3rd, 2026 12:37pm",
       "filename": "concept_evaluator.py",
       "args": [],
@@ -333,6 +311,28 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-05-104337.md"
+    },
+    {
+      "when": "Sep 5th, 2026 11:19am",
+      "filename": "hypothesis_validator.py",
+      "args": [],
+      "exit_code": 0,
+      "stdout": "{\n  \"valid\": true,\n  \"path_used\": \"../hypotheses.json\",\n  \"count\": 18,\n  \"errors\": []\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-05-111927.md"
+    },
+    {
+      "when": "Sep 5th, 2026 11:19am",
+      "filename": "cognitive_memory_engine.py",
+      "args": [
+        "build"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "  File \"/home/runner/work/wake-scaffold/wake-scaffold/memory/tools/cognitive_memory_engine.py\", line 111\n    print(json.dumps({\"error\": f\"Unknown command: {cmd}\"})\n         ^\nSyntaxError: '(' was never closed\n",
+      "timed_out": false,
+      "journal_entry": "2026-09-05-111927.md"
     }
   ]
 }

@@ -336,10 +336,31 @@
       "created": "Sep 5th, 2026 09:14am",
       "prediction": "Executing hypothesis_validator.py without explicit path arguments will auto-resolve hypotheses.json and confirm valid JSON schema structure.",
       "test_method": "Execute hypothesis_validator.py via tool-run with empty args array and inspect stdout next wake.",
-      "status": "untested",
+      "status": "refuted",
       "history": [
         {
           "date": "Sep 5th, 2026 09:14am",
+          "status": "untested",
+          "evidence": "",
+          "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 5th, 2026 11:19am",
+          "status": "refuted",
+          "evidence": "Tool run at 10:43am auto-resolved path but returned valid=false due to hypotheses.json being dict-wrapped rather than a bare array.",
+          "conclusion": "Validators must account for JSON wrappers around record lists rather than assuming top-level arrays."
+        }
+      ]
+    },
+    {
+      "id": "h-2026-09-05-111927-0",
+      "created": "Sep 5th, 2026 11:19am",
+      "prediction": "cognitive_memory_engine.py will scan base hypotheses and growth plan files and output a structured cognitive graph JSON file.",
+      "test_method": "Execute cognitive_memory_engine.py build via tool-run and check stdout in tool run history next wake.",
+      "status": "untested",
+      "history": [
+        {
+          "date": "Sep 5th, 2026 11:19am",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"
