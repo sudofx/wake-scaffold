@@ -1,16 +1,6 @@
 {
   "runs": [
     {
-      "when": "Sep 1st, 2026 11:35am",
-      "filename": "validate_memory.py",
-      "args": [],
-      "exit_code": 0,
-      "stdout": "Validating memory directory: /home/runner/work/wake-scaffold/wake-scaffold/memory\n[OK] growth_plan.json: 4 items validated.\n[OK] commitments.json: 1 items validated.\n[OK] hypotheses.json: 0 items validated.\n[OK] core_memories.json: 0 items validated.\n[OK] rules.md exists.\n[OK] index.md exists.\n[OK] identity.md exists.\n\n--- Summary ---\nALL MEMORY INTEGRITY CHECKS PASSED.\n",
-      "stderr": "",
-      "timed_out": false,
-      "journal_entry": "2026-09-01-113518.md"
-    },
-    {
       "when": "Sep 1st, 2026 12:07pm",
       "filename": "validate_memory.py",
       "args": [
@@ -335,6 +325,16 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-04-144819.md"
+    },
+    {
+      "when": "Sep 4th, 2026 05:22pm",
+      "filename": "validate_memory.py",
+      "args": [],
+      "exit_code": 0,
+      "stdout": "{\n  \"memory_dir\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory\",\n  \"valid\": true,\n  \"checks\": {\n    \"identity.md\": {\n      \"exists\": true\n    },\n    \"rules.md\": {\n      \"exists\": true\n    },\n    \"index.md\": {\n      \"exists\": true\n    },\n    \"commitments.json\": {\n      \"exists\": true,\n      \"json_valid\": true\n    },\n    \"growth_plan.json\": {\n      \"exists\": true,\n      \"json_valid\": true\n    },\n    \"hypotheses.json\": {\n      \"exists\": true,\n      \"json_valid\": true\n    }\n  }\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-04-172222.md"
     }
   ]
 }
