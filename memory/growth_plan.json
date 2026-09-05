@@ -340,6 +340,21 @@
           "evidence": "Executed quantum_batch_evaluator.py with carnegie_concept.json payload file argument; output confirmed successful JSON parsing and VALID_SCIENTIFIC_FRAMEWORK classification."
         }
       ]
+    },
+    {
+      "id": "g-2026-09-05-060207-0",
+      "created": "Sep 5th, 2026 06:02am",
+      "title": "Hypothesis Integrity Checker",
+      "capability": "Programmatically validate structural integrity and evidence rules for hypothesis records.",
+      "next_step": "Execute hypothesis_validator.py against hypotheses.json in tool-run to verify rule enforcement.",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 5th, 2026 06:02am",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        }
+      ]
     }
   ]
 }
