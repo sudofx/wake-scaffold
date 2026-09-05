@@ -1,7 +1,7 @@
 import os
-import shutil
-import json
 import sys
+import json
+import shutil
 
 CATEGORIES = {
     "core_functions": ["validate_memory.py", "hypothesis_validator.py"],
@@ -10,38 +10,54 @@ CATEGORIES = {
     "core_maintenance": ["mind_map_organizer.py"]
 }
 
+MANIFEST_FILE = "mind_map.json"
+
 def organize():
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    summary = {"directories_created": [], "files_categorized": {}, "mind_map": {}}
-
+    summary = {"directories_created": [], "files_categorized": {}}
+    
     for cat, files in CATEGORIES.items():
-        cat_dir = os.path.join(base_dir, cat)
-        if not os.path.exists(cat_dir):
-            os.makedirs(cat_dir, exist_ok=True)
+        cat_path = os.path.join(base_dir, cat)
+        if not os.path.exists(cat_path):
+            os.makedirs(cat_path, exist_ok=True)
             summary["directories_created"].append(cat)
         
         summary["files_categorized"][cat] = []
         for filename in files:
             src = os.path.join(base_dir, filename)
+            dest = os.path.join(cat_path, filename)
             if os.path.exists(src):
-                dst = os.path.join(cat_dir, filename)
-                shutil.copy2(src, dst)
+                shutil.copy2(src, dest)
                 summary["files_categorized"][cat].append(filename)
-                summary["mind_map"][filename] = {
-                    "category": cat,
-                    "rel_path": os.path.join(cat, filename)
-                }
+            elif os.path.exists(dest):
+                summary["files_categorized"][cat].append(filename)
 
-    manifest_path = os.path.join(base_dir, "mind_map.json")
-    with open(manifest_path, "w", encoding="utf-8") as f:
-        json.dump(summary["mind_map"], f, indent=2)
+    manifest_path = os.path.join(base_dir, MANIFEST_FILE)
+    with open(manifest_path, "w") as f:
+        json.dump(summary, f, indent=2)
 
     return {"status": "success", "summary": summary}
 
-if __name__ == "__main__":
-    cmd = sys.argv[1] if len(sys.argv) > 1 else "organize"
+def status():
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    manifest_path = os.path.join(base_dir, MANIFEST_FILE)
+    
+    if os.path.exists(manifest_path):
+        with open(manifest_path, "r") as f:
+            manifest = json.load(f)
+        return {"status": "success", "manifest_found": True, "manifest": manifest}
+    else:
+        return {"status": "success", "manifest_found": False, "message": "Manifest not found. Run organize first."}
+
+def main():
+    cmd = sys.argv[1] if len(sys.argv) > 1 else "status"
     if cmd == "organize":
         res = organize()
-        print(json.dumps(res))
+    elif cmd == "status":
+        res = status()
     else:
-        print(json.dumps({"error": f"Unknown command: {cmd}"}))
+        res = {"error": f"Unknown command: {cmd}"}
+    print(json.dumps(res))
+
+if __name__ == "__main__":
+    main()
