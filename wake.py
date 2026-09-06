@@ -2565,7 +2565,7 @@ def write_journal_entry(now: datetime, filename: str, reflection: str, model_out
         "\n\n---\n*This entry is append-only. If something here turns out "
         "to be wrong, say so in a future entry — do not edit this one.*\n"
     )
-    path.write_text(header + reflection_section + model_output + footer)
+    atomic_write_text(path, header + reflection_section + model_output + footer)
     return path
 
 
@@ -2579,7 +2579,7 @@ def write_synthesis_entry(now: datetime, journal_filename_value: str, reflection
     while path.exists():
         path = day_dir / f"{stem}-{suffix}.md"
         suffix += 1
-    path.write_text(
+    atomic_write_text(path,
         f"# Reflection {path.stem}\n\n"
         f"**Woke:** {format_display_time(now)}\n"
         f"**Journal entry:** {journal_filename_value}\n\n"
@@ -2607,7 +2607,7 @@ def write_daily_synthesis_index(now: datetime) -> Path:
         entries.append(
             f"- [{entry_path.stem}](../../../../../journal/{journal_name}): {excerpt}"
         )
-    index_path.write_text(
+    atomic_write_text(index_path,
         f"# Daily synthesis — {now.strftime('%Y-%m-%d')}\n\n"
         f"Successful wakes: {len(entries)}\n\n"
         + "\n".join(entries)
@@ -2643,7 +2643,7 @@ def write_semantic_daily_summary(day: datetime, summary: str) -> Path:
     summary_dir = SYNTHESIS_DIR / "daily" / day.strftime("%Y") / day.strftime("%m")
     summary_dir.mkdir(parents=True, exist_ok=True)
     path = summary_dir / f"{day.strftime('%d')}-summary.md"
-    path.write_text(
+    atomic_write_text(path,
         f"# Semantic daily summary — {day.strftime('%Y-%m-%d')}\n\n"
         "Generated on demand from the recorded daily synthesis index.\n\n"
         + summary
@@ -2732,7 +2732,7 @@ def write_failure_record(
             "real, deterministic check so the cycle wasn't a total "
             "loss:\n\n" + "\n".join(f"- {n}" for n in fallback_notes) + "\n"
         )
-    fail_path.write_text(
+    atomic_write_text(fail_path,
         f"# Wake FAILED\n\n"
         f"**Attempted:** {format_display_time(now)} (Pacific time)\n"
         f"**Provider:** {provider_name}\n"
