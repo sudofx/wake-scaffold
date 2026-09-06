@@ -129,6 +129,23 @@ class MemoryValidationTests(WakeTestCase):
 
         self.assertTrue(any("stale manifest layout" in finding for finding in findings))
 
+    def test_validation_reports_broken_blog_journal_link(self):
+        posts_path = self.memory / "core_public_facing_persona" / "blog" / "blog_posts.json"
+        posts = json.loads(posts_path.read_text())
+        (self.memory / "journal" / "real-journal.md").write_text("entry")
+        posts["posts"].append({
+            "id": "post-test",
+            "date_sortable": "2026-08-31-090000",
+            "title": "Test",
+            "body_html": "<p>Test</p>",
+            "journal_entry": "missing-journal.md",
+        })
+        posts_path.write_text(json.dumps(posts))
+
+        findings = wake.validate_active_memory()
+
+        self.assertTrue(any("broken blog journal link" in finding for finding in findings))
+
 
 class SynthesisStorageTests(WakeTestCase):
     def test_atomic_write_replaces_content_without_temp_files(self):

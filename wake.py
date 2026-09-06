@@ -515,6 +515,24 @@ def validate_active_memory() -> list[str]:
                 f"invalid shape: {path.relative_to(MEMORY)} must contain a "
                 f"'{collection_key}' list"
             )
+        elif path == BLOG_DIR / "blog_posts.json":
+            for index, post in enumerate(data[collection_key]):
+                if not isinstance(post, dict):
+                    findings.append(f"invalid blog post #{index + 1}: must be a mapping")
+                    continue
+                for field in ("id", "date_sortable", "title", "body_html", "journal_entry"):
+                    if not str(post.get(field, "")).strip():
+                        findings.append(f"invalid blog post #{index + 1}: missing {field!r}")
+                journal_name = post.get("journal_entry", "")
+                if (
+                    isinstance(journal_name, str)
+                    and journal_name
+                    and ("/" in journal_name or "\\" in journal_name
+                         or not (JOURNAL / journal_name).is_file())
+                ):
+                    findings.append(
+                        f"broken blog journal link: {journal_name!r}"
+                    )
     return findings
 
 
