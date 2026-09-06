@@ -107,6 +107,18 @@ class SynthesisStorageTests(WakeTestCase):
         self.assertIn("../../../../../journal/2026-08-31-090000.md", daily_text)
         self.assertIn("Choose a capability and test it.", daily_text)
         self.assertIn("A second reflection must not overwrite the first.", daily_text)
+
+        prompt = wake.build_daily_summary_prompt(FIXED_NOW)
+        self.assertIn("2026-08-31", prompt)
+        self.assertIn("Separate observed work from interpretation", prompt)
+        self.assertIn("Choose a capability and test it.", prompt)
+
+        summary = wake.write_semantic_daily_summary(
+            FIXED_NOW, "## Themes\n\nThe reflections point toward deliberate testing."
+        )
+        self.assertEqual(summary.name, "31-summary.md")
+        self.assertIn("Semantic daily summary", summary.read_text())
+        self.assertIn("deliberate testing", summary.read_text())
         self.assertIn("A second reflection", second.read_text())
 
 

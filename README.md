@@ -100,6 +100,11 @@ memory/
                               links back to the journal entries. It is a
                               navigation/compression aid, not a replacement
                               for the immutable detail files.
+    daily/YYYY/MM/DD-summary.md
+                             - optional semantic summary created only by
+                               an explicit `summarize-day` command and one
+                               model call; never generated during a normal
+                               wake.
   core_public_facing_persona/
     blog/
       blog_posts.json           - the actual append-only source of truth
@@ -414,6 +419,15 @@ environment never appears in the subprocess's output.
    for any promise tracking.
 6. When ready, enable `.github/workflows/wake.yml` to run it on a schedule
 for free.
+
+To spend one deliberate model call compressing a recorded day:
+
+```bash
+python wake.py summarize-day --date 2026-09-06
+```
+
+The summary is a separate, reviewable artifact. The original daily index,
+reflection files, and journal entries remain available as sources.
 
 ## Identity lifecycle
 

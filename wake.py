@@ -2557,6 +2557,62 @@ def write_daily_synthesis_index(now: datetime) -> Path:
     return index_path
 
 
+def build_daily_summary_prompt(day: datetime) -> str:
+    """Build an on-demand synthesis prompt from one day's recorded reflections."""
+    index_path = SYNTHESIS_DIR / "daily" / day.strftime("%Y") / day.strftime("%m") / f"{day.strftime('%d')}.md"
+    if not index_path.is_file():
+        raise RuntimeError(f"No daily synthesis index exists for {day.strftime('%Y-%m-%d')}")
+    return (
+        "You are compressing one day of an AI agent's recorded wake reflections. "
+        "Write a concise semantic summary in Markdown, maximum 600 words. "
+        "Separate observed work from interpretation. Identify recurring themes, "
+        "decisions, unresolved questions, and the most useful next direction. "
+        "Do not invent events, feelings, or results not present in the source. "
+        "This is an internal synthesis artifact, not a blog post.\n\n"
+        f"## DATE\n{day.strftime('%Y-%m-%d')}\n\n"
+        f"## SOURCE INDEX\n{index_path.read_text()}"
+    )
+
+
+def write_semantic_daily_summary(day: datetime, summary: str) -> Path:
+    """Persist an explicitly requested semantic summary for a calendar day."""
+    summary = summary.strip()
+    if not summary:
+        raise ValueError("daily summary must not be empty")
+    if len(summary) > 6_000:
+        summary = summary[:6_000].rstrip() + "\n\n[summary truncated]"
+    summary_dir = SYNTHESIS_DIR / "daily" / day.strftime("%Y") / day.strftime("%m")
+    summary_dir.mkdir(parents=True, exist_ok=True)
+    path = summary_dir / f"{day.strftime('%d')}-summary.md"
+    path.write_text(
+        f"# Semantic daily summary — {day.strftime('%Y-%m-%d')}\n\n"
+        "Generated on demand from the recorded daily synthesis index.\n\n"
+        + summary
+        + "\n"
+    )
+    return path
+
+
+def summarize_day(day_text: str) -> Path:
+    """Use one model call to summarize a day, only when explicitly invoked."""
+    try:
+        day = datetime.strptime(day_text, "%Y-%m-%d").replace(tzinfo=get_local_tz())
+    except ValueError as e:
+        raise ValueError("date must use YYYY-MM-DD") from e
+    config = load_config()
+    provider = get_provider(
+        config.get("provider", "gemini"),
+        config.get("model"),
+        fallback_models=config.get("gemini_fallback_models"),
+    )
+    summary = generate_with_retry(
+        provider,
+        "You are a careful internal synthesis editor. Do not write a journal entry.",
+        build_daily_summary_prompt(day),
+    )
+    return write_semantic_daily_summary(day, summary)
+
+
 def run_offline_fallback(now: datetime, journal_fname: str) -> list[str]:
     """
     When the model call fails outright (all fallback models and
@@ -2811,6 +2867,11 @@ def command_line_main() -> int:
         "migrate-persona",
         help="Rename core_public_facing_persona/ to core_persona/ in the active memory.",
     )
+    summarize = commands.add_parser(
+        "summarize-day",
+        help="Use one explicit model call to summarize a recorded day's reflections.",
+    )
+    summarize.add_argument("--date", default=now_local().strftime("%Y-%m-%d"))
 
     args = parser.parse_args()
     if args.command in (None, "wake"):
@@ -2834,6 +2895,9 @@ def command_line_main() -> int:
         elif args.command == "migrate-persona":
             destination = migrate_persona_layout()
             print(f"Migrated active persona directory: {destination}")
+        elif args.command == "summarize-day":
+            destination = summarize_day(args.date)
+            print(f"Semantic daily summary written: {destination}")
     except (RuntimeError, ValueError) as e:
         print(f"Identity lifecycle action failed: {e}", file=sys.stderr)
         return 1
