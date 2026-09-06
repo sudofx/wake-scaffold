@@ -1,0 +1,4 @@
+{
+  "_comment": "Last MAX_TOOL_RUN_HISTORY tool executions (stdout/stderr/exit code), written by tool-run and read back as evidence next wake. New identities start with none.",
+  "runs": []
+}

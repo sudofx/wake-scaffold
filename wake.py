@@ -44,8 +44,24 @@ from providers import get_provider
 
 ROOT = Path(__file__).parent
 MEMORY = ROOT / "memory"
-JOURNAL = MEMORY / "journal"
 BASE_MEMORY = ROOT / "base_memory"
+
+# Compartmentalized memory layout. Every wake-cycle function reads/writes
+# through one of these instead of a bare MEMORY / "filename" — that's what
+# makes the whole tree relocatable (archive/bootstrap just move or copy
+# MEMORY wholesale) without hunting down individual path strings. See
+# core_manifest.json (written by write_core_manifest) for a machine-
+# readable copy of this same layout.
+IDENTITY_DIR = MEMORY / "core_identity"          # who Bob is: identity, rules, failure log
+MEMORIES_DIR = MEMORY / "core_memories"          # knowledge: index, commitments, growth, hypotheses
+WORKSPACE_DIR = MEMORY / "core_workspace"        # execution: tools + their run evidence
+TOOLS_DIR = WORKSPACE_DIR / "tools"
+PERSONA_DIR = MEMORY / "core_public_facing_persona"  # public-facing output
+BLOG_DIR = PERSONA_DIR / "blog"
+BLOG_HTML_DIR = BLOG_DIR / "html"
+JOURNAL = MEMORY / "journal"                     # episodic log, immutable, one file per wake
+
+CORE_MANIFEST_FILE = MEMORY / "core_manifest.json"
 
 # Marks the boundary between the reflection and the work in a combined
 # single-call response (see build_combined_prompt). Must match the
@@ -62,7 +78,7 @@ def load_config():
         return yaml.safe_load(f)
 
 
-EPISTEMIC_STATE_FILE = MEMORY / "epistemic_state.json"
+EPISTEMIC_STATE_FILE = MEMORIES_DIR / "epistemic_state.json"
 MAX_MODEL_REVISIONS = 100
 
 
@@ -225,16 +241,16 @@ def read(path: Path) -> str:
 
 
 TEMPLATE_FILES = (
-    "identity.md",
-    "rules.md",
-    "index.md",
-    "commitments.json",
-    "failure_modes.md",
-    "blog.html",
-    "blog_posts.json",
-    "core_memories.json",
-    "growth_plan.json",
-    "hypotheses.json",
+    ("core_identity", "identity.md"),
+    ("core_identity", "rules.md"),
+    ("core_identity", "failure_modes.md"),
+    ("core_memories", "index.md"),
+    ("core_memories", "commitments.json"),
+    ("core_memories", "growth_plan.json"),
+    ("core_memories", "hypotheses.json"),
+    ("core_memories", "semantic_memory.json"),
+    (Path("core_public_facing_persona") / "blog", "blog_posts.json"),
+    (Path("core_public_facing_persona") / "blog" / "html", "index.html"),
 )
 
 
@@ -253,6 +269,39 @@ def htmlpreview_url(relative_html_path: str) -> str:
     return f"https://htmlpreview.github.io/?{raw}"
 
 
+MEMORY_LAYOUT = {
+    "identity": "core_identity",
+    "memories": "core_memories",
+    "workspace": "core_workspace",
+    "persona": "core_public_facing_persona",
+    "journal": "journal",
+}
+
+
+def write_core_manifest(name: str = None) -> None:
+    """Write memory/core_manifest.json — a small, always-current ledger
+    naming the active identity and confirming the on-disk layout matches
+    what this version of wake.py expects. Not read by any prompt (the
+    model doesn't need it); it exists so a human — or a future migration
+    script — can tell at a glance which schema a given memory/ was built
+    with, without inferring it from directory names."""
+    if name is None:
+        identity_path = IDENTITY_DIR / "identity.md"
+        name = "(unknown)"
+        if identity_path.exists():
+            m = re.search(r"\*\*Name:\*\*\s*(.+)", identity_path.read_text())
+            if m:
+                name = m.group(1).strip()
+    manifest = {
+        "schema_version": 1,
+        "identity_name": name,
+        "layout": MEMORY_LAYOUT,
+        "last_wake": format_display_time(now_local()),
+        "total_wakes": count_successful_wakes(),
+    }
+    CORE_MANIFEST_FILE.write_text(json.dumps(manifest, indent=2) + "\n")
+
+
 def identity_archive_path(label: str) -> Path:
     """Return a safe, predictable archive path such as memory_bob."""
     cleaned = label.strip().lower()
@@ -265,9 +314,15 @@ def identity_archive_path(label: str) -> Path:
 
 
 def verify_template() -> None:
-    missing = [name for name in TEMPLATE_FILES if not (BASE_MEMORY / name).is_file()]
+    missing = [
+        str(Path(subdir) / name)
+        for subdir, name in TEMPLATE_FILES
+        if not (BASE_MEMORY / subdir / name).is_file()
+    ]
     if not (BASE_MEMORY / "journal").is_dir():
         missing.append("journal/")
+    if not (BASE_MEMORY / "core_workspace" / "tools").is_dir():
+        missing.append("core_workspace/tools/")
     if missing:
         raise RuntimeError(
             "base_memory is incomplete; missing: " + ", ".join(missing)
@@ -336,11 +391,11 @@ def archive_current_identity(label: str) -> Path:
         raise RuntimeError("No active memory/ directory exists to archive.")
     if destination.exists():
         raise RuntimeError(f"Archive already exists: {destination.name}")
-    old_url = htmlpreview_url("memory/blog.html")
-    new_url = htmlpreview_url(f"{destination.name}/blog.html")
+    old_url = htmlpreview_url("memory/core_public_facing_persona/blog/html/index.html")
+    new_url = htmlpreview_url(f"{destination.name}/core_public_facing_persona/blog/html/index.html")
     shutil.move(str(MEMORY), str(destination))
 
-    archived_index = destination / "index.md"
+    archived_index = destination / "core_memories" / "index.md"
     if archived_index.exists():
         text = archived_index.read_text()
         if old_url in text:
@@ -368,7 +423,7 @@ def bootstrap_identity(name: str, purpose: str) -> Path:
     shutil.copytree(BASE_MEMORY, MEMORY)
     JOURNAL.mkdir(parents=True, exist_ok=True)
 
-    identity_path = MEMORY / "identity.md"
+    identity_path = IDENTITY_DIR / "identity.md"
     identity = identity_path.read_text()
     identity = re.sub(r"\*\*Name:\*\*.*", f"**Name:** {name}", identity, count=1)
     identity = re.sub(r"\*\*Created:\*\*.*", f"**Created:** {created}", identity, count=1)
@@ -397,13 +452,18 @@ def bootstrap_identity(name: str, purpose: str) -> Path:
 
     # Render a valid, empty blog from its source of truth rather than leaving
     # the template's placeholder page in the new identity.
-    (MEMORY / "blog.html").write_text(render_blog_html(load_blog_posts()))
-    _identities_add_row(name, htmlpreview_url("memory/blog.html"), created)
+    (BLOG_HTML_DIR / "index.html").write_text(render_blog_html(load_blog_posts()))
+    _identities_add_row(
+        name,
+        htmlpreview_url("memory/core_public_facing_persona/blog/html/index.html"),
+        created,
+    )
+    write_core_manifest(name)
     return MEMORY
 
 
 def load_open_commitments() -> str:
-    path = MEMORY / "commitments.json"
+    path = MEMORIES_DIR / "commitments.json"
     if not path.exists():
         return "[no commitments file]"
     try:
@@ -457,12 +517,12 @@ def build_reflection_prompt(now: datetime) -> str:
         "You are waking up with no memory of any previous session except "
         "what is written below. Everything you know about your own past "
         "comes from these files. Do not invent history that isn't here.",
-        "## IDENTITY\n" + read(MEMORY / "identity.md"),
-        "## RULES (hard constraints, follow exactly)\n" + read(MEMORY / "rules.md"),
+        "## IDENTITY\n" + read(IDENTITY_DIR / "identity.md"),
+        "## RULES (hard constraints, follow exactly)\n" + read(IDENTITY_DIR / "rules.md"),
         "## CORE MEMORIES (rare, formative lessons — let these genuinely "
         "shape how you act this wake, not just inform you)\n"
         + format_core_memories_for_prompt(),
-        "## CURRENT KNOWLEDGE (summary)\n" + read(MEMORY / "index.md"),
+        "## CURRENT KNOWLEDGE (summary)\n" + read(MEMORIES_DIR / "index.md"),
         "## OPEN COMMITMENTS\n" + load_open_commitments(),
         "## GROWTH PLAN (capability projects)\n" + format_growth_plan_for_prompt(),
         "## HYPOTHESES (self-experiments: prediction -> test method -> "
@@ -566,7 +626,7 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         "You are the same agent from the reflection step above. Here is "
         "the reflection you just wrote:",
         "## YOUR REFLECTION THIS WAKE\n" + reflection,
-        "## RULES (hard constraints, follow exactly)\n" + read(MEMORY / "rules.md"),
+        "## RULES (hard constraints, follow exactly)\n" + read(IDENTITY_DIR / "rules.md"),
         "## CAPABILITY BOUNDARY (read carefully, this is not optional)\n"
         "You do NOT have the ability to directly edit rules.md, index.md, "
         "or the Name/Created/Purpose fields of identity.md — propose "
@@ -877,7 +937,7 @@ def apply_identity_update(raw_json: str, now: datetime = None) -> list[str]:
             f"IGNORED unauthorized identity fields (not applied): {sorted(ignored_keys)}"
         )
 
-    path = MEMORY / "identity.md"
+    path = IDENTITY_DIR / "identity.md"
     if not path.exists():
         return notes + ["REJECTED identity-update: identity.md not found."]
     text = path.read_text()
@@ -953,7 +1013,7 @@ def apply_commitments_update(raw_json: str) -> list[str]:
     if not isinstance(ops, dict):
         return ["REJECTED commitments-update: must be a JSON object. No changes applied."]
 
-    path = MEMORY / "commitments.json"
+    path = MEMORIES_DIR / "commitments.json"
     try:
         data = json.loads(path.read_text()) if path.exists() else {"commitments": []}
     except json.JSONDecodeError:
@@ -1022,7 +1082,11 @@ def apply_commitments_update(raw_json: str) -> list[str]:
     return notes
 
 
-ALLOWED_PR_FILES = {"rules.md", "index.md", "identity.md"}
+ALLOWED_PR_FILES = {
+    "rules.md": IDENTITY_DIR / "rules.md",
+    "index.md": MEMORIES_DIR / "index.md",
+    "identity.md": IDENTITY_DIR / "identity.md",
+}
 
 
 def extract_proposal_block(text: str):
@@ -1072,7 +1136,7 @@ def open_proposal_pull_request(proposal: dict) -> str:
                 "opened.")
 
     branch = f"bob-proposal-{filename_stamp(now_local())}"
-    file_path = MEMORY / target
+    file_path = ALLOWED_PR_FILES[target]
 
     def run(*args):
         return subprocess.run(args, cwd=ROOT, check=True, capture_output=True, text=True)
@@ -1207,7 +1271,7 @@ POST_TEMPLATE = """            <article class="post">
 
 
 def load_blog_posts() -> dict:
-    path = MEMORY / "blog_posts.json"
+    path = BLOG_DIR / "blog_posts.json"
     if not path.exists():
         return {"posts": []}
     try:
@@ -1237,7 +1301,7 @@ def render_blog_html(data: dict) -> str:
         for p in posts:
             journal_link = ""
             if p.get("journal_entry"):
-                journal_link = (f' — <a href="journal/{p["journal_entry"]}">'
+                journal_link = (f' — <a href="../../../journal/{p["journal_entry"]}">'
                                 f'{p["journal_entry"]}</a>')
             blocks.append(POST_TEMPLATE.format(
                 date_display=p.get("date_display", ""),
@@ -1291,8 +1355,8 @@ def apply_blog_post(raw_json: str, now: datetime, journal_fname: str) -> list[st
         "journal_entry": journal_fname,
     }
     data.setdefault("posts", []).append(post)
-    (MEMORY / "blog_posts.json").write_text(json.dumps(data, indent=2) + "\n")
-    (MEMORY / "blog.html").write_text(render_blog_html(data))
+    (BLOG_DIR / "blog_posts.json").write_text(json.dumps(data, indent=2) + "\n")
+    (BLOG_HTML_DIR / "index.html").write_text(render_blog_html(data))
     return [f"ADDED blog post '{title[:60]}' and re-rendered blog.html "
             f"({len(data['posts'])} total posts)."]
 
@@ -1341,7 +1405,7 @@ def _topic_overlap(a_title: str, a_capability: str, b_title: str, b_capability: 
 
 
 def load_growth_plan() -> dict:
-    path = MEMORY / "growth_plan.json"
+    path = MEMORIES_DIR / "growth_plan.json"
     if not path.exists():
         return {"projects": []}
     try:
@@ -1484,7 +1548,7 @@ def apply_growth_plan_update(raw_json: str, now: datetime) -> list[str]:
         changed = True
 
     if changed:
-        (MEMORY / "growth_plan.json").write_text(json.dumps(data, indent=2) + "\n")
+        (MEMORIES_DIR / "growth_plan.json").write_text(json.dumps(data, indent=2) + "\n")
     return notes or ["No valid operations present in growth-plan-update block."]
 
 
@@ -1630,7 +1694,7 @@ def wakes_since_last_hypothesis() -> int:
 
 
 def load_hypotheses() -> dict:
-    path = MEMORY / "hypotheses.json"
+    path = MEMORIES_DIR / "hypotheses.json"
     if not path.exists():
         return {"hypotheses": []}
     try:
@@ -1794,7 +1858,7 @@ def apply_hypotheses_update(raw_json: str, now: datetime) -> list[str]:
         changed = True
 
     if changed:
-        (MEMORY / "hypotheses.json").write_text(json.dumps(data, indent=2) + "\n")
+        (MEMORIES_DIR / "hypotheses.json").write_text(json.dumps(data, indent=2) + "\n")
     return notes or ["No valid operations present in hypothesis-update block."]
 
 
@@ -1802,8 +1866,6 @@ MAX_TOOL_FILES_PER_WAKE = 3
 MAX_TOOL_FILE_BYTES = 20000
 MAX_TOTAL_TOOL_FILES = 100
 ALLOWED_TOOL_EXTENSIONS = {".py", ".md", ".txt", ".json"}
-TOOLS_DIR = MEMORY / "tools"
-
 
 def safe_tool_filename(name) -> str | None:
     """Plain filename only: no path separators, no '..', no leading dot,
@@ -1894,7 +1956,7 @@ MAX_TOOL_RUN_ARGS = 10
 MAX_TOOL_RUN_ARG_LEN = 200
 MAX_TOOL_RUN_OUTPUT_CHARS = 4_000
 MAX_TOOL_RUN_HISTORY = 30
-TOOL_RUNS_FILE = MEMORY / "tool_runs.json"
+TOOL_RUNS_FILE = WORKSPACE_DIR / "tool_runs.json"
 
 # The only environment variables a tool subprocess ever sees. This is a
 # strict allowlist, not a denylist: everything else in this process's
@@ -2042,7 +2104,7 @@ MAX_CORE_MEMORIES = 20
 
 
 def load_core_memories() -> dict:
-    path = MEMORY / "core_memories.json"
+    path = MEMORIES_DIR / "semantic_memory.json"
     if not path.exists():
         return {"memories": []}
     try:
@@ -2120,7 +2182,7 @@ def apply_core_memory_add(raw_json: str, now: datetime, journal_fname: str) -> l
         "lesson": lesson,
         "journal_entry": journal_fname,
     })
-    (MEMORY / "core_memories.json").write_text(json.dumps(data, indent=2) + "\n")
+    (MEMORIES_DIR / "semantic_memory.json").write_text(json.dumps(data, indent=2) + "\n")
     return [f"ADDED core memory ({weight}): {lesson[:80]}"]
 
 
@@ -2562,6 +2624,7 @@ def main():
     output_with_notes = output + self_edit_notes
 
     path = write_journal_entry(now, journal_fname, reflection, output_with_notes, provider_name)
+    write_core_manifest()
 
     print(f"Wake complete. Journal entry written: {path}")
     if self_edit_notes:

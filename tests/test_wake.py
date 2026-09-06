@@ -52,12 +52,25 @@ class WakeTestCase(unittest.TestCase):
 
         self._orig = {
             name: getattr(wake, name)
-            for name in ("MEMORY", "JOURNAL", "TOOLS_DIR", "TOOL_RUNS_FILE")
+            for name in (
+                "MEMORY", "JOURNAL", "IDENTITY_DIR", "MEMORIES_DIR",
+                "WORKSPACE_DIR", "TOOLS_DIR", "TOOL_RUNS_FILE",
+                "PERSONA_DIR", "BLOG_DIR", "BLOG_HTML_DIR",
+                "EPISTEMIC_STATE_FILE", "CORE_MANIFEST_FILE",
+            )
         }
         wake.MEMORY = self.memory
         wake.JOURNAL = self.memory / "journal"
-        wake.TOOLS_DIR = self.memory / "tools"
-        wake.TOOL_RUNS_FILE = self.memory / "tool_runs.json"
+        wake.IDENTITY_DIR = self.memory / "core_identity"
+        wake.MEMORIES_DIR = self.memory / "core_memories"
+        wake.WORKSPACE_DIR = self.memory / "core_workspace"
+        wake.TOOLS_DIR = self.memory / "core_workspace" / "tools"
+        wake.TOOL_RUNS_FILE = self.memory / "core_workspace" / "tool_runs.json"
+        wake.PERSONA_DIR = self.memory / "core_public_facing_persona"
+        wake.BLOG_DIR = self.memory / "core_public_facing_persona" / "blog"
+        wake.BLOG_HTML_DIR = self.memory / "core_public_facing_persona" / "blog" / "html"
+        wake.EPISTEMIC_STATE_FILE = self.memory / "core_memories" / "epistemic_state.json"
+        wake.CORE_MANIFEST_FILE = self.memory / "core_manifest.json"
 
     def tearDown(self):
         for name, value in self._orig.items():
@@ -65,7 +78,7 @@ class WakeTestCase(unittest.TestCase):
         shutil.rmtree(self.tmpdir, ignore_errors=True)
 
     def blog_posts(self):
-        return json.loads((self.memory / "blog_posts.json").read_text())["posts"]
+        return json.loads((self.memory / "core_public_facing_persona" / "blog" / "blog_posts.json").read_text())["posts"]
 
 
 class BlogFallbackTests(WakeTestCase):
@@ -91,7 +104,7 @@ class BlogFallbackTests(WakeTestCase):
         self.assertIn("REJECTED commitments-update", posts[0]["body_html"])
         self.assertNotIn("Quiet wake", posts[0]["body_html"])
 
-        blog_html = (self.memory / "blog.html").read_text()
+        blog_html = (self.memory / "core_public_facing_persona" / "blog" / "html" / "index.html").read_text()
         self.assertIn("Wake notes —", blog_html, "blog.html must be re-rendered to include the fallback post")
 
     def test_truly_quiet_wake_gets_generic_fallback_message(self):
@@ -229,7 +242,7 @@ class LimitationSpawnsGrowthProjectTests(WakeTestCase):
         notes = wake.apply_identity_update(block, FIXED_NOW)
         self.assertTrue(any(n.startswith("SPAWNED (from new limitation)") for n in notes))
 
-        growth = json.loads((self.memory / "growth_plan.json").read_text())
+        growth = json.loads((self.memory / "core_memories" / "growth_plan.json").read_text())
         self.assertEqual(len(growth["projects"]), 1)
         project = growth["projects"][0]
         self.assertIn("Cannot verify claims about the outside world", project["title"])
@@ -249,7 +262,7 @@ class GrowthPlanDuplicateTests(WakeTestCase):
         }]})
         notes = wake.apply_growth_plan_update(first, FIXED_NOW)
         self.assertTrue(any(n.startswith("ADDED capability project") for n in notes))
-        existing_id = json.loads((self.memory / "growth_plan.json").read_text())["projects"][0]["id"]
+        existing_id = json.loads((self.memory / "core_memories" / "growth_plan.json").read_text())["projects"][0]["id"]
 
         second = json.dumps({"add": [{
             "title": "Automated workspace integrity validator",
@@ -259,7 +272,7 @@ class GrowthPlanDuplicateTests(WakeTestCase):
         notes = wake.apply_growth_plan_update(second, FIXED_NOW)
         self.assertTrue(any(n.startswith("REJECTED growth project") for n in notes), notes)
         self.assertTrue(any(existing_id in n for n in notes), notes)
-        projects = json.loads((self.memory / "growth_plan.json").read_text())["projects"]
+        projects = json.loads((self.memory / "core_memories" / "growth_plan.json").read_text())["projects"]
         self.assertEqual(len(projects), 1, "the near-duplicate must not have been appended")
 
     def test_genuinely_different_project_is_accepted(self):
@@ -277,7 +290,7 @@ class GrowthPlanDuplicateTests(WakeTestCase):
         }]})
         notes = wake.apply_growth_plan_update(second, FIXED_NOW)
         self.assertTrue(any(n.startswith("ADDED capability project") for n in notes), notes)
-        projects = json.loads((self.memory / "growth_plan.json").read_text())["projects"]
+        projects = json.loads((self.memory / "core_memories" / "growth_plan.json").read_text())["projects"]
         self.assertEqual(len(projects), 2)
 
     def test_duplicate_check_ignores_closed_projects(self):
@@ -287,7 +300,7 @@ class GrowthPlanDuplicateTests(WakeTestCase):
             "next_step": "Run it.",
         }]})
         wake.apply_growth_plan_update(first, FIXED_NOW)
-        existing_id = json.loads((self.memory / "growth_plan.json").read_text())["projects"][0]["id"]
+        existing_id = json.loads((self.memory / "core_memories" / "growth_plan.json").read_text())["projects"][0]["id"]
         wake.apply_growth_plan_update(json.dumps({"status_change": [
             {"id": existing_id, "new_status": "complete", "evidence": "Ran it, works."}
         ]}), FIXED_NOW)
@@ -406,7 +419,7 @@ class HypothesesTests(WakeTestCase):
         notes = wake.apply_hypotheses_update(add_block, FIXED_NOW)
         self.assertTrue(any(n.startswith("ADDED hypothesis") for n in notes))
 
-        hyp_id = json.loads((self.memory / "hypotheses.json").read_text())["hypotheses"][0]["id"]
+        hyp_id = json.loads((self.memory / "core_memories" / "hypotheses.json").read_text())["hypotheses"][0]["id"]
 
         # Rejected: no evidence supplied for a non-"testing" status.
         bad_change = json.dumps({"status_change": [
@@ -414,7 +427,7 @@ class HypothesesTests(WakeTestCase):
         ]})
         notes = wake.apply_hypotheses_update(bad_change, FIXED_NOW)
         self.assertTrue(any("requires real 'evidence'" in n for n in notes))
-        hyps = json.loads((self.memory / "hypotheses.json").read_text())["hypotheses"]
+        hyps = json.loads((self.memory / "core_memories" / "hypotheses.json").read_text())["hypotheses"]
         self.assertEqual(hyps[0]["status"], "untested")
 
         # Accepted: real evidence supplied.
@@ -425,7 +438,7 @@ class HypothesesTests(WakeTestCase):
         ]})
         notes = wake.apply_hypotheses_update(good_change, FIXED_NOW)
         self.assertTrue(any(n.startswith("UPDATED hypothesis") for n in notes))
-        hyps = json.loads((self.memory / "hypotheses.json").read_text())["hypotheses"]
+        hyps = json.loads((self.memory / "core_memories" / "hypotheses.json").read_text())["hypotheses"]
         self.assertEqual(hyps[0]["status"], "confirmed")
 
 
@@ -689,7 +702,7 @@ class HypothesesFormattingTests(WakeTestCase):
             {"prediction": prediction, "test_method": "inspect a file"}
         ]})
         wake.apply_hypotheses_update(block, now)
-        hyps = json.loads((self.memory / "hypotheses.json").read_text())["hypotheses"]
+        hyps = json.loads((self.memory / "core_memories" / "hypotheses.json").read_text())["hypotheses"]
         return hyps[-1]["id"]
 
     def _resolve(self, hyp_id: str, status: str):
@@ -748,12 +761,28 @@ class IdentityLifecycleTests(unittest.TestCase):
         shutil.copy(wake.ROOT / "config.yaml", self.tmproot / "config.yaml")
         self._orig = {
             name: getattr(wake, name)
-            for name in ("ROOT", "MEMORY", "JOURNAL", "IDENTITIES_FILE")
+            for name in (
+                "ROOT", "MEMORY", "JOURNAL", "IDENTITIES_FILE",
+                "IDENTITY_DIR", "MEMORIES_DIR", "WORKSPACE_DIR",
+                "TOOLS_DIR", "TOOL_RUNS_FILE", "PERSONA_DIR",
+                "BLOG_DIR", "BLOG_HTML_DIR", "EPISTEMIC_STATE_FILE",
+                "CORE_MANIFEST_FILE",
+            )
         }
         wake.ROOT = self.tmproot
         wake.MEMORY = self.tmproot / "memory"
         wake.JOURNAL = wake.MEMORY / "journal"
         wake.IDENTITIES_FILE = self.tmproot / "IDENTITIES.md"
+        wake.IDENTITY_DIR = wake.MEMORY / "core_identity"
+        wake.MEMORIES_DIR = wake.MEMORY / "core_memories"
+        wake.WORKSPACE_DIR = wake.MEMORY / "core_workspace"
+        wake.TOOLS_DIR = wake.WORKSPACE_DIR / "tools"
+        wake.TOOL_RUNS_FILE = wake.WORKSPACE_DIR / "tool_runs.json"
+        wake.PERSONA_DIR = wake.MEMORY / "core_public_facing_persona"
+        wake.BLOG_DIR = wake.PERSONA_DIR / "blog"
+        wake.BLOG_HTML_DIR = wake.BLOG_DIR / "html"
+        wake.EPISTEMIC_STATE_FILE = wake.MEMORIES_DIR / "epistemic_state.json"
+        wake.CORE_MANIFEST_FILE = wake.MEMORY / "core_manifest.json"
 
     def tearDown(self):
         for name, value in self._orig.items():
@@ -767,15 +796,15 @@ class IdentityLifecycleTests(unittest.TestCase):
 
     def test_archive_rewrites_index_md_self_link_and_marks_archived(self):
         wake.bootstrap_identity("Ada", "Test archiving.")
-        old_url = wake.htmlpreview_url("memory/blog.html")
+        old_url = wake.htmlpreview_url("memory/core_public_facing_persona/blog/html/index.html")
         # Seed index.md with the stale self-link a real identity would have.
-        index_path = wake.MEMORY / "index.md"
+        index_path = wake.MEMORIES_DIR / "index.md"
         index_path.write_text(f"## What's been built\n\n[blog]({old_url})\n")
 
         destination = wake.archive_current_identity("ada_v1")
 
-        new_url = wake.htmlpreview_url("memory_ada_v1/blog.html")
-        archived_text = (destination / "index.md").read_text()
+        new_url = wake.htmlpreview_url("memory_ada_v1/core_public_facing_persona/blog/html/index.html")
+        archived_text = (destination / "core_memories" / "index.md").read_text()
         self.assertIn(new_url, archived_text)
         self.assertNotIn(old_url, archived_text)
 
@@ -787,7 +816,7 @@ class IdentityLifecycleTests(unittest.TestCase):
         wake.bootstrap_identity("Ada", "Test immutability.")
         wake.JOURNAL.mkdir(parents=True, exist_ok=True)
         (wake.JOURNAL / "2026-08-31-090000.md").write_text("original content")
-        original_blog_posts = (wake.MEMORY / "blog_posts.json").read_text()
+        original_blog_posts = (wake.BLOG_DIR / "blog_posts.json").read_text()
 
         destination = wake.archive_current_identity("ada_v2")
 
@@ -795,7 +824,7 @@ class IdentityLifecycleTests(unittest.TestCase):
             (destination / "journal" / "2026-08-31-090000.md").read_text(),
             "original content",
         )
-        self.assertEqual((destination / "blog_posts.json").read_text(), original_blog_posts)
+        self.assertEqual((destination / "core_public_facing_persona" / "blog" / "blog_posts.json").read_text(), original_blog_posts)
 
 
 if __name__ == "__main__":

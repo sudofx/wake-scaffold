@@ -34,52 +34,75 @@ Every wake, the agent:
 
 The model backend is swappable. See `providers/`.
 
+
+
 ## Structure
+
+Memory is compartmentalized by category rather than kept as a flat pile
+of files, so the tree is readable at a glance:
 
 ```
 memory/
-  identity.md            - who the agent is. Name/Created/Purpose only
+  core_manifest.json       - small machine-readable ledger: active
+                           identity name, the layout below, last wake
+                           time, total wake count. Not read by any
+                           prompt — for humans/tooling to sanity-check
+                           which schema a given memory/ was built with.
+  core_identity/
+    identity.md            - who the agent is. Name/Created/Purpose only
                            change by human edit. Current focus and
                            Known limitations can be self-edited by
                            the agent, within limits (see below).
-  rules.md               - hard constraints, read every wake. Human-edit
+    rules.md               - hard constraints, read every wake. Human-edit
                            only, or via an opt-in pull request (below).
-  commitments.json        - promises made, tracked to completion. Bob
+    failure_modes.md        - named, dated log of memory failures and fixes
+  core_memories/
+    index.md                 - periodically-refreshed summary of everything
+                           known. Human-edit only, or via an opt-in
+                           pull request (below).
+    commitments.json        - promises made, tracked to completion. Bob
                            can add new ones and move existing ones
                            forward in status; can never delete one or
                            rewrite it outright.
-  failure_modes.md        - named, dated log of memory failures and fixes
-  index.md                 - periodically-refreshed summary of everything
-                           known. Human-edit only, or via an opt-in
-                           pull request (below).
-  blog.html                - a plain HTML/CSS/JS page, mechanically
-                           rendered from blog_posts.json every time a
-                           post is added — never written directly by
-                           Bob, so a post can't be lost by a bad
-                           generation. Local file only, not hosted.
-  blog_posts.json           - the actual append-only source of truth
-                           for the blog. Each post is added once and
-                           never rewritten or removed.
-  core_memories.json        - a small, capped (see MAX_CORE_MEMORIES
+    semantic_memory.json      - a small, capped (see MAX_CORE_MEMORIES
                            in wake.py), append-only list of
                            self-nominated formative lessons, read into
                            every wake's reflection.
-  growth_plan.json          - a small backlog of capability projects
+    growth_plan.json          - a small backlog of capability projects
                            ("can I build this?"), each with a status
                            history and evidence field.
-  hypotheses.json           - a self-experiment tracker ("is this
+    hypotheses.json           - a self-experiment tracker ("is this
                            true?"): prediction, test method, real
                            evidence, conclusion. See "Self-editing"
                            below.
-  tool_runs.json            - the last MAX_TOOL_RUN_HISTORY tool-run
+    epistemic_state.json      - durable observation -> claim -> prediction
+                           -> test -> outcome -> revision ledger. Created
+                           on first use; absent until then.
+  core_workspace/
+    tool_runs.json            - the last MAX_TOOL_RUN_HISTORY tool-run
                            results (stdout/stderr/exit code), written
                            by tool-run and read back as evidence in
                            the next wake's TOOL RUN HISTORY section.
-  tools/
-    validate_memory.py            - a tool file written via tool-write,
+    tools/
+      validate_memory.py            - a tool file written via tool-write,
                                   executed via tool-run. Anything the
                                   agent has built and can now run lives
-                                  here, plain Python files only.
+                                  here, plain Python files only, no
+                                  subfolders.
+  core_public_facing_persona/
+    blog/
+      blog_posts.json           - the actual append-only source of truth
+                           for the blog. Each post is added once and
+                           never rewritten or removed.
+      html/
+        index.html               - a plain HTML/CSS/JS page, mechanically
+                           rendered from blog_posts.json every time a
+                           post is added — never written directly by
+                           Bob, so a post can't be lost by a bad
+                           generation. Local file only, not hosted
+                           (see htmlpreview links in IDENTITIES.md).
+        assets/                   - reserved for future static assets
+                           (images, custom CSS); empty until used.
   journal/
     2026-08-29-040827.md          - one append-only file per wake, never
                                   edited after. Filename is the exact
@@ -93,10 +116,15 @@ memory/
                                   end so it still sorts in time order.
 
 base_memory/
-  Complete seed template for a new identity. It includes the empty
-  blog_posts.json, core_memories.json, growth_plan.json, and journal/
-  directory as well as the Markdown and commitment files. The lifecycle
-  commands copy it; normal wakes never read or alter it.
+  Complete seed template for a new identity, in the exact same
+  compartmentalized layout as memory/ above (empty blog_posts.json,
+  semantic_memory.json, growth_plan.json, hypotheses.json, and an
+  empty journal/, plus the Markdown and commitment files). The
+  lifecycle commands copy it; normal wakes never read or alter it.
+  identity.md and rules.md here also carry the two fixed inspirational
+  directives (see "Voice and influences" in rules.md) forward into
+  every future identity, regardless of what Purpose text is supplied
+  at creation time.
 
 providers/
   base.py               - the interface every model backend implements
@@ -108,9 +136,18 @@ config.yaml              - provider/model choice, self-edit and pull
 .github/workflows/wake.yml - free cron trigger via GitHub Actions
 ```
 
+Every function in `wake.py` reads and writes through a small set of
+module-level path constants (`IDENTITY_DIR`, `MEMORIES_DIR`,
+`WORKSPACE_DIR`, `TOOLS_DIR`, `PERSONA_DIR`, `BLOG_DIR`,
+`BLOG_HTML_DIR`, `JOURNAL`) rather than scattering `memory/whatever.json`
+string literals — that's what makes the whole tree relocatable:
+`archive`/`new`/`reset` just move or copy `memory/` wholesale, and
+every archived identity ends up in the same compartmentalized shape
+memory/ started in.
+
 ## Keeping the template in sync
 
-`memory/rules.md` (the active identity's copy) and `base_memory/rules.md`
+`memory/core_identity/rules.md` (the active identity's copy) and `base_memory/core_identity/rules.md`
 (the seed template every new identity is bootstrapped from) will drift
 over time, and that's expected — but not every drift should be resolved
 the same way. Before editing either file, diff them and ask which kind
@@ -124,8 +161,8 @@ of change this is:
   not just the current one.
 - **Voice/tone/persona** (how Bob's own Publishing section describes his
   particular writing style — e.g. a specific voice a given identity has
-  developed) stays **only** in the active identity's `memory/rules.md`
-  and must **not** be pushed to `base_memory/rules.md`. A future
+  developed) stays **only** in the active identity's `memory/core_identity/rules.md`
+  and must **not** be pushed to `base_memory/core_identity/rules.md`. A future
   identity should start from a neutral template, not inherit a prior
   identity's personality.
 
@@ -147,10 +184,10 @@ does NOT apply it, only these exact blocks do:
   and moving an existing commitment's status forward with a note.
   Nothing can ever be deleted or have its other fields silently
   rewritten.
-- **`blog.html` / `blog_posts.json`**: adding one new post per wake
+- **`blog/html/index.html` / `blog/blog_posts.json`**: adding one new post per wake
   (title + body content only — the page shell and styling are fixed
   Python code, not model-generated). Posts are never replaced or
-  removed; blog.html is re-rendered from the full accumulated list
+  removed; index.html is re-rendered from the full accumulated list
   every time, most recent post first, each one linked to the journal
   entry that created it. This is deliberately different from the
   identity/commitments pattern — there's no "sacred" section to
@@ -158,7 +195,7 @@ does NOT apply it, only these exact blocks do:
   code-driven rendering) that replaces trusting the model to remember
   and re-include every past post correctly, which turned out to be
   fragile in practice.
-- **`core_memories.json`**: adding one rare, formative lesson, capped
+- **`semantic_memory.json`**: adding one rare, formative lesson, capped
   at `MAX_CORE_MEMORIES` total (20 by default) — not a growing log,
   a small curated set read into every wake's reflection so it can
   actually shape decisions. Once full, adding more requires a human
@@ -189,10 +226,10 @@ does NOT apply it, only these exact blocks do:
   mechanisms, because writing code and running it are different
   claims:
   - `tool-write` saves 1–3 plain files (`.py`/`.md`/`.txt`/`.json`,
-    no subfolders, 20,000-byte cap each) into `memory/tools/`. This
+    no subfolders, 20,000-byte cap each) into `memory/core_workspace/tools/`. This
     only writes bytes to disk — it never executes anything.
   - `tool-run` executes one already-written `.py` file from
-    `memory/tools/` with Python, capped at 2 runs per wake, a
+    `memory/core_workspace/tools/` with Python, capped at 2 runs per wake, a
     15-second timeout, and 4,000-character-truncated stdout/stderr.
     The result (exit code, stdout, stderr) is appended to
     `tool_runs.json`, which is what shows up as real evidence in the
@@ -212,7 +249,7 @@ does NOT apply it, only these exact blocks do:
     `subprocess.run()` inherits the *entire* parent environment by
     default unless `env=` is set explicitly, which is exactly the gap
     this closes.
-  - **`cwd` is `memory/tools/`, not the repo root.** A script that
+  - **`cwd` is `memory/core_workspace/tools/`, not the repo root.** A script that
     opens a relative path by default lands inside its own tools
     directory, not next to `identity.md`, `rules.md`, `.env`, or the
     git history.
@@ -267,11 +304,11 @@ with a manual `workflow_dispatch` run before relying on it.
 
 ## Memory compression: a two-tier system
 
-`core_memories.json` and `index.md` together are the compress/recall
+`semantic_memory.json` and `index.md` together are the compress/recall
 system that keeps a normal wake's context small and cheap, even as the
 journal grows indefinitely:
 
-- **Read every wake (small, bounded, cheap):** `core_memories.json`
+- **Read every wake (small, bounded, cheap):** `semantic_memory.json`
   (capped at `MAX_CORE_MEMORIES`, currently 20) and `index.md` (a
   hand/proposal-edited summary, not auto-generated). These are what
   `build_reflection_prompt` actually loads.
@@ -308,7 +345,7 @@ line inside each entry, `identity.md`'s "Last updated", and the
 `made_on`/status dates in `commitments.json` — uses the timezone set
 in `config.yaml` (`timezone: America/Los_Angeles` by default). Bob is
 also explicitly told the current local time at the start of each wake,
-so anything he writes into `blog.html` or elsewhere should reflect it
+so anything he writes into the blog or elsewhere should reflect it
 too, rather than guessing from file contents.
 
 This uses Python's `zoneinfo`, so daylight saving (PDT ↔ PST) is
@@ -341,14 +378,14 @@ This includes an actual, run test — not just an inspection of the code
 — confirming the mandatory blog-post fallback (`compose_fallback_blog_post`
 + `apply_blog_post`, wired through `apply_self_edits`) does its job:
 when journal output has no `blog-post` block, a fallback post is added,
-`blog.html` is re-rendered to include it, and a `WARNING: no blog-post
+the blog's `index.html` is re-rendered to include it, and a `WARNING: no blog-post
 block this wake` note comes back; when the model *does* include a real
 `blog-post` block (as `MockProvider`'s always does), the fallback path
 is never exercised. It also runs `MockProvider`'s actual reflection and
 journal prompts through the two-pass flow end to end, and separately
 verifies the `tool-run` sandbox: a tool file that prints its own `cwd`
 and dumps `os.environ` is written and executed for real, and the test
-asserts the working directory is `memory/tools/` (not the repo root)
+asserts the working directory is `memory/core_workspace/tools/` (not the repo root)
 and that a secret only present in the *outer* test process's
 environment never appears in the subprocess's output.
 
@@ -357,9 +394,9 @@ environment never appears in the subprocess's output.
 1. `pip install -r requirements.txt`
 2. Copy `.env.example` to `.env` and fill in the API key for whichever
    provider you're using (only one is required).
-3. Edit `memory/identity.md` and `memory/rules.md` to set the agent up.
+3. Edit `memory/core_identity/identity.md` and `memory/core_identity/rules.md` to set the agent up.
 4. Run one wake cycle manually: `python wake.py`
-5. Inspect `memory/journal/` for the new entry and `memory/commitments.json`
+5. Inspect `memory/journal/` for the new entry and `memory/core_memories/commitments.json`
    for any promise tracking.
 6. When ready, enable `.github/workflows/wake.yml` to run it on a schedule
 for free.
