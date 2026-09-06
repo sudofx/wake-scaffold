@@ -39,6 +39,30 @@ from providers.mock import MockProvider
 FIXED_NOW = datetime(2026, 8, 31, 9, 0, 0, tzinfo=ZoneInfo("America/Los_Angeles"))
 
 
+class ConfigValidationTests(unittest.TestCase):
+    def test_valid_config_is_accepted(self):
+        wake.validate_config({
+            "provider": "mock",
+            "timezone": "America/Los_Angeles",
+            "gemini_fallback_models": [],
+            "daily_review_hour": 21,
+            "index_consolidation_interval_wakes": 15,
+            "recent_blog_posts": 20,
+        })
+
+    def test_invalid_provider_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "unknown provider"):
+            wake.validate_config({"provider": "missing"})
+
+    def test_invalid_timezone_and_limits_are_rejected(self):
+        with self.assertRaisesRegex(ValueError, "invalid timezone"):
+            wake.validate_config({"timezone": "Not/AZone"})
+        with self.assertRaisesRegex(ValueError, "daily_review_hour"):
+            wake.validate_config({"daily_review_hour": 24})
+        with self.assertRaisesRegex(ValueError, "recent_blog_posts"):
+            wake.validate_config({"recent_blog_posts": 0})
+
+
 class WakeTestCase(unittest.TestCase):
     """Base case: points every module-level memory path at a throwaway
     temp directory seeded from base_memory/, and restores the real

@@ -38,7 +38,7 @@ import tempfile
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 try:
     import fcntl
@@ -102,6 +102,31 @@ def wake_lock():
 def load_config():
     with open(ROOT / "config.yaml") as f:
         return yaml.safe_load(f)
+
+
+def validate_config(config: dict) -> None:
+    """Reject malformed runtime settings before any wake state is changed."""
+    if not isinstance(config, dict):
+        raise ValueError("config.yaml must contain a mapping")
+    provider = config.get("provider", "gemini")
+    if provider not in {"gemini", "anthropic", "openai", "ollama", "mock"}:
+        raise ValueError(f"unknown provider in config.yaml: {provider!r}")
+    timezone_name = config.get("timezone", "America/Los_Angeles")
+    try:
+        ZoneInfo(timezone_name)
+    except (TypeError, ValueError, ZoneInfoNotFoundError):
+        raise ValueError(f"invalid timezone in config.yaml: {timezone_name!r}")
+    fallback_models = config.get("gemini_fallback_models", [])
+    if fallback_models is not None and not isinstance(fallback_models, list):
+        raise ValueError("gemini_fallback_models must be a list")
+    for key in ("daily_review_hour", "index_consolidation_interval_wakes", "recent_blog_posts"):
+        if key in config and (isinstance(config[key], bool) or not isinstance(config[key], int)):
+            raise ValueError(f"{key} must be an integer")
+    if not 0 <= config.get("daily_review_hour", 21) <= 23:
+        raise ValueError("daily_review_hour must be between 0 and 23")
+    for key in ("index_consolidation_interval_wakes", "recent_blog_posts"):
+        if config.get(key, 1) < 1:
+            raise ValueError(f"{key} must be at least 1")
 
 
 EPISTEMIC_STATE_FILE = MEMORIES_DIR / "epistemic_state.json"
@@ -2659,6 +2684,7 @@ def summarize_day(day_text: str) -> Path:
     except ValueError as e:
         raise ValueError("date must use YYYY-MM-DD") from e
     config = load_config()
+    validate_config(config)
     provider = get_provider(
         config.get("provider", "gemini"),
         config.get("model"),
@@ -2818,6 +2844,7 @@ def _run_wake():
     provider_name = "unknown"
     try:
         config = load_config()
+        validate_config(config)
         provider_name = config.get("provider", "gemini")
         model = config.get("model")
         # Gemini-only, ignored by every other provider (see get_provider):
