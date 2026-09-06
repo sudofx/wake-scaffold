@@ -13,6 +13,17 @@
       "source": "journal",
       "confidence_before": "60%",
       "confidence_after": "100%"
+    },
+    {
+      "id": "mr-2026-09-06-164209-002",
+      "date": "Sep 6th, 2026 04:42pm",
+      "observation": "inspect_env.py stdout in wake 3 showed working directory is /home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools, explaining why env_check.py failed to locate relative directories.",
+      "claim": "Workspace tools run with cwd inside the tools/ folder, so path traversal must anchor to Path(__file__).resolve() parents to access memory and repo files.",
+      "prediction": "workspace_diagnostic.py using Path(__file__).resolve().parents will locate parent directories and return non-empty directory listings.",
+      "test": "Executed inspect_env.py and created workspace_diagnostic.py using script-anchored path resolution.",
+      "outcome": "inspect_env.py execution confirmed tools run from tools/ folder. Execution of workspace_diagnostic.py was queued to verify parent listing.",
+      "revision": "Adopted script-relative path resolution as standard design constraint for all workspace inspection tools.",
+      "source": "tool-run"
     }
   ]
 }
