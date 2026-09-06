@@ -70,6 +70,16 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-06-145125.md"
+    },
+    {
+      "when": "Sep 6th, 2026 03:21pm",
+      "filename": "validate_workspace.py",
+      "args": [],
+      "exit_code": 0,
+      "stdout": "{\n  \"status\": \"DETAILED_REPORT\",\n  \"discovered_root\": \"/home/runner/work/wake-scaffold/wake-scaffold\",\n  \"directory_check\": {\n    \"memory\": true,\n    \"memory/core_workspace\": true,\n    \"memory/core_workspace/tools\": true,\n    \"memory/core_workspace/journal\": false\n  }\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-06-152156.md"
     }
   ]
 }
