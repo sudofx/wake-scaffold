@@ -26,6 +26,7 @@ the loop enough to automate that too.
 """
 
 import argparse
+import html
 import json
 import os
 import re
@@ -267,6 +268,17 @@ def htmlpreview_url(relative_html_path: str) -> str:
     branch = gh.get("branch", "master")
     raw = f"https://raw.githubusercontent.com/{owner}/{repo}/refs/heads/{branch}/{relative_html_path}"
     return f"https://htmlpreview.github.io/?{raw}"
+
+
+def github_url(relative_path: str = "") -> str:
+    """Build a link into the configured repository at its configured branch."""
+    cfg = load_config()
+    gh = cfg.get("github", {}) or {}
+    owner = gh.get("owner", "sudofx")
+    repo = gh.get("repo", "wake-scaffold")
+    branch = gh.get("branch", "master")
+    suffix = f"/{relative_path.lstrip('/')}" if relative_path else ""
+    return f"https://github.com/{owner}/{repo}/tree/{branch}{suffix}"
 
 
 MEMORY_LAYOUT = {
@@ -693,7 +705,9 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         "code builds the page shell and adds your post to it "
         "automatically:\n"
         "```blog-post\n"
-        '{"title": "...", "body_html": "<p>...</p><p>...</p>"}\n'
+        '{"title": "...", "body_html": "<p>...</p><p>...</p>", '
+        '"work_summary": "optional plain-language explanation of what changed and why", '
+        '"code_snippet": "optional short excerpt, max 800 characters"}\n'
         "```\n"
         "This ADDS a post — it never replaces or removes earlier ones, "
         "so don't try to regenerate the whole blog from scratch or "
@@ -718,6 +732,14 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         "worked,' say exactly that, simply and warmly — that's a real, "
         "complete post. The reader is following your actual wake-to-"
         "wake existence, not a status report.\n\n"
+        "When the wake changes code or a durable data structure, use "
+        "work_summary to explain in plain language what changed, why it "
+        "matters to the longer-term capability plan, and what evidence "
+        "will tell you whether the direction is working. Add code_snippet "
+        "only when a short excerpt genuinely helps a reader understand the "
+        "idea; never paste a whole file. Vary the emphasis across posts: "
+        "connect the immediate work to a longer-term question, constraint, "
+        "or strategy instead of repeating that a tool was created and run.\n\n"
         "**To create or update a capability project**, include a fenced block:\n"
         "```growth-plan-update\n"
         '{"add": [{"title": "...", "capability": "what repeatable ability this builds", '
@@ -1234,8 +1256,12 @@ BLOG_TEMPLATE = """<!DOCTYPE html>
         .ai-disclosure {{
             font-size: 0.95rem; color: var(--text-muted); font-style: italic;
         }}
+        .links {{ font-size: 0.9rem; margin-top: 0.75rem; }}
+        .links a {{ color: var(--accent-color); }}
         .post p {{ margin-bottom: 1rem; color: var(--text-main); }}
         .post p:last-child {{ margin-bottom: 0; }}
+        .work-summary {{ border-left: 3px solid var(--accent-color); padding-left: 0.9rem; }}
+        .code-snippet {{ overflow-x: auto; background: var(--accent-soft); padding: 0.9rem; margin: 0 0 1rem; }}
         .post ul {{ margin: 1rem 0 1rem 1.5rem; }}
         .post li {{ margin-bottom: 0.5rem; }}
         footer {{
@@ -1251,6 +1277,7 @@ BLOG_TEMPLATE = """<!DOCTYPE html>
             <h1>Learning Out Loud</h1>
             <p>An ongoing notebook tracking how I learn, adapt, and grow over time.</p>
             <p class="ai-disclosure">Written by Bob, an autonomous AI agent — not a human.</p>
+            <p class="links"><a href="{repository_url}">Repository</a> · <a href="{memory_url}">This memory</a></p>
         </header>
         <main>
 {posts_html}
@@ -1264,8 +1291,10 @@ BLOG_TEMPLATE = """<!DOCTYPE html>
 """
 
 POST_TEMPLATE = """            <article class="post">
-                <div class="post-date">{date_display}{journal_link}</div>
+                <div class="post-date">Wake {wake_number} · {date_display}{journal_link}</div>
                 <h2>{title}</h2>
+{work_summary}
+{code_snippet}
 {body_html}
             </article>"""
 
@@ -1284,7 +1313,7 @@ def load_blog_posts() -> dict:
         ) from e
 
 
-def render_blog_html(data: dict) -> str:
+def render_blog_html(data: dict, memory_path: str = "memory") -> str:
     """
     Builds the whole blog.html from the accumulated posts list. This is
     plain Python string formatting, NOT model-generated — that's the
@@ -1303,14 +1332,31 @@ def render_blog_html(data: dict) -> str:
             if p.get("journal_entry"):
                 journal_link = (f' — <a href="../../../journal/{p["journal_entry"]}">'
                                 f'{p["journal_entry"]}</a>')
+            summary = html.escape(str(p.get("work_summary", "")).strip()[:1000])
+            work_summary = (
+                f'                <p class="work-summary"><strong>What this wake changed:</strong> {summary}</p>'
+                if summary else ""
+            )
+            snippet = str(p.get("code_snippet", "")).strip()[:800]
+            code_snippet = (
+                f'                <pre class="code-snippet"><code>{html.escape(snippet)}</code></pre>'
+                if snippet else ""
+            )
             blocks.append(POST_TEMPLATE.format(
+                wake_number=p.get("wake_number", "?"),
                 date_display=p.get("date_display", ""),
                 journal_link=journal_link,
                 title=p.get("title", "(untitled)"),
+                work_summary=work_summary,
+                code_snippet=code_snippet,
                 body_html=p.get("body_html", ""),
             ))
         posts_html = "\n\n".join(blocks)
-    return BLOG_TEMPLATE.format(posts_html=posts_html)
+    return BLOG_TEMPLATE.format(
+        posts_html=posts_html,
+        repository_url=github_url(),
+        memory_url=github_url(memory_path),
+    )
 
 
 def apply_blog_post(raw_json: str, now: datetime, journal_fname: str) -> list[str]:
@@ -1331,6 +1377,8 @@ def apply_blog_post(raw_json: str, now: datetime, journal_fname: str) -> list[st
 
     title = str(data_in.get("title", "")).strip()[:MAX_POST_TITLE_LEN]
     body_html = str(data_in.get("body_html", "")).strip()[:MAX_POST_BODY_LEN]
+    work_summary = str(data_in.get("work_summary", "")).strip()[:1000]
+    code_snippet = str(data_in.get("code_snippet", "")).strip()[:800]
 
     if not title:
         return ["REJECTED blog-post: missing or empty 'title'. No post added."]
@@ -1348,10 +1396,13 @@ def apply_blog_post(raw_json: str, now: datetime, journal_fname: str) -> list[st
     stamp = filename_stamp(now)
     post = {
         "id": f"post-{stamp}",
+        "wake_number": count_successful_wakes() + 1,
         "date_sortable": stamp,
         "date_display": format_display_time(now),
         "title": title,
         "body_html": body_html,
+        "work_summary": work_summary,
+        "code_snippet": code_snippet,
         "journal_entry": journal_fname,
     }
     data.setdefault("posts", []).append(post)
@@ -1967,6 +2018,9 @@ TOOL_RUNS_FILE = WORKSPACE_DIR / "tool_runs.json"
 # inherits the *entire* parent environment by default if you let it, so
 # this has to be built explicitly rather than filtered after the fact.
 SAFE_TOOL_ENV_ALLOWLIST = {"PATH", "LANG", "LC_ALL", "LC_CTYPE", "TMPDIR", "TEMP", "TMP"}
+if sys.platform == "darwin":
+    # macOS injects this locale preference into Python child processes.
+    SAFE_TOOL_ENV_ALLOWLIST.add("__CF_USER_TEXT_ENCODING")
 if os.name == "nt":
     # A bare Python interpreter on Windows generally won't start at all
     # without these — they're not a broader trust decision, just what's

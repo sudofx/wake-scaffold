@@ -156,6 +156,30 @@ class BlogFallbackTests(WakeTestCase):
         self.assertEqual(len(posts), 1, "should be exactly the real post, no fallback added on top")
         self.assertEqual(posts[0]["title"], "A real post")
 
+    def test_blog_post_records_wake_context_and_escapes_code_snippet(self):
+        model_output = (
+            "```blog-post\n"
+            '{"title": "Explaining the work", '
+            '"body_html": "<p>Plain-language result.</p>", '
+            '"work_summary": "Checked the memory layout", '
+            '"code_snippet": "print(<unsafe>)"}\n'
+            "```\n"
+        )
+        wake.apply_self_edits(model_output, {}, FIXED_NOW, "test-journal.md")
+
+        post = self.blog_posts()[0]
+        self.assertEqual(post["wake_number"], 1)
+        self.assertEqual(post["work_summary"], "Checked the memory layout")
+        self.assertEqual(post["code_snippet"], "print(<unsafe>)")
+
+        blog_html = (self.memory / "core_public_facing_persona" / "blog" / "html" / "index.html").read_text()
+        self.assertIn("Wake 1", blog_html)
+        self.assertIn("https://github.com/sudofx/wake-scaffold/tree/master", blog_html)
+        self.assertIn("https://github.com/sudofx/wake-scaffold/tree/master/memory", blog_html)
+        self.assertIn("What this wake changed:</strong> Checked the memory layout", blog_html)
+        self.assertIn("print(&lt;unsafe&gt;)", blog_html)
+        self.assertNotIn("print(<unsafe>)", blog_html)
+
     def test_full_mock_provider_round_trip_never_hits_fallback(self):
         """Runs the actual two-pass prompts through MockProvider (never a
         live API) end to end, confirming the normal happy path — where
