@@ -360,7 +360,7 @@ MEMORY_LAYOUT = {
     "memories": "core_memories",
     "workspace": "core_workspace",
     "synthesis": "core_synthesis",
-    "persona": "core_public_facing_persona",
+    "persona": PERSONA_DIR.relative_to(MEMORY).as_posix(),
     "journal": "journal",
 }
 
@@ -475,6 +475,22 @@ def validate_active_memory() -> list[str]:
     for path in (JOURNAL, TOOLS_DIR, SYNTHESIS_DIR):
         if not path.is_dir():
             findings.append(f"missing directory: {path.relative_to(MEMORY)}")
+
+    if CORE_MANIFEST_FILE.is_file():
+        try:
+            manifest = json.loads(CORE_MANIFEST_FILE.read_text())
+        except (OSError, json.JSONDecodeError) as error:
+            findings.append(f"invalid JSON: core_manifest.json ({error})")
+        else:
+            layout = manifest.get("layout") if isinstance(manifest, dict) else None
+            if not isinstance(layout, dict):
+                findings.append("invalid shape: core_manifest.json must contain a 'layout' mapping")
+            else:
+                for key, expected in MEMORY_LAYOUT.items():
+                    if layout.get(key) != expected:
+                        findings.append(
+                            f"stale manifest layout: {key!r} should be {expected!r}"
+                        )
 
     json_shapes = {
         MEMORIES_DIR / "commitments.json": "commitments",

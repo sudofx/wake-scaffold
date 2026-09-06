@@ -5,6 +5,7 @@
     "identity": "core_identity",
     "memories": "core_memories",
     "workspace": "core_workspace",
+    "synthesis": "core_synthesis",
     "persona": "core_public_facing_persona",
     "journal": "journal"
   },

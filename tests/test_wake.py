@@ -121,6 +121,14 @@ class MemoryValidationTests(WakeTestCase):
         self.assertEqual(commitments.read_text(), "not json")
         self.assertNotEqual(original, commitments.read_text())
 
+    def test_validation_reports_stale_manifest_layout(self):
+        manifest = self.memory / "core_manifest.json"
+        manifest.write_text(json.dumps({"layout": {"persona": "core_public_facing_persona"}}))
+
+        findings = wake.validate_active_memory()
+
+        self.assertTrue(any("stale manifest layout" in finding for finding in findings))
+
 
 class SynthesisStorageTests(WakeTestCase):
     def test_atomic_write_replaces_content_without_temp_files(self):
