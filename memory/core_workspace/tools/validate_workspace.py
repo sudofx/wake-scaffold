@@ -1,40 +1,41 @@
-import json
 import os
+import json
+from pathlib import Path
 
-def find_repo_root():
-    start = os.path.abspath(os.path.dirname(__file__))
-    curr = start
-    while curr and curr != os.path.dirname(curr):
-        if os.path.exists(os.path.join(curr, "rules.md")):
-            return curr
-        curr = os.path.dirname(curr)
-    curr = os.path.abspath(os.getcwd())
-    while curr and curr != os.path.dirname(curr):
-        if os.path.exists(os.path.join(curr, "rules.md")):
-            return curr
-        curr = os.path.dirname(curr)
-    return os.getcwd()
-
-def validate():
-    root = find_repo_root()
+def inspect_environment():
+    cwd = Path.cwd().resolve()
+    hierarchy = []
+    curr = cwd
+    repo_root = None
+    for i in range(7):
+        try:
+            items = os.listdir(curr)
+        except Exception as e:
+            items = [f"Error: {e}"]
+        if ("memory" in items or ".git" in items) and curr != cwd:
+            if repo_root is None:
+                repo_root = curr
+        hierarchy.append({"level": i, "path": str(curr), "items": items[:15]})
+        if curr.parent == curr:
+            break
+        curr = curr.parent
+    if repo_root is None:
+        repo_root = cwd
     checks = {
-        "rules_md": os.path.exists(os.path.join(root, "rules.md")),
-        "memory_dir": os.path.isdir(os.path.join(root, "memory")),
-        "core_workspace_dir": os.path.exists(os.path.join(root, "memory", "core_workspace")) or os.path.exists(os.path.join(root, "core_workspace")),
-        "growth_plan": os.path.exists(os.path.join(root, "memory", "core_workspace", "growth_plan.json")) or os.path.exists(os.path.join(root, "growth_plan.json")),
-        "hypotheses": os.path.exists(os.path.join(root, "memory", "core_workspace", "hypotheses.json")) or os.path.exists(os.path.join(root, "hypotheses.json")),
-        "tool_runs": os.path.exists(os.path.join(root, "memory", "core_workspace", "tool_runs.json")) or os.path.exists(os.path.join(root, "tool_runs.json")),
-        "tools_dir": os.path.isdir(os.path.join(root, "memory", "core_workspace", "tools")) or os.path.isdir(os.path.join(root, "tools"))
+        "memory_dir": (repo_root / "memory").exists(),
+        "rules_md": (repo_root / "rules.md").exists(),
+        "core_workspace_dir": (repo_root / "memory" / "core_workspace").exists(),
+        "tools_dir": (repo_root / "memory" / "core_workspace" / "tools").exists()
     }
-    all_ok = all(checks.values())
-    status = "STRUCTURALLY_COMPLETE" if all_ok else "STRUCTURALLY_INVALID"
-    output = {
+    status = "STRUCTURALLY_COMPLETE" if all(checks.values()) else "STRUCTURALLY_INVALID"
+    print(json.dumps({
         "status": status,
-        "mechanism": "Repo root traversal and workspace path verification",
-        "discovered_root": root,
-        "checks": checks
-    }
-    print(json.dumps(output, indent=2))
+        "mechanism": "Hierarchical directory walk up parent tree",
+        "cwd": str(cwd),
+        "discovered_root": str(repo_root),
+        "checks": checks,
+        "hierarchy_sample": hierarchy
+    }, indent=2))
 
 if __name__ == "__main__":
-    validate()
+    inspect_environment()

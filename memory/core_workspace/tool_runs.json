@@ -40,6 +40,16 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-06-122926.md"
+    },
+    {
+      "when": "Sep 6th, 2026 01:39pm",
+      "filename": "validate_workspace.py",
+      "args": [],
+      "exit_code": 0,
+      "stdout": "{\n  \"status\": \"STRUCTURALLY_INVALID\",\n  \"mechanism\": \"Hierarchical directory walk up parent tree\",\n  \"cwd\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools\",\n  \"discovered_root\": \"/home/runner/work/wake-scaffold/wake-scaffold\",\n  \"checks\": {\n    \"memory_dir\": true,\n    \"rules_md\": false,\n    \"core_workspace_dir\": true,\n    \"tools_dir\": true\n  },\n  \"hierarchy_sample\": [\n    {\n      \"level\": 0,\n      \"path\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools\",\n      \"items\": [\n        \"validate_workspace.py\",\n        \".gitkeep\"\n      ]\n    },\n    {\n      \"level\": 1,\n      \"path\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace\",\n      \"items\": [\n        \"tools\",\n        \"tool_runs.json\"\n      ]\n    },\n    {\n      \"level\": 2,\n      \"path\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory\",\n      \"items\": [\n        \"core_memories\",\n        \"core_manifest.json\",\n        \"core_synthesis\",\n        \"core_persona\",\n        \"core_identity\",\n        \"journal\",\n        \"core_workspace\"\n      ]\n    },\n    {\n      \"level\": 3,\n      \"path\": \"/home/runner/work/wake-scaffold/wake-scaffold\",\n      \"items\": [\n        \".git\",\n        \"providers\",\n        \".env.example\",\n        \"wake.py\",\n        \"requirements.txt\",\n        \"tests\",\n        \"config.yaml\",\n        \"IDENTITIES.md\",\n        \"base_memory\",\n        \"memory\",\n        \".gitignore\",\n        \".wake.lock\",\n        \"README.md\",\n        \".github\",\n        \"LICENSE\"\n      ]\n    },\n    {\n      \"level\": 4,\n      \"path\": \"/home/runner/work/wake-scaffold\",\n      \"items\": [\n        \"wake-scaffold\"\n      ]\n    },\n    {\n      \"level\": 5,\n      \"path\": \"/home/runner/work\",\n      \"items\": [\n        \"_temp\",\n        \"wake-scaffold\",\n        \"_actions\",\n        \"_PipelineMapping\"\n      ]\n    },\n    {\n      \"level\": 6,\n      \"path\": \"/home/runner\",\n      \"items\": [\n        \"actions-runner\",\n        \".cache\",\n        \".bash_logout\",\n        \".nvm\",\n        \".dotnet\",\n        \".composer\",\n        \".docker\",\n        \".rustup\",\n        \".bash_profile\",\n        \".cargo\",\n        \".bashrc\",\n        \".config\",\n        \"work\",\n        \".ghcup\",\n        \".profile\"\n      ]\n    }\n  ]\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-06-133914.md"
     }
   ]
 }

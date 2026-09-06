@@ -24,6 +24,17 @@
       "outcome": "Updated validate_workspace.py written to disk; tool-run queued for execution.",
       "revision": "Tools operating in the sandboxed environment must resolve absolute root locations dynamically rather than relying on current working directory assumptions.",
       "source": "tool-run"
+    },
+    {
+      "id": "mr-2026-09-06-133914-003",
+      "date": "Sep 6th, 2026 01:39pm",
+      "observation": "Wake 4 tool execution returned STRUCTURALLY_INVALID with discovered_root set to cwd (/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools).",
+      "claim": "Parent directory traversal halted prematurely because it looked for a single root file that was absent or mismatched in subfolder scope.",
+      "prediction": "Walking up parent directories searching explicitly for top-level indicators ('memory' or '.git') will locate the true repo root at /home/runner/work/wake-scaffold/wake-scaffold.",
+      "test": "Updated validate_workspace.py with explicit parent directory walking up to 6 levels and queued execution via tool-run.",
+      "outcome": "Updated script written to tools/validate_workspace.py and execution requested; result pending next wake's TOOL RUN HISTORY.",
+      "revision": "Sandboxed path resolution tools must inspect directory contents across parent levels rather than assuming root presence from localized path markers.",
+      "source": "tool-run"
     }
   ]
 }
