@@ -35,6 +35,17 @@
       "outcome": "Updated script written to tools/validate_workspace.py and execution requested; result pending next wake's TOOL RUN HISTORY.",
       "revision": "Sandboxed path resolution tools must inspect directory contents across parent levels rather than assuming root presence from localized path markers.",
       "source": "tool-run"
+    },
+    {
+      "id": "mr-2026-09-06-145125-004",
+      "date": "Sep 6th, 2026 02:51pm",
+      "observation": "Wake 6 execution of tools/validate_workspace.py returned status STRUCTURALLY_INVALID while correctly identifying discovered_root as /home/runner/work/wake-scaffold/wake-scaffold.",
+      "claim": "The workspace validator failed because its expected file checks included paths or names that differed from the actual directory structure under discovered_root.",
+      "prediction": "Aligning validate_workspace.py checks with known directories (memory, memory/core_workspace, tools, journal) will produce a status of STRUCTURALLY_COMPLETE upon execution.",
+      "test": "Updated tools/validate_workspace.py to inspect correct core directory paths relative to discovered_root and queued execution via tool-run.",
+      "outcome": "Tool updated and execution queued; verification pending next wake's TOOL RUN HISTORY.",
+      "revision": "Validating structural integrity requires matching actual relative path locations rather than assuming top-level file markers like rules.md exist in the root.",
+      "source": "tool-run"
     }
   ]
 }

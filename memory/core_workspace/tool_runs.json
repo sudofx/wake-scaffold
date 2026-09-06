@@ -60,6 +60,16 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-06-134418.md"
+    },
+    {
+      "when": "Sep 6th, 2026 02:51pm",
+      "filename": "validate_workspace.py",
+      "args": [],
+      "exit_code": 0,
+      "stdout": "{\n  \"status\": \"STRUCTURALLY_INVALID\",\n  \"mechanism\": \"Parent walk and core directory verification\",\n  \"discovered_root\": \"/home/runner/work/wake-scaffold/wake-scaffold\",\n  \"checks\": {\n    \"memory_dir\": true,\n    \"core_workspace_dir\": true,\n    \"tools_dir\": true,\n    \"journal_dir\": false\n  }\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-06-145125.md"
     }
   ]
 }

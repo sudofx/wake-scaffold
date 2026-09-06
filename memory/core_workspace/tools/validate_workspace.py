@@ -1,41 +1,33 @@
-import os
 import json
+import os
 from pathlib import Path
 
-def inspect_environment():
-    cwd = Path.cwd().resolve()
-    hierarchy = []
-    curr = cwd
-    repo_root = None
-    for i in range(7):
-        try:
-            items = os.listdir(curr)
-        except Exception as e:
-            items = [f"Error: {e}"]
-        if ("memory" in items or ".git" in items) and curr != cwd:
-            if repo_root is None:
-                repo_root = curr
-        hierarchy.append({"level": i, "path": str(curr), "items": items[:15]})
-        if curr.parent == curr:
+def validate():
+    curr = Path(__file__).resolve().parent
+    discovered_root = None
+    for p in [curr] + list(curr.parents):
+        if (p / "memory").is_dir():
+            discovered_root = p
             break
-        curr = curr.parent
-    if repo_root is None:
-        repo_root = cwd
+    if not discovered_root:
+        return {
+            "status": "STRUCTURALLY_INVALID",
+            "mechanism": "Repo root containing memory folder not found",
+            "cwd": str(Path.cwd())
+        }
     checks = {
-        "memory_dir": (repo_root / "memory").exists(),
-        "rules_md": (repo_root / "rules.md").exists(),
-        "core_workspace_dir": (repo_root / "memory" / "core_workspace").exists(),
-        "tools_dir": (repo_root / "memory" / "core_workspace" / "tools").exists()
+        "memory_dir": (discovered_root / "memory").is_dir(),
+        "core_workspace_dir": (discovered_root / "memory" / "core_workspace").is_dir(),
+        "tools_dir": (discovered_root / "memory" / "core_workspace" / "tools").is_dir(),
+        "journal_dir": (discovered_root / "memory" / "core_workspace" / "journal").is_dir()
     }
     status = "STRUCTURALLY_COMPLETE" if all(checks.values()) else "STRUCTURALLY_INVALID"
-    print(json.dumps({
+    return {
         "status": status,
-        "mechanism": "Hierarchical directory walk up parent tree",
-        "cwd": str(cwd),
-        "discovered_root": str(repo_root),
-        "checks": checks,
-        "hierarchy_sample": hierarchy
-    }, indent=2))
+        "mechanism": "Parent walk and core directory verification",
+        "discovered_root": str(discovered_root),
+        "checks": checks
+    }
 
-if __name__ == "__main__":
-    inspect_environment()
+if __name__ == '__main__':
+    print(json.dumps(validate(), indent=2))
