@@ -23,9 +23,9 @@ and continued operation; it's a means, not the goal.
 
 Every wake, the agent:
 1. Reads a small, curated set of files (not its entire history)
-2. **Reflects** — a dedicated synthesis pass, before doing or writing
-   anything, on what's changed, what's been learned, and what patterns
-   are emerging across sessions
+2. **Reflects before acting** — the single wake response first synthesizes
+  what's changed, what's been learned, and what patterns are emerging,
+  then acts on that reflection
 3. Does its work for this wake, informed by that reflection
 4. Writes exactly one immutable journal entry, which includes the
    reflection as a visible, labeled section — not hidden reasoning
@@ -105,7 +105,9 @@ memory/
                                an explicit `summarize-day` command and one
                                model call; never generated during a normal
                                wake.
-  core_public_facing_persona/
+  core_persona/                - canonical public-facing output directory
+    (older identities may still use `core_public_facing_persona/` until
+    `python wake.py migrate-persona` is run)
     blog/
       blog_posts.json           - the actual append-only source of truth
                for the blog. Each post is added once and
@@ -157,8 +159,9 @@ config.yaml              - provider/model choice, self-edit and pull
 
 Every function in `wake.py` reads and writes through a small set of
 module-level path constants (`IDENTITY_DIR`, `MEMORIES_DIR`,
-`WORKSPACE_DIR`, `TOOLS_DIR`, `PERSONA_DIR`, `BLOG_DIR`,
-`BLOG_HTML_DIR`, `JOURNAL`) rather than scattering `memory/whatever.json`
+`WORKSPACE_DIR`, `TOOLS_DIR`, `SYNTHESIS_DIR`, `PERSONA_DIR`,
+`BLOG_DIR`, `BLOG_HTML_DIR`, `JOURNAL`) rather than scattering
+`memory/whatever.json`
 string literals — that's what makes the whole tree relocatable:
 `archive`/`new`/`reset` just move or copy `memory/` wholesale, and
 every archived identity ends up in the same compartmentalized shape
@@ -204,7 +207,8 @@ does NOT apply it, only these exact blocks do:
   Nothing can ever be deleted or have its other fields silently
   rewritten.
 - **`blog/html/index.html` / `blog/blog_posts.json`**: adding one new post per wake
-  (title + body content only — the page shell and styling are fixed
+  (title, body content, and optional plain-language work summary/code excerpt —
+  the page shell and styling are fixed
   Python code, not model-generated). Posts are never replaced or
   removed; index.html is re-rendered from the full accumulated list
   every time, most recent post first, each one linked to the journal
@@ -323,7 +327,7 @@ with a manual `workflow_dispatch` run before relying on it.
 
 ## Memory compression: a two-tier system
 
-`semantic_memory.json` and `index.md` together are the compress/recall
+`semantic_memory.json`, `index.md`, and `core_synthesis/` together are the compress/recall
 system that keeps a normal wake's context small and cheap, even as the
 journal grows indefinitely:
 
@@ -338,6 +342,11 @@ journal grows indefinitely:
   prompt. Journal links already embedded in blog posts and core
   memories are how a reader (human or Bob) finds the detail when it's
   actually needed.
+- **Synthesis layer:** `core_synthesis/ideas/YYYY/MM/DD/` preserves each
+  wake's reflection, while `core_synthesis/daily/YYYY/MM/DD.md` provides a
+  mechanical same-day index. A semantic `*-summary.md` is created only by
+  the explicit `summarize-day` command, so normal wakes do not spend an
+  extra model call on compression.
 
 Because `index.md` is one of the few files Bob can only change via the
 human-reviewed proposal mechanism (the same protection as `rules.md`),
