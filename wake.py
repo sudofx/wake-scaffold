@@ -1486,6 +1486,12 @@ def apply_blog_post(raw_json: str, now: datetime, journal_fname: str) -> list[st
 MAX_GROWTH_PROJECTS = 20
 GROWTH_STATUSES = {"proposed", "active", "blocked", "complete"}
 GROWTH_OPEN_STATUSES = {"proposed", "active", "blocked"}
+GROWTH_STATUS_TRANSITIONS = {
+    "proposed": {"active", "blocked"},
+    "active": {"blocked", "complete"},
+    "blocked": {"active", "complete"},
+    "complete": set(),
+}
 DUPLICATE_SIMILARITY_THRESHOLD = 0.4
 NARROW_DOMAIN_WINDOW = 5
 NARROW_DOMAIN_MIN_SHARED = 4
@@ -1661,6 +1667,13 @@ def apply_growth_plan_update(raw_json: str, now: datetime) -> list[str]:
         project = next((p for p in projects if p.get("id") == project_id), None)
         if not project:
             notes.append(f"SKIPPED growth status change: id {project_id!r} not found.")
+            continue
+        current_status = project.get("status")
+        if new_status not in GROWTH_STATUS_TRANSITIONS.get(current_status, set()):
+            notes.append(
+                f"SKIPPED growth status change for {project_id!r}: "
+                f"{current_status!r} -> {new_status!r} is not a forward transition."
+            )
             continue
         project["status"] = new_status
         project.setdefault("history", []).append({

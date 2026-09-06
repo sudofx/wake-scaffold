@@ -386,6 +386,30 @@ class GrowthPlanDuplicateTests(WakeTestCase):
         projects = json.loads((self.memory / "core_memories" / "growth_plan.json").read_text())["projects"]
         self.assertEqual(len(projects), 2)
 
+    def test_growth_status_transitions_are_forward_only(self):
+        add = json.dumps({"add": [{
+            "title": "Forward-only lifecycle test",
+            "capability": "Validate monotonic project status history.",
+            "next_step": "Advance through each allowed state.",
+        }]})
+        wake.apply_growth_plan_update(add, FIXED_NOW)
+        project_path = self.memory / "core_memories" / "growth_plan.json"
+        project_id = json.loads(project_path.read_text())["projects"][0]["id"]
+
+        def change(status):
+            return wake.apply_growth_plan_update(json.dumps({"status_change": [{
+                "id": project_id, "new_status": status, "evidence": "observed test result"
+            }]}), FIXED_NOW)
+
+        self.assertTrue(any("not a forward transition" in note for note in change("complete")))
+        self.assertTrue(any(note.startswith("UPDATED capability project") for note in change("active")))
+        self.assertTrue(any("not a forward transition" in note for note in change("proposed")))
+        self.assertTrue(any(note.startswith("UPDATED capability project") for note in change("complete")))
+        self.assertTrue(any("not a forward transition" in note for note in change("blocked")))
+
+        project = json.loads(project_path.read_text())["projects"][0]
+        self.assertEqual(project["status"], "complete")
+
     def test_duplicate_check_ignores_closed_projects(self):
         first = json.dumps({"add": [{
             "title": "Memory Integrity Validator",
@@ -395,7 +419,8 @@ class GrowthPlanDuplicateTests(WakeTestCase):
         wake.apply_growth_plan_update(first, FIXED_NOW)
         existing_id = json.loads((self.memory / "core_memories" / "growth_plan.json").read_text())["projects"][0]["id"]
         wake.apply_growth_plan_update(json.dumps({"status_change": [
-            {"id": existing_id, "new_status": "complete", "evidence": "Ran it, works."}
+            {"id": existing_id, "new_status": "active", "evidence": "Started the validation."},
+            {"id": existing_id, "new_status": "complete", "evidence": "Ran it, works."},
         ]}), FIXED_NOW)
 
         second = json.dumps({"add": [{
