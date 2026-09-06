@@ -42,6 +42,8 @@ jobs:
             ollama|mock) : ;;
             *) echo "Unknown provider: $provider" >&2; exit 1 ;;
           esac
+      - name: Validate active memory
+        run: python wake.py validate
       - name: Run wake cycle
         env:
           GITHUB_TOKEN: ${{ github.token }}
