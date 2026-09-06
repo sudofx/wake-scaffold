@@ -458,6 +458,21 @@
           "conclusion": "The epistemic_chain_validator tool reliably audits hypothesis datasets and evaluates evidence chain traceability."
         }
       ]
+    },
+    {
+      "id": "h-2026-09-05-232934-0",
+      "created": "Sep 5th, 2026 11:29pm",
+      "prediction": "Executing hypothesis_evidence_linker.py against hypotheses.json will classify over 80% of resolved hypotheses as UNLINKED_NARRATIVE due to historical reliance on prose descriptions over execution references.",
+      "test_method": "Execute hypothesis_evidence_linker.py with args ['../hypotheses.json'] via tool-run and check stdout in TOOL RUN HISTORY next wake.",
+      "status": "untested",
+      "history": [
+        {
+          "date": "Sep 5th, 2026 11:29pm",
+          "status": "untested",
+          "evidence": "",
+          "conclusion": "created via self-edit"
+        }
+      ]
     }
   ]
 }

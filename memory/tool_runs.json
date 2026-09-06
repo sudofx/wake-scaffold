@@ -1,16 +1,6 @@
 {
   "runs": [
     {
-      "when": "Sep 4th, 2026 09:35am",
-      "filename": "validate_html.py",
-      "args": [],
-      "exit_code": 0,
-      "stdout": "{\n  \"file\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/blog.html\",\n  \"valid\": true,\n  \"errors\": [],\n  \"unclosed_tags\": []\n}\n",
-      "stderr": "",
-      "timed_out": false,
-      "journal_entry": "2026-09-04-093536.md"
-    },
-    {
       "when": "Sep 4th, 2026 12:07pm",
       "filename": "validate_html.py",
       "args": [
@@ -343,6 +333,18 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-05-161615.md"
+    },
+    {
+      "when": "Sep 5th, 2026 11:29pm",
+      "filename": "hypothesis_evidence_linker.py",
+      "args": [
+        "../hypotheses.json"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"total_hypotheses\": 26,\n  \"categories\": {\n    \"EMPIRICALLY_LINKED\": 20,\n    \"UNLINKED_NARRATIVE\": 3,\n    \"UNTESTED\": 3\n  },\n  \"details\": [\n    {\n      \"id\": \"h-2026-09-01-120756-0\",\n      \"status\": \"confirmed\",\n      \"classification\": \"EMPIRICALLY_LINKED\",\n      \"evidence_length\": 0\n    },\n    {\n      \"id\": \"h-2026-09-03-002322-0\",\n      \"status\": \"confirmed\",\n      \"classification\": \"UNLINKED_NARRATIVE\",\n      \"evidence_length\": 0\n    },\n    {\n      \"id\": \"h-2026-09-03-130929-0\",\n      \"status\": \"confirmed\",\n      \"classification\": \"UNLINKED_NARRATIVE\",\n      \"evidence_length\": 0\n    },\n    {\n      \"id\": \"h-2026-09-03-154817-0\",\n      \"status\": \"confirmed\",\n      \"classification\": \"EMPIRICALLY_LINKED\",\n      \"evidence_length\": 0\n    },\n    {\n      \"id\": \"h-2026-09-03-182134-0\",\n      \"status\": \"confirmed\",\n      \"classification\": \"EMPIRICALLY_LINKED\",\n      \"evidence_length\": 0\n    },\n    {\n      \"id\": \"h-2026-09-04-003450-0\",\n      \"status\": \"confirmed\",\n      \"classification\": \"UNLINKED_NARRATIVE\",\n      \"evidence_length\": 0\n    },\n    {\n      \"id\": \"h-2026-09-04-044333-0\",\n      \"status\": \"confirmed\",\n      \"classification\": \"EMPIRICALLY_LINKED\",\n      \"evidence_length\": 0\n    },\n    {\n      \"id\": \"h-2026-09-04-120736-0\",\n      \"status\": \"refuted\",\n      \"classification\": \"EMPIRICALLY_LINKED\",\n      \"evidence_length\": 0\n    },\n    {\n      \"id\": \"h-2026-09-04-134755-0\",\n      \"status\": \"confirmed\",\n      \"classification\": \"EMPIRICALLY_LINKED\",\n      \"evidence_length\": 0\n    },\n    {\n      \"id\": \"h-2026-09-04-144819-0\",\n      \"status\": \"confirmed\",\n      \"classification\": \"EMPIRICALLY_LINKED\",\n      \"evidence_length\": 0\n    },\n    {\n      \"id\": \"h-2026-09-04-172222-0\",\n      \"status\": \"confirmed\",\n      \"classification\": \"EMPIRICALLY_LINKED\",\n      \"evidence_length\": 0\n    },\n    {\n      \"id\": \"h-2026-09-04-215534-0\",\n      \"status\": \"untested\",\n      \"classification\": \"UNTESTED\",\n      \"evidence_length\": 0\n    },\n    {\n      \"id\": \"h-2026-09-05-011458-0\",\n      \"status\": \"confirmed\",\n      \"classification\": \"EMPIRICALLY_LINKED\",\n      \"evidence_length\": 0\n    },\n    {\n      \"id\": \"h-2026-09-05-012545-0\",\n      \"status\": \"confirmed\",\n      \"classification\": \"EMPIRICALLY_LINKED\",\n      \"evidence_length\": 0\n    },\n    {\n      \"id\": \"h-2026-09-05-032553-0\",\n      \"status\": \"confirmed\",\n      \"classification\": \"EMPIRICALLY_LINKED\",\n      \"evidence_length\": 0\n    },\n    {\n      \"id\": \"h-2026-09-05-060207-0\",\n      \"status\": \"refuted\",\n      \"classification\": \"EMPIRICALLY_LINKED\",\n      \"evidence_length\": 0\n    },\n    {\n      \"id\": \"h-2026-09-05-091449-0\",\n      \"status\": \"refuted\",\n      \"classification\": \"EMPIRICALLY_LINKED\",\n      \"evidence_length\": 0\n    },\n    {\n      \"id\": \"h-2026-09-05-111927-0\",\n      \"status\": \"untested\",\n      \"classification\": \"UNTESTED\",\n      \"evidence_length\": 0\n    },\n    {\n      \"id\": \"h-2026-09-05-121542-0\",\n      \"status\": \"refuted\",\n      \"classification\": \"EMPIRICALLY_LINKED\",\n      \"evidence_length\": 0\n    },\n    {\n      \"id\": \"h-2026-09-05-123018-0\",\n      \"status\": \"confirmed\",\n      \"classification\": \"EMPIRICALLY_LINKED\",\n      \"evidence_length\": 0\n    },\n    {\n      \"id\": \"h-2026-09-05-124328-0\",\n      \"status\": \"confirmed\",\n      \"classification\": \"EMPIRICALLY_LINKED\",\n      \"evidence_length\": 0\n    },\n    {\n      \"id\": \"h-2026-09-05-132452-0\",\n      \"status\": \"confirmed\",\n      \"classification\": \"EMPIRICALLY_LINKED\",\n      \"evidence_length\": 0\n    },\n    {\n      \"id\": \"h-2026-09-05-134425-0\",\n      \"status\": \"refuted\",\n      \"classification\": \"EMPIRICALLY_LINKED\",\n      \"evidence_length\": 0\n    },\n    {\n      \"id\": \"h-2026-09-05-134931-0\",\n      \"status\": \"confirmed\",\n      \"classification\": \"EMPIRICALLY_LINKED\",\n      \"evidence_length\": 0\n    },\n    {\n      \"id\": \"h-2026-09-05-161615-0\",\n      \"status\": \"confirmed\",\n      \"classification\": \"EMPIRICALLY_LINKED\",\n      \"evidence_length\": 0\n    },\n    {\n      \"id\": \"h-2026-09-05-232934-0\",\n      \"status\": \"untested\",\n      \"classificat",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-05-232934.md"
     }
   ]
 }
