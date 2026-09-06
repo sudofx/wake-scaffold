@@ -400,8 +400,8 @@ def identity_archive_path(label: str) -> Path:
     return ROOT / f"memory_{cleaned}"
 
 
-def migrate_persona_layout() -> Path:
-    """Rename the public persona directory to its shorter canonical name."""
+def migrate_persona_layout(dry_run: bool = False) -> Path:
+    """Rename the public persona directory, or preview that rename."""
     legacy = MEMORY / LEGACY_PERSONA_NAME
     canonical = MEMORY / PERSONA_NAME
     if canonical.exists() and legacy.exists():
@@ -415,6 +415,8 @@ def migrate_persona_layout() -> Path:
 
     old_url = htmlpreview_url(f"memory/{LEGACY_PERSONA_NAME}/blog/html/index.html")
     new_url = htmlpreview_url(f"memory/{PERSONA_NAME}/blog/html/index.html")
+    if dry_run:
+        return canonical
     shutil.move(str(legacy), str(canonical))
     for path in (MEMORIES_DIR / "index.md", IDENTITY_DIR / "identity.md"):
         if path.exists():
@@ -3019,9 +3021,13 @@ def command_line_main() -> int:
     reset.add_argument("--name", required=True)
     reset.add_argument("--purpose", required=True)
 
-    commands.add_parser(
+    migrate = commands.add_parser(
         "migrate-persona",
         help="Rename core_public_facing_persona/ to core_persona/ in the active memory.",
+    )
+    migrate.add_argument(
+        "--dry-run", action="store_true",
+        help="Show the target path without changing files.",
     )
     commands.add_parser(
         "validate",
@@ -3053,8 +3059,9 @@ def command_line_main() -> int:
             print(f"Archived active identity: {archived}")
             print(f"Created new identity: {destination}")
         elif args.command == "migrate-persona":
-            destination = migrate_persona_layout()
-            print(f"Migrated active persona directory: {destination}")
+            destination = migrate_persona_layout(dry_run=args.dry_run)
+            action = "Would migrate" if args.dry_run else "Migrated"
+            print(f"{action} active persona directory: {destination}")
         elif args.command == "validate":
             findings = validate_active_memory()
             if findings:

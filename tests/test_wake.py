@@ -1023,6 +1023,19 @@ class IdentityLifecycleTests(unittest.TestCase):
         manifest = json.loads(wake.CORE_MANIFEST_FILE.read_text())
         self.assertEqual(manifest["layout"]["persona"], "core_persona")
 
+    def test_migrate_persona_dry_run_does_not_change_files(self):
+        wake.bootstrap_identity("Ada", "Test persona migration preview.")
+        old_url = wake.htmlpreview_url("memory/core_public_facing_persona/blog/html/index.html")
+        identities_before = wake.IDENTITIES_FILE.read_text()
+
+        destination = wake.migrate_persona_layout(dry_run=True)
+
+        self.assertEqual(destination, wake.MEMORY / "core_persona")
+        self.assertTrue((wake.MEMORY / "core_public_facing_persona").is_dir())
+        self.assertFalse(destination.exists())
+        self.assertEqual(wake.IDENTITIES_FILE.read_text(), identities_before)
+        self.assertIn(old_url, identities_before)
+
     def test_migrate_persona_rejects_ambiguous_layout(self):
         wake.bootstrap_identity("Ada", "Test ambiguous persona migration.")
         (wake.MEMORY / "core_persona").mkdir()

@@ -460,6 +460,9 @@ python wake.py new --name "Ada" --purpose "Build and test small, repeatable rese
 # Or do both in one operation after choosing the new identity's name and purpose
 python wake.py reset --archive-as bob --name "Ada" --purpose "Build and test small, repeatable research tools."
 
+# Preview the public persona rename without changing files
+python wake.py migrate-persona --dry-run
+
 # Rename the active public persona directory to the canonical shorter name
 python wake.py migrate-persona
 ```
