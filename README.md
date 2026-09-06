@@ -411,13 +411,14 @@ environment never appears in the subprocess's output.
 ## Getting started
 
 1. `pip install -r requirements.txt`
-2. Copy `.env.example` to `.env` and fill in the API key for whichever
+2. Install the SDK for the provider selected in `config.yaml`: `pip install google-genai` for Gemini, `pip install anthropic` for Anthropic, or `pip install openai` for OpenAI. Ollama needs no Python SDK.
+3. Copy `.env.example` to `.env` and fill in the API key for whichever
    provider you're using (only one is required).
-3. Edit `memory/core_identity/identity.md` and `memory/core_identity/rules.md` to set the agent up.
-4. Run one wake cycle manually: `python wake.py`
-5. Inspect `memory/journal/` for the new entry and `memory/core_memories/commitments.json`
+4. Edit `memory/core_identity/identity.md` and `memory/core_identity/rules.md` to set the agent up.
+5. Run one wake cycle manually: `python wake.py`
+6. Inspect `memory/journal/` for the new entry and `memory/core_memories/commitments.json`
    for any promise tracking.
-6. When ready, enable `.github/workflows/wake.yml` to run it on a schedule
+7. When ready, enable `.github/workflows/wake.yml` to run it on a schedule
 for free.
 
 To spend one deliberate model call compressing a recorded day:

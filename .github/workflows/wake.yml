@@ -34,7 +34,14 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          pip install google-genai
+          provider=$(python -c 'import yaml; print((yaml.safe_load(open("config.yaml")) or {}).get("provider", "gemini").lower())')
+          case "$provider" in
+            gemini) pip install google-genai ;;
+            anthropic) pip install anthropic ;;
+            openai) pip install openai ;;
+            ollama|mock) : ;;
+            *) echo "Unknown provider: $provider" >&2; exit 1 ;;
+          esac
       - name: Run wake cycle
         env:
           GITHUB_TOKEN: ${{ github.token }}
