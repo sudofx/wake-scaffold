@@ -177,7 +177,7 @@ class SynthesisStorageTests(WakeTestCase):
         )
         daily_text = daily.read_text()
         self.assertIn("Successful wakes: 2", daily_text)
-        self.assertIn("../../../../../journal/2026-08-31-090000.md", daily_text)
+        self.assertIn("../../../../journal/2026-08-31-090000.md", daily_text)
         self.assertIn("Choose a capability and test it.", daily_text)
         self.assertIn("A second reflection must not overwrite the first.", daily_text)
 

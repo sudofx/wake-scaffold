@@ -2724,7 +2724,7 @@ def write_daily_synthesis_index(now: datetime) -> Path:
         excerpt = " ".join(reflection.split())[:500]
         journal_name = entry_path.stem + ".md"
         entries.append(
-            f"- [{entry_path.stem}](../../../../../journal/{journal_name}): {excerpt}"
+            f"- [{entry_path.stem}](../../../../journal/{journal_name}): {excerpt}"
         )
     atomic_write_text(index_path,
         f"# Daily synthesis — {now.strftime('%Y-%m-%d')}\n\n"
