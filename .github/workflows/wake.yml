@@ -7,7 +7,7 @@ on:
   # of the schedule triggered real 429 RESOURCE_EXHAUSTED errors. This
   # leaves a 10-call margin per day for manual runs, 503 stragglers, etc.
   schedule:
-    - cron: "42 0,5,10,15,20 * * *"
+    - cron: "42 * * * *"
   workflow_dispatch: {}
 
 # A scheduled run and a manual run share the same committed memory tree.
