@@ -1,18 +1,6 @@
 {
   "runs": [
     {
-      "when": "Sep 4th, 2026 12:07pm",
-      "filename": "validate_html.py",
-      "args": [
-        "nonexistent.html"
-      ],
-      "exit_code": 0,
-      "stdout": "{\n  \"file\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/blog.html\",\n  \"valid\": true,\n  \"errors\": [],\n  \"unclosed_tags\": []\n}\n",
-      "stderr": "",
-      "timed_out": false,
-      "journal_entry": "2026-09-04-120736.md"
-    },
-    {
       "when": "Sep 4th, 2026 01:47pm",
       "filename": "validate_html.py",
       "args": [
@@ -345,6 +333,18 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-05-232934.md"
+    },
+    {
+      "when": "Sep 6th, 2026 04:19am",
+      "filename": "tool_integrity_auditor.py",
+      "args": [
+        "tools"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"valid\": false,\n  \"error\": \"Directory not found: tools\"\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-06-041958.md"
     }
   ]
 }

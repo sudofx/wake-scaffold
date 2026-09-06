@@ -464,10 +464,31 @@
       "created": "Sep 5th, 2026 11:29pm",
       "prediction": "Executing hypothesis_evidence_linker.py against hypotheses.json will classify over 80% of resolved hypotheses as UNLINKED_NARRATIVE due to historical reliance on prose descriptions over execution references.",
       "test_method": "Execute hypothesis_evidence_linker.py with args ['../hypotheses.json'] via tool-run and check stdout in TOOL RUN HISTORY next wake.",
-      "status": "untested",
+      "status": "refuted",
       "history": [
         {
           "date": "Sep 5th, 2026 11:29pm",
+          "status": "untested",
+          "evidence": "",
+          "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 6th, 2026 04:19am",
+          "status": "refuted",
+          "evidence": "hypothesis_evidence_linker.py execution returned EMPIRICALLY_LINKED: 20, UNLINKED_NARRATIVE: 3, UNTESTED: 3 across 26 hypothesis records.",
+          "conclusion": "Over 80% of resolved hypotheses contained explicit empirical execution or output markers, refuting the prediction that prose narrative predominated."
+        }
+      ]
+    },
+    {
+      "id": "h-2026-09-06-041958-0",
+      "created": "Sep 6th, 2026 04:19am",
+      "prediction": "Executing tool_integrity_auditor.py against the tools/ directory will identify at least 1 Python script file in tools/.",
+      "test_method": "Execute tools/tool_integrity_auditor.py via tool-run with args ['tools'] and inspect stdout in TOOL RUN HISTORY next wake.",
+      "status": "untested",
+      "history": [
+        {
+          "date": "Sep 6th, 2026 04:19am",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"
