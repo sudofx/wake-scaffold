@@ -821,6 +821,7 @@ class IdentityLifecycleTests(unittest.TestCase):
                 "CORE_MANIFEST_FILE",
             )
         }
+        self._orig_layout = wake.MEMORY_LAYOUT.copy()
         wake.ROOT = self.tmproot
         wake.MEMORY = self.tmproot / "memory"
         wake.JOURNAL = wake.MEMORY / "journal"
@@ -839,6 +840,8 @@ class IdentityLifecycleTests(unittest.TestCase):
     def tearDown(self):
         for name, value in self._orig.items():
             setattr(wake, name, value)
+        wake.MEMORY_LAYOUT.clear()
+        wake.MEMORY_LAYOUT.update(self._orig_layout)
         shutil.rmtree(self.tmproot, ignore_errors=True)
 
     def test_bootstrap_adds_active_row_to_identities_file(self):
@@ -877,6 +880,30 @@ class IdentityLifecycleTests(unittest.TestCase):
             "original content",
         )
         self.assertEqual((destination / "core_public_facing_persona" / "blog" / "blog_posts.json").read_text(), original_blog_posts)
+
+    def test_migrate_persona_renames_directory_and_updates_links(self):
+        wake.bootstrap_identity("Ada", "Test persona migration.")
+        old_url = wake.htmlpreview_url("memory/core_public_facing_persona/blog/html/index.html")
+        new_url = wake.htmlpreview_url("memory/core_persona/blog/html/index.html")
+        index_path = wake.MEMORIES_DIR / "index.md"
+        index_path.write_text(f"[blog]({old_url})\n")
+
+        destination = wake.migrate_persona_layout()
+
+        self.assertEqual(destination, wake.MEMORY / "core_persona")
+        self.assertTrue((destination / "blog" / "blog_posts.json").is_file())
+        self.assertFalse((wake.MEMORY / "core_public_facing_persona").exists())
+        self.assertIn(new_url, index_path.read_text())
+        self.assertNotIn(old_url, index_path.read_text())
+        manifest = json.loads(wake.CORE_MANIFEST_FILE.read_text())
+        self.assertEqual(manifest["layout"]["persona"], "core_persona")
+
+    def test_migrate_persona_rejects_ambiguous_layout(self):
+        wake.bootstrap_identity("Ada", "Test ambiguous persona migration.")
+        (wake.MEMORY / "core_persona").mkdir()
+
+        with self.assertRaises(RuntimeError):
+            wake.migrate_persona_layout()
 
 
 if __name__ == "__main__":

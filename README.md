@@ -419,6 +419,9 @@ python wake.py new --name "Ada" --purpose "Build and test small, repeatable rese
 
 # Or do both in one operation after choosing the new identity's name and purpose
 python wake.py reset --archive-as bob --name "Ada" --purpose "Build and test small, repeatable research tools."
+
+# Rename the active public persona directory to the canonical shorter name
+python wake.py migrate-persona
 ```
 
 The reset command checks the template and the new identity details before it
@@ -426,6 +429,12 @@ moves the active directory. Archives are never edited by the wake loop. A new
 identity begins with empty journals, commitments, blog posts, core memories,
 and a capability-growth plan; it does not inherit the prior identity's
 persona or unfinished tasks.
+
+`migrate-persona` is deliberately separate from `reset`: it only renames
+`core_public_facing_persona/` to `core_persona/`, updates known self-links and
+the layout manifest, and leaves journals, tools, and memory ledgers in place.
+It refuses to run if both directory names exist so an ambiguous layout cannot
+silently lose data.
 
 ## Growth through work
 

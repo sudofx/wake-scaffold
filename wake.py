@@ -46,6 +46,8 @@ from providers import get_provider
 ROOT = Path(__file__).parent
 MEMORY = ROOT / "memory"
 BASE_MEMORY = ROOT / "base_memory"
+LEGACY_PERSONA_NAME = "core_public_facing_persona"
+PERSONA_NAME = "core_persona"
 
 # Compartmentalized memory layout. Every wake-cycle function reads/writes
 # through one of these instead of a bare MEMORY / "filename" — that's what
@@ -57,7 +59,7 @@ IDENTITY_DIR = MEMORY / "core_identity"          # who Bob is: identity, rules, 
 MEMORIES_DIR = MEMORY / "core_memories"          # knowledge: index, commitments, growth, hypotheses
 WORKSPACE_DIR = MEMORY / "core_workspace"        # execution: tools + their run evidence
 TOOLS_DIR = WORKSPACE_DIR / "tools"
-PERSONA_DIR = MEMORY / "core_public_facing_persona"  # public-facing output
+PERSONA_DIR = MEMORY / (PERSONA_NAME if (MEMORY / PERSONA_NAME).exists() else LEGACY_PERSONA_NAME)
 BLOG_DIR = PERSONA_DIR / "blog"
 BLOG_HTML_DIR = BLOG_DIR / "html"
 JOURNAL = MEMORY / "journal"                     # episodic log, immutable, one file per wake
@@ -270,6 +272,11 @@ def htmlpreview_url(relative_html_path: str) -> str:
     return f"https://htmlpreview.github.io/?{raw}"
 
 
+def persona_relative_path(root_name: str = "memory") -> str:
+    """Return the active persona path, supporting both layout generations."""
+    return f"{root_name}/{PERSONA_DIR.relative_to(MEMORY).as_posix()}/blog/html/index.html"
+
+
 def github_url(relative_path: str = "") -> str:
     """Build a link into the configured repository at its configured branch."""
     cfg = load_config()
@@ -323,6 +330,37 @@ def identity_archive_path(label: str) -> Path:
             "or underscores, starting with a letter or number."
         )
     return ROOT / f"memory_{cleaned}"
+
+
+def migrate_persona_layout() -> Path:
+    """Rename the public persona directory to its shorter canonical name."""
+    legacy = MEMORY / LEGACY_PERSONA_NAME
+    canonical = MEMORY / PERSONA_NAME
+    if canonical.exists() and legacy.exists():
+        raise RuntimeError(
+            f"Both {LEGACY_PERSONA_NAME}/ and {PERSONA_NAME}/ exist; resolve this manually."
+        )
+    if canonical.exists():
+        raise RuntimeError(f"{PERSONA_NAME}/ is already present; nothing to migrate.")
+    if not legacy.is_dir():
+        raise RuntimeError(f"{legacy.name}/ does not exist in the active memory directory.")
+
+    old_url = htmlpreview_url(f"memory/{LEGACY_PERSONA_NAME}/blog/html/index.html")
+    new_url = htmlpreview_url(f"memory/{PERSONA_NAME}/blog/html/index.html")
+    shutil.move(str(legacy), str(canonical))
+    for path in (MEMORIES_DIR / "index.md", IDENTITY_DIR / "identity.md"):
+        if path.exists():
+            text = path.read_text()
+            if old_url in text:
+                path.write_text(text.replace(old_url, new_url))
+
+    global PERSONA_DIR, BLOG_DIR, BLOG_HTML_DIR
+    PERSONA_DIR = canonical
+    BLOG_DIR = PERSONA_DIR / "blog"
+    BLOG_HTML_DIR = BLOG_DIR / "html"
+    MEMORY_LAYOUT["persona"] = PERSONA_NAME
+    write_core_manifest()
+    return canonical
 
 
 def verify_template() -> None:
@@ -403,8 +441,8 @@ def archive_current_identity(label: str) -> Path:
         raise RuntimeError("No active memory/ directory exists to archive.")
     if destination.exists():
         raise RuntimeError(f"Archive already exists: {destination.name}")
-    old_url = htmlpreview_url("memory/core_public_facing_persona/blog/html/index.html")
-    new_url = htmlpreview_url(f"{destination.name}/core_public_facing_persona/blog/html/index.html")
+    old_url = htmlpreview_url(persona_relative_path())
+    new_url = htmlpreview_url(persona_relative_path(destination.name))
     shutil.move(str(MEMORY), str(destination))
 
     archived_index = destination / "core_memories" / "index.md"
@@ -467,7 +505,7 @@ def bootstrap_identity(name: str, purpose: str) -> Path:
     (BLOG_HTML_DIR / "index.html").write_text(render_blog_html(load_blog_posts()))
     _identities_add_row(
         name,
-        htmlpreview_url("memory/core_public_facing_persona/blog/html/index.html"),
+        htmlpreview_url(persona_relative_path()),
         created,
     )
     write_core_manifest(name)
@@ -2718,6 +2756,11 @@ def command_line_main() -> int:
     reset.add_argument("--name", required=True)
     reset.add_argument("--purpose", required=True)
 
+    commands.add_parser(
+        "migrate-persona",
+        help="Rename core_public_facing_persona/ to core_persona/ in the active memory.",
+    )
+
     args = parser.parse_args()
     if args.command in (None, "wake"):
         return main()
@@ -2737,6 +2780,9 @@ def command_line_main() -> int:
             destination = bootstrap_identity(args.name, args.purpose)
             print(f"Archived active identity: {archived}")
             print(f"Created new identity: {destination}")
+        elif args.command == "migrate-persona":
+            destination = migrate_persona_layout()
+            print(f"Migrated active persona directory: {destination}")
     except (RuntimeError, ValueError) as e:
         print(f"Identity lifecycle action failed: {e}", file=sys.stderr)
         return 1
