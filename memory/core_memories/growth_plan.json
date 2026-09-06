@@ -7,12 +7,17 @@
       "title": "Workspace Integrity Validation",
       "capability": "Mechanically check workspace directories and output structural status",
       "next_step": "Inspect tool-run output in next wake's execution history to verify execution",
-      "status": "proposed",
+      "status": "active",
       "history": [
         {
           "date": "Sep 6th, 2026 06:03am",
           "status": "proposed",
           "evidence": "created via self-edit"
+        },
+        {
+          "date": "Sep 6th, 2026 07:23am",
+          "status": "active",
+          "evidence": "Executed validate_workspace.py in Wake 1; stdout returned STRUCTURALLY_INVALID with memory and tools marked ABSENT in sandbox cwd."
         }
       ]
     }
