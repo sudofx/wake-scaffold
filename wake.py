@@ -2531,6 +2531,32 @@ def write_synthesis_entry(now: datetime, journal_filename_value: str, reflection
     return path
 
 
+def write_daily_synthesis_index(now: datetime) -> Path:
+    """Build a compact same-day index without rewriting individual reflections."""
+    day_dir = SYNTHESIS_DIR / now.strftime("%Y") / now.strftime("%m") / now.strftime("%d")
+    if not day_dir.is_dir():
+        raise RuntimeError(f"No synthesis entries exist for {now.strftime('%Y-%m-%d')}")
+    index_dir = SYNTHESIS_DIR / "daily" / now.strftime("%Y") / now.strftime("%m")
+    index_dir.mkdir(parents=True, exist_ok=True)
+    index_path = index_dir / f"{now.strftime('%d')}.md"
+    entries = []
+    for entry_path in sorted(day_dir.glob("*.md")):
+        text = entry_path.read_text()
+        reflection = text.split("## Synthesis\n\n", 1)[-1].strip()
+        excerpt = " ".join(reflection.split())[:500]
+        journal_name = entry_path.stem + ".md"
+        entries.append(
+            f"- [{entry_path.stem}](../../../../../journal/{journal_name}): {excerpt}"
+        )
+    index_path.write_text(
+        f"# Daily synthesis — {now.strftime('%Y-%m-%d')}\n\n"
+        f"Successful wakes: {len(entries)}\n\n"
+        + "\n".join(entries)
+        + "\n"
+    )
+    return index_path
+
+
 def run_offline_fallback(now: datetime, journal_fname: str) -> list[str]:
     """
     When the model call fails outright (all fallback models and
@@ -2746,6 +2772,7 @@ def main():
 
     path = write_journal_entry(now, journal_fname, reflection, output_with_notes, provider_name)
     write_synthesis_entry(now, journal_fname, reflection)
+    write_daily_synthesis_index(now)
     write_core_manifest()
 
     print(f"Wake complete. Journal entry written: {path}")

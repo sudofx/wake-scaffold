@@ -95,6 +95,11 @@ memory/
                               also kept visibly in its journal entry for
                               auditability; this stream is the future input
                               to synthesis and compression work.
+    daily/YYYY/MM/DD.md      - mechanically rebuilt same-day index with
+                              wake count, short reflection excerpts, and
+                              links back to the journal entries. It is a
+                              navigation/compression aid, not a replacement
+                              for the immutable detail files.
   core_public_facing_persona/
     blog/
       blog_posts.json           - the actual append-only source of truth

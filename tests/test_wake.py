@@ -96,6 +96,17 @@ class SynthesisStorageTests(WakeTestCase):
         self.assertEqual(second.name, "2026-08-31-090000-2.md")
         self.assertIn("Choose a capability", first.read_text())
         self.assertIn("2026-08-31-090000.md", second.read_text())
+
+        daily = wake.write_daily_synthesis_index(FIXED_NOW)
+        self.assertEqual(
+            daily,
+            self.memory / "core_synthesis" / "daily" / "2026" / "08" / "31.md",
+        )
+        daily_text = daily.read_text()
+        self.assertIn("Successful wakes: 2", daily_text)
+        self.assertIn("../../../../../journal/2026-08-31-090000.md", daily_text)
+        self.assertIn("Choose a capability and test it.", daily_text)
+        self.assertIn("A second reflection must not overwrite the first.", daily_text)
         self.assertIn("A second reflection", second.read_text())
 
 
