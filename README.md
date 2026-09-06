@@ -106,8 +106,6 @@ memory/
                                model call; never generated during a normal
                                wake.
   core_persona/                - canonical public-facing output directory
-    (older identities may still use `core_public_facing_persona/` until
-    `python wake.py migrate-persona` is run)
     blog/
       blog_posts.json           - the actual append-only source of truth
                for the blog. Each post is added once and
@@ -475,8 +473,8 @@ identity begins with empty journals, commitments, blog posts, core memories,
 and a capability-growth plan; it does not inherit the prior identity's
 persona or unfinished tasks.
 
-`migrate-persona` is deliberately separate from `reset`: it only renames
-`core_public_facing_persona/` to `core_persona/`, updates known self-links and
+`migrate-persona` is deliberately separate from `reset`: it migrates a legacy
+`core_public_facing_persona/` directory to `core_persona/`, updates known self-links and
 the layout manifest, and leaves journals, tools, and memory ledgers in place.
 It refuses to run if both directory names exist so an ambiguous layout cannot
 silently lose data.

@@ -91,9 +91,9 @@ class WakeTestCase(unittest.TestCase):
         wake.TOOLS_DIR = self.memory / "core_workspace" / "tools"
         wake.TOOL_RUNS_FILE = self.memory / "core_workspace" / "tool_runs.json"
         wake.SYNTHESIS_DIR = self.memory / "core_synthesis"
-        wake.PERSONA_DIR = self.memory / "core_public_facing_persona"
-        wake.BLOG_DIR = self.memory / "core_public_facing_persona" / "blog"
-        wake.BLOG_HTML_DIR = self.memory / "core_public_facing_persona" / "blog" / "html"
+        wake.PERSONA_DIR = self.memory / "core_persona"
+        wake.BLOG_DIR = self.memory / "core_persona" / "blog"
+        wake.BLOG_HTML_DIR = self.memory / "core_persona" / "blog" / "html"
         wake.EPISTEMIC_STATE_FILE = self.memory / "core_memories" / "epistemic_state.json"
         wake.CORE_MANIFEST_FILE = self.memory / "core_manifest.json"
 
@@ -103,7 +103,7 @@ class WakeTestCase(unittest.TestCase):
         shutil.rmtree(self.tmpdir, ignore_errors=True)
 
     def blog_posts(self):
-        return json.loads((self.memory / "core_public_facing_persona" / "blog" / "blog_posts.json").read_text())["posts"]
+        return json.loads((self.memory / "core_persona" / "blog" / "blog_posts.json").read_text())["posts"]
 
 
 class MemoryValidationTests(WakeTestCase):
@@ -130,7 +130,7 @@ class MemoryValidationTests(WakeTestCase):
         self.assertTrue(any("stale manifest layout" in finding for finding in findings))
 
     def test_validation_reports_broken_blog_journal_link(self):
-        posts_path = self.memory / "core_public_facing_persona" / "blog" / "blog_posts.json"
+        posts_path = self.memory / "core_persona" / "blog" / "blog_posts.json"
         posts = json.loads(posts_path.read_text())
         (self.memory / "journal" / "real-journal.md").write_text("entry")
         posts["posts"].append({
@@ -218,7 +218,7 @@ class BlogFallbackTests(WakeTestCase):
         self.assertIn("REJECTED commitments-update", posts[0]["body_html"])
         self.assertNotIn("Quiet wake", posts[0]["body_html"])
 
-        blog_html = (self.memory / "core_public_facing_persona" / "blog" / "html" / "index.html").read_text()
+        blog_html = (self.memory / "core_persona" / "blog" / "html" / "index.html").read_text()
         self.assertIn("Wake notes —", blog_html, "blog.html must be re-rendered to include the fallback post")
 
     def test_truly_quiet_wake_gets_generic_fallback_message(self):
@@ -299,7 +299,7 @@ class BlogFallbackTests(WakeTestCase):
         self.assertEqual(post["work_summary"], "Checked the memory layout")
         self.assertEqual(post["code_snippet"], "print(<unsafe>)")
 
-        blog_html = (self.memory / "core_public_facing_persona" / "blog" / "html" / "index.html").read_text()
+        blog_html = (self.memory / "core_persona" / "blog" / "html" / "index.html").read_text()
         self.assertIn("Wake 1", blog_html)
         self.assertIn("https://github.com/sudofx/wake-scaffold/tree/master", blog_html)
         self.assertIn("https://github.com/sudofx/wake-scaffold/tree/master/memory", blog_html)
@@ -330,7 +330,7 @@ class BlogFallbackTests(WakeTestCase):
 
         posts = self.blog_posts()
         self.assertEqual(len(posts), 3)
-        blog_html = (self.memory / "core_public_facing_persona" / "blog" / "html" / "index.html").read_text()
+        blog_html = (self.memory / "core_persona" / "blog" / "html" / "index.html").read_text()
         self.assertIn("Post 2", blog_html)
         self.assertIn("Post 1", blog_html)
         self.assertNotIn("Post 0", blog_html)
@@ -983,7 +983,7 @@ class IdentityLifecycleTests(unittest.TestCase):
         wake.WORKSPACE_DIR = wake.MEMORY / "core_workspace"
         wake.TOOLS_DIR = wake.WORKSPACE_DIR / "tools"
         wake.TOOL_RUNS_FILE = wake.WORKSPACE_DIR / "tool_runs.json"
-        wake.PERSONA_DIR = wake.MEMORY / "core_public_facing_persona"
+        wake.PERSONA_DIR = wake.MEMORY / "core_persona"
         wake.BLOG_DIR = wake.PERSONA_DIR / "blog"
         wake.BLOG_HTML_DIR = wake.BLOG_DIR / "html"
         wake.EPISTEMIC_STATE_FILE = wake.MEMORIES_DIR / "epistemic_state.json"
@@ -1003,14 +1003,14 @@ class IdentityLifecycleTests(unittest.TestCase):
 
     def test_archive_rewrites_index_md_self_link_and_marks_archived(self):
         wake.bootstrap_identity("Ada", "Test archiving.")
-        old_url = wake.htmlpreview_url("memory/core_public_facing_persona/blog/html/index.html")
+        old_url = wake.htmlpreview_url("memory/core_persona/blog/html/index.html")
         # Seed index.md with the stale self-link a real identity would have.
         index_path = wake.MEMORIES_DIR / "index.md"
         index_path.write_text(f"## What's been built\n\n[blog]({old_url})\n")
 
         destination = wake.archive_current_identity("ada_v1")
 
-        new_url = wake.htmlpreview_url("memory_ada_v1/core_public_facing_persona/blog/html/index.html")
+        new_url = wake.htmlpreview_url("memory_ada_v1/core_persona/blog/html/index.html")
         archived_text = (destination / "core_memories" / "index.md").read_text()
         self.assertIn(new_url, archived_text)
         self.assertNotIn(old_url, archived_text)
@@ -1031,10 +1031,16 @@ class IdentityLifecycleTests(unittest.TestCase):
             (destination / "journal" / "2026-08-31-090000.md").read_text(),
             "original content",
         )
-        self.assertEqual((destination / "core_public_facing_persona" / "blog" / "blog_posts.json").read_text(), original_blog_posts)
+        self.assertEqual((destination / "core_persona" / "blog" / "blog_posts.json").read_text(), original_blog_posts)
 
     def test_migrate_persona_renames_directory_and_updates_links(self):
         wake.bootstrap_identity("Ada", "Test persona migration.")
+        canonical = wake.MEMORY / "core_persona"
+        legacy = wake.MEMORY / "core_public_facing_persona"
+        shutil.move(canonical, legacy)
+        wake.PERSONA_DIR = legacy
+        wake.BLOG_DIR = legacy / "blog"
+        wake.BLOG_HTML_DIR = legacy / "blog" / "html"
         old_url = wake.htmlpreview_url("memory/core_public_facing_persona/blog/html/index.html")
         new_url = wake.htmlpreview_url("memory/core_persona/blog/html/index.html")
         index_path = wake.MEMORIES_DIR / "index.md"
@@ -1055,8 +1061,17 @@ class IdentityLifecycleTests(unittest.TestCase):
 
     def test_migrate_persona_dry_run_does_not_change_files(self):
         wake.bootstrap_identity("Ada", "Test persona migration preview.")
+        canonical = wake.MEMORY / "core_persona"
+        legacy = wake.MEMORY / "core_public_facing_persona"
+        shutil.move(canonical, legacy)
+        wake.PERSONA_DIR = legacy
+        wake.BLOG_DIR = legacy / "blog"
+        wake.BLOG_HTML_DIR = legacy / "blog" / "html"
         old_url = wake.htmlpreview_url("memory/core_public_facing_persona/blog/html/index.html")
         identities_before = wake.IDENTITIES_FILE.read_text()
+        canonical_url = wake.htmlpreview_url("memory/core_persona/blog/html/index.html")
+        identities_before = identities_before.replace(canonical_url, old_url)
+        wake.IDENTITIES_FILE.write_text(identities_before)
 
         destination = wake.migrate_persona_layout(dry_run=True)
 
@@ -1068,7 +1083,7 @@ class IdentityLifecycleTests(unittest.TestCase):
 
     def test_migrate_persona_rejects_ambiguous_layout(self):
         wake.bootstrap_identity("Ada", "Test ambiguous persona migration.")
-        (wake.MEMORY / "core_persona").mkdir()
+        (wake.MEMORY / "core_public_facing_persona").mkdir()
 
         with self.assertRaises(RuntimeError):
             wake.migrate_persona_layout()

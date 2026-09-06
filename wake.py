@@ -319,8 +319,8 @@ TEMPLATE_FILES = (
     ("core_memories", "growth_plan.json"),
     ("core_memories", "hypotheses.json"),
     ("core_memories", "semantic_memory.json"),
-    (Path("core_public_facing_persona") / "blog", "blog_posts.json"),
-    (Path("core_public_facing_persona") / "blog" / "html", "index.html"),
+    (Path(PERSONA_NAME) / "blog", "blog_posts.json"),
+    (Path(PERSONA_NAME) / "blog" / "html", "index.html"),
 )
 
 
