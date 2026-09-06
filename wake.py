@@ -445,10 +445,59 @@ def verify_template() -> None:
         missing.append("journal/")
     if not (BASE_MEMORY / "core_workspace" / "tools").is_dir():
         missing.append("core_workspace/tools/")
+    if not (BASE_MEMORY / "core_synthesis").is_dir():
+        missing.append("core_synthesis/")
     if missing:
         raise RuntimeError(
             "base_memory is incomplete; missing: " + ", ".join(missing)
         )
+
+
+def validate_active_memory() -> list[str]:
+    """Return read-only health findings for the active memory tree."""
+    findings = []
+    required_files = [
+        IDENTITY_DIR / "identity.md",
+        IDENTITY_DIR / "rules.md",
+        IDENTITY_DIR / "failure_modes.md",
+        MEMORIES_DIR / "index.md",
+        MEMORIES_DIR / "commitments.json",
+        MEMORIES_DIR / "growth_plan.json",
+        MEMORIES_DIR / "hypotheses.json",
+        MEMORIES_DIR / "semantic_memory.json",
+        WORKSPACE_DIR / "tool_runs.json",
+        BLOG_DIR / "blog_posts.json",
+        BLOG_HTML_DIR / "index.html",
+    ]
+    for path in required_files:
+        if not path.is_file():
+            findings.append(f"missing file: {path.relative_to(MEMORY)}")
+    for path in (JOURNAL, TOOLS_DIR, SYNTHESIS_DIR):
+        if not path.is_dir():
+            findings.append(f"missing directory: {path.relative_to(MEMORY)}")
+
+    json_shapes = {
+        MEMORIES_DIR / "commitments.json": "commitments",
+        MEMORIES_DIR / "growth_plan.json": "projects",
+        MEMORIES_DIR / "hypotheses.json": "hypotheses",
+        MEMORIES_DIR / "semantic_memory.json": "memories",
+        WORKSPACE_DIR / "tool_runs.json": "runs",
+        BLOG_DIR / "blog_posts.json": "posts",
+    }
+    for path, collection_key in json_shapes.items():
+        if not path.is_file():
+            continue
+        try:
+            data = json.loads(path.read_text())
+        except (OSError, json.JSONDecodeError) as error:
+            findings.append(f"invalid JSON: {path.relative_to(MEMORY)} ({error})")
+            continue
+        if not isinstance(data, dict) or not isinstance(data.get(collection_key), list):
+            findings.append(
+                f"invalid shape: {path.relative_to(MEMORY)} must contain a "
+                f"'{collection_key}' list"
+            )
+    return findings
 
 
 IDENTITIES_FILE = ROOT / "IDENTITIES.md"
@@ -2958,6 +3007,10 @@ def command_line_main() -> int:
         "migrate-persona",
         help="Rename core_public_facing_persona/ to core_persona/ in the active memory.",
     )
+    commands.add_parser(
+        "validate",
+        help="Read-only validation of the active memory tree.",
+    )
     summarize = commands.add_parser(
         "summarize-day",
         help="Use one explicit model call to summarize a recorded day's reflections.",
@@ -2986,6 +3039,14 @@ def command_line_main() -> int:
         elif args.command == "migrate-persona":
             destination = migrate_persona_layout()
             print(f"Migrated active persona directory: {destination}")
+        elif args.command == "validate":
+            findings = validate_active_memory()
+            if findings:
+                print("Active memory validation failed:", file=sys.stderr)
+                for finding in findings:
+                    print(f"- {finding}", file=sys.stderr)
+                return 1
+            print("Active memory validation passed.")
         elif args.command == "summarize-day":
             destination = summarize_day(args.date)
             print(f"Semantic daily summary written: {destination}")

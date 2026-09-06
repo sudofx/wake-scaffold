@@ -106,6 +106,22 @@ class WakeTestCase(unittest.TestCase):
         return json.loads((self.memory / "core_public_facing_persona" / "blog" / "blog_posts.json").read_text())["posts"]
 
 
+class MemoryValidationTests(WakeTestCase):
+    def test_clean_seeded_memory_passes_validation(self):
+        self.assertEqual(wake.validate_active_memory(), [])
+
+    def test_validation_reports_corrupt_json_without_repairing_it(self):
+        commitments = self.memory / "core_memories" / "commitments.json"
+        original = commitments.read_text()
+        commitments.write_text("not json")
+
+        findings = wake.validate_active_memory()
+
+        self.assertTrue(any("invalid JSON" in finding for finding in findings))
+        self.assertEqual(commitments.read_text(), "not json")
+        self.assertNotEqual(original, commitments.read_text())
+
+
 class SynthesisStorageTests(WakeTestCase):
     def test_atomic_write_replaces_content_without_temp_files(self):
         target = self.memory / "core_memories" / "atomic-test.json"
