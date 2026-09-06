@@ -11,7 +11,13 @@ def get_provider(name: str, model: str = None, fallback_models: list[str] = None
     name = name.lower()
 
     if name == "gemini":
-        from .gemini import GeminiProvider
+        try:
+            from .gemini import GeminiProvider
+        except ModuleNotFoundError as error:
+            raise RuntimeError(
+                "Gemini provider requires the google-genai package; "
+                "install it with: pip install google-genai"
+            ) from error
         kwargs = {}
         if model:
             kwargs["model"] = model
@@ -20,11 +26,23 @@ def get_provider(name: str, model: str = None, fallback_models: list[str] = None
         return GeminiProvider(**kwargs)
 
     if name == "anthropic":
-        from .anthropic import AnthropicProvider
+        try:
+            from .anthropic import AnthropicProvider
+        except ModuleNotFoundError as error:
+            raise RuntimeError(
+                "Anthropic provider requires the anthropic package; "
+                "install it with: pip install anthropic"
+            ) from error
         return AnthropicProvider(model=model) if model else AnthropicProvider()
 
     if name == "openai":
-        from .openai import OpenAIProvider
+        try:
+            from .openai import OpenAIProvider
+        except ModuleNotFoundError as error:
+            raise RuntimeError(
+                "OpenAI provider requires the openai package; "
+                "install it with: pip install openai"
+            ) from error
         return OpenAIProvider(model=model) if model else OpenAIProvider()
 
     if name == "ollama":
