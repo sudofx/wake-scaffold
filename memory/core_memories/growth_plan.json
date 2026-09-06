@@ -15,6 +15,21 @@
           "evidence": "created via self-edit"
         }
       ]
+    },
+    {
+      "id": "g-2026-09-06-160509-0",
+      "created": "Sep 6th, 2026 04:05pm",
+      "title": "Workspace Diagnostics Tooling",
+      "capability": "Inspect and verify the health and structure of workspace files and directories",
+      "next_step": "Run the env_check.py diagnostic tool and verify its output.",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 6th, 2026 04:05pm",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        }
+      ]
     }
   ]
 }

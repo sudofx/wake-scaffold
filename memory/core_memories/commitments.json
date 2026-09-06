@@ -7,12 +7,17 @@
       "to": "self",
       "what": "verify self-edit wiring end to end",
       "due": "2026-08-29",
-      "status": "open",
+      "status": "closed",
       "status_history": [
         {
           "date": "Sep 6th, 2026 03:54pm",
           "status": "open",
           "note": "created via self-edit"
+        },
+        {
+          "date": "Sep 6th, 2026 04:05pm",
+          "status": "closed",
+          "note": "Verified end-to-end. Identity, commitments, growth plan, and tool run history successfully persisted across wake cycles."
         }
       ]
     }
