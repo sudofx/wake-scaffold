@@ -7,8 +7,14 @@ on:
   # of the schedule triggered real 429 RESOURCE_EXHAUSTED errors. This
   # leaves a 10-call margin per day for manual runs, 503 stragglers, etc.
   schedule:
-    - cron: "42 * * * *"
+    - cron: "42 0,5,10,15,20 * * *"
   workflow_dispatch: {}
+
+# A scheduled run and a manual run share the same committed memory tree.
+# Queue a later run instead of allowing concurrent JSON/journal writes.
+concurrency:
+  group: wake-${{ github.ref }}
+  cancel-in-progress: false
 
 # Grant only the permissions this workflow needs: recording wake data and
 # optionally opening a reviewable proposal pull request.
@@ -19,6 +25,7 @@ permissions:
 jobs:
   wake:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
