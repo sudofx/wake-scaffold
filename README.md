@@ -92,8 +92,11 @@ memory/
   core_public_facing_persona/
     blog/
       blog_posts.json           - the actual append-only source of truth
-                           for the blog. Each post is added once and
-                           never rewritten or removed.
+               for the blog. Each post is added once and
+               never rewritten or removed. The generated HTML
+               shows only the newest `recent_blog_posts`
+               entries so the public page stays readable;
+               older posts remain here for recall and links.
       html/
         index.html               - a plain HTML/CSS/JS page, mechanically
                            rendered from blog_posts.json every time a

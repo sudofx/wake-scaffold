@@ -180,6 +180,34 @@ class BlogFallbackTests(WakeTestCase):
         self.assertIn("print(&lt;unsafe&gt;)", blog_html)
         self.assertNotIn("print(<unsafe>)", blog_html)
 
+    def test_blog_html_caps_recent_posts_without_discarding_source_history(self):
+        original_limit = wake.load_config
+        wake.load_config = lambda: {"github": {
+            "owner": "sudofx", "repo": "wake-scaffold", "branch": "master"
+        }, "recent_blog_posts": 2}
+        self.addCleanup(setattr, wake, "load_config", original_limit)
+
+        for index in range(3):
+            model_output = (
+                "```blog-post\n"
+                + json.dumps({
+                    "title": f"Post {index}",
+                    "body_html": f"<p>Post {index}</p>",
+                })
+                + "\n```\n"
+            )
+            wake.apply_self_edits(
+                model_output, {}, FIXED_NOW.replace(second=index),
+                f"test-journal-{index}.md",
+            )
+
+        posts = self.blog_posts()
+        self.assertEqual(len(posts), 3)
+        blog_html = (self.memory / "core_public_facing_persona" / "blog" / "html" / "index.html").read_text()
+        self.assertIn("Post 2", blog_html)
+        self.assertIn("Post 1", blog_html)
+        self.assertNotIn("Post 0", blog_html)
+
     def test_full_mock_provider_round_trip_never_hits_fallback(self):
         """Runs the actual two-pass prompts through MockProvider (never a
         live API) end to end, confirming the normal happy path — where

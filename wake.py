@@ -1323,6 +1323,12 @@ def render_blog_html(data: dict, memory_path: str = "memory") -> str:
     re-include it in a fresh generation.
     """
     posts = sorted(data.get("posts", []), key=lambda p: p.get("date_sortable", ""), reverse=True)
+    recent_limit = load_config().get("recent_blog_posts", 20)
+    try:
+        recent_limit = max(1, int(recent_limit))
+    except (TypeError, ValueError):
+        recent_limit = 20
+    posts = posts[:recent_limit]
     if not posts:
         posts_html = '            <p style="color: var(--text-muted);">No posts yet.</p>'
     else:

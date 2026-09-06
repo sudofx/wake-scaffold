@@ -51,6 +51,10 @@ daily_review_hour: 21
 # a hard trigger; see build_reflection_prompt's consolidation checkpoint.
 index_consolidation_interval_wakes: 15
 
+# Keep the public HTML page readable as blog_posts.json grows. The source
+# file remains append-only and complete; only the rendered page is capped.
+recent_blog_posts: 20
+
 # Used to build correct htmlpreview blog URLs for the active identity and
 # every archived one — single source so renaming/forking the repo doesn't
 # require hunting down hardcoded URLs.
