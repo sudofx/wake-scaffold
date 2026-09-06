@@ -936,6 +936,9 @@ class IdentityLifecycleTests(unittest.TestCase):
         self.assertFalse((wake.MEMORY / "core_public_facing_persona").exists())
         self.assertIn(new_url, index_path.read_text())
         self.assertNotIn(old_url, index_path.read_text())
+        identities_text = wake.IDENTITIES_FILE.read_text()
+        self.assertIn(new_url, identities_text)
+        self.assertNotIn(old_url, identities_text)
         manifest = json.loads(wake.CORE_MANIFEST_FILE.read_text())
         self.assertEqual(manifest["layout"]["persona"], "core_persona")
 

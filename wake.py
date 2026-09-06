@@ -376,6 +376,10 @@ def migrate_persona_layout() -> Path:
             text = path.read_text()
             if old_url in text:
                 path.write_text(text.replace(old_url, new_url))
+    if IDENTITIES_FILE.exists():
+        text = IDENTITIES_FILE.read_text()
+        if old_url in text:
+            IDENTITIES_FILE.write_text(text.replace(old_url, new_url))
 
     global PERSONA_DIR, BLOG_DIR, BLOG_HTML_DIR
     PERSONA_DIR = canonical
