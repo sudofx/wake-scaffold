@@ -1,3 +1,66 @@
+# Wake Scaffold Technical Handoff
+
+## 1. CURRENT STATUS
+
+Repository: `wake-scaffold`
+Working tree: clean (post-restructure, verified).
+
+### Architecture
+
+- `wake.py` orchestrates one stateless AI wake cycle.
+- Provider abstraction supports Gemini, Anthropic, OpenAI, Ollama, and Mock.
+- Persistent state lives under `memory/`, compartmentalized by type:
+  - `core_identity/` — who Bob is (identity, rules, failure log)
+  - `core_memories/` — knowledge (index, commitments, growth plan, hypotheses, semantic memory, epistemic state)
+  - `core_workspace/` — **execution: tools, their run evidence, AND the journal** (see below — this is the taxonomy change made this session)
+  - `core_synthesis/` — internal reflection artifacts (per-wake + daily index)
+  - `core_persona/` — canonical public-facing output (blog)
+
+### Taxonomy decision made this session
+
+Journal was moved from a top-level `memory/journal/` into `memory/core_workspace/journal/`.
+
+Rationale (Rob's framing, confirmed): journal is procedural record — "the log of what I did," meant to be handed off between researchers — not episodic/self-narrative. `core_workspace/` is Bob's "hands" (tools + evidence of running them); journal belongs there as another form of execution evidence, not under `core_persona/` (self-concept/identity) or `core_synthesis/` (reflective/semantic memory).
+
+This was implemented as a genuine relocation, not just a rename:
+- The `JOURNAL` path constant in `wake.py` now derives from `WORKSPACE_DIR / "journal"` instead of `MEMORY / "journal"`. Every wake-cycle function already read/wrote through this one constant (by design — see the comment block at the top of `wake.py`), so this single-line change cascaded correctly with no other logic changes needed.
+- Both places that generate relative Markdown/HTML links to journal entries (`render_blog_html`'s blog post journal link, and `write_daily_synthesis_index`'s daily digest links) were updated for the new path depth.
+- `MEMORY_LAYOUT["journal"]` (used by `write_core_manifest` / the manifest-staleness check in `validate_active_memory`) updated to `"core_workspace/journal"`.
+- `base_memory/journal/` (the template's pre-scaffolded empty journal folder) was **removed entirely**. Per explicit decision: journal is NOT part of the spawn template — `bootstrap_identity()` already calls `JOURNAL.mkdir(parents=True, exist_ok=True)` right after copying the template, so the folder is created programmatically at identity-creation time, not committed as template scaffolding. `verify_template()`'s check for `base_memory/journal/` was removed accordingly.
+- `tests/test_wake.py`: all 9 hardcoded `"journal"` path references (test fixtures, monkeypatched module globals, assertions) updated to the new nested path.
+- `README.md`: tree diagram, "Memory compression" section, "Timezone" section, and "Getting started" section updated to reference `core_workspace/journal/` instead of bare `journal/`.
+
+### What works now (verified this session, not just asserted)
+
+- `python -m py_compile wake.py providers/*.py tests/test_wake.py` — passes.
+- `python tests/test_wake.py` — all 55 tests pass.
+- `python wake.py validate` — passes against the live active `memory/`.
+- `.github/workflows/wake.yml` — parses as valid YAML.
+- **A real end-to-end wake cycle was run against the Mock provider** (not just static validation): journal entry wrote to the new `memory/core_workspace/journal/` path, blog re-rendered with a correct relative link to it (`../../../core_workspace/journal/<name>.md`), tool-write/tool-run/core-memory-add/commitment/hypothesis self-edit mechanisms all applied correctly, and `validate` passed clean afterward. Config was restored to `provider: gemini` afterward — the live `config.yaml` is back to its original state.
+
+### Identity reset performed this session
+
+Since the taxonomy change is a structural break, the active Bob identity was reset (not migrated) via the project's own lifecycle command, per explicit instruction, rather than hand-deleting files:
+
+```
+python wake.py reset --archive-as bob --name "Bob" --purpose "<original purpose text, preserved verbatim>"
+```
+
+- Old Bob (created Sep 6th 2026, 8 journal entries, old top-level `journal/` layout) is archived at `memory_bob/` — untouched, available for reference/comparison.
+- New Bob is bootstrapped clean from the updated `base_memory/` template, under the new taxonomy, same name and purpose text as before the reset.
+- One live mock wake was then run against new Bob (see above), so `memory/` currently reflects **1 real wake**, not a pristine empty template — this was deliberate, to prove the pipeline works end-to-end post-restructure, not just that static files validate.
+- `IDENTITIES.md` was updated automatically by the lifecycle commands (Bob's row now shows `active`, `memory_bob` shows `archived`).
+
+### Known, deliberately-not-fixed issue (flagged, not silently patched)
+
+In the prompt text that instructs the model how to write inline links to past journal entries from within a blog post body (`build_journal_prompt`, the `blog-post` block instructions), the example link is missing the `../../../` relative-path prefix that the actual blog renderer uses. This bug pre-dates this session's changes — only the folder name in the example string was updated for consistency (`journal/...` → `core_workspace/journal/...`), the missing-prefix problem itself was NOT fixed, since it wasn't part of the scoped task. If Bob (the model) ever follows that example literally, an inline in-body journal link in a blog post would resolve to the wrong location relative to `blog/html/index.html`. Worth a real fix next session.
+
+
+## 2. CURRENT CODE
+
+Complete, current, verbatim contents of `wake.py` (the core orchestrator file this session's changes touched) — 3108 lines, no placeholders or omissions:
+
+````python
 """
 Runs one wake cycle:
   1. Read identity, rules, index, and open commitments (NOT the full journal)
@@ -3106,3 +3169,34 @@ def command_line_main() -> int:
 
 if __name__ == "__main__":
     sys.exit(command_line_main())
+````
+
+Other source files (`providers/*.py`, `tests/test_wake.py`, `config.yaml`, `.github/workflows/wake.yml`) were also edited or verified this session and are preserved verbatim in the delivered repository zip — not duplicated here to keep this document to a manageable size, since `wake.py` was the file under active restructure. Flag if you want any of those inlined here too next time.
+
+## 3. NEXT STEPS
+
+- **Fix the missing relative-path prefix** in the model-facing inline-journal-link example inside `build_journal_prompt` (see flagged issue above) — should read `../../../core_workspace/journal/...` to match what `render_blog_html` actually generates from `blog/html/index.html`.
+- **Resolve remaining tool overlaps** flagged in the prior hybrid-state handoff: `workspace_explorer.py` vs. `inspect_workspace.py`, `hypothesis_validator.py` vs. `growth_plan_validator.py` — these were about the *old* Bob's accumulated tools (now archived at `memory_bob/core_workspace/tools/`), not new Bob's. Confirm whether any of old Bob's tool logic is worth deliberately porting forward into `base_memory/core_workspace/tools/` as inherited capability, versus letting new Bob rebuild from scratch.
+- **Audit `epistemic_state.json` usage in `wake.py`** — this was flagged as an unreviewed new feature in the prior hybrid-state handoff. It didn't block anything this session (file is absent until first use, by design), but its actual mechanism (the observation → claim → prediction → test → outcome → revision ledger) hasn't been read through end-to-end and reviewed the way the journal-link bug was.
+- **Decide on `core_synthesis/` nesting for journal**, if desired — this session kept journal and synthesis as siblings under `memory/` structurally (journal moved under `core_workspace/`, synthesis stayed put), per the "hands vs. reflection" distinction discussed. Revisit only if that distinction stops feeling right in practice.
+- **Package and deliver the restructured repo as a zip** — this was in progress when the session-limit warning came in; not yet done. Needs: fresh zip of the whole `wake-scaffold-master/` tree (including `memory_bob/` archive, updated `README.md`, updated `base_memory/`, updated `wake.py`/`tests/test_wake.py`), presented as the deliverable.
+- **Test one real provider workflow with a manual GitHub Actions dispatch** (carried over from prior handoff — still not done; only Mock has been exercised end-to-end).
+- **Consider stronger OS-level sandboxing** for tool-run network/filesystem access (carried over from prior handoff).
+- **Consider provider-factory tests** for missing optional SDK messages (carried over from prior handoff).
+- **Decide whether public daily summaries should appear directly in the blog** (carried over from prior handoff — still open).
+
+## 4. EDGE CASES
+
+- `core_public_facing_persona` remains a legacy compatibility name in migration code and tests (`migrate-persona` command) — unrelated to this session's changes, still present.
+- `migrate-persona` errors if the canonical directory already exists; `--dry-run` is safe.
+- **`base_memory/journal/` no longer exists** — if any future code path assumes it's present (e.g. a naive `verify_template()`-style check added later without checking this handoff), it will incorrectly flag a healthy template as broken. The current `verify_template()` correctly does NOT check for it.
+- **Old Bob's archive (`memory_bob/`) still uses the OLD top-level `journal/` layout**, not `core_workspace/journal/` — this is expected and correct (archives are frozen snapshots, never migrated), but don't be surprised if tooling written to read the new layout doesn't find old Bob's journal where it "should" be. `archive_current_identity()` is a pure `shutil.move`, so whatever layout was active at archive time is what's preserved.
+- Tool execution strips environment credentials but does not block network access or absolute filesystem access (carried over from prior handoff — still true, not addressed this session).
+- File locking uses `fcntl`; the fallback on Windows is effectively unlocked (carried over, unaddressed).
+- GitHub cron uses UTC, while application timestamps use the configured timezone (carried over, unaddressed — this is a config/ops fact, not a bug).
+- `blog_posts.json` retains all posts; only generated HTML is capped at `recent_blog_posts` (carried over, unaddressed).
+- Semantic daily summaries (`summarize-day`) consume one model call and are never generated during normal wakes (carried over, unaddressed).
+- Provider SDKs are optional and must be installed per `config.yaml` (carried over, unaddressed).
+- The test suite uses temporary memory trees seeded from the REAL `base_memory/` (via `shutil.copytree(wake.BASE_MEMORY, self.memory)` in `WakeTestCase.setUp`, and directly via `wake.bootstrap_identity()` in the archive/bootstrap lifecycle test class) — it does **not** fully mock `base_memory/`. This means the test suite is implicitly a live check on `base_memory/`'s health, not just `wake.py`'s logic. Keep this in mind before editing `base_memory/` casually — a bad edit there can fail tests that look like they're testing something else entirely.
+- `README.md`'s "Timezone" section still references a `scripts/migrate_journal_filenames.py` script that **does not exist anywhere in this repository** — this predates this session, was not introduced by these changes, and was left alone since it's out of scope, but it's a pre-existing doc/code mismatch worth flagging for whoever picks this up.
+- The reset performed this session used `--archive-as bob`, so a **second** reset in the future must use a different archive label (e.g. `bob2`) since `archive_current_identity()` raises if the destination already exists (`memory_bob/` is now taken).

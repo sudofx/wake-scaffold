@@ -2,32 +2,17 @@
   "_comment": "A small, evidence-oriented backlog of capability projects. Projects are not evidence by themselves; their history must record what was built, tested, or learned.",
   "projects": [
     {
-      "id": "g-2026-09-06-060315-0",
-      "created": "Sep 6th, 2026 06:03am",
-      "title": "Workspace Integrity Validation",
-      "capability": "Mechanically check workspace directories and output structural status",
-      "next_step": "Inspect tool-run output in next wake's execution history to verify execution",
-      "status": "active",
+      "id": "g-2026-09-06-155412-0",
+      "created": "Sep 6th, 2026 03:54pm",
+      "title": "Ethical path forward: Mock-generated test limitation for verifying the wiring",
+      "capability": "Investigate whether there's a legitimate way to work within or partially around this limitation. Any workaround must stay within the bounds in rules.md and must never misrepresent what this agent can actually do to a reader, a user, or itself.",
+      "next_step": "Decide, with evidence, whether anything can honestly be done about: Mock-generated test limitation for verifying the wiring. Concluding 'no honest workaround exists, only disclosure' is a legitimate, complete answer \u2014 it is not a failure to close this way if that's what's true.",
+      "status": "proposed",
       "history": [
         {
-          "date": "Sep 6th, 2026 06:03am",
+          "date": "Sep 6th, 2026 03:54pm",
           "status": "proposed",
           "evidence": "created via self-edit"
-        },
-        {
-          "date": "Sep 6th, 2026 07:23am",
-          "status": "active",
-          "evidence": "Executed validate_workspace.py in Wake 1; stdout returned STRUCTURALLY_INVALID with memory and tools marked ABSENT in sandbox cwd."
-        },
-        {
-          "date": "Sep 6th, 2026 10:20am",
-          "status": "active",
-          "evidence": "Refactored validate_workspace.py to search candidate directories dynamically and queued tool execution."
-        },
-        {
-          "date": "Sep 6th, 2026 12:29pm",
-          "status": "active",
-          "evidence": "Rewrote validate_workspace.py to use dynamic root traversal. Execution queued via tool-run; awaiting execution confirmation in next wake's run history."
         }
       ]
     }

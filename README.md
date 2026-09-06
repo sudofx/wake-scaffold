@@ -89,6 +89,20 @@ memory/
                                   agent has built and can now run lives
                                   here, plain Python files only, no
                                   subfolders.
+    journal/
+      2026-08-29-040827.md          - one append-only file per wake, never
+                                  edited after. Filename is the exact
+                                  local time the wake happened (see
+                                  "timezone" in config.yaml), so files
+                                  sort chronologically by name. This is
+                                  procedural record — what was done, in
+                                  enough detail to hand off to another
+                                  researcher — not a self-narrative.
+      2026-08-29-040827-FAILED.md   - written instead of a normal entry
+                                  when a wake's API call fails, so a
+                                  failure never just vanishes silently.
+                                  Same naming scheme, "-FAILED" at the
+                                  end so it still sorts in time order.
   core_synthesis/
     ideas/YYYY/MM/DD/        - dated internal reflection artifacts, one
                               per successful wake. The same reflection is
@@ -124,24 +138,16 @@ memory/
                            (see htmlpreview links in IDENTITIES.md).
         assets/                   - reserved for future static assets
                            (images, custom CSS); empty until used.
-  journal/
-    2026-08-29-040827.md          - one append-only file per wake, never
-                                  edited after. Filename is the exact
-                                  local time the wake happened (see
-                                  "timezone" in config.yaml), so files
-                                  sort chronologically by name.
-    2026-08-29-040827-FAILED.md   - written instead of a normal entry
-                                  when a wake's API call fails, so a
-                                  failure never just vanishes silently.
-                                  Same naming scheme, "-FAILED" at the
-                                  end so it still sorts in time order.
 
 base_memory/
   Complete seed template for a new identity, in the exact same
   compartmentalized layout as memory/ above (empty blog_posts.json,
-  semantic_memory.json, growth_plan.json, hypotheses.json, and an
-  empty journal/, plus the Markdown and commitment files). The
-  lifecycle commands copy it; normal wakes never read or alter it.
+  semantic_memory.json, growth_plan.json, hypotheses.json, and the
+  Markdown and commitment files). journal/ is deliberately NOT part
+  of the template — bootstrap_identity() creates an empty
+  core_workspace/journal/ at identity-creation time instead, so
+  there's nothing to keep in sync in git. The lifecycle commands
+  copy the template; normal wakes never read or alter it.
   identity.md and rules.md here also carry the two fixed inspirational
   directives (see "Voice and influences" in rules.md) forward into
   every future identity, regardless of what Purpose text is supplied
@@ -336,7 +342,7 @@ journal grows indefinitely:
   hand/proposal-edited summary, not auto-generated). These are what
   `build_reflection_prompt` actually loads.
 - **Detail layer (retrievable by reference, not re-read wholesale):**
-  the full `journal/` history, `blog_posts.json`, and everything in
+  the full `core_workspace/journal/` history, `blog_posts.json`, and everything in
   `tool_runs.json` beyond the last 5 entries. Nothing in this layer is
   deleted or summarized away — it's just not reloaded into every
   prompt. Journal links already embedded in blog posts and core
@@ -383,7 +389,7 @@ one exception is the *cron schedule itself* in
 that still needs a manual one-hour shift when DST changes if you want
 the scheduled run time to stay pinned to a specific local time.
 
-`memory/journal/`'s naming scheme was old-UTC-based before
+`memory/core_workspace/journal/`'s naming scheme was old-UTC-based before
 (`2026-08-28-0001.md`, `FAILED-2026-08-28T161327.md`) and is now
 local-time-based (`2026-08-28-025254.md`,
 `2026-08-28-091327-FAILED.md`). `scripts/migrate_journal_filenames.py`
@@ -426,7 +432,7 @@ environment never appears in the subprocess's output.
 4. Edit `memory/core_identity/identity.md` and `memory/core_identity/rules.md` to set the agent up.
 5. Run one wake cycle manually: `python wake.py`
 6. Run `python wake.py validate` to check required paths and JSON ledger shapes without changing files.
-7. Inspect `memory/journal/` for the new entry and `memory/core_memories/commitments.json`
+7. Inspect `memory/core_workspace/journal/` for the new entry and `memory/core_memories/commitments.json`
    for any promise tracking.
 8. When ready, enable `.github/workflows/wake.yml` to run it on a schedule
 for free.

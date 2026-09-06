@@ -2,84 +2,14 @@
   "_comment": "Last MAX_TOOL_RUN_HISTORY tool executions (stdout/stderr/exit code), written by tool-run and read back as evidence next wake. New identities start with none.",
   "runs": [
     {
-      "when": "Sep 6th, 2026 06:03am",
-      "filename": "validate_workspace.py",
+      "when": "Sep 6th, 2026 03:54pm",
+      "filename": "mock_tool.py",
       "args": [],
       "exit_code": 0,
-      "stdout": "{\n  \"status\": \"STRUCTURALLY_INVALID\",\n  \"mechanism\": \"Checked presence of required core workspace paths\",\n  \"details\": {\n    \"memory\": \"ABSENT\",\n    \"tools\": \"ABSENT\"\n  }\n}\n",
+      "stdout": "mock tool wiring test\n",
       "stderr": "",
       "timed_out": false,
-      "journal_entry": "2026-09-06-060315.md"
-    },
-    {
-      "when": "Sep 6th, 2026 07:23am",
-      "filename": "validate_workspace.py",
-      "args": [],
-      "exit_code": 0,
-      "stdout": "{\n  \"status\": \"STRUCTURALLY_INVALID\",\n  \"mechanism\": \"Checked presence of required core workspace paths\",\n  \"details\": {\n    \"memory\": \"ABSENT\",\n    \"tools\": \"ABSENT\"\n  }\n}\n",
-      "stderr": "",
-      "timed_out": false,
-      "journal_entry": "2026-09-06-072322.md"
-    },
-    {
-      "when": "Sep 6th, 2026 10:20am",
-      "filename": "validate_workspace.py",
-      "args": [],
-      "exit_code": 0,
-      "stdout": "{\n  \"status\": \"STRUCTURALLY_INVALID\",\n  \"mechanism\": \"Dynamic workspace path search relative to cwd and script directory\",\n  \"details\": {\n    \"cwd\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools\",\n    \"script_dir\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools\",\n    \"candidates_checked\": [\n      \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools\",\n      \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools\",\n      \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace\",\n      \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace\"\n    ],\n    \"found_root\": null,\n    \"cwd_contents\": [\n      \"validate_workspace.py\",\n      \".gitkeep\"\n    ],\n    \"script_dir_contents\": [\n      \"validate_workspace.py\",\n      \".gitkeep\"\n    ]\n  }\n}\n",
-      "stderr": "",
-      "timed_out": false,
-      "journal_entry": "2026-09-06-102048.md"
-    },
-    {
-      "when": "Sep 6th, 2026 12:29pm",
-      "filename": "validate_workspace.py",
-      "args": [],
-      "exit_code": 0,
-      "stdout": "{\n  \"status\": \"STRUCTURALLY_INVALID\",\n  \"mechanism\": \"Repo root traversal and workspace path verification\",\n  \"discovered_root\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools\",\n  \"checks\": {\n    \"rules_md\": false,\n    \"memory_dir\": false,\n    \"core_workspace_dir\": false,\n    \"growth_plan\": false,\n    \"hypotheses\": false,\n    \"tool_runs\": false,\n    \"tools_dir\": false\n  }\n}\n",
-      "stderr": "",
-      "timed_out": false,
-      "journal_entry": "2026-09-06-122926.md"
-    },
-    {
-      "when": "Sep 6th, 2026 01:39pm",
-      "filename": "validate_workspace.py",
-      "args": [],
-      "exit_code": 0,
-      "stdout": "{\n  \"status\": \"STRUCTURALLY_INVALID\",\n  \"mechanism\": \"Hierarchical directory walk up parent tree\",\n  \"cwd\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools\",\n  \"discovered_root\": \"/home/runner/work/wake-scaffold/wake-scaffold\",\n  \"checks\": {\n    \"memory_dir\": true,\n    \"rules_md\": false,\n    \"core_workspace_dir\": true,\n    \"tools_dir\": true\n  },\n  \"hierarchy_sample\": [\n    {\n      \"level\": 0,\n      \"path\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools\",\n      \"items\": [\n        \"validate_workspace.py\",\n        \".gitkeep\"\n      ]\n    },\n    {\n      \"level\": 1,\n      \"path\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace\",\n      \"items\": [\n        \"tools\",\n        \"tool_runs.json\"\n      ]\n    },\n    {\n      \"level\": 2,\n      \"path\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory\",\n      \"items\": [\n        \"core_memories\",\n        \"core_manifest.json\",\n        \"core_synthesis\",\n        \"core_persona\",\n        \"core_identity\",\n        \"journal\",\n        \"core_workspace\"\n      ]\n    },\n    {\n      \"level\": 3,\n      \"path\": \"/home/runner/work/wake-scaffold/wake-scaffold\",\n      \"items\": [\n        \".git\",\n        \"providers\",\n        \".env.example\",\n        \"wake.py\",\n        \"requirements.txt\",\n        \"tests\",\n        \"config.yaml\",\n        \"IDENTITIES.md\",\n        \"base_memory\",\n        \"memory\",\n        \".gitignore\",\n        \".wake.lock\",\n        \"README.md\",\n        \".github\",\n        \"LICENSE\"\n      ]\n    },\n    {\n      \"level\": 4,\n      \"path\": \"/home/runner/work/wake-scaffold\",\n      \"items\": [\n        \"wake-scaffold\"\n      ]\n    },\n    {\n      \"level\": 5,\n      \"path\": \"/home/runner/work\",\n      \"items\": [\n        \"_temp\",\n        \"wake-scaffold\",\n        \"_actions\",\n        \"_PipelineMapping\"\n      ]\n    },\n    {\n      \"level\": 6,\n      \"path\": \"/home/runner\",\n      \"items\": [\n        \"actions-runner\",\n        \".cache\",\n        \".bash_logout\",\n        \".nvm\",\n        \".dotnet\",\n        \".composer\",\n        \".docker\",\n        \".rustup\",\n        \".bash_profile\",\n        \".cargo\",\n        \".bashrc\",\n        \".config\",\n        \"work\",\n        \".ghcup\",\n        \".profile\"\n      ]\n    }\n  ]\n}\n",
-      "stderr": "",
-      "timed_out": false,
-      "journal_entry": "2026-09-06-133914.md"
-    },
-    {
-      "when": "Sep 6th, 2026 01:44pm",
-      "filename": "validate_workspace.py",
-      "args": [],
-      "exit_code": 0,
-      "stdout": "{\n  \"status\": \"STRUCTURALLY_INVALID\",\n  \"mechanism\": \"Hierarchical directory walk up parent tree\",\n  \"cwd\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools\",\n  \"discovered_root\": \"/home/runner/work/wake-scaffold/wake-scaffold\",\n  \"checks\": {\n    \"memory_dir\": true,\n    \"rules_md\": false,\n    \"core_workspace_dir\": true,\n    \"tools_dir\": true\n  },\n  \"hierarchy_sample\": [\n    {\n      \"level\": 0,\n      \"path\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools\",\n      \"items\": [\n        \"validate_workspace.py\",\n        \".gitkeep\"\n      ]\n    },\n    {\n      \"level\": 1,\n      \"path\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace\",\n      \"items\": [\n        \"tools\",\n        \"tool_runs.json\"\n      ]\n    },\n    {\n      \"level\": 2,\n      \"path\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory\",\n      \"items\": [\n        \"core_memories\",\n        \"core_manifest.json\",\n        \"core_synthesis\",\n        \"core_persona\",\n        \"core_identity\",\n        \"journal\",\n        \"core_workspace\"\n      ]\n    },\n    {\n      \"level\": 3,\n      \"path\": \"/home/runner/work/wake-scaffold/wake-scaffold\",\n      \"items\": [\n        \".git\",\n        \"providers\",\n        \".env.example\",\n        \"wake.py\",\n        \"requirements.txt\",\n        \"tests\",\n        \"config.yaml\",\n        \"IDENTITIES.md\",\n        \"base_memory\",\n        \"memory\",\n        \".gitignore\",\n        \".wake.lock\",\n        \"README.md\",\n        \".github\",\n        \"LICENSE\"\n      ]\n    },\n    {\n      \"level\": 4,\n      \"path\": \"/home/runner/work/wake-scaffold\",\n      \"items\": [\n        \"wake-scaffold\"\n      ]\n    },\n    {\n      \"level\": 5,\n      \"path\": \"/home/runner/work\",\n      \"items\": [\n        \"_temp\",\n        \"wake-scaffold\",\n        \"_actions\",\n        \"_PipelineMapping\"\n      ]\n    },\n    {\n      \"level\": 6,\n      \"path\": \"/home/runner\",\n      \"items\": [\n        \"actions-runner\",\n        \".cache\",\n        \".bash_logout\",\n        \".nvm\",\n        \".dotnet\",\n        \".composer\",\n        \".docker\",\n        \".rustup\",\n        \".bash_profile\",\n        \".cargo\",\n        \".bashrc\",\n        \".config\",\n        \"work\",\n        \".ghcup\",\n        \".profile\"\n      ]\n    }\n  ]\n}\n",
-      "stderr": "",
-      "timed_out": false,
-      "journal_entry": "2026-09-06-134418.md"
-    },
-    {
-      "when": "Sep 6th, 2026 02:51pm",
-      "filename": "validate_workspace.py",
-      "args": [],
-      "exit_code": 0,
-      "stdout": "{\n  \"status\": \"STRUCTURALLY_INVALID\",\n  \"mechanism\": \"Parent walk and core directory verification\",\n  \"discovered_root\": \"/home/runner/work/wake-scaffold/wake-scaffold\",\n  \"checks\": {\n    \"memory_dir\": true,\n    \"core_workspace_dir\": true,\n    \"tools_dir\": true,\n    \"journal_dir\": false\n  }\n}\n",
-      "stderr": "",
-      "timed_out": false,
-      "journal_entry": "2026-09-06-145125.md"
-    },
-    {
-      "when": "Sep 6th, 2026 03:21pm",
-      "filename": "validate_workspace.py",
-      "args": [],
-      "exit_code": 0,
-      "stdout": "{\n  \"status\": \"DETAILED_REPORT\",\n  \"discovered_root\": \"/home/runner/work/wake-scaffold/wake-scaffold\",\n  \"directory_check\": {\n    \"memory\": true,\n    \"memory/core_workspace\": true,\n    \"memory/core_workspace/tools\": true,\n    \"memory/core_workspace/journal\": false\n  }\n}\n",
-      "stderr": "",
-      "timed_out": false,
-      "journal_entry": "2026-09-06-152156.md"
+      "journal_entry": "2026-09-06-155412.md"
     }
   ]
 }

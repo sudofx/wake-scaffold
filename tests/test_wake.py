@@ -72,7 +72,7 @@ class WakeTestCase(unittest.TestCase):
         self.tmpdir = tempfile.mkdtemp(prefix="wake-scaffold-test-")
         self.memory = Path(self.tmpdir) / "memory"
         shutil.copytree(wake.BASE_MEMORY, self.memory)
-        (self.memory / "journal").mkdir(exist_ok=True)
+        (self.memory / "core_workspace" / "journal").mkdir(exist_ok=True)
 
         self._orig = {
             name: getattr(wake, name)
@@ -84,7 +84,7 @@ class WakeTestCase(unittest.TestCase):
             )
         }
         wake.MEMORY = self.memory
-        wake.JOURNAL = self.memory / "journal"
+        wake.JOURNAL = self.memory / "core_workspace" / "journal"
         wake.IDENTITY_DIR = self.memory / "core_identity"
         wake.MEMORIES_DIR = self.memory / "core_memories"
         wake.WORKSPACE_DIR = self.memory / "core_workspace"
@@ -132,7 +132,7 @@ class MemoryValidationTests(WakeTestCase):
     def test_validation_reports_broken_blog_journal_link(self):
         posts_path = self.memory / "core_persona" / "blog" / "blog_posts.json"
         posts = json.loads(posts_path.read_text())
-        (self.memory / "journal" / "real-journal.md").write_text("entry")
+        (self.memory / "core_workspace" / "journal" / "real-journal.md").write_text("entry")
         posts["posts"].append({
             "id": "post-test",
             "date_sortable": "2026-08-31-090000",
@@ -177,7 +177,7 @@ class SynthesisStorageTests(WakeTestCase):
         )
         daily_text = daily.read_text()
         self.assertIn("Successful wakes: 2", daily_text)
-        self.assertIn("../../../../journal/2026-08-31-090000.md", daily_text)
+        self.assertIn("../../../../core_workspace/journal/2026-08-31-090000.md", daily_text)
         self.assertIn("Choose a capability and test it.", daily_text)
         self.assertIn("A second reflection must not overwrite the first.", daily_text)
 
@@ -554,7 +554,7 @@ class HypothesisGapTests(WakeTestCase):
 
     def _touch_journal(self, stamp, failed=False):
         suffix = "-FAILED.md" if failed else ".md"
-        (self.memory / "journal" / f"{stamp}{suffix}").write_text("entry")
+        (self.memory / "core_workspace" / "journal" / f"{stamp}{suffix}").write_text("entry")
 
     def test_gap_counts_successful_wakes_since_last_hypothesis(self):
         wake.apply_hypotheses_update(json.dumps({"add": [
@@ -866,12 +866,12 @@ class TemporalContextTests(WakeTestCase):
     assumed."""
 
     def test_wakes_today_excludes_other_days_and_failed_entries(self):
-        (self.memory / "journal" / "2026-08-31-060000.md").write_text("x")
-        (self.memory / "journal" / "2026-08-31-090000.md").write_text("x")
+        (self.memory / "core_workspace" / "journal" / "2026-08-31-060000.md").write_text("x")
+        (self.memory / "core_workspace" / "journal" / "2026-08-31-090000.md").write_text("x")
         # Earlier today but failed — should not count.
-        (self.memory / "journal" / "2026-08-31-070000-FAILED.md").write_text("x")
+        (self.memory / "core_workspace" / "journal" / "2026-08-31-070000-FAILED.md").write_text("x")
         # Successful, but the previous calendar day — should not count.
-        (self.memory / "journal" / "2026-08-30-235900.md").write_text("x")
+        (self.memory / "core_workspace" / "journal" / "2026-08-30-235900.md").write_text("x")
 
         result = wake.wakes_today(FIXED_NOW)
 
@@ -887,7 +887,7 @@ class TemporalContextTests(WakeTestCase):
         self.assertIn("this wake", context)
 
     def test_build_temporal_context_reports_prior_wake_count(self):
-        (self.memory / "journal" / "2026-08-31-060000.md").write_text("x")
+        (self.memory / "core_workspace" / "journal" / "2026-08-31-060000.md").write_text("x")
         context = wake.build_temporal_context(FIXED_NOW)
         self.assertIn("already woken 1 time(s) today", context)
 
@@ -976,7 +976,7 @@ class IdentityLifecycleTests(unittest.TestCase):
         self._orig_layout = wake.MEMORY_LAYOUT.copy()
         wake.ROOT = self.tmproot
         wake.MEMORY = self.tmproot / "memory"
-        wake.JOURNAL = wake.MEMORY / "journal"
+        wake.JOURNAL = wake.MEMORY / "core_workspace" / "journal"
         wake.IDENTITIES_FILE = self.tmproot / "IDENTITIES.md"
         wake.IDENTITY_DIR = wake.MEMORY / "core_identity"
         wake.MEMORIES_DIR = wake.MEMORY / "core_memories"
@@ -1028,7 +1028,7 @@ class IdentityLifecycleTests(unittest.TestCase):
         destination = wake.archive_current_identity("ada_v2")
 
         self.assertEqual(
-            (destination / "journal" / "2026-08-31-090000.md").read_text(),
+            (destination / "core_workspace" / "journal" / "2026-08-31-090000.md").read_text(),
             "original content",
         )
         self.assertEqual((destination / "core_persona" / "blog" / "blog_posts.json").read_text(), original_blog_posts)

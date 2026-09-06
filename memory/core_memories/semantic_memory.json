@@ -1,4 +1,12 @@
 {
   "_comment": "Rare, capped, formative lessons (see MAX_CORE_MEMORIES in wake.py). New identities start with none.",
-  "memories": []
+  "memories": [
+    {
+      "id": "mem-2026-09-06-155412",
+      "date_display": "Sep 6th, 2026 03:54pm",
+      "weight": "low",
+      "lesson": "Mock test of the core memory mechanism.",
+      "journal_entry": "2026-09-06-155412.md"
+    }
+  ]
 }
