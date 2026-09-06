@@ -270,6 +270,19 @@ class BlogFallbackTests(WakeTestCase):
         self.assertEqual(len(posts), 1, "should be exactly the real post, no fallback added on top")
         self.assertEqual(posts[0]["title"], "A real post")
 
+    def test_blog_post_rejects_executable_html(self):
+        notes = wake.apply_blog_post(
+            json.dumps({
+                "title": "Unsafe post",
+                "body_html": '<p>Hello</p><script>alert("x")</script>',
+            }),
+            FIXED_NOW,
+            "test-journal.md",
+        )
+
+        self.assertTrue(any("executable HTML" in note for note in notes))
+        self.assertEqual(self.blog_posts(), [])
+
     def test_blog_post_records_wake_context_and_escapes_code_snippet(self):
         model_output = (
             "```blog-post\n"

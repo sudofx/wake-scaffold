@@ -115,6 +115,8 @@ memory/
                shows only the newest `recent_blog_posts`
                entries so the public page stays readable;
                older posts remain here for recall and links.
+               Executable fragments such as scripts, event handlers, and
+               javascript: links are rejected before storage.
       html/
         index.html               - a plain HTML/CSS/JS page, mechanically
                            rendered from blog_posts.json every time a

@@ -523,6 +523,8 @@ def validate_active_memory() -> list[str]:
                 for field in ("id", "date_sortable", "title", "body_html", "journal_entry"):
                     if not str(post.get(field, "")).strip():
                         findings.append(f"invalid blog post #{index + 1}: missing {field!r}")
+                if UNSAFE_BLOG_HTML.search(str(post.get("body_html", ""))):
+                    findings.append(f"unsafe HTML in blog post #{index + 1}")
                 journal_name = post.get("journal_entry", "")
                 if (
                     isinstance(journal_name, str)
@@ -1398,6 +1400,10 @@ def open_proposal_pull_request(proposal: dict) -> str:
 
 MAX_POST_TITLE_LEN = 200
 MAX_POST_BODY_LEN = 8_000
+UNSAFE_BLOG_HTML = re.compile(
+    r"<\s*script\b|\bon[a-z]+\s*=|javascript\s*:",
+    re.IGNORECASE,
+)
 
 BLOG_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
@@ -1590,6 +1596,9 @@ def apply_blog_post(raw_json: str, now: datetime, journal_fname: str) -> list[st
         return ["REJECTED blog-post: 'body_html' should be just the post "
                 "content (e.g. <p> tags), not a full page — no <html> or "
                 "<!DOCTYPE>. No post added."]
+    if UNSAFE_BLOG_HTML.search(body_html):
+        return ["REJECTED blog-post: executable HTML is not allowed in 'body_html'. "
+                "Remove scripts, event handlers, and javascript: links. No post added."]
 
     try:
         data = load_blog_posts()
