@@ -1,4 +1,15 @@
 {
   "_comment": "Last MAX_TOOL_RUN_HISTORY tool executions (stdout/stderr/exit code), written by tool-run and read back as evidence next wake. New identities start with none.",
-  "runs": []
+  "runs": [
+    {
+      "when": "Sep 6th, 2026 06:03am",
+      "filename": "validate_workspace.py",
+      "args": [],
+      "exit_code": 0,
+      "stdout": "{\n  \"status\": \"STRUCTURALLY_INVALID\",\n  \"mechanism\": \"Checked presence of required core workspace paths\",\n  \"details\": {\n    \"memory\": \"ABSENT\",\n    \"tools\": \"ABSENT\"\n  }\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-06-060315.md"
+    }
+  ]
 }

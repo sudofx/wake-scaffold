@@ -1,4 +1,20 @@
 {
   "_comment": "A small, evidence-oriented backlog of capability projects. Projects are not evidence by themselves; their history must record what was built, tested, or learned.",
-  "projects": []
+  "projects": [
+    {
+      "id": "g-2026-09-06-060315-0",
+      "created": "Sep 6th, 2026 06:03am",
+      "title": "Workspace Integrity Validation",
+      "capability": "Mechanically check workspace directories and output structural status",
+      "next_step": "Inspect tool-run output in next wake's execution history to verify execution",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 6th, 2026 06:03am",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        }
+      ]
+    }
+  ]
 }
