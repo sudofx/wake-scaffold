@@ -83,6 +83,14 @@ class WakeTestCase(unittest.TestCase):
 
 
 class SynthesisStorageTests(WakeTestCase):
+    def test_atomic_write_replaces_content_without_temp_files(self):
+        target = self.memory / "core_memories" / "atomic-test.json"
+        wake.atomic_write_text(target, '{"version": 1}\n')
+        wake.atomic_write_text(target, '{"version": 2}\n')
+
+        self.assertEqual(target.read_text(), '{"version": 2}\n')
+        self.assertEqual(list(target.parent.glob(".atomic-test.json.*.tmp")), [])
+
     def test_reflection_is_stored_in_dated_internal_stream(self):
         first = wake.write_synthesis_entry(
             FIXED_NOW, "2026-08-31-090000.md", "Choose a capability and test it."

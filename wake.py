@@ -34,6 +34,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -129,7 +130,7 @@ def save_epistemic_state(data: dict) -> None:
     """Persist the model-revision ledger without rewriting journal history."""
     data["version"] = 1
     data["revisions"] = data.get("revisions", [])[-MAX_MODEL_REVISIONS:]
-    EPISTEMIC_STATE_FILE.write_text(json.dumps(data, indent=2) + "\n")
+    atomic_write_text(EPISTEMIC_STATE_FILE, json.dumps(data, indent=2) + "\n")
 
 
 def record_model_revision(
@@ -265,6 +266,25 @@ def read(path: Path) -> str:
     return path.read_text() if path.exists() else f"[missing: {path.name}]"
 
 
+def atomic_write_text(path: Path, content: str) -> None:
+    """Replace a file atomically so an interrupted write cannot truncate it."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary_path = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w", encoding="utf-8", dir=path.parent,
+            prefix=f".{path.name}.", suffix=".tmp", delete=False,
+        ) as temporary_file:
+            temporary_file.write(content)
+            temporary_file.flush()
+            os.fsync(temporary_file.fileno())
+            temporary_path = Path(temporary_file.name)
+        os.replace(temporary_path, path)
+    finally:
+        if temporary_path is not None:
+            temporary_path.unlink(missing_ok=True)
+
+
 TEMPLATE_FILES = (
     ("core_identity", "identity.md"),
     ("core_identity", "rules.md"),
@@ -341,7 +361,7 @@ def write_core_manifest(name: str = None) -> None:
         "last_wake": format_display_time(now_local()),
         "total_wakes": count_successful_wakes(),
     }
-    CORE_MANIFEST_FILE.write_text(json.dumps(manifest, indent=2) + "\n")
+    atomic_write_text(CORE_MANIFEST_FILE, json.dumps(manifest, indent=2) + "\n")
 
 
 def identity_archive_path(label: str) -> Path:
@@ -1164,7 +1184,7 @@ def apply_commitments_update(raw_json: str) -> list[str]:
         changed = True
 
     if changed:
-        path.write_text(json.dumps(data, indent=2) + "\n")
+        atomic_write_text(path, json.dumps(data, indent=2) + "\n")
     if not notes:
         notes.append("No valid operations present in commitments-update block.")
     return notes
@@ -1478,8 +1498,8 @@ def apply_blog_post(raw_json: str, now: datetime, journal_fname: str) -> list[st
         "journal_entry": journal_fname,
     }
     data.setdefault("posts", []).append(post)
-    (BLOG_DIR / "blog_posts.json").write_text(json.dumps(data, indent=2) + "\n")
-    (BLOG_HTML_DIR / "index.html").write_text(render_blog_html(data))
+    atomic_write_text(BLOG_DIR / "blog_posts.json", json.dumps(data, indent=2) + "\n")
+    atomic_write_text(BLOG_HTML_DIR / "index.html", render_blog_html(data))
     return [f"ADDED blog post '{title[:60]}' and re-rendered blog.html "
             f"({len(data['posts'])} total posts)."]
 
@@ -1684,7 +1704,7 @@ def apply_growth_plan_update(raw_json: str, now: datetime) -> list[str]:
         changed = True
 
     if changed:
-        (MEMORIES_DIR / "growth_plan.json").write_text(json.dumps(data, indent=2) + "\n")
+        atomic_write_text(MEMORIES_DIR / "growth_plan.json", json.dumps(data, indent=2) + "\n")
     return notes or ["No valid operations present in growth-plan-update block."]
 
 
@@ -1994,7 +2014,7 @@ def apply_hypotheses_update(raw_json: str, now: datetime) -> list[str]:
         changed = True
 
     if changed:
-        (MEMORIES_DIR / "hypotheses.json").write_text(json.dumps(data, indent=2) + "\n")
+        atomic_write_text(MEMORIES_DIR / "hypotheses.json", json.dumps(data, indent=2) + "\n")
     return notes or ["No valid operations present in hypothesis-update block."]
 
 
@@ -2232,7 +2252,7 @@ def apply_tool_run(raw_json: str, now: datetime, journal_fname: str) -> list[str
     })
     if len(runs) > MAX_TOOL_RUN_HISTORY:
         data["runs"] = runs[-MAX_TOOL_RUN_HISTORY:]
-    TOOL_RUNS_FILE.write_text(json.dumps(data, indent=2) + "\n")
+    atomic_write_text(TOOL_RUNS_FILE, json.dumps(data, indent=2) + "\n")
 
     status = "TIMED OUT" if timed_out else f"exit code {exit_code}"
     return [f"RAN tools/{filename} {clean_args} -> {status}. Output saved to "
@@ -2321,7 +2341,7 @@ def apply_core_memory_add(raw_json: str, now: datetime, journal_fname: str) -> l
         "lesson": lesson,
         "journal_entry": journal_fname,
     })
-    (MEMORIES_DIR / "semantic_memory.json").write_text(json.dumps(data, indent=2) + "\n")
+    atomic_write_text(MEMORIES_DIR / "semantic_memory.json", json.dumps(data, indent=2) + "\n")
     return [f"ADDED core memory ({weight}): {lesson[:80]}"]
 
 
