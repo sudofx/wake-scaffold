@@ -89,6 +89,12 @@ memory/
                                   agent has built and can now run lives
                                   here, plain Python files only, no
                                   subfolders.
+  core_synthesis/
+    ideas/YYYY/MM/DD/        - dated internal reflection artifacts, one
+                              per successful wake. The same reflection is
+                              also kept visibly in its journal entry for
+                              auditability; this stream is the future input
+                              to synthesis and compression work.
   core_public_facing_persona/
     blog/
       blog_posts.json           - the actual append-only source of truth

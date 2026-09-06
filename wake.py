@@ -59,6 +59,7 @@ IDENTITY_DIR = MEMORY / "core_identity"          # who Bob is: identity, rules, 
 MEMORIES_DIR = MEMORY / "core_memories"          # knowledge: index, commitments, growth, hypotheses
 WORKSPACE_DIR = MEMORY / "core_workspace"        # execution: tools + their run evidence
 TOOLS_DIR = WORKSPACE_DIR / "tools"
+SYNTHESIS_DIR = MEMORY / "core_synthesis"        # internal reflection artifacts
 PERSONA_DIR = MEMORY / (PERSONA_NAME if (MEMORY / PERSONA_NAME).exists() else LEGACY_PERSONA_NAME)
 BLOG_DIR = PERSONA_DIR / "blog"
 BLOG_HTML_DIR = BLOG_DIR / "html"
@@ -292,6 +293,7 @@ MEMORY_LAYOUT = {
     "identity": "core_identity",
     "memories": "core_memories",
     "workspace": "core_workspace",
+    "synthesis": "core_synthesis",
     "persona": "core_public_facing_persona",
     "journal": "journal",
 }
@@ -2508,6 +2510,27 @@ def write_journal_entry(now: datetime, filename: str, reflection: str, model_out
     return path
 
 
+def write_synthesis_entry(now: datetime, journal_filename_value: str, reflection: str) -> Path:
+    """Store the reflection in a dated internal stream without replacing the journal copy."""
+    day_dir = SYNTHESIS_DIR / now.strftime("%Y") / now.strftime("%m") / now.strftime("%d")
+    day_dir.mkdir(parents=True, exist_ok=True)
+    stem = Path(journal_filename_value).stem
+    path = day_dir / f"{stem}.md"
+    suffix = 2
+    while path.exists():
+        path = day_dir / f"{stem}-{suffix}.md"
+        suffix += 1
+    path.write_text(
+        f"# Reflection {path.stem}\n\n"
+        f"**Woke:** {format_display_time(now)}\n"
+        f"**Journal entry:** {journal_filename_value}\n\n"
+        "## Synthesis\n\n"
+        + reflection.strip()
+        + "\n"
+    )
+    return path
+
+
 def run_offline_fallback(now: datetime, journal_fname: str) -> list[str]:
     """
     When the model call fails outright (all fallback models and
@@ -2722,6 +2745,7 @@ def main():
     output_with_notes = output + self_edit_notes
 
     path = write_journal_entry(now, journal_fname, reflection, output_with_notes, provider_name)
+    write_synthesis_entry(now, journal_fname, reflection)
     write_core_manifest()
 
     print(f"Wake complete. Journal entry written: {path}")

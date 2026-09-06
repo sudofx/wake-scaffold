@@ -54,7 +54,7 @@ class WakeTestCase(unittest.TestCase):
             name: getattr(wake, name)
             for name in (
                 "MEMORY", "JOURNAL", "IDENTITY_DIR", "MEMORIES_DIR",
-                "WORKSPACE_DIR", "TOOLS_DIR", "TOOL_RUNS_FILE",
+                "WORKSPACE_DIR", "TOOLS_DIR", "TOOL_RUNS_FILE", "SYNTHESIS_DIR",
                 "PERSONA_DIR", "BLOG_DIR", "BLOG_HTML_DIR",
                 "EPISTEMIC_STATE_FILE", "CORE_MANIFEST_FILE",
             )
@@ -66,6 +66,7 @@ class WakeTestCase(unittest.TestCase):
         wake.WORKSPACE_DIR = self.memory / "core_workspace"
         wake.TOOLS_DIR = self.memory / "core_workspace" / "tools"
         wake.TOOL_RUNS_FILE = self.memory / "core_workspace" / "tool_runs.json"
+        wake.SYNTHESIS_DIR = self.memory / "core_synthesis"
         wake.PERSONA_DIR = self.memory / "core_public_facing_persona"
         wake.BLOG_DIR = self.memory / "core_public_facing_persona" / "blog"
         wake.BLOG_HTML_DIR = self.memory / "core_public_facing_persona" / "blog" / "html"
@@ -79,6 +80,23 @@ class WakeTestCase(unittest.TestCase):
 
     def blog_posts(self):
         return json.loads((self.memory / "core_public_facing_persona" / "blog" / "blog_posts.json").read_text())["posts"]
+
+
+class SynthesisStorageTests(WakeTestCase):
+    def test_reflection_is_stored_in_dated_internal_stream(self):
+        first = wake.write_synthesis_entry(
+            FIXED_NOW, "2026-08-31-090000.md", "Choose a capability and test it."
+        )
+        second = wake.write_synthesis_entry(
+            FIXED_NOW, "2026-08-31-090000.md", "A second reflection must not overwrite the first."
+        )
+
+        self.assertEqual(first.parent, self.memory / "core_synthesis" / "2026" / "08" / "31")
+        self.assertEqual(first.name, "2026-08-31-090000.md")
+        self.assertEqual(second.name, "2026-08-31-090000-2.md")
+        self.assertIn("Choose a capability", first.read_text())
+        self.assertIn("2026-08-31-090000.md", second.read_text())
+        self.assertIn("A second reflection", second.read_text())
 
 
 class BlogFallbackTests(WakeTestCase):
