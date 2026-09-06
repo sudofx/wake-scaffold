@@ -421,6 +421,10 @@ environment never appears in the subprocess's output.
 7. When ready, enable `.github/workflows/wake.yml` to run it on a schedule
 for free.
 
+Wake runs also take a local `.wake.lock` file lock for the duration of the
+cycle, so manual and scheduled invocations in the same checkout cannot write
+the memory ledgers concurrently.
+
 To spend one deliberate model call compressing a recorded day:
 
 ```bash

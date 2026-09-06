@@ -26,6 +26,7 @@ the loop enough to automate that too.
 """
 
 import argparse
+from contextlib import contextmanager
 import html
 import json
 import os
@@ -37,6 +38,11 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
+
+try:
+    import fcntl
+except ImportError:  # pragma: no cover - Windows has no fcntl
+    fcntl = None
 
 import requests
 import yaml
@@ -75,6 +81,21 @@ CORE_MANIFEST_FILE = MEMORY / "core_manifest.json"
 WAKE_SPLIT_MARKER = "===WAKE-JOURNAL-BEGINS==="
 
 _TZ_CACHE = None
+
+
+@contextmanager
+def wake_lock():
+    """Hold an exclusive repository lock for one complete wake cycle."""
+    lock_path = ROOT / ".wake.lock"
+    if fcntl is None:
+        yield
+        return
+    with lock_path.open("a+") as lock_file:
+        fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
 
 
 def load_config():
@@ -2755,7 +2776,7 @@ def generate_with_retry(
             attempt += 1
 
 
-def main():
+def _run_wake():
     provider_name = "unknown"
     try:
         config = load_config()
@@ -2839,6 +2860,11 @@ def main():
         "review the journal for any 'Proposed changes for human review' "
         "section before applying those by hand."
     )
+
+
+def main():
+    with wake_lock():
+        return _run_wake()
 
 
 def command_line_main() -> int:
