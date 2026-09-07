@@ -801,6 +801,32 @@ class HypothesesTests(WakeTestCase):
         formatted = wake.format_hypotheses_for_prompt()
         self.assertIn("(external validation)", formatted)
 
+    def test_resolved_hypothesis_status_is_immutable(self):
+        # Regression test: a resolved hypothesis's status must never be
+        # rewritten by a later status_change block. The only sanctioned
+        # path for a changed claim is 'revise', which creates a new,
+        # separately-tracked hypothesis linked back to the original —
+        # the original's resolved outcome must stay historically final.
+        data = {"hypotheses": [{
+            "id": "h-test-0", "status": "confirmed",
+            "prediction": "X is true", "test_method": "ran it",
+            "scope": "internal", "boundary": "same_wake",
+            "history": [{"date": "earlier", "status": "confirmed",
+                         "evidence": "real evidence", "conclusion": "X held"}],
+        }]}
+        (self.memory / "core_memories" / "hypotheses.json").write_text(json.dumps(data))
+
+        notes = wake.apply_hypotheses_update(json.dumps({
+            "status_change": [{"id": "h-test-0", "new_status": "refuted",
+                                "evidence": "changed my mind",
+                                "conclusion": "actually false"}]
+        }), FIXED_NOW)
+
+        self.assertTrue(any("already resolved" in n for n in notes), notes)
+        hyps = json.loads((self.memory / "core_memories" / "hypotheses.json").read_text())["hypotheses"]
+        self.assertEqual(hyps[0]["status"], "confirmed")
+        self.assertEqual(len(hyps[0]["history"]), 1)
+
 
 class SameWakeDevelopmentTests(WakeTestCase):
     def test_failed_tool_can_be_revised_and_rerun_within_same_wake(self):

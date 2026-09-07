@@ -2226,6 +2226,14 @@ def apply_hypotheses_update(raw_json: str, now: datetime) -> list[str]:
         if not match:
             notes.append(f"SKIPPED hypothesis status change: id {hyp_id!r} not found.")
             continue
+        if match.get("status") in RESOLVED_HYPOTHESIS_STATUSES:
+            notes.append(
+                f"SKIPPED hypothesis status change for {hyp_id!r}: already "
+                f"resolved as {match['status']!r}. Resolved hypotheses are "
+                f"historically final — use the 'revise' operation with "
+                f"'parent_id' to test a changed claim instead."
+            )
+            continue
         boundary = str(match.get("boundary", "same_wake")).strip().lower()
         if boundary == "next_wake":
             hyp_stamp = str(match.get("id", "")).removeprefix("h-").rsplit("-", 1)[0]
