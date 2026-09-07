@@ -1296,6 +1296,26 @@ class IdentityLifecycleTests(unittest.TestCase):
         text = wake.IDENTITIES_FILE.read_text()
         self.assertIn("| Ada | active | `memory/` |", text)
 
+    def test_bootstrap_leaves_journal_dir_git_trackable(self):
+        # Regression test: git does not track empty directories. If
+        # bootstrap only mkdir()s the journal folder without putting a
+        # file in it, the directory vanishes the moment it's committed
+        # and pushed, and the next checkout (e.g. a GitHub Actions runner)
+        # fails `wake.py validate` with "missing directory:
+        # core_workspace/journal" before the first wake ever runs.
+        wake.bootstrap_identity("Ada", "Test journal dir survives git.")
+        self.assertTrue(wake.JOURNAL.is_dir())
+        self.assertTrue(
+            any(wake.JOURNAL.iterdir()),
+            "journal/ must contain at least one file (e.g. .gitkeep) "
+            "so git actually tracks the directory",
+        )
+        findings = wake.validate_active_memory()
+        self.assertFalse(
+            any("core_workspace/journal" in f for f in findings),
+            f"unexpected journal finding: {findings}",
+        )
+
     def test_archive_rewrites_index_md_self_link_and_marks_archived(self):
         wake.bootstrap_identity("Ada", "Test archiving.")
         old_url = wake.htmlpreview_url("memory/core_persona/blog/html/index.html")

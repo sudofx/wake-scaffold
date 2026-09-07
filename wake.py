@@ -638,6 +638,13 @@ def bootstrap_identity(name: str, purpose: str) -> Path:
     created = format_display_time(now_local())
     shutil.copytree(BASE_MEMORY, MEMORY)
     JOURNAL.mkdir(parents=True, exist_ok=True)
+    # git does not track empty directories, so without a placeholder file,
+    # a freshly bootstrapped journal/ dir silently disappears the moment
+    # it's committed and pushed — it never makes it into the tree, and the
+    # next machine to check out the repo (e.g. the GitHub Actions runner)
+    # sees no core_workspace/journal/ at all, failing `wake.py validate`
+    # before the first wake ever gets a chance to write into it.
+    (JOURNAL / ".gitkeep").touch()
 
     identity_path = IDENTITY_DIR / "identity.md"
     identity = identity_path.read_text()
