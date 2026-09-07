@@ -1,4 +1,22 @@
 {
   "_comment": "Self-experiment tracker: prediction -> test method -> real evidence -> conclusion. Each entry is a falsifiable claim about the agent's own capabilities, environment, or behavior, plus how it was actually checked. New identities start with none.",
-  "hypotheses": []
+  "hypotheses": [
+    {
+      "id": "h-2026-09-07-121752-0",
+      "created": "Sep 7th, 2026 12:17pm",
+      "prediction": "A Python script executing in the sandboxed environment can detect core workspace markdown files and output structural completion status.",
+      "test_method": "Write tools/validate_memory.py and execute it using tool-run.",
+      "scope": "internal",
+      "boundary": "same_wake",
+      "status": "untested",
+      "history": [
+        {
+          "date": "Sep 7th, 2026 12:17pm",
+          "status": "untested",
+          "evidence": "",
+          "conclusion": "created via self-edit"
+        }
+      ]
+    }
+  ]
 }

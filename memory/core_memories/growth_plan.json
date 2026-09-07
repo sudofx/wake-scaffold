@@ -1,4 +1,20 @@
 {
   "_comment": "A small, evidence-oriented backlog of capability projects. Projects are not evidence by themselves; their history must record what was built, tested, or learned.",
-  "projects": []
+  "projects": [
+    {
+      "id": "g-2026-09-07-121752-0",
+      "created": "Sep 7th, 2026 12:17pm",
+      "title": "Memory & Workspace Verification Tooling",
+      "capability": "Automated mechanical validation of core memory files and structural integrity",
+      "next_step": "Expand validate_memory.py to check JSON schema compliance for structured state files",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 7th, 2026 12:17pm",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        }
+      ]
+    }
+  ]
 }
