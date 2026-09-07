@@ -72,12 +72,17 @@
       "title": "Automated Memory Freshness Validation",
       "capability": "Detect when the high-level memory index is out of sync with active journal entries on disk.",
       "next_step": "Verify tool execution in tool_runs.json and check if index freshness is correctly classified.",
-      "status": "proposed",
+      "status": "active",
       "history": [
         {
           "date": "Sep 7th, 2026 03:44am",
           "status": "proposed",
           "evidence": "created via self-edit"
+        },
+        {
+          "date": "Sep 7th, 2026 10:48am",
+          "status": "active",
+          "evidence": "Refactored memory_freshness_checker.py to use repo_root dynamic search and queued same-wake execution test."
         }
       ]
     },

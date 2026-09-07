@@ -1,79 +1,82 @@
+import sys
 import json
 import re
 from pathlib import Path
 
+def find_repo_root():
+    current = Path(__file__).resolve()
+    for parent in [current] + list(current.parents):
+        if (parent / "base_memory").exists() or (parent / "memory").exists() or (parent / ".git").exists():
+            return parent
+    return current.parents[2]
+
+def locate_all_files(repo_root, filename_pattern):
+    return sorted(list(repo_root.glob(f"**/{filename_pattern}")))
+
+def extract_timestamps(text):
+    pattern = r"(20\d{2})[-_./]?(\d{2})[-_./]?(\d{2})(?:[-_.\sT]?(\d{2}):?(\d{2}):?(\d{2}))?"
+    stamps = []
+    for m in re.finditer(pattern, text):
+        y, mon, d, h, min_, s = m.groups()
+        h = h or "00"
+        min_ = min_ or "00"
+        s = s or "00"
+        stamps.append(f"{y}-{mon}-{d}-{h}{min_}{s}")
+    return stamps
+
 def main():
-    # Get paths relative to tool script location
-    tools_dir = Path(__file__).resolve().parent
-    core_workspace = tools_dir.parent
-    memory_dir = core_workspace.parent
-    index_path = memory_dir / "core_memories" / "index.md"
-
-    output = {
-        "status": "UNKNOWN",
-        "index_path": str(index_path),
-        "last_consolidated_timestamp": None,
-        "latest_journal": None,
-        "stale_journals": [],
-        "error": None
-    }
-
-    try:
-        if not index_path.exists():
-            output["status"] = "ERROR"
-            output["error"] = f"index.md not found at {index_path}"
-            print(json.dumps(output, indent=2))
-            return
-
-        # Read index.md to extract last consolidated journal
-        index_content = index_path.read_text()
-        # Match 'through 2026-09-07-032146' or similar
-        match = re.search(r"through\s+(\d{4}-\d{2}-\d{2}-\d{6})", index_content)
-        if not match:
-            output["status"] = "INCOMPLETE_INDEX_METADATA"
-            output["error"] = "Could not parse standard YYYY-MM-DD-HHMMSS journal timestamp from index.md"
-            print(json.dumps(output, indent=2))
-            return
-
-        last_consolidated = match.group(1)
-        output["last_consolidated_timestamp"] = last_consolidated
-
-        # Scan recursively under memory/ for files matching YYYY-MM-DD-HHMMSS.md
-        journal_pattern = re.compile(r"^(\d{4}-\d{2}-\d{2}-\d{6})\.md$")
-        journals = []
-        for path in memory_dir.rglob("*.md"):
-            m = journal_pattern.match(path.name)
-            if m:
-                journals.append((m.group(1), str(path)))
-
-        if not journals:
-            output["status"] = "NO_JOURNALS_FOUND"
-            output["error"] = "No journal files matching YYYY-MM-DD-HHMMSS.md pattern found."
-            print(json.dumps(output, indent=2))
-            return
-
-        journals.sort()  # Chronological sorting
-        latest_journal_timestamp, latest_journal_path = journals[-1]
-        output["latest_journal"] = {
-            "timestamp": latest_journal_timestamp,
-            "path": latest_journal_path
-        }
-
-        # Find journal files with timestamps newer than our consolidated index
-        stale = [j for j in journals if j[0] > last_consolidated]
-        output["stale_journals"] = [s[0] for s in stale]
-
-        if stale:
-            output["status"] = "STALE"
+    repo_root = find_repo_root()
+    
+    index_files = locate_all_files(repo_root, "index.md")
+    
+    index_details = []
+    all_index_stamps = []
+    
+    for idx_path in index_files:
+        try:
+            content = idx_path.read_text(encoding="utf-8")
+        except Exception as e:
+            content = f"Error reading file: {e}"
+        
+        stamps = extract_timestamps(content)
+        all_index_stamps.extend(stamps)
+        
+        snippet = content[:300] if len(content) > 300 else content
+        interesting_lines = [line.strip() for line in content.splitlines() if any(k in line.lower() for k in ["202", "journal", "consolidat", "update", "date"])]
+        
+        index_details.append({
+            "path": str(idx_path.relative_to(repo_root)),
+            "timestamps_found": stamps,
+            "snippet": snippet,
+            "interesting_lines": interesting_lines[:10]
+        })
+        
+    last_consolidated_stamp = max(all_index_stamps) if all_index_stamps else None
+    
+    journal_files = sorted(list(repo_root.glob("**/journal/20*.md")) + list(repo_root.glob("**/journals/20*.md")))
+    latest_journal = journal_files[-1] if journal_files else None
+    latest_journal_stamp = None
+    if latest_journal:
+        j_stamps = extract_timestamps(latest_journal.name)
+        if j_stamps:
+            latest_journal_stamp = j_stamps[-1]
+            
+    status = "UNKNOWN"
+    if last_consolidated_stamp and latest_journal_stamp:
+        if last_consolidated_stamp >= latest_journal_stamp:
+            status = "FRESH"
         else:
-            output["status"] = "FRESH"
-
-    except Exception as e:
-        output["status"] = "ERROR"
-        output["error"] = str(e)
-
-    # Output formatted JSON at start to prevent truncation diagnostic loss
-    print(json.dumps(output, indent=2))
+            status = "STALE"
+            
+    out = {
+        "status": status,
+        "index_files_scanned": index_details,
+        "last_consolidated_stamp": last_consolidated_stamp,
+        "latest_journal_path": str(latest_journal.relative_to(repo_root)) if latest_journal else None,
+        "latest_journal_stamp": latest_journal_stamp
+    }
+    print(json.dumps(out, indent=2))
+    sys.exit(0 if status in ["FRESH", "STALE"] else 1)
 
 if __name__ == "__main__":
     main()
