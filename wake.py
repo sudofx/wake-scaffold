@@ -968,8 +968,12 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         "must describe something that actually happened (a tool-run result, "
         "a file you inspected, a test you performed), never a restatement of "
         "the prediction — moving to any status besides 'testing' without "
-        "real evidence is rejected outright. Up to 3 new hypotheses per "
-        "wake.\n\n"
+        "real evidence is rejected outright. Resolved hypotheses (confirmed, "
+        "refuted, or inconclusive) are historically final: do not rewrite their "
+        "prediction or move them to another outcome. To test a revised claim, "
+        "use the optional 'revise' operation with 'parent_id', 'prediction', "
+        "and 'test_method'; this creates a new hypothesis linked to the original. "
+        "Up to 3 new hypotheses per wake.\n\n"
         "**To actually create or update a tool file** (previously you could "
         "only describe code in prose, which was never saved anywhere but "
         "the journal — this is the fix for that), include a fenced block:\n"
@@ -2102,6 +2106,42 @@ def apply_hypotheses_update(raw_json: str, now: datetime) -> list[str]:
                 f"WARNING on {hyp_id}: {reason}. Consider revising to name "
                 f"a specific, checkable outcome before testing it."
             )
+        changed = True
+
+    # Resolved hypotheses are historical evidence, not mutable drafts.
+    # A revised claim is represented as a new hypothesis linked to its parent.
+    for index, item in enumerate(ops.get("revise", [])[:MAX_HYPOTHESIS_ADDS_PER_WAKE]):
+        if not isinstance(item, dict):
+            notes.append(f"SKIPPED hypothesis revision #{index + 1}: must be an object.")
+            continue
+        parent_id = str(item.get("parent_id", "")).strip()
+        prediction = str(item.get("prediction", "")).strip()[:500]
+        test_method = str(item.get("test_method", "")).strip()[:500]
+        parent = next((h for h in hyps if h.get("id") == parent_id), None)
+        if not parent:
+            notes.append(f"SKIPPED hypothesis revision #{index + 1}: parent id {parent_id!r} not found.")
+            continue
+        if parent.get("status") not in RESOLVED_HYPOTHESIS_STATUSES:
+            notes.append(f"SKIPPED hypothesis revision #{index + 1}: parent {parent_id!r} is not resolved yet.")
+            continue
+        if not prediction or not test_method:
+            notes.append(f"SKIPPED hypothesis revision #{index + 1}: prediction and test_method are required.")
+            continue
+        if len(hyps) >= MAX_HYPOTHESES:
+            notes.append(f"SKIPPED hypothesis revision #{index + 1}: cap of {MAX_HYPOTHESES} reached.")
+            continue
+        hyp_id = f"h-{filename_stamp(now)}-r{index}"
+        hyps.append({
+            "id": hyp_id, "created": format_display_time(now),
+            "prediction": prediction, "test_method": test_method,
+            "status": "untested", "revised_from": parent_id,
+            "history": [{"date": format_display_time(now), "status": "untested",
+                         "evidence": "", "conclusion": f"revised from {parent_id}"}],
+        })
+        notes.append(f"ADDED revised hypothesis {hyp_id} from {parent_id}: {prediction[:80]}")
+        is_falsifiable, reason = falsifiability_signal(prediction, test_method)
+        if not is_falsifiable:
+            notes.append(f"WARNING on {hyp_id}: {reason}. Consider revising to name a specific, checkable outcome before testing it.")
         changed = True
 
     for change in ops.get("status_change", []):
