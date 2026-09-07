@@ -59,6 +59,17 @@
       "source": "tool-run",
       "confidence_before": "medium",
       "confidence_after": "high"
+    },
+    {
+      "id": "mr-2026-09-07-001155-006",
+      "date": "Sep 7th, 2026 12:11am",
+      "observation": "workspace_integrity_checker.py output in tool_runs.json returned status STRUCTURALLY_INVALID with all_targets_exist: false.",
+      "claim": "Path(__file__).resolve().parents[2] points to the repository root when executing from memory/core_workspace/tools/.",
+      "prediction": "workspace_integrity_checker.py using parents[2] will locate rules.md at repo root and return STRUCTURALLY_COMPLETE.",
+      "test": "Executed workspace_integrity_checker.py and inspected stdout in tool_runs.json.",
+      "outcome": "Tool returned STRUCTURALLY_INVALID because parents[2] resolved to memory/, where rules.md does not exist.",
+      "revision": "Corrected directory depth index mapping: parents[0]=tools, parents[1]=core_workspace, parents[2]=memory, parents[3]=repo root.",
+      "source": "tool-run"
     }
   ]
 }

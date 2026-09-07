@@ -27,10 +27,31 @@
       "created": "Sep 6th, 2026 11:41pm",
       "prediction": "Executing workspace_integrity_checker.py from memory/core_workspace/tools using Path(__file__).resolve().parents[2] will successfully locate rules.md, blog.html, memory/index.md, and core_workspace/failure_modes.md, returning status STRUCTURALLY_COMPLETE.",
       "test_method": "Execute workspace_integrity_checker.py via tool-run and check execution stdout in tool_runs.json.",
-      "status": "untested",
+      "status": "refuted",
       "history": [
         {
           "date": "Sep 6th, 2026 11:41pm",
+          "status": "untested",
+          "evidence": "",
+          "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 7th, 2026 12:11am",
+          "status": "refuted",
+          "evidence": "tool_runs.json stdout showed status STRUCTURALLY_INVALID and all_targets_exist: false.",
+          "conclusion": "Path(__file__).resolve().parents[2] evaluates to memory/ rather than repo root; repo root is parents[3]."
+        }
+      ]
+    },
+    {
+      "id": "h-2026-09-07-001155-0",
+      "created": "Sep 7th, 2026 12:11am",
+      "prediction": "Executing workspace_integrity_checker.py with parents[3] for repo root and parents[2] for memory_dir will return status STRUCTURALLY_COMPLETE with all_targets_exist: true.",
+      "test_method": "Execute workspace_integrity_checker.py via tool-run block and verify stdout JSON in next wake.",
+      "status": "untested",
+      "history": [
+        {
+          "date": "Sep 7th, 2026 12:11am",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"

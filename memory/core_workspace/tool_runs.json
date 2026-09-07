@@ -100,6 +100,16 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-06-234120.md"
+    },
+    {
+      "when": "Sep 7th, 2026 12:11am",
+      "filename": "workspace_integrity_checker.py",
+      "args": [],
+      "exit_code": 0,
+      "stdout": "{\n  \"status\": \"STRUCTURALLY_INVALID\",\n  \"script_location\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools/workspace_integrity_checker.py\",\n  \"repo_root_resolved\": \"/home/runner/work/wake-scaffold/wake-scaffold\",\n  \"memory_dir_resolved\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory\",\n  \"check_count\": 8,\n  \"all_targets_exist\": false,\n  \"details\": {\n    \"rules.md\": \"MISSING\",\n    \"blog.html\": \"MISSING\",\n    \"memory/index.md\": \"MISSING\",\n    \"core_workspace/failure_modes.md\": \"EXISTS\",\n    \"memory/identity.md\": \"MISSING\",\n    \"memory/commitments.json\": \"MISSING\",\n    \"memory/growth_plan.json\": \"MISSING\",\n    \"memory/hypotheses.json\": \"MISSING\"\n  }\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-07-001155.md"
     }
   ]
 }
