@@ -759,6 +759,77 @@ class HypothesesTests(WakeTestCase):
         self.assertEqual(hyps[0]["status"], "confirmed")
 
 
+class SameWakeDevelopmentTests(WakeTestCase):
+    def test_failed_tool_can_be_revised_and_rerun_within_same_wake(self):
+        journal = "2026-08-31-090000.md"
+        wake.TOOLS_DIR.mkdir(parents=True, exist_ok=True)
+        wake.TOOL_RUNS_FILE.write_text(json.dumps({"runs": []}) + "\n")
+
+        wake.apply_tool_write(
+            json.dumps({"files": [{"filename": "dev_tool.py", "content": "raise SystemExit(1)\n"}]}),
+            FIXED_NOW, journal,
+        )
+        first_notes = wake.apply_tool_run(
+            json.dumps({"filename": "dev_tool.py", "args": []}), FIXED_NOW, journal,
+        )
+        self.assertIn("exit code 1", first_notes[0])
+
+        failed = wake.unresolved_failed_tool_runs_for_journal(journal)
+        self.assertEqual(len(failed), 1)
+        system_prompt, user_prompt = wake.build_development_followup_prompt(
+            "initial response", failed, FIXED_NOW, iteration=1
+        )
+        self.assertIn("same-wake development follow-up", system_prompt)
+        self.assertIn('"exit_code": 1', user_prompt)
+        self.assertIn("raise SystemExit(1)", user_prompt)
+
+        revised_output = (
+            "The failure is explained by the tool exiting immediately.\n\n"
+            "```tool-write\n"
+            + json.dumps({"files": [{"filename": "dev_tool.py", "content": "print('fixed')\n"}]})
+            + "\n```\n\n```tool-run\n"
+            + json.dumps({"filename": "dev_tool.py", "args": []})
+            + "\n```"
+        )
+        notes, writes, runs = wake.apply_development_output(
+            revised_output, FIXED_NOW, journal, remaining_writes=3, remaining_runs=4,
+        )
+
+        self.assertEqual(writes, 1)
+        self.assertEqual(runs, 1)
+        self.assertTrue(any("exit code 0" in note for note in notes))
+        self.assertEqual(wake.unresolved_failed_tool_runs_for_journal(journal), [])
+
+        runs_for_wake = wake.tool_runs_for_journal(journal)
+        self.assertEqual(len(runs_for_wake), 2)
+        self.assertEqual(runs_for_wake[0]["exit_code"], 1)
+        self.assertEqual(runs_for_wake[1]["exit_code"], 0)
+
+    def test_development_execution_budget_is_enforced(self):
+        output = "```tool-run\n" + json.dumps({"filename": "missing.py", "args": []}) + "\n```"
+        notes, writes, runs = wake.apply_development_output(
+            output, FIXED_NOW, "budget.md", remaining_writes=0, remaining_runs=0,
+        )
+        self.assertEqual((writes, runs), (0, 0))
+        self.assertTrue(any("budget exhausted" in note for note in notes))
+
+    def test_prompt_log_exchange_label_keeps_multiple_same_wake_calls(self):
+        wake.log_prompt_exchange(
+            {}, "2026-08-31-090000.md", "system 1", "user 1", raw_output="out 1",
+            exchange_label="development-1",
+        )
+        wake.log_prompt_exchange(
+            {}, "2026-08-31-090000.md", "system 2", "user 2", raw_output="out 2",
+            exchange_label="development-2",
+        )
+        first = wake.PROMPTS_DIR / "2026-08-31-090000-development-1.json"
+        second = wake.PROMPTS_DIR / "2026-08-31-090000-development-2.json"
+        self.assertTrue(first.is_file())
+        self.assertTrue(second.is_file())
+        self.assertEqual(json.loads(first.read_text())["raw_output"], "out 1")
+        self.assertEqual(json.loads(second.read_text())["raw_output"], "out 2")
+
+
 class ToolRunSandboxTests(WakeTestCase):
     """Item under test: tool-run's stripped env and restricted cwd, verified
     against a real subprocess, not just by reading the code."""

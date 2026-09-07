@@ -982,11 +982,9 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         "subfolders, no path separators, must end in .py/.md/.txt/.json. "
         "Up to 3 files per wake, each capped at 20,000 bytes; writing to an "
         "existing filename overwrites it (real iterative development, not "
-        "append-only like the journal). IMPORTANT: writing a file does NOT "
-        "run it — you have no code-execution ability in this loop. Treat a "
-        "tool as 'implemented' the wake you write it, and only claim it "
-        "'works' once a human (or a later capability) has actually run it "
-        "and reported evidence back in a journal entry. A plain, untagged "
+        "append-only like the journal). Writing a file does NOT execute it "
+        "automatically, but a same-wake tool-run block may execute it after "
+        "the write is applied. A plain, untagged "
         "code fence in your prose is never saved to disk — only this exact "
         "block is.\n\n"
         "**To actually run a tool file you (or an earlier wake) already "
@@ -1000,13 +998,12 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         "args are allowed (up to 10, 200 chars each). Runs with a 15-second "
         "timeout; credentials are removed from the environment, but network "
         "access is not sandboxed. stdout/stderr are captured (truncated "
-        "to 4,000 chars each) and saved to a small run history, which is "
-        "what you'll see under TOOL RUN HISTORY next wake as real evidence — "
-        "this is the only thing that can honestly justify marking a tool "
-        "project 'complete'. You can include at most 2 tool-run blocks per "
-        "wake. A run you write this wake happens AFTER your journal text is "
-        "generated, so you won't see its output until the next wake — don't "
-        "narrate results you haven't seen yet.\n\n"
+        "to 4,000 chars each) and saved to a small run history. You can "
+        "include at most 5 tool-run blocks across the entire wake. A run "
+        "written this wake executes before the wake is finalized, so its "
+        "result may be surfaced to a bounded same-wake development follow-up. "
+        "Do not narrate a successful result unless an actual tool-run result "
+        "supports it.\n\n"
         "**To record a core memory** — a rare, genuinely formative "
         "lesson, not a routine observation — include a fenced block:\n"
         "```core-memory-add\n"
@@ -2155,7 +2152,7 @@ def safe_tool_filename(name) -> str | None:
     return name
 
 
-def apply_tool_write(raw_json: str, now: datetime, journal_fname: str) -> list[str]:
+def apply_tool_write(raw_json: str, now: datetime, journal_fname: str, max_files: int = MAX_TOOL_FILES_PER_WAKE) -> list[str]:
     """
     Writes actual files into a sandboxed memory/tools/ directory — this
     is the mechanism that turns 'I wrote tools/x.py' in the journal
@@ -2188,7 +2185,7 @@ def apply_tool_write(raw_json: str, now: datetime, journal_fname: str) -> list[s
     existing_count = sum(1 for _ in TOOLS_DIR.glob("*") if _.is_file())
     notes = []
     written = 0
-    for entry in files[:MAX_TOOL_FILES_PER_WAKE]:
+    for entry in files[:max_files]:
         if not isinstance(entry, dict):
             notes.append("SKIPPED tool file: entry must be an object.")
             continue
@@ -2225,7 +2222,9 @@ def apply_tool_write(raw_json: str, now: datetime, journal_fname: str) -> list[s
     return notes
 
 
-MAX_TOOL_RUNS_PER_WAKE = 2
+MAX_TOOL_RUNS_PER_WAKE = 5
+MAX_TOOL_WRITES_PER_WAKE = 3
+MAX_SAME_WAKE_DEVELOPMENT_FOLLOWUPS = 2
 TOOL_RUN_TIMEOUT_SECONDS = 15
 MAX_TOOL_RUN_ARGS = 10
 MAX_TOOL_RUN_ARG_LEN = 200
@@ -2285,13 +2284,13 @@ def format_tool_runs_for_prompt() -> str:
     return "\n".join(lines)
 
 
-def apply_tool_run(raw_json: str, now: datetime, journal_fname: str) -> list[str]:
+def apply_tool_run(raw_json: str, now: datetime, journal_fname: str, max_runs: int = 1) -> list[str]:
     """
     Executes exactly one already-written file from memory/tools/ with
     Python and nothing else — no shell, no arbitrary paths, bounded by
     a timeout and output cap. The result is persisted to tool_runs.json
-    so a FUTURE wake (not this one — the run happens after the model's
-    text is already generated) can read real evidence instead of
+    so the current wake can immediately inspect real evidence in a bounded
+    development follow-up, and future wakes can read the persisted record.
     trusting the model's own unverified claim that a tool 'works'.
 
     Sandboxing, best-effort within what a plain subprocess allows (this
@@ -2312,6 +2311,8 @@ def apply_tool_run(raw_json: str, now: datetime, journal_fname: str) -> list[str
         return [f"REJECTED tool-run: not valid JSON ({e}). Nothing run."]
     if not isinstance(data_in, dict):
         return ["REJECTED tool-run: must be a JSON object. Nothing run."]
+    if max_runs <= 0:
+        return ["REJECTED tool-run: same-wake execution budget exhausted. Nothing run."]
 
     raw_name = data_in.get("filename", "")
     filename = safe_tool_filename(raw_name)
@@ -2375,7 +2376,111 @@ def apply_tool_run(raw_json: str, now: datetime, journal_fname: str) -> list[str
 
     status = "TIMED OUT" if timed_out else f"exit code {exit_code}"
     return [f"RAN tools/{filename} {clean_args} -> {status}. Output saved to "
-            f"tool_runs.json — visible as evidence starting next wake, not this one."]
+            f"tool_runs.json — available immediately to a same-wake development follow-up and to future wakes."]
+
+
+def tool_runs_for_journal(journal_fname: str) -> list[dict]:
+    """Return immutable execution evidence produced by this wake."""
+    return [
+        run for run in load_tool_runs().get("runs", [])
+        if run.get("journal_entry") == journal_fname
+    ]
+
+
+def failed_tool_runs_for_journal(journal_fname: str) -> list[dict]:
+    """Return this wake's tool runs that did not produce exit code 0."""
+    return [
+        run for run in tool_runs_for_journal(journal_fname)
+        if run.get("exit_code") != 0
+    ]
+
+
+def unresolved_failed_tool_runs_for_journal(journal_fname: str) -> list[dict]:
+    """Return targets whose most recent same-wake run is still failing.
+
+    An earlier failed attempt remains immutable evidence, but a later
+    successful rerun resolves that target for the current development loop.
+    """
+    latest = {}
+    for run in tool_runs_for_journal(journal_fname):
+        key = (run.get("filename"), tuple(run.get("args", [])))
+        latest[key] = run
+    return [run for run in latest.values() if run.get("exit_code") != 0]
+
+
+def build_development_followup_prompt(
+    initial_output: str,
+    failed_runs: list[dict],
+    now: datetime,
+    iteration: int,
+) -> tuple[str, str]:
+    """Build a stateless follow-up prompt from persisted execution evidence.
+
+    The provider receives the relevant initial response, actual failed run
+    results, and the current source of the affected tool files. This keeps
+    the development loop causal without giving the model hidden state.
+    """
+    tool_sections = []
+    for run in failed_runs:
+        filename = safe_tool_filename(run.get("filename", ""))
+        if not filename:
+            continue
+        path = TOOLS_DIR / filename
+        source = path.read_text()[:MAX_TOOL_FILE_BYTES] if path.is_file() else "[tool file no longer exists]"
+        tool_sections.append(
+            f"### tools/{filename}\n```python\n{source}\n```"
+        )
+    evidence = json.dumps(failed_runs, indent=2)[:12_000]
+    system_prompt = (
+        "You are in a bounded same-wake development follow-up. The initial "
+        "work response already happened, and a real tool execution failed. "
+        "Use only the evidence supplied below. Do not rewrite or retroactively "
+        "confirm the original hypothesis. Diagnose the failure, and if a code "
+        "revision is warranted, emit a tool-write block followed by a tool-run "
+        "block. You may make only a small, evidence-driven revision. Do not "
+        "claim that the revised tool works until its new run produces evidence. "
+        "Do not emit blog, commitment, growth-plan, identity, or core-memory "
+        "blocks in this follow-up. If no safe revision is justified, explain why. "
+        f"This is development iteration {iteration}.\n\n"
+        "Allowed structured blocks: tool-write and tool-run only.\n"
+    )
+    user_prompt = (
+        "## INITIAL WORK RESPONSE\n" + initial_output[:16_000] + "\n\n"
+        "## FAILED TOOL-RUN EVIDENCE\n" + evidence + "\n\n"
+        "## CURRENT TOOL SOURCE\n" + ("\n\n".join(tool_sections) or "No affected tool source available.") + "\n\n"
+        "Revise only if the evidence supports a concrete fix. If you revise, "
+        "write the replacement file and request a run of that exact file."
+    )
+    return system_prompt, user_prompt
+
+
+def apply_development_output(
+    model_output: str,
+    now: datetime,
+    journal_fname: str,
+    remaining_writes: int,
+    remaining_runs: int,
+) -> tuple[list[str], int, int]:
+    """Apply only tool-write/tool-run blocks from a development follow-up."""
+    notes: list[str] = []
+    writes_used = 0
+    runs_used = 0
+    write_block = extract_block(model_output, "tool-write")
+    if write_block is not None and remaining_writes > 0:
+        write_notes = apply_tool_write(write_block, now, journal_fname, max_files=remaining_writes)
+        notes.extend(write_notes)
+        writes_used = sum(1 for n in write_notes if n.startswith(("WROTE tools/", "OVERWROTE tools/")))
+    elif write_block is not None:
+        notes.append("REJECTED development tool-write: per-wake write budget exhausted.")
+
+    run_blocks = extract_all_blocks(model_output, "tool-run")
+    allowed_runs = min(len(run_blocks), remaining_runs)
+    for run_block in run_blocks[:allowed_runs]:
+        notes.extend(apply_tool_run(run_block, now, journal_fname, max_runs=1))
+        runs_used += 1 if notes and notes[-1].startswith("RAN tools/") else 0
+    if len(run_blocks) > allowed_runs:
+        notes.append("IGNORED development tool-run block(s): per-wake execution budget exhausted.")
+    return notes, writes_used, runs_used
 
 
 MAX_CORE_MEMORIES = 20
@@ -2597,11 +2702,11 @@ def apply_self_edits(model_output: str, config: dict, now: datetime, journal_fna
 
     tool_block = extract_block(model_output, "tool-write")
     if tool_block is not None:
-        all_notes.extend(apply_tool_write(tool_block, now, journal_fname))
+        all_notes.extend(apply_tool_write(tool_block, now, journal_fname, max_files=MAX_TOOL_WRITES_PER_WAKE))
 
     tool_run_blocks = extract_all_blocks(model_output, "tool-run")
     for run_block in tool_run_blocks[:MAX_TOOL_RUNS_PER_WAKE]:
-        all_notes.extend(apply_tool_run(run_block, now, journal_fname))
+        all_notes.extend(apply_tool_run(run_block, now, journal_fname, max_runs=1))
     if len(tool_run_blocks) > MAX_TOOL_RUNS_PER_WAKE:
         all_notes.append(
             f"IGNORED {len(tool_run_blocks) - MAX_TOOL_RUNS_PER_WAKE} extra "
@@ -2941,6 +3046,7 @@ def log_prompt_exchange(
     user_prompt: str,
     raw_output: str = None,
     error: Exception = None,
+    exchange_label: str = None,
 ) -> None:
     """
     Record the exact system/user prompt sent to the provider this wake,
@@ -2978,7 +3084,8 @@ def log_prompt_exchange(
     if error is not None:
         record["error"] = f"{type(error).__name__}: {error}"
     try:
-        out_path = PROMPTS_DIR / f"{Path(filename).stem}.json"
+        suffix = f"-{exchange_label}" if exchange_label else ""
+        out_path = PROMPTS_DIR / f"{Path(filename).stem}{suffix}.json"
         atomic_write_text(out_path, json.dumps(record, indent=2) + "\n")
     except Exception as e:
         print(f"WARNING: failed to write prompt log: {type(e).__name__}: {e}", file=sys.stderr)
@@ -3062,7 +3169,58 @@ def _run_wake():
     # outcome (applied/rejected) to the journal text so it's part of
     # the record.
     self_edit_notes = apply_self_edits(output, config, now, journal_fname)
+
+    # Same-wake development loop: if a real tool run failed, give the
+    # stateless provider a bounded chance to inspect the actual evidence,
+    # revise the affected tool, and rerun it. Every follow-up is separately
+    # prompt-logged and every execution remains in immutable tool history.
+    development_notes = []
+    development_writes = sum(
+        1 for note in self_edit_notes.splitlines()
+        if note.startswith(("- WROTE tools/", "- OVERWROTE tools/"))
+    )
+    development_runs = len(tool_runs_for_journal(journal_fname))
+    for iteration in range(1, MAX_SAME_WAKE_DEVELOPMENT_FOLLOWUPS + 1):
+        failed_runs = unresolved_failed_tool_runs_for_journal(journal_fname)
+        remaining_writes = max(0, MAX_TOOL_WRITES_PER_WAKE - development_writes)
+        remaining_runs = max(0, MAX_TOOL_RUNS_PER_WAKE - development_runs)
+        if not failed_runs or remaining_writes <= 0 or remaining_runs <= 0:
+            break
+        followup_system, followup_user = build_development_followup_prompt(
+            output, failed_runs, now, iteration
+        )
+        try:
+            followup_output = generate_with_retry(provider, followup_system, followup_user)
+            log_prompt_exchange(
+                config, journal_fname, followup_system, followup_user,
+                raw_output=followup_output, exchange_label=f"development-{iteration}"
+            )
+        except Exception as e:
+            log_prompt_exchange(
+                config, journal_fname, followup_system, followup_user,
+                error=e, exchange_label=f"development-{iteration}"
+            )
+            development_notes.append(
+                f"DEVELOPMENT follow-up {iteration} failed: {type(e).__name__}: {e}"
+            )
+            break
+        notes, writes_used, runs_used = apply_development_output(
+            followup_output, now, journal_fname, remaining_writes, remaining_runs
+        )
+        development_notes.extend([f"DEVELOPMENT iteration {iteration}: {n}" for n in notes])
+        development_writes += writes_used
+        development_runs += runs_used
+        output += "\n\n## Same-wake development follow-up\n\n" + followup_output
+        if not runs_used:
+            break
+        if not unresolved_failed_tool_runs_for_journal(journal_fname):
+            break
+
     output_with_notes = output + self_edit_notes
+    if development_notes:
+        output_with_notes += "\n\n---\n\n## System note: same-wake development\n\n" + "\n".join(
+            f"- {n}" for n in development_notes
+        )
 
     path = write_journal_entry(now, journal_fname, reflection, output_with_notes, provider_name)
     write_synthesis_entry(now, journal_fname, reflection)
