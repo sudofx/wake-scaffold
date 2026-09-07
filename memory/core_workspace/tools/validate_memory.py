@@ -1,81 +1,95 @@
 import os
 import json
-import sys
 
-def find_root():
+def find_workspace_root():
     curr = os.path.abspath(os.getcwd())
-    while True:
-        if os.path.exists(os.path.join(curr, "core_workspace")) or os.path.exists(os.path.join(curr, "identity.md")):
+    while curr != os.path.dirname(curr):
+        if os.path.exists(os.path.join(curr, '.git')) or os.path.basename(curr) == 'wake-scaffold':
             return curr
-        if os.path.exists(os.path.join(curr, "memory")):
-            return os.path.join(curr, "memory")
-        parent = os.path.dirname(curr)
-        if parent == curr:
-            break
-        curr = parent
-    return os.path.abspath(os.getcwd())
+        curr = os.path.dirname(curr)
+    return os.path.abspath(os.path.join(os.getcwd(), "..", ".."))
 
-def check_file(path):
-    exists = os.path.exists(path)
-    size = os.path.getsize(path) if exists else 0
-    return {"exists": exists, "size_bytes": size}
+def find_file_in_tree(root, target_name):
+    matches = []
+    for dirpath, dirnames, filenames in os.walk(root):
+        if target_name in filenames:
+            matches.append(os.path.join(dirpath, target_name))
+    return matches
 
-def validate_json(path):
-    f_info = check_file(path)
-    if not f_info["exists"]:
-        return {**f_info, "valid_json": False, "type": None}
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        return {**f_info, "valid_json": True, "type": type(data).__name__}
-    except Exception as e:
-        return {**f_info, "valid_json": False, "error": str(e)}
-
-def main():
-    root = find_root()
-    markdown_files = ["identity.md", "rules.md", "index.md"]
-    json_files = ["core_workspace/commitments.json", "core_workspace/tool_runs.json"]
+def validate():
+    root = find_workspace_root()
+    target_markdowns = ["identity.md", "rules.md", "index.md"]
+    target_jsons = ["commitments.json", "tool_runs.json"]
     
-    md_results = {}
-    for mf in markdown_files:
-        paths_to_try = [
-            os.path.join(root, mf),
-            os.path.join(root, "memory", mf),
-            os.path.join(root, "core_workspace", mf)
-        ]
-        found_path = None
-        for p in paths_to_try:
-            if os.path.exists(p):
-                found_path = p
-                break
-        if found_path:
-            md_results[mf] = check_file(found_path)
-            md_results[mf]["located_at"] = os.path.relpath(found_path, root)
-        else:
-            md_results[mf] = {"exists": False, "size_bytes": 0, "located_at": None}
-
+    markdown_results = {}
     json_results = {}
-    for jf in json_files:
-        path = os.path.join(root, jf)
-        if not os.path.exists(path):
-            alt_path = os.path.join(root, os.path.basename(jf))
-            if os.path.exists(alt_path):
-                path = alt_path
-        json_results[jf] = validate_json(path)
-
-    all_md_exist = all(info["exists"] for info in md_results.values())
-    all_json_valid = all(info["exists"] and info.get("valid_json", False) for info in json_results.values())
-
-    status = "STRUCTURALLY_COMPLETE" if (all_md_exist and all_json_valid) else "STRUCTURALLY_INVALID"
-
+    all_found = True
+    
+    for md in target_markdowns:
+        matches = find_file_in_tree(root, md)
+        if matches:
+            filepath = matches[0]
+            size = os.path.getsize(filepath)
+            rel_path = os.path.relpath(filepath, root)
+            markdown_results[md] = {
+                "exists": True,
+                "size_bytes": size,
+                "located_at": rel_path
+            }
+        else:
+            all_found = False
+            markdown_results[md] = {
+                "exists": False,
+                "size_bytes": 0,
+                "located_at": None
+            }
+            
+    for jf in target_jsons:
+        matches = find_file_in_tree(root, jf)
+        if matches:
+            filepath = matches[0]
+            rel_path = os.path.relpath(filepath, root)
+            size = os.path.getsize(filepath)
+            valid_json = False
+            record_count = 0
+            try:
+                with open(filepath, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                valid_json = True
+                if isinstance(data, list):
+                    record_count = len(data)
+                elif isinstance(data, dict):
+                    record_count = len(data)
+            except Exception:
+                all_found = False
+                
+            json_results[jf] = {
+                "exists": True,
+                "size_bytes": size,
+                "located_at": rel_path,
+                "valid_json": valid_json,
+                "record_count": record_count
+            }
+        else:
+            all_found = False
+            json_results[jf] = {
+                "exists": False,
+                "size_bytes": 0,
+                "located_at": None,
+                "valid_json": False,
+                "record_count": 0
+            }
+            
+    status = "STRUCTURALLY_COMPLETE" if all_found else "STRUCTURALLY_INVALID"
+    
     report = {
         "status": status,
         "root_path": root,
-        "markdown_checks": md_results,
+        "markdown_checks": markdown_results,
         "json_checks": json_results
     }
     
     print(json.dumps(report, indent=2))
 
 if __name__ == "__main__":
-    main()
+    validate()
