@@ -1176,6 +1176,51 @@ class HypothesesFormattingTests(WakeTestCase):
             self.assertIn(hid, formatted)
         self.assertIn("2 earlier resolved hypothesis(es) not shown", formatted)
 
+    def test_next_wake_boundary_is_persisted_and_shown(self):
+        block = json.dumps({"add": [{
+            "prediction": "a lesson will survive into the next wake",
+            "test_method": "resolve it only after the next wake",
+            "scope": "external",
+            "boundary": "next_wake",
+        }]})
+        wake.apply_hypotheses_update(block, FIXED_NOW)
+        data = json.loads((self.memory / "core_memories" / "hypotheses.json").read_text())
+        hyp = data["hypotheses"][-1]
+        self.assertEqual(hyp["boundary"], "next_wake")
+        formatted = wake.format_hypotheses_for_prompt()
+        self.assertIn("next_wake boundary", formatted)
+
+    def test_next_wake_boundary_cannot_resolve_in_same_wake(self):
+        block = json.dumps({"add": [{
+            "prediction": "a claim will be testable after another wake",
+            "test_method": "observe the next wake's behavior",
+            "boundary": "next_wake",
+        }]})
+        wake.apply_hypotheses_update(block, FIXED_NOW)
+        hyp = json.loads((self.memory / "core_memories" / "hypotheses.json").read_text())["hypotheses"][-1]
+        notes = wake.apply_hypotheses_update(json.dumps({"status_change": [{
+            "id": hyp["id"], "new_status": "confirmed",
+            "evidence": "observed result", "conclusion": "confirmed",
+        }]}), FIXED_NOW)
+        self.assertIn("requires a later wake", " ".join(notes))
+        data = json.loads((self.memory / "core_memories" / "hypotheses.json").read_text())
+        self.assertEqual(data["hypotheses"][-1]["status"], "untested")
+
+    def test_next_wake_boundary_can_resolve_on_later_wake(self):
+        block = json.dumps({"add": [{
+            "prediction": "a claim will remain useful across a wake boundary",
+            "test_method": "check the persisted lesson on the next wake",
+            "boundary": "next_wake",
+        }]})
+        wake.apply_hypotheses_update(block, FIXED_NOW)
+        hyp = json.loads((self.memory / "core_memories" / "hypotheses.json").read_text())["hypotheses"][-1]
+        later = FIXED_NOW.replace(second=1)
+        notes = wake.apply_hypotheses_update(json.dumps({"status_change": [{
+            "id": hyp["id"], "new_status": "confirmed",
+            "evidence": "the persisted lesson was observed", "conclusion": "survived",
+        }]}), later)
+        self.assertIn(f"UPDATED hypothesis {hyp['id']} -> confirmed", notes)
+
     def test_no_omission_note_when_three_or_fewer_resolved(self):
         from datetime import timedelta
         times = iter(FIXED_NOW + timedelta(seconds=i) for i in range(1, 10))

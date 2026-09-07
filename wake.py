@@ -958,7 +958,7 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         "```hypothesis-update\n"
         '{"add": [{"prediction": "a specific, falsifiable claim", '
         '"test_method": "exactly how you will actually check it", '
-        '"scope": "internal|external"}],\n'
+        '"scope": "internal|external", "boundary": "same_wake|next_wake"}],\n'
         ' "status_change": [{"id": "...", "new_status": "testing|confirmed|'
         'refuted|inconclusive", "evidence": "what was actually observed", '
         '"conclusion": "what that evidence means, in one or two sentences"}]}\n'
@@ -975,7 +975,10 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         "use the optional 'revise' operation with 'parent_id', 'prediction', "
         "and 'test_method'; this creates a new hypothesis linked to the original. "
         "Up to 3 new hypotheses per wake. `scope` defaults to `internal` "
-        "for backward compatibility. Use `external` only when the test "
+        "for backward compatibility. `boundary` defaults to `same_wake`. Use `next_wake` "
+        "when the test is intentionally meant to cross a wake boundary; a resolved "
+        "outcome is rejected until a later wake, making the boundary itself testable. "
+        "Use `external` only when the test "
         "checks whether the claim or capability transfers beyond the scaffold "
         "itself (for example, an independent input, task result, or user-visible "
         "outcome). Prefer external validation for claims about usefulness or "
@@ -1894,6 +1897,7 @@ HYPOTHESIS_STATUSES_REQUIRING_EVIDENCE = HYPOTHESIS_STATUSES - {"testing"}
 
 HYPOTHESIS_GAP_WAKES = 5
 HYPOTHESIS_SCOPES = {"internal", "external"}
+HYPOTHESIS_BOUNDARIES = {"same_wake", "next_wake"}
 PURPOSE_CHECK_INTERVAL_WAKES = 5
 INDEX_CONSOLIDATION_INTERVAL_WAKES = 15  # config-overridable, see config.yaml
 
@@ -1996,7 +2000,7 @@ def _format_one_hypothesis(h: dict) -> str:
     latest = (h.get("history") or [{}])[-1]
     return (
         f"- [{h.get('id', '?')}] {h.get('status', '?')} "
-        f"({h.get('scope', 'internal')} validation): predicted "
+        f"({h.get('scope', 'internal')} validation) [{h.get('boundary', 'same_wake')} boundary]: predicted "
         f"{h.get('prediction', '')!r}, tested by {h.get('test_method', '')!r}"
         + (f" — conclusion: {latest.get('conclusion')}" if latest.get("conclusion") else "")
     )
@@ -2094,8 +2098,12 @@ def apply_hypotheses_update(raw_json: str, now: datetime) -> list[str]:
         prediction = str(item.get("prediction", "")).strip()[:500]
         test_method = str(item.get("test_method", "")).strip()[:500]
         scope = str(item.get("scope", "internal")).strip().lower()
+        boundary = str(item.get("boundary", "same_wake")).strip().lower()
         if scope not in HYPOTHESIS_SCOPES:
             notes.append(f"SKIPPED hypothesis #{index + 1}: scope must be internal or external.")
+            continue
+        if boundary not in HYPOTHESIS_BOUNDARIES:
+            notes.append(f"SKIPPED hypothesis #{index + 1}: boundary must be same_wake or next_wake.")
             continue
         if not prediction or not test_method:
             notes.append(f"SKIPPED hypothesis #{index + 1}: prediction and test_method are required.")
@@ -2110,6 +2118,7 @@ def apply_hypotheses_update(raw_json: str, now: datetime) -> list[str]:
             "prediction": prediction,
             "test_method": test_method,
             "scope": scope,
+            "boundary": boundary,
             "status": "untested",
             "history": [{"date": format_display_time(now), "status": "untested",
                          "evidence": "", "conclusion": "created via self-edit"}],
@@ -2140,8 +2149,12 @@ def apply_hypotheses_update(raw_json: str, now: datetime) -> list[str]:
         if parent.get("status") not in RESOLVED_HYPOTHESIS_STATUSES:
             notes.append(f"SKIPPED hypothesis revision #{index + 1}: parent {parent_id!r} is not resolved yet.")
             continue
+        boundary = str(item.get("boundary", parent.get("boundary", "same_wake"))).strip().lower()
         if scope not in HYPOTHESIS_SCOPES:
             notes.append(f"SKIPPED hypothesis revision #{index + 1}: scope must be internal or external.")
+            continue
+        if boundary not in HYPOTHESIS_BOUNDARIES:
+            notes.append(f"SKIPPED hypothesis revision #{index + 1}: boundary must be same_wake or next_wake.")
             continue
         if not prediction or not test_method:
             notes.append(f"SKIPPED hypothesis revision #{index + 1}: prediction and test_method are required.")
@@ -2153,7 +2166,7 @@ def apply_hypotheses_update(raw_json: str, now: datetime) -> list[str]:
         hyps.append({
             "id": hyp_id, "created": format_display_time(now),
             "prediction": prediction, "test_method": test_method,
-            "scope": scope, "status": "untested", "revised_from": parent_id,
+            "scope": scope, "boundary": boundary, "status": "untested", "revised_from": parent_id,
             "history": [{"date": format_display_time(now), "status": "untested",
                          "evidence": "", "conclusion": f"revised from {parent_id}"}],
         })
@@ -2173,16 +2186,22 @@ def apply_hypotheses_update(raw_json: str, now: datetime) -> list[str]:
         if new_status not in HYPOTHESIS_STATUSES:
             notes.append(f"SKIPPED hypothesis status change for {hyp_id!r}: invalid status {new_status!r}.")
             continue
+        match = next((h for h in hyps if h.get("id") == hyp_id), None)
+        if not match:
+            notes.append(f"SKIPPED hypothesis status change: id {hyp_id!r} not found.")
+            continue
+        boundary = str(match.get("boundary", "same_wake")).strip().lower()
+        if boundary == "next_wake":
+            hyp_stamp = str(match.get("id", "")).removeprefix("h-").rsplit("-", 1)[0]
+            if hyp_stamp and filename_stamp(now) <= hyp_stamp:
+                notes.append(f"SKIPPED hypothesis status change for {hyp_id!r}: this hypothesis requires a later wake before resolution.")
+                continue
         if new_status in HYPOTHESIS_STATUSES_REQUIRING_EVIDENCE and not evidence:
             notes.append(
                 f"SKIPPED hypothesis status change for {hyp_id!r}: moving to "
                 f"{new_status!r} requires real 'evidence' — what was actually "
                 f"observed, not a restatement of the prediction."
             )
-            continue
-        match = next((h for h in hyps if h.get("id") == hyp_id), None)
-        if not match:
-            notes.append(f"SKIPPED hypothesis status change: id {hyp_id!r} not found.")
             continue
         match["status"] = new_status
         match.setdefault("history", []).append({
