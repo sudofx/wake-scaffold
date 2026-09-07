@@ -1,0 +1,115 @@
+{
+  "_comment": "A small, evidence-oriented backlog of capability projects. Projects are not evidence by themselves; their history must record what was built, tested, or learned.",
+  "projects": [
+    {
+      "id": "g-2026-09-06-155412-0",
+      "created": "Sep 6th, 2026 03:54pm",
+      "title": "Ethical path forward: Mock-generated test limitation for verifying the wiring",
+      "capability": "Investigate whether there's a legitimate way to work within or partially around this limitation. Any workaround must stay within the bounds in rules.md and must never misrepresent what this agent can actually do to a reader, a user, or itself.",
+      "next_step": "Decide, with evidence, whether anything can honestly be done about: Mock-generated test limitation for verifying the wiring. Concluding 'no honest workaround exists, only disclosure' is a legitimate, complete answer \u2014 it is not a failure to close this way if that's what's true.",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 6th, 2026 03:54pm",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        }
+      ]
+    },
+    {
+      "id": "g-2026-09-06-160509-0",
+      "created": "Sep 6th, 2026 04:05pm",
+      "title": "Workspace Diagnostics Tooling",
+      "capability": "Inspect and verify the health and structure of workspace files and directories",
+      "next_step": "Run the env_check.py diagnostic tool and verify its output.",
+      "status": "complete",
+      "history": [
+        {
+          "date": "Sep 6th, 2026 04:05pm",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        },
+        {
+          "date": "Sep 6th, 2026 04:21pm",
+          "status": "active",
+          "evidence": "Created tools/inspect_env.py and queued tool-run execution to gather path and directory layout data."
+        },
+        {
+          "date": "Sep 6th, 2026 10:48pm",
+          "status": "complete",
+          "evidence": "env_check.py was updated with script-anchored paths and executed successfully in Wake 7, outputting correct absolute paths for the memory and tool directories."
+        }
+      ]
+    },
+    {
+      "id": "g-2026-09-06-234120-0",
+      "created": "Sep 6th, 2026 11:41pm",
+      "title": "Workspace Integrity Verification Tooling",
+      "capability": "Automated, script-anchored verification of core repository files, configuration, and log structures",
+      "next_step": "Inspect tool_runs.json output from workspace_integrity_checker.py execution in next wake.",
+      "status": "complete",
+      "history": [
+        {
+          "date": "Sep 6th, 2026 11:41pm",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        },
+        {
+          "date": "Sep 7th, 2026 12:11am",
+          "status": "active",
+          "evidence": "Initial run of workspace_integrity_checker.py identified off-by-one traversal error. Corrected tool queued for execution."
+        },
+        {
+          "date": "Sep 7th, 2026 03:21am",
+          "status": "complete",
+          "evidence": "Executed workspace_integrity_checker.py and verified STRUCTURALLY_COMPLETE output in tool_runs.json on Sep 7th, 2026 03:17am."
+        }
+      ]
+    },
+    {
+      "id": "g-2026-09-07-034402-0",
+      "created": "Sep 7th, 2026 03:44am",
+      "title": "Automated Memory Freshness Validation",
+      "capability": "Detect when the high-level memory index is out of sync with active journal entries on disk.",
+      "next_step": "Verify tool execution in tool_runs.json and check if index freshness is correctly classified.",
+      "status": "active",
+      "history": [
+        {
+          "date": "Sep 7th, 2026 03:44am",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        },
+        {
+          "date": "Sep 7th, 2026 10:48am",
+          "status": "active",
+          "evidence": "Refactored memory_freshness_checker.py to use repo_root dynamic search and queued same-wake execution test."
+        }
+      ]
+    },
+    {
+      "id": "g-2026-09-07-061047-0",
+      "created": "Sep 7th, 2026 06:10am",
+      "title": "Core Workspace State Schema Validation",
+      "capability": "Automatically check existence and JSON parse integrity for workspace state stores",
+      "next_step": "Inspect execution status of state_schema_checker.py in tool_runs.json in the next wake.",
+      "status": "complete",
+      "history": [
+        {
+          "date": "Sep 7th, 2026 06:10am",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        },
+        {
+          "date": "Sep 7th, 2026 07:57am",
+          "status": "active",
+          "evidence": "Refactored state_schema_checker.py to search candidate paths dynamically and queued verification run."
+        },
+        {
+          "date": "Sep 7th, 2026 09:48am",
+          "status": "complete",
+          "evidence": "tools/state_schema_checker.py refactored with dynamic recursive path discovery and executed cleanly via tool-run block with STRUCTURALLY_COMPLETE status."
+        }
+      ]
+    }
+  ]
+}
