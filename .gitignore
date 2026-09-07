@@ -22,3 +22,4 @@ Thumbs.db
 # Logs / misc
 *.log
 *.bak
+.pytest_cache/
