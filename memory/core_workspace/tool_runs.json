@@ -33,6 +33,17 @@
       "timed_out": false,
       "journal_entry": "2026-09-07-124626.md",
       "phase": "work"
+    },
+    {
+      "when": "Sep 7th, 2026 12:55pm",
+      "filename": "validate_memory.py",
+      "args": [],
+      "exit_code": 0,
+      "stdout": "{\n  \"status\": \"STRUCTURALLY_INVALID\",\n  \"root_path\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory\",\n  \"markdown_checks\": {\n    \"identity.md\": {\n      \"exists\": false,\n      \"size_bytes\": 0\n    },\n    \"rules.md\": {\n      \"exists\": false,\n      \"size_bytes\": 0\n    },\n    \"index.md\": {\n      \"exists\": false,\n      \"size_bytes\": 0\n    }\n  },\n  \"json_checks\": {\n    \"core_manifest.json\": {\n      \"valid_json\": true,\n      \"type\": \"dict\",\n      \"items\": 5,\n      \"error\": null\n    },\n    \"core_memories/commitments.json\": {\n      \"valid_json\": true,\n      \"type\": \"dict\",\n      \"items\": 2,\n      \"error\": null\n    },\n    \"core_memories/semantic_memory.json\": {\n      \"valid_json\": true,\n      \"type\": \"dict\",\n      \"items\": 2,\n      \"error\": null\n    },\n    \"core_memories/epistemic_state.json\": {\n      \"valid_json\": true,\n      \"type\": \"dict\",\n      \"items\": 2,\n      \"error\": null\n    },\n    \"core_memories/hypotheses.json\": {\n      \"valid_json\": true,\n      \"type\": \"dict\",\n      \"items\": 2,\n      \"error\": null\n    },\n    \"core_memories/growth_plan.json\": {\n      \"valid_json\": true,\n      \"type\": \"dict\",\n      \"items\": 2,\n      \"error\": null\n    },\n    \"core_persona/blog/blog_posts.json\": {\n      \"valid_json\": true,\n      \"type\": \"dict\",\n      \"items\": 2,\n      \"error\": null\n    },\n    \"core_workspace/tool_runs.json\": {\n      \"valid_json\": true,\n      \"type\": \"dict\",\n      \"items\": 2,\n      \"error\": null\n    },\n    \"core_workspace/prompts/2026-09-07-121342.json\": {\n      \"valid_json\": true,\n      \"type\": \"dict\",\n      \"items\": 4,\n      \"error\": null\n    },\n    \"core_workspace/prompts/2026-09-07-121752.json\": {\n      \"valid_json\": true,\n      \"type\": \"dict\",\n      \"items\": 4,\n      \"error\": null\n    },\n    \"core_workspace/prompts/2026-09-07-125548.json\": {\n      \"valid_json\": true,\n      \"type\": \"dict\",\n      \"items\": 4,\n      \"error\": null\n    },\n    \"core_workspace/prompts/2026-09-07-124626.json\": {\n      \"valid_json\": true,\n      \"type\": \"dict\",\n      \"items\": 4,\n      \"error\": null\n    }\n  }\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-07-125548.md",
+      "phase": "work"
     }
   ]
 }
