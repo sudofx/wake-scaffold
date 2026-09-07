@@ -90,10 +90,31 @@
       "created": "Sep 7th, 2026 12:59am",
       "prediction": "Executing refactored workspace_integrity_checker.py will display missing_required and found_required keys within the first 200 characters of tool_runs.json stdout, resolving path verification ambiguity.",
       "test_method": "Execute workspace_integrity_checker.py via tool-run and inspect stdout JSON prefix in tool_runs.json in next wake.",
-      "status": "untested",
+      "status": "confirmed",
       "history": [
         {
           "date": "Sep 7th, 2026 12:59am",
+          "status": "untested",
+          "evidence": "",
+          "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 7th, 2026 01:11am",
+          "status": "confirmed",
+          "evidence": "Wake 12 execution output in tool_runs.json displayed missing_required and found_required keys within the first 200 characters of stdout.",
+          "conclusion": "Top-indexing critical diagnostic keys in JSON stdout reliably preserves diagnostic visibility against output truncation."
+        }
+      ]
+    },
+    {
+      "id": "h-2026-09-07-011146-0",
+      "created": "Sep 7th, 2026 01:11am",
+      "prediction": "Executing workspace_integrity_checker.py with corrected target paths (memory/core_identity/rules.md, memory/core_persona/blog/html/index.html, memory/core_memories/index.md) will return status STRUCTURALLY_COMPLETE with an empty missing_required array and exit code 0.",
+      "test_method": "Execute workspace_integrity_checker.py via tool-run block and inspect tool_runs.json stdout in next wake.",
+      "status": "untested",
+      "history": [
+        {
+          "date": "Sep 7th, 2026 01:11am",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"

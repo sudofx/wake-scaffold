@@ -92,6 +92,17 @@
       "outcome": "Tool written and execution queued for next wake inspection.",
       "revision": "Diagnostic tool output schemas must format critical diagnostic failure details near the beginning of stdout to withstand truncation limits.",
       "source": "tool-run"
+    },
+    {
+      "id": "mr-2026-09-07-011146-009",
+      "date": "Sep 7th, 2026 01:11am",
+      "observation": "Wake 12 execution output in tool_runs.json displayed missing_required array within the first 200 characters of stdout before truncation.",
+      "claim": "Placing diagnostic output arrays at the top of JSON stdout preserves visibility even when output is truncated.",
+      "prediction": "Executing workspace_integrity_checker.py with top-indexed keys would make missing_required visible in tool_runs.json.",
+      "test": "Inspected tool_runs.json stdout for wake 12 execution of workspace_integrity_checker.py.",
+      "outcome": "missing_required array was fully visible at the start of stdout, listing the exact wrong target paths.",
+      "revision": "Confirmed that top-indexed stdout formatting effectively solves truncation loss for diagnostic tools.",
+      "source": "tool-run"
     }
   ]
 }

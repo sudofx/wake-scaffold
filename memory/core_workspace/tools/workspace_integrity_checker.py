@@ -2,55 +2,47 @@ import json
 import sys
 from pathlib import Path
 
-def main():
-    script_path = Path(__file__).resolve()
-    tools_dir = script_path.parent
-    core_workspace_dir = tools_dir.parent
-    memory_dir = core_workspace_dir.parent
-    repo_root_dir = memory_dir.parent
+def check_integrity():
+    tools_dir = Path(__file__).resolve().parent
+    core_workspace = tools_dir.parent
+    memory_dir = core_workspace.parent
+    repo_root = memory_dir.parent
 
     targets = {
-        "rules_md": repo_root_dir / "rules.md",
-        "blog_html": repo_root_dir / "blog.html",
-        "memory_index": memory_dir / "index.md",
-        "failure_modes": core_workspace_dir / "failure_modes.md",
+        "rules_md": memory_dir / "core_identity" / "rules.md",
+        "blog_index": memory_dir / "core_persona" / "blog" / "html" / "index.html",
+        "memory_index": memory_dir / "core_memories" / "index.md",
+        "failure_modes": core_workspace / "failure_modes.md",
+        "tool_runs": core_workspace / "tool_runs.json",
         "tools_dir": tools_dir,
     }
 
-    optional_targets = {
-        "tool_runs_core": core_workspace_dir / "tool_runs.json",
-        "tool_runs_tools": tools_dir / "tool_runs.json",
-        "growth_plan": memory_dir / "growth_plan.json",
-        "hypotheses": memory_dir / "hypotheses.json",
-    }
-
-    missing = []
-    found = []
+    found_required = []
+    missing_required = []
 
     for name, path in targets.items():
         if path.exists():
-            found.append(name)
+            found_required.append(f"{name}: {path}")
         else:
-            missing.append(f"{name}: {path}")
+            missing_required.append(f"{name}: {path}")
 
-    opt_found = [name for name, path in optional_targets.items() if path.exists()]
-    opt_missing = [name for name, path in optional_targets.items() if not path.exists()]
+    all_exist = len(missing_required) == 0
+    status = "STRUCTURALLY_COMPLETE" if all_exist else "STRUCTURALLY_INVALID"
 
-    all_required = (len(missing) == 0)
-    status = "STRUCTURALLY_COMPLETE" if all_required else "STRUCTURALLY_INVALID"
-
-    result = {
+    output = {
         "status": status,
-        "missing_required": missing,
-        "found_required": found,
-        "found_optional": opt_found,
-        "missing_optional": opt_missing,
-        "summary": f"{len(found)}/{len(targets)} required targets present",
-        "repo_root": str(repo_root_dir)
+        "missing_required": missing_required,
+        "found_required": found_required,
+        "script_location": str(Path(__file__).resolve()),
+        "repo_root_resolved": str(repo_root),
+        "memory_dir_resolved": str(memory_dir),
+        "check_count": len(targets),
+        "all_targets_exist": all_exist,
     }
 
-    print(json.dumps(result, indent=2))
-    sys.exit(0 if all_required else 1)
+    print(json.dumps(output, indent=2))
+    if not all_exist:
+        sys.exit(1)
 
 if __name__ == "__main__":
-    main()
+    check_integrity()
