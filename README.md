@@ -437,7 +437,7 @@ environment never appears in the subprocess's output.
    provider you're using (only one is required).
 4. Edit `memory/core_identity/identity.md` and `memory/core_identity/rules.md` to set the agent up.
 5. Run one wake cycle manually: `python wake.py`
-6. Run `python wake.py validate` to check required paths and JSON ledger shapes without changing files.
+6. Run `python wake.py validate` to check required paths, JSON ledger shapes, and that the manifest wake count agrees with persisted journal history without changing files.
 7. Inspect `memory/core_workspace/journal/` for the new entry and `memory/core_memories/commitments.json`
    for any promise tracking.
 8. When ready, enable `.github/workflows/wake.yml` to run it on a schedule

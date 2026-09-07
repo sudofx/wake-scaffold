@@ -494,6 +494,13 @@ def validate_active_memory() -> list[str]:
                             f"stale manifest layout: {key!r} should be {expected!r}"
                         )
 
+            successful_wakes = count_successful_wakes()
+            manifest_total = manifest.get("total_wakes") if isinstance(manifest, dict) else None
+            if manifest_total != successful_wakes:
+                findings.append(
+                    "manifest wake count drift: total_wakes should be "
+                    f"{successful_wakes}, got {manifest_total!r}"
+                )
     json_shapes = {
         MEMORIES_DIR / "commitments.json": "commitments",
         MEMORIES_DIR / "growth_plan.json": "projects",

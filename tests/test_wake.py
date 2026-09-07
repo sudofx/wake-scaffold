@@ -108,6 +108,24 @@ class WakeTestCase(unittest.TestCase):
 
 
 class MemoryValidationTests(WakeTestCase):
+    def test_manifest_persistence_matches_successful_journal_history(self):
+        journal = self.memory / "core_workspace" / "journal" / "2026-08-31-090000.md"
+        journal.write_text("# Reflection 2026-08-31-090000\n")
+        wake.write_core_manifest("Ada")
+        self.assertEqual(wake.validate_active_memory(), [])
+
+    def test_validation_detects_manifest_wake_count_drift(self):
+        journal = self.memory / "core_workspace" / "journal" / "2026-08-31-090000.md"
+        journal.write_text("# Reflection 2026-08-31-090000\n")
+        wake.write_core_manifest("Ada")
+        manifest_path = self.memory / "core_manifest.json"
+        manifest = json.loads(manifest_path.read_text())
+        manifest["total_wakes"] = 0
+        manifest_path.write_text(json.dumps(manifest) + "\n")
+
+        findings = wake.validate_active_memory()
+        self.assertTrue(any("manifest wake count drift" in item for item in findings))
+
     def test_clean_seeded_memory_passes_validation(self):
         self.assertEqual(wake.validate_active_memory(), [])
 
