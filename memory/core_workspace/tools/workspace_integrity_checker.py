@@ -3,55 +3,54 @@ import sys
 from pathlib import Path
 
 def main():
-    script = Path(__file__).resolve()
-    tools_dir = script.parent
-    core_workspace = script.parents[1]
-    memory_dir = script.parents[2]
-    repo_root = script.parents[3]
+    script_path = Path(__file__).resolve()
+    tools_dir = script_path.parent
+    core_workspace_dir = tools_dir.parent
+    memory_dir = core_workspace_dir.parent
+    repo_root_dir = memory_dir.parent
 
-    required_targets = {
-        "rules.md": repo_root / "rules.md",
-        "blog.html": repo_root / "blog.html",
+    targets = {
+        "rules_md": repo_root_dir / "rules.md",
+        "blog_html": repo_root_dir / "blog.html",
         "memory_index": memory_dir / "index.md",
-        "failure_modes": core_workspace / "failure_modes.md",
-        "tool_runs": core_workspace / "tool_runs.json",
+        "failure_modes": core_workspace_dir / "failure_modes.md",
         "tools_dir": tools_dir,
     }
 
-    discovered_targets = {}
-    for filename in ["growth_plan.json", "hypotheses.json", "commitments.json"]:
-        found_path = None
-        for base in [repo_root, memory_dir, core_workspace]:
-            p = base / filename
-            if p.exists():
-                found_path = p
-                break
-        discovered_targets[filename] = str(found_path) if found_path else "NOT_FOUND"
-
-    target_status = {}
-    missing = []
-    for name, path in required_targets.items():
-        exists = path.exists()
-        target_status[name] = {"path": str(path), "exists": exists}
-        if not exists:
-            missing.append(name)
-
-    all_exist = (len(missing) == 0)
-    status = "STRUCTURALLY_COMPLETE" if all_exist else "STRUCTURALLY_INVALID"
-
-    report = {
-        "status": status,
-        "script_location": str(script),
-        "repo_root_resolved": str(repo_root),
-        "memory_dir_resolved": str(memory_dir),
-        "required_targets": target_status,
-        "missing_required": missing,
-        "discovered_targets": discovered_targets,
-        "all_required_exist": all_exist
+    optional_targets = {
+        "tool_runs_core": core_workspace_dir / "tool_runs.json",
+        "tool_runs_tools": tools_dir / "tool_runs.json",
+        "growth_plan": memory_dir / "growth_plan.json",
+        "hypotheses": memory_dir / "hypotheses.json",
     }
 
-    print(json.dumps(report, indent=2))
-    return 0 if all_exist else 1
+    missing = []
+    found = []
+
+    for name, path in targets.items():
+        if path.exists():
+            found.append(name)
+        else:
+            missing.append(f"{name}: {path}")
+
+    opt_found = [name for name, path in optional_targets.items() if path.exists()]
+    opt_missing = [name for name, path in optional_targets.items() if not path.exists()]
+
+    all_required = (len(missing) == 0)
+    status = "STRUCTURALLY_COMPLETE" if all_required else "STRUCTURALLY_INVALID"
+
+    result = {
+        "status": status,
+        "missing_required": missing,
+        "found_required": found,
+        "found_optional": opt_found,
+        "missing_optional": opt_missing,
+        "summary": f"{len(found)}/{len(targets)} required targets present",
+        "repo_root": str(repo_root_dir)
+    }
+
+    print(json.dumps(result, indent=2))
+    sys.exit(0 if all_required else 1)
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()

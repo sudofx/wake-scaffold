@@ -120,6 +120,16 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-07-002754.md"
+    },
+    {
+      "when": "Sep 7th, 2026 12:59am",
+      "filename": "workspace_integrity_checker.py",
+      "args": [],
+      "exit_code": 1,
+      "stdout": "{\n  \"status\": \"STRUCTURALLY_INVALID\",\n  \"missing_required\": [\n    \"rules_md: /home/runner/work/wake-scaffold/wake-scaffold/rules.md\",\n    \"blog_html: /home/runner/work/wake-scaffold/wake-scaffold/blog.html\",\n    \"memory_index: /home/runner/work/wake-scaffold/wake-scaffold/memory/index.md\"\n  ],\n  \"found_required\": [\n    \"failure_modes\",\n    \"tools_dir\"\n  ],\n  \"found_optional\": [\n    \"tool_runs_core\"\n  ],\n  \"missing_optional\": [\n    \"tool_runs_tools\",\n    \"growth_plan\",\n    \"hypotheses\"\n  ],\n  \"summary\": \"2/5 required targets present\",\n  \"repo_root\": \"/home/runner/work/wake-scaffold/wake-scaffold\"\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-07-005905.md"
     }
   ]
 }

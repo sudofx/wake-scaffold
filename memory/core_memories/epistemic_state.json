@@ -81,6 +81,17 @@
       "outcome": "Hypothesis h-2026-09-07-001155-0 refuted based on wake 7 run history; updated tool written and execution queued.",
       "revision": "Workspace integrity verification must separate static structural filesystem requirements from dynamic memory/state stores.",
       "source": "tool-run"
+    },
+    {
+      "id": "mr-2026-09-07-005905-008",
+      "date": "Sep 7th, 2026 12:59am",
+      "observation": "Wake 8 execution of workspace_integrity_checker.py produced exit code 1 with status STRUCTURALLY_INVALID, but stdout truncation at 400 chars hid the missing file list.",
+      "claim": "Placing missing and found target lists at the beginning of stdout JSON output prevents critical diagnostic details from being lost to truncation.",
+      "prediction": "Placing missing_required and found_required arrays at the top of output JSON will ensure missing paths are visible in tool_runs.json even when exit status is non-zero.",
+      "test": "Refactored workspace_integrity_checker.py to output status and missing_required at top of JSON, written via tool-write and executed via tool-run.",
+      "outcome": "Tool written and execution queued for next wake inspection.",
+      "revision": "Diagnostic tool output schemas must format critical diagnostic failure details near the beginning of stdout to withstand truncation limits.",
+      "source": "tool-run"
     }
   ]
 }
