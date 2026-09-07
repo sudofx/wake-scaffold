@@ -992,6 +992,10 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         "```tool-run\n"
         '{"filename": "validate_memory.py", "args": ["memory"]}\n'
         "```\n"
+        "Optionally include `hypothesis_id` in a tool-run block to link the "
+        "execution to a recorded hypothesis. The runner mechanically records "
+        "the wake phase and, for same-wake development runs, the development "
+        "iteration; do not claim those fields are evidence of success.\n"
         "Executes that one file from tools/ with Python, nothing else — it "
         "must already exist there (write it first with tool-write, same "
         "wake or an earlier one), must be a .py file, and only plain string "
@@ -2284,7 +2288,14 @@ def format_tool_runs_for_prompt() -> str:
     return "\n".join(lines)
 
 
-def apply_tool_run(raw_json: str, now: datetime, journal_fname: str, max_runs: int = 1) -> list[str]:
+def apply_tool_run(
+    raw_json: str,
+    now: datetime,
+    journal_fname: str,
+    max_runs: int = 1,
+    phase: str = "work",
+    development_iteration: int | None = None,
+) -> list[str]:
     """
     Executes exactly one already-written file from memory/tools/ with
     Python and nothing else — no shell, no arbitrary paths, bounded by
@@ -2360,7 +2371,11 @@ def apply_tool_run(raw_json: str, now: datetime, journal_fname: str, max_runs: i
 
     data = load_tool_runs()
     runs = data.setdefault("runs", [])
-    runs.append({
+
+    # Execution metadata is recorded alongside the raw result so a later
+    # wake can distinguish an ordinary work run from a same-wake development
+    # iteration without relying on the journal prose to reconstruct it.
+    run_record = {
         "when": format_display_time(now),
         "filename": filename,
         "args": clean_args,
@@ -2369,7 +2384,14 @@ def apply_tool_run(raw_json: str, now: datetime, journal_fname: str, max_runs: i
         "stderr": stderr,
         "timed_out": timed_out,
         "journal_entry": journal_fname,
-    })
+        "phase": phase,
+    }
+    if development_iteration is not None:
+        run_record["development_iteration"] = development_iteration
+    hypothesis_id = data_in.get("hypothesis_id")
+    if hypothesis_id is not None and str(hypothesis_id).strip():
+        run_record["hypothesis_id"] = str(hypothesis_id).strip()[:120]
+    runs.append(run_record)
     if len(runs) > MAX_TOOL_RUN_HISTORY:
         data["runs"] = runs[-MAX_TOOL_RUN_HISTORY:]
     atomic_write_text(TOOL_RUNS_FILE, json.dumps(data, indent=2) + "\n")
@@ -2460,6 +2482,7 @@ def apply_development_output(
     journal_fname: str,
     remaining_writes: int,
     remaining_runs: int,
+    development_iteration: int = 1,
 ) -> tuple[list[str], int, int]:
     """Apply only tool-write/tool-run blocks from a development follow-up."""
     notes: list[str] = []
@@ -2476,8 +2499,15 @@ def apply_development_output(
     run_blocks = extract_all_blocks(model_output, "tool-run")
     allowed_runs = min(len(run_blocks), remaining_runs)
     for run_block in run_blocks[:allowed_runs]:
-        notes.extend(apply_tool_run(run_block, now, journal_fname, max_runs=1))
-        runs_used += 1 if notes and notes[-1].startswith("RAN tools/") else 0
+        before = len(tool_runs_for_journal(journal_fname))
+        notes.extend(
+            apply_tool_run(
+                run_block, now, journal_fname, max_runs=1,
+                phase="development", development_iteration=development_iteration,
+            )
+        )
+        after = len(tool_runs_for_journal(journal_fname))
+        runs_used += 1 if after > before else 0
     if len(run_blocks) > allowed_runs:
         notes.append("IGNORED development tool-run block(s): per-wake execution budget exhausted.")
     return notes, writes_used, runs_used
@@ -2914,7 +2944,7 @@ def run_offline_fallback(now: datetime, journal_fname: str) -> list[str]:
                 "tools/validate_memory.py doesn't exist yet."]
     return apply_tool_run(
         json.dumps({"filename": "validate_memory.py", "args": []}),
-        now, journal_fname,
+        now, journal_fname, phase="offline",
     )
 
 
@@ -3205,7 +3235,8 @@ def _run_wake():
             )
             break
         notes, writes_used, runs_used = apply_development_output(
-            followup_output, now, journal_fname, remaining_writes, remaining_runs
+            followup_output, now, journal_fname, remaining_writes, remaining_runs,
+            development_iteration=iteration,
         )
         development_notes.extend([f"DEVELOPMENT iteration {iteration}: {n}" for n in notes])
         development_writes += writes_used

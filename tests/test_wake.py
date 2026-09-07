@@ -804,6 +804,29 @@ class SameWakeDevelopmentTests(WakeTestCase):
         self.assertEqual(len(runs_for_wake), 2)
         self.assertEqual(runs_for_wake[0]["exit_code"], 1)
         self.assertEqual(runs_for_wake[1]["exit_code"], 0)
+        self.assertEqual(runs_for_wake[0]["phase"], "work")
+        self.assertNotIn("development_iteration", runs_for_wake[0])
+        self.assertEqual(runs_for_wake[1]["phase"], "development")
+        self.assertEqual(runs_for_wake[1]["development_iteration"], 1)
+
+    def test_tool_run_records_hypothesis_id(self):
+        journal = "2026-08-31-100000.md"
+        wake.TOOLS_DIR.mkdir(parents=True, exist_ok=True)
+        wake.TOOL_RUNS_FILE.write_text(json.dumps({"runs": []}) + "\n")
+        wake.apply_tool_write(
+            json.dumps({"files": [{"filename": "linked.py", "content": "print('ok')\n"}]}),
+            FIXED_NOW, journal,
+        )
+        notes = wake.apply_tool_run(
+            json.dumps({"filename": "linked.py", "args": [], "hypothesis_id": "h-test-1"}),
+            FIXED_NOW, journal,
+            phase="development", development_iteration=2,
+        )
+        self.assertIn("exit code 0", notes[0])
+        run = wake.tool_runs_for_journal(journal)[0]
+        self.assertEqual(run["hypothesis_id"], "h-test-1")
+        self.assertEqual(run["phase"], "development")
+        self.assertEqual(run["development_iteration"], 2)
 
     def test_development_execution_budget_is_enforced(self):
         output = "```tool-run\n" + json.dumps({"filename": "missing.py", "args": []}) + "\n```"
