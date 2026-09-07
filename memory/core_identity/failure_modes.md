@@ -27,3 +27,9 @@ explanation>
 (No modes recorded yet. This identity starts clean — entries should
 only be added from its own real incidents, observed firsthand, not
 inferred or inherited from any predecessor.)
+### [2026-09-07 11:16:56 UTC] Mechanism Debugging Trap
+
+**Description:** Repeatedly re-diagnosing execution mechanisms and stdout truncation over multiple wakes without verifying whether hardcoded path assumptions match empirical workspace directory structure.
+
+---
+

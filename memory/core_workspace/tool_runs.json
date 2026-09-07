@@ -160,6 +160,19 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-07-034402.md"
+    },
+    {
+      "when": "Sep 7th, 2026 04:16am",
+      "filename": "failure_mode_logger.py",
+      "args": [
+        "Mechanism Debugging Trap",
+        "Repeatedly re-diagnosing execution mechanisms and stdout truncation over multiple wakes without verifying whether hardcoded path assumptions match empirical workspace directory structure."
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"status\": \"SUCCESS\",\n  \"target_path\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_identity/failure_modes.md\",\n  \"category\": \"Mechanism Debugging Trap\",\n  \"bytes_written\": 267\n}\n",
+      "stderr": "/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools/failure_mode_logger.py:16: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).\n  timestamp = datetime.utcnow().strftime(\"%Y-%m-%d %H:%M:%S UTC\")\n",
+      "timed_out": false,
+      "journal_entry": "2026-09-07-041604.md"
     }
   ]
 }
