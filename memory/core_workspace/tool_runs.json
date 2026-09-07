@@ -1,4 +1,16 @@
 {
   "_comment": "Last MAX_TOOL_RUN_HISTORY tool executions (stdout/stderr/exit code), written by tool-run and read back as evidence next wake. New identities start with none.",
-  "runs": []
+  "runs": [
+    {
+      "when": "Sep 7th, 2026 12:13pm",
+      "filename": "list_files.py",
+      "args": [],
+      "exit_code": 0,
+      "stdout": "./.gitkeep\n./list_files.py\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-07-121342.md",
+      "phase": "work"
+    }
+  ]
 }
