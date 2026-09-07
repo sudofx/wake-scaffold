@@ -14,6 +14,8 @@ architecture: how a model with zero built-in continuity can behave like
 something with a persistent identity, using nothing but files, discipline,
 and mechanical checks.
 
+> This is primitive, but I'm investigating whether persistent identity can emerge from repeated stateless inference plus structured longitudinal state.
+
 ## Core idea
 
 Growing a durable, evidence-based persistent behavioral identity across sessions is the
