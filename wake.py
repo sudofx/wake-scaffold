@@ -2441,6 +2441,62 @@ def apply_tool_run(
             f"tool_runs.json — available immediately to a same-wake development follow-up and to future wakes."]
 
 
+def build_development_metrics(journal_fname: str, development_notes: list[str] | None = None) -> str:
+    """Render mechanically derived same-wake development metrics.
+
+    These are deliberately derived from persisted tool-run records and the
+    visible development notes rather than asking the model to estimate its
+    own performance.  They measure the immediate value of same-wake
+    iteration without claiming that a local fix is longitudinal learning.
+    """
+    runs = [
+        run for run in tool_runs_for_journal(journal_fname)
+        if run.get("phase") == "development"
+    ]
+    notes = development_notes or []
+    revisions = sum(
+        1 for note in notes
+        if "WROTE tools/" in note or "OVERWROTE tools/" in note
+    )
+    successful = sum(1 for run in runs if run.get("exit_code") == 0)
+    failed = sum(1 for run in runs if run.get("exit_code") != 0)
+    targets = {(run.get("filename"), tuple(run.get("args", []))) for run in runs}
+    iterations = [
+        run.get("development_iteration") for run in runs
+        if isinstance(run.get("development_iteration"), int)
+    ]
+
+    lines = [
+        "## Same-wake development metrics",
+        "",
+        "These metrics are computed from persisted execution evidence; they are not model-reported estimates.",
+        "",
+        f"- **Development executions:** {len(runs)}",
+        f"- **Successful executions:** {successful}",
+        f"- **Failed executions:** {failed}",
+        f"- **Distinct development targets:** {len(targets)}",
+        f"- **Recorded development revisions:** {revisions}",
+    ]
+    if iterations:
+        lines.append(f"- **Highest development iteration:** {max(iterations)}")
+    if runs and failed and successful:
+        lines.append(
+            "- **Same-wake recovery observed:** yes — at least one development "
+            "failure was followed by a successful development execution."
+        )
+    elif runs and failed:
+        lines.append("- **Same-wake recovery observed:** no successful development execution followed the recorded failures.")
+    elif runs:
+        lines.append("- **Same-wake recovery observed:** not applicable — no development failure was recorded.")
+    else:
+        lines.append("- **Same-wake recovery observed:** no development execution occurred.")
+    lines.append(
+        "- **Interpretation boundary:** these metrics describe local development efficiency only; "
+        "they do not establish longitudinal learning across a wake boundary."
+    )
+    return "\n".join(lines)
+
+
 def build_development_causal_trace(journal_fname: str, development_notes: list[str]) -> str:
     """Render a compact, evidence-grounded trace of same-wake development.
 
@@ -3341,8 +3397,10 @@ def _run_wake():
             f"- {n}" for n in development_notes
         )
         output_with_notes += "\n\n" + build_development_causal_trace(journal_fname, development_notes)
+        output_with_notes += "\n\n" + build_development_metrics(journal_fname, development_notes)
     elif tool_runs_for_journal(journal_fname):
         output_with_notes += "\n\n" + build_development_causal_trace(journal_fname, [])
+        output_with_notes += "\n\n" + build_development_metrics(journal_fname, [])
 
     path = write_journal_entry(now, journal_fname, reflection, output_with_notes, provider_name)
     write_synthesis_entry(now, journal_fname, reflection)

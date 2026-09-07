@@ -1295,6 +1295,40 @@ class IdentityLifecycleTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             wake.migrate_persona_layout()
 
+    def test_development_metrics_are_derived_from_execution_evidence(self):
+        journal = "2026-08-31-120000.md"
+        wake.TOOLS_DIR.mkdir(parents=True, exist_ok=True)
+        wake.TOOL_RUNS_FILE.write_text(json.dumps({"runs": []}) + "\n")
+        wake.apply_tool_write(
+            json.dumps({"files": [{"filename": "metrics_tool.py", "content": "raise SystemExit(1)\n"}]}),
+            FIXED_NOW, journal,
+        )
+        wake.apply_tool_run(
+            json.dumps({"filename": "metrics_tool.py", "args": [], "hypothesis_id": "h-metrics"}),
+            FIXED_NOW, journal, phase="development", development_iteration=1,
+        )
+        wake.apply_tool_write(
+            json.dumps({"files": [{"filename": "metrics_tool.py", "content": "print('fixed')\n"}]}),
+            FIXED_NOW, journal,
+        )
+        wake.apply_tool_run(
+            json.dumps({"filename": "metrics_tool.py", "args": [], "hypothesis_id": "h-metrics"}),
+            FIXED_NOW, journal, phase="development", development_iteration=2,
+        )
+
+        metrics = wake.build_development_metrics(
+            journal,
+            ["DEVELOPMENT iteration 1: OVERWROTE tools/metrics_tool.py"]
+        )
+        self.assertIn("Development executions:** 2", metrics)
+        self.assertIn("Successful executions:** 1", metrics)
+        self.assertIn("Failed executions:** 1", metrics)
+        self.assertIn("Distinct development targets:** 1", metrics)
+        self.assertIn("Recorded development revisions:** 1", metrics)
+        self.assertIn("Highest development iteration:** 2", metrics)
+        self.assertIn("Same-wake recovery observed:** yes", metrics)
+        self.assertIn("do not establish longitudinal learning", metrics)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
