@@ -2441,6 +2441,54 @@ def apply_tool_run(
             f"tool_runs.json — available immediately to a same-wake development follow-up and to future wakes."]
 
 
+def build_development_causal_trace(journal_fname: str, development_notes: list[str]) -> str:
+    """Render a compact, evidence-grounded trace of same-wake development.
+
+    The trace deliberately separates implementation/revision notes from actual
+    execution evidence.  A successful final run establishes local development
+    success; it does not establish that the lesson survived a wake boundary.
+    """
+    runs = tool_runs_for_journal(journal_fname)
+    if not runs and not development_notes:
+        return "No same-wake development sequence occurred."
+
+    lines = [
+        "## Development causal trace",
+        "",
+        "The sequence below is reconstructed from persisted tool evidence and visible development notes; "
+        "it does not retroactively alter any hypothesis.",
+        "",
+        "- **Prediction / intent:** established before the relevant test; see the linked hypothesis record when present.",
+    ]
+    for index, run in enumerate(runs, start=1):
+        status = "success" if run.get("exit_code") == 0 else f"failure (exit {run.get('exit_code')})"
+        iteration = run.get("development_iteration")
+        phase = run.get("phase", "work")
+        label = f"iteration {iteration}" if iteration is not None else phase
+        hypothesis = run.get("hypothesis_id")
+        hyp_text = f"; hypothesis {hypothesis}" if hypothesis else ""
+        lines.append(
+            f"- **Result {index} ({label}):** tools/{run.get('filename', '?')} "
+            f"→ {status}{hyp_text}."
+        )
+    if development_notes:
+        lines.append("- **Observation / revision notes:**")
+        for note in development_notes:
+            lines.append(f"  - {note}")
+    final_runs = {}
+    for run in runs:
+        final_runs[(run.get("filename"), tuple(run.get("args", [])))] = run
+    if any(r.get("exit_code") == 0 for r in final_runs.values()):
+        lines.append("- **Local development result:** at least one target finished with a successful latest run in this wake.")
+    else:
+        lines.append("- **Local development result:** no target has a successful latest run in this wake.")
+    lines.append(
+        "- **Longitudinal validation:** remains a separate claim; the next wake must verify what persisted "
+        "and whether it changes later behavior."
+    )
+    return "\n".join(lines)
+
+
 def tool_runs_for_journal(journal_fname: str) -> list[dict]:
     """Return immutable execution evidence produced by this wake."""
     return [
@@ -3292,6 +3340,9 @@ def _run_wake():
         output_with_notes += "\n\n---\n\n## System note: same-wake development\n\n" + "\n".join(
             f"- {n}" for n in development_notes
         )
+        output_with_notes += "\n\n" + build_development_causal_trace(journal_fname, development_notes)
+    elif tool_runs_for_journal(journal_fname):
+        output_with_notes += "\n\n" + build_development_causal_trace(journal_fname, [])
 
     path = write_journal_entry(now, journal_fname, reflection, output_with_notes, provider_name)
     write_synthesis_entry(now, journal_fname, reflection)

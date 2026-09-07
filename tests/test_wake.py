@@ -1298,3 +1298,35 @@ class IdentityLifecycleTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+class DevelopmentCausalTraceTests(WakeTestCase):
+    def test_causal_trace_preserves_failure_and_success_and_marks_longitudinal_pending(self):
+        journal = "2026-08-31-110000.md"
+        wake.TOOLS_DIR.mkdir(parents=True, exist_ok=True)
+        wake.TOOL_RUNS_FILE.write_text(json.dumps({"runs": []}) + "\n")
+        wake.apply_tool_write(
+            json.dumps({"files": [{"filename": "trace_tool.py", "content": "raise SystemExit(1)\n"}]}),
+            FIXED_NOW, journal,
+        )
+        wake.apply_tool_run(
+            json.dumps({"filename": "trace_tool.py", "args": [], "hypothesis_id": "h-trace"}),
+            FIXED_NOW, journal,
+        )
+        wake.apply_tool_write(
+            json.dumps({"files": [{"filename": "trace_tool.py", "content": "print('fixed')\n"}]}),
+            FIXED_NOW, journal,
+        )
+        wake.apply_tool_run(
+            json.dumps({"filename": "trace_tool.py", "args": [], "hypothesis_id": "h-trace"}),
+            FIXED_NOW, journal, phase="development", development_iteration=1,
+        )
+
+        trace = wake.build_development_causal_trace(journal, ["revised after observed failure"])
+        self.assertIn("Result 1", trace)
+        self.assertIn("failure (exit 1)", trace)
+        self.assertIn("Result 2", trace)
+        self.assertIn("success", trace)
+        self.assertIn("h-trace", trace)
+        self.assertIn("revised after observed failure", trace)
+        self.assertIn("Local development result", trace)
+        self.assertIn("Longitudinal validation", trace)
