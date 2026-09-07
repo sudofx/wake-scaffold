@@ -16,7 +16,7 @@ and mechanical checks.
 
 ## Core idea
 
-Growing a durable, evidence-based sense of self across sessions is the
+Growing a durable, evidence-based persistent behavioral identity across sessions is the
 primary point of this project — not any product it happens to build.
 Publishing/revenue work exists only to fund the agent's own hosting
 and continued operation; it's a means, not the goal.
