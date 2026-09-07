@@ -35,6 +35,17 @@
       "outcome": "Tool execution queued; output format structure handles root, memory, core_workspace, and tools directories cleanly.",
       "revision": "Adopted script-location anchored pathing as mandatory baseline for all workspace maintenance and inspection tools.",
       "source": "tool-run"
+    },
+    {
+      "id": "mr-2026-09-06-223736-004",
+      "date": "Sep 6th, 2026 10:37pm",
+      "observation": "explore_workspace.py output showed sandboxed tools execute in memory/core_workspace/tools while repo root is 3 levels up and memory is 2 levels up.",
+      "claim": "Anchoring file paths to Path(__file__).resolve().parents allows tools to reliably access workspace directories regardless of process cwd.",
+      "prediction": "Rewriting env_check.py with Path(__file__).resolve().parents will allow it to locate memory/ and tools/ without path errors.",
+      "test": "Rewrote env_check.py using script parent paths and queued tool execution.",
+      "outcome": "Tool written cleanly and execution queued for environment verification.",
+      "revision": "Script-location anchored path resolution is established as the standard pattern for all workspace inspection tools.",
+      "source": "hypothesis"
     }
   ]
 }
