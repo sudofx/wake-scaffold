@@ -44,6 +44,17 @@
       "timed_out": false,
       "journal_entry": "2026-09-07-125548.md",
       "phase": "work"
+    },
+    {
+      "when": "Sep 7th, 2026 01:10pm",
+      "filename": "validate_memory.py",
+      "args": [],
+      "exit_code": 0,
+      "stdout": "{\n  \"status\": \"STRUCTURALLY_INVALID\",\n  \"root_path\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory\",\n  \"markdown_checks\": {\n    \"identity.md\": {\n      \"exists\": false,\n      \"size_bytes\": 0,\n      \"located_at\": null\n    },\n    \"rules.md\": {\n      \"exists\": false,\n      \"size_bytes\": 0,\n      \"located_at\": null\n    },\n    \"index.md\": {\n      \"exists\": false,\n      \"size_bytes\": 0,\n      \"located_at\": null\n    }\n  },\n  \"json_checks\": {\n    \"core_workspace/commitments.json\": {\n      \"exists\": false,\n      \"size_bytes\": 0,\n      \"valid_json\": false,\n      \"type\": null\n    },\n    \"core_workspace/tool_runs.json\": {\n      \"exists\": true,\n      \"size_bytes\": 4659,\n      \"valid_json\": true,\n      \"type\": \"dict\"\n    }\n  }\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-07-131008.md",
+      "phase": "work"
     }
   ]
 }
