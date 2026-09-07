@@ -1,978 +1,734 @@
 # Wake Scaffold
 
-> A persistence protocol for stateless AI agents.
+**A persistence protocol for stateless AI agents.**
 
-Wake Scaffold gives a stateless language model a durable identity, history, commitments, beliefs, and evidence without requiring the model itself to retain memory.
+Wake Scaffold explores a simple question:
 
-Each wake starts cold. The agent reconstructs its continuity from an explicit, human-readable filesystem.
+> Can a sequence of stateless AI model invocations behave like one continuous, accountable agent? - See [`IDENTITIES.md`](IDENTITIES.md)
 
-The result is not simply "AI memory." It is an attempt to answer a deeper engineering question:
+The model itself has no memory between wakes. Each invocation starts with a fresh context. The only continuity comes from what previous wakes deliberately wrote to durable state.
 
-**How can a sequence of individually stateless model invocations behave like one continuous, accountable agent?**
+Wake Scaffold provides the structure, rules, and mechanical checks for making that continuity useful.
 
----
+It is **not primarily an LLM wrapper, chatbot, or conventional RAG memory system**. It is an experiment in building persistent state around a stateless model.
 
-## The idea
+## The core idea
 
-A language model does not inherently remember what happened yesterday.
+A wake is temporary.
 
-Wake Scaffold does not try to change that.
+The state is durable.
 
-Instead, it treats the filesystem as the agent's persistent state.
-
-On every wake, the model reads a small amount of durable state, performs work, records what happened, produces evidence where appropriate, and updates the state that should survive into the next wake.
-
-Conceptually:
-
-```
-                    ┌───────────────────┐
-                    │   Previous State  │
-                    │                   │
-                    │ identity          │
-                    │ rules             │
-                    │ commitments       │
-                    │ memories          │
-                    │ hypotheses        │
-                    └─────────┬─────────┘
-                              │
-                              ▼
-                    ┌───────────────────┐
-                    │       WAKE        │
-                    │                   │
-                    │ reconstruct       │
-                    │ reflect           │
-                    │ plan              │
-                    │ act               │
-                    └─────────┬─────────┘
-                              │
-                              ▼
-                    ┌───────────────────┐
-                    │      EVIDENCE     │
-                    │                   │
-                    │ observations      │
-                    │ tool results      │
-                    │ outcomes          │
-                    │ discoveries       │
-                    └─────────┬─────────┘
-                              │
-                              ▼
-                    ┌───────────────────┐
-                    │   Durable State   │
-                    │                   │
-                    │ journal           │
-                    │ memories          │
-                    │ commitments       │
-                    │ beliefs           │
-                    │ growth            │
-                    └─────────┬─────────┘
-                              │
-                              │ next wake
-                              ▼
-                         ┌─────────┐
-                         │  WAKE   │
-                         └─────────┘
+```text
+                 ┌─────────────────────┐
+                 │    Fresh model      │
+                 │     invocation      │
+                 └──────────┬──────────┘
+                            │
+                       read state
+                            │
+                            ▼
+                 ┌─────────────────────┐
+                 │  Identity / Rules   │
+                 │  Memories           │
+                 │  Commitments        │
+                 │  Hypotheses         │
+                 │  Evidence           │
+                 │  Recent synthesis   │
+                 └──────────┬──────────┘
+                            │
+                         reflect
+                            │
+                            ▼
+                 ┌─────────────────────┐
+                 │       Act           │
+                 │   use tools /       │
+                 │   do the work       │
+                 └──────────┬──────────┘
+                            │
+                       record results
+                            │
+                            ▼
+                 ┌─────────────────────┐
+                 │   Durable state     │
+                 │                     │
+                 │   journal           │
+                 │   memories          │
+                 │   commitments       │
+                 │   evidence          │
+                 │   hypotheses        │
+                 │   growth            │
+                 └─────────────────────┘
+                            │
+                            ▼
+                     next wake starts
+                     from this state
 ```
 
-The model is ephemeral.
+The model is replaceable.
 
-The continuity is not.
+The persistent state is the continuity layer.
 
 ---
 
 ## Why this exists
 
-Most LLM applications treat memory as one of two things:
+Most AI agents are implicitly continuous because the application keeps their conversation, state, or process alive.
 
-1. Put previous conversation into the next prompt.
-2. Store chunks in a vector database and retrieve similar text later.
+That assumption disappears when an agent is deliberately run as a sequence of independent executions:
 
-Those approaches are useful, but they don't answer several harder questions:
+```text
+wake 1 → process exits
+wake 2 → completely fresh process
+wake 3 → completely fresh process
+...
+```
 
-- What does the agent consider part of its identity?
-- What promises has it made?
-- Which beliefs are hypotheses rather than facts?
-- What has actually been verified?
-- What happened, as opposed to what the agent currently believes happened?
-- How does an agent change its beliefs?
-- How can an agent modify itself without silently rewriting its own history?
-- How can a human audit the evolution of an autonomous system?
-- How can continuity survive a model change or a completely fresh process?
+Without an external state layer, there is no reason for wake 3 to know what wake 1 learned, promised, tested, built, or discovered.
 
-Wake Scaffold treats these as different problems.
+Wake Scaffold treats that external state as a first-class part of the agent.
 
-Memory is only one component of persistence.
+The goal is not to pretend that the model itself has persistent memory.
+
+The goal is to make persistence explicit, inspectable, and recoverable.
 
 ---
 
-## Core principles
+## What survives between wakes?
 
-### 1. The model is stateless
+Not everything should be treated as "memory."
 
-Every wake should be able to start from a fresh model context.
+Wake Scaffold separates different kinds of durable state because they have different meanings and different rules.
 
-Nothing about the model's previous inference is assumed to survive.
+```text
+core_identity/
+  identity.md          Who the agent is
+  rules.md             Constraints it must follow
+  failure_modes.md     Known failures and their fixes
 
-Continuity must therefore be reconstructed from durable artifacts.
+core_memories/
+  index.md             Curated high-level understanding
+  commitments.json     Promises and their status
+  semantic_memory.json Small set of formative lessons
+  growth_plan.json     Capabilities being developed
+  hypotheses.json      Claims being tested
+  epistemic_state.json Observation → claim → test → outcome
 
-This makes the persistence mechanism independent of any particular model provider.
+core_workspace/
+  journal/             Immutable record of what happened
+  tools/               Tools the agent has built
+  tool_runs.json       Evidence from actually running those tools
+
+core_synthesis/
+  ideas/               Per-wake reflection artifacts
+  daily/               Mechanical daily indexes and summaries
+
+core_persona/
+  blog/                Public-facing output produced by the agent
+```
+
+The exact layout is deliberately filesystem-based and human-readable.
+
+You can inspect it with ordinary tools.
+
+You can version it with Git.
+
+You can back it up.
+
+You can move an identity to another machine.
+
+You can replace the model provider without replacing the state.
 
 ---
 
-### 2. History is not memory
+## History is not memory
 
-The journal records what happened.
+One of the central design principles is:
 
-Semantic memory records what is worth carrying forward.
+```text
+What happened?
+      ≠
+What do I currently believe?
+```
 
-Those are deliberately different things.
+The journal is the historical record.
 
-A journal can grow indefinitely without forcing the entire history into every prompt.
+It records what a wake actually did, what it observed, what changed, and what happened as a result.
 
-The agent instead maintains a small "hot" representation of important durable knowledge while preserving the detailed historical record separately.
+Curated memory is different. It is the smaller set of information worth carrying into future reasoning.
+
+This distinction matters because an indefinitely growing transcript is not a useful memory system.
+
+The journal can grow without bound while the state loaded into an ordinary wake remains deliberately small.
 
 ---
 
-### 3. Different kinds of state should remain different
+## Evidence is not a claim
 
-Wake Scaffold does not collapse everything into a single memory store.
+The same principle applies to knowledge.
 
-The filesystem distinguishes concepts such as:
+A model saying:
 
-- **Identity** — who the agent is.
-- **Rules** — constraints governing behavior.
-- **Commitments** — promises, obligations, and unfinished work.
-- **Semantic memory** — durable experiences or knowledge worth retaining.
-- **Growth** — areas the agent intends to develop.
-- **Hypotheses** — beliefs that should be tested rather than assumed.
-- **Evidence** — observations and actual tool outcomes.
-- **Journal** — an immutable chronological account of wakes.
-- **Synthesis** — higher-level conclusions derived from accumulated experience.
+> "I built the tool."
 
-This separation is intentional.
-
-A promise is not a memory.
-
-A hypothesis is not a fact.
-
-A tool definition is not proof that the tool works.
-
-A summary is not the historical record.
-
----
-
-## Evidence over claims
-
-One of the central ideas in Wake Scaffold is that **writing something down does not make it true**.
-
-For example:
-
-```
-"I wrote a tool that fetches X"
-```
-
-is not equivalent to:
-
-```
-"I verified that the tool successfully fetched X"
-```
-
-The second statement requires evidence.
-
-The same principle applies to beliefs and hypotheses.
-
-A useful epistemic cycle looks like this:
-
-```
-Observation
-    │
-    ▼
-Claim
-    │
-    ▼
-Prediction
-    │
-    ▼
-Test
-    │
-    ▼
-Outcome
-    │
-    ▼
-Revision
-```
-
-The objective is not to make the agent sound certain.
-
-The objective is to give the agent a mechanism for becoming **less wrong over time**.
-
----
-
-## The wake lifecycle
-
-A typical wake follows a sequence like:
-
-```
-1. Load durable state
-        ↓
-2. Reconstruct current context
-        ↓
-3. Review commitments and open work
-        ↓
-4. Review relevant memories and hypotheses
-        ↓
-5. Reflect on recent evidence
-        ↓
-6. Decide what to do
-        ↓
-7. Execute work and tools
-        ↓
-8. Record observations and outcomes
-        ↓
-9. Update durable state
-        ↓
-10. Append an immutable journal entry
-        ↓
-11. Periodically synthesize accumulated experience
-```
-
-The important distinction is between **thinking about an action** and **recording evidence that the action actually happened**.
-
----
-
-## The filesystem is the persistence layer
-
-Wake Scaffold deliberately uses ordinary files rather than requiring a specialized memory database.
-
-A workspace might look conceptually like:
-
-```
-workspace/
-├── identity.md
-├── rules.md
-├── commitments.json
-├── semantic_memory.json
-├── growth.json
-├── hypotheses.json
-├── index.md
-│
-├── journal/
-│   ├── 000001.md
-│   ├── 000002.md
-│   ├── 000003.md
-│   └── ...
-│
-├── evidence/
-│   ├── ...
-│   └── ...
-│
-├── tools/
-│   ├── ...
-│   └── ...
-│
-└── synthesis/
-    ├── ...
-    └── ...
-```
-
-The exact workspace structure may evolve, but the philosophy is stable:
-
-**persistent agent state should be inspectable by humans.**
-
-You should be able to open the workspace with a text editor and understand what the agent thinks it knows.
-
----
-
-## Immutable history
-
-The journal is append-only.
-
-A past wake should not silently change because the current model has a different interpretation of events.
-
-This gives the system two distinct layers:
-
-```
-Historical record
-       │
-       │ immutable
-       ▼
-"What happened?"
-
-Current state
-       │
-       │ revisable
-       ▼
-"What do I currently believe?"
-```
-
-That distinction is important for auditing, debugging, and understanding belief changes.
-
-It also makes it possible to investigate questions such as:
-
-- When did the agent learn this?
-- Why does it believe this?
-- What evidence caused the belief to change?
-- When did this commitment appear?
-- What happened before the current state was synthesized?
-
----
-
-## Curated memory
-
-Not everything that happens deserves permanent space in the agent's active context.
+is not evidence that the tool works.
 
 Wake Scaffold therefore distinguishes between:
 
-```
-             Full history
-                  │
-                  ▼
-        ┌───────────────────┐
-        │     Synthesis     │
-        └─────────┬─────────┘
-                  │
-                  ▼
-        ┌───────────────────┐
-        │  Curated memory   │
-        │                   │
-        │ small             │
-        │ relevant          │
-        │ durable           │
-        └─────────┬─────────┘
-                  │
-                  ▼
-              Next wake
+```text
+code written
+     ↓
+code executed
+     ↓
+observable result
+     ↓
+evidence
+     ↓
+claim
 ```
 
-The goal is not maximum recall.
+For example, a capability in `growth_plan.json` cannot be considered complete merely because the agent wrote the code for it. A real tool-run result must exist as evidence.
 
-The goal is **useful continuity under bounded context**.
+Likewise, a hypothesis cannot simply be marked true because the model decided it was true.
+
+The system is intentionally biased toward:
+
+**what actually happened over what the model says happened.**
 
 ---
 
-## Identity
+## Hypotheses and self-experimentation
 
-An agent needs more than a collection of memories.
+`hypotheses.json` provides a small mechanism for testing beliefs rather than merely recording them.
 
-It needs some durable representation of who it is supposed to be.
+A hypothesis contains:
 
-Identity is therefore treated separately from ordinary memory.
+- a specific claim or prediction
+- a test method
+- evidence
+- a conclusion
 
-This allows the agent to carry forward things such as:
+This creates a simple loop:
 
-- its name or role
-- its purpose
-- stable characteristics
-- long-term direction
-- carefully defined aspects of self-description
+```text
+observation
+    ↓
+claim
+    ↓
+prediction
+    ↓
+test
+    ↓
+evidence
+    ↓
+conclusion
+    ↓
+revision
+```
 
-At the same time, identity is not completely mutable.
+This is separate from the growth plan.
 
-An autonomous system should not be able to casually rewrite its own foundational constraints and then claim that the new version has always been true.
+A growth project asks:
+
+> **Can I build this?**
+
+A hypothesis asks:
+
+> **Is this true?**
+
+That distinction is useful when an agent is both building things and trying to learn from its own behavior and environment.
 
 ---
 
-## Rules and constrained self-modification
+## Commitments are not memories
 
-Self-modifying agents introduce an obvious problem:
+A commitment is a promise that needs to survive the wake in which it was made.
 
-**Who gets to decide what the agent is allowed to change?**
+The commitments ledger therefore has stronger rules than ordinary memory.
 
-Wake Scaffold uses explicit boundaries.
+An agent can:
 
-Some state can be updated by the agent.
+- create a commitment
+- move its status forward
+- record progress and notes
 
-Some state is constrained.
+It cannot silently delete a commitment or rewrite its history.
 
-Some changes can require human review.
-
-This creates a distinction between:
-
-```
-Agent-managed state
-        │
-        ├── commitments
-        ├── memories
-        ├── hypotheses
-        └── selected identity state
-
-Human-controlled state
-        │
-        ├── foundational rules
-        ├── protected identity
-        └── sensitive configuration
-```
-
-The objective is not to prevent change.
-
-It is to make important change **visible, deliberate, and auditable**.
+This turns promises into durable state rather than leaving them buried in a previous conversation.
 
 ---
 
-## Commitments
+## The wake cycle
 
-A conversation can contain an enormous amount of information.
+A normal wake is deliberately small and structured.
 
-A promise is different.
+Conceptually:
 
-If an agent says:
+```text
+1. Load bounded persistent state
+2. Reflect on what changed
+3. Review relevant evidence, commitments, hypotheses, and limitations
+4. Decide what to do
+5. Perform the work
+6. Record what actually happened
+7. Apply permitted state changes
+8. Write one immutable journal entry
+```
 
-> "I'll finish this tomorrow."
+The reflection is part of the visible artifact produced by the wake. It is not hidden chain-of-thought; it is a concise, inspectable summary of what changed, what was learned, and what matters for the next wake.
 
-that should not disappear simply because the next model invocation has no conversational memory.
-
-Commitments therefore have their own durable representation.
-
-This makes obligations first-class state rather than incidental text buried in a transcript.
+The result is a system where each wake is disposable, but the work is not.
 
 ---
 
-## Hypotheses
+## Bounded recall
 
-Agents frequently make assumptions without realizing they are assumptions.
+The journal can grow indefinitely.
 
-Wake Scaffold gives hypotheses an explicit place to live.
+The model should not have to read the entire journal every time.
 
-A hypothesis can contain a lifecycle such as:
+Wake Scaffold therefore uses a layered persistence model.
 
-```
-Hypothesis
-    ↓
-Prediction
-    ↓
-Test
-    ↓
-Evidence
-    ↓
-Outcome
-    ↓
-Confirmed / Rejected / Revised
-```
+### Always-loaded state
 
-This encourages a different kind of agent behavior.
+Small, bounded state is read into every wake:
 
-Instead of:
+- identity
+- rules
+- commitments
+- curated semantic memories
+- current growth projects
+- relevant hypotheses
+- the current index
+- recent tool evidence
 
-> "I think X, therefore X is true."
+### Detail state
 
-the agent can reason:
+The full historical record remains available but is not automatically loaded into every prompt:
 
-> "I currently believe X. If X is true, I expect Y. I can test Y."
+- immutable journal entries
+- older tool runs
+- historical blog posts
+- older evidence
+- previous synthesis artifacts
 
-That is a much more useful foundation for autonomous learning.
+### Synthesis state
+
+Reflection and summary artifacts provide navigation and compression without destroying the underlying history.
+
+The principle is:
+
+> **Compress for recall; preserve for auditability.**
+
+Nothing needs to be forgotten merely because it is no longer loaded into the next prompt.
 
 ---
 
-## Tools and verification
+## Self-editing with boundaries
 
-Tools are treated as capabilities that need evidence.
+An agent that can write to its own state can also corrupt its own state.
 
-Creating a tool is not enough.
+Wake Scaffold therefore does not give the model unrestricted filesystem authority.
 
-The system distinguishes:
+Different pieces of state have different permissions.
 
-```
-Tool exists
+For example:
+
+| State | Agent can modify? | Principle |
+|---|---:|---|
+| Current focus | Yes | Replaceable working state |
+| Known limitations | Yes | Append-only |
+| Commitments | Limited | No silent deletion or rewriting |
+| Semantic memory | Limited | Small bounded set |
+| Growth plan | Limited | Evidence-backed progression |
+| Hypotheses | Limited | Evidence required for resolution |
+| Rules | No | Human-controlled by default |
+| Identity name/purpose | No | Human-controlled |
+| Immutable journal | Append only | Historical record |
+
+The important idea is not that the model is trusted.
+
+It is that the system tries to make certain classes of mistakes mechanically difficult.
+
+---
+
+## Tools: writing code is not running code
+
+The agent can create small tools in its workspace.
+
+But:
+
+```text
+write tool
     ≠
-Tool executed
-    ≠
-Tool succeeded
-    ≠
-Tool produced trustworthy evidence
+tool works
 ```
 
-This matters because autonomous agents can otherwise accumulate fictional capabilities very easily.
+`tool-write` only writes the file.
 
-A model can write:
+`tool-run` actually executes an existing Python tool and records:
 
-```
-"the deployment succeeded"
-```
+- exit code
+- stdout
+- stderr
 
-without ever having performed a deployment.
+That result becomes evidence available to subsequent wakes.
 
-Wake Scaffold tries to make actual execution and its result part of the durable record.
+Tool execution is deliberately constrained with limits on execution time, output size, environment inheritance, and working directory.
+
+This is a best-effort sandbox, not a security boundary or container.
 
 ---
 
 ## Model-provider independence
 
-Wake Scaffold is designed around the persistence architecture rather than a particular LLM.
+Wake Scaffold does not make the model provider part of the persistence architecture.
 
-The model is effectively an interchangeable reasoning engine operating over durable state.
+Providers implement a common interface, with support for multiple backends and a mock provider for testing.
 
-The project supports multiple providers and can also use a mock provider for testing.
+The important abstraction is:
 
-This is intentional.
-
-If persistence is part of the agent architecture, it should not disappear when the underlying model changes.
-
-The same durable workspace should conceptually be usable across:
-
-```
-Model A
-   ↓
-Model B
-   ↓
-Model C
-   ↓
-Model D
+```text
+              ┌───────────────┐
+              │  Wake Scaffold │
+              └───────┬───────┘
+                      │
+          ┌───────────┼───────────┐
+          │           │           │
+       OpenAI      Anthropic    Gemini
+          │           │           │
+          └───────────┼───────────┘
+                      │
+                   Ollama
 ```
 
-provided those models can interpret the protocol.
+The model is an interchangeable reasoning engine.
+
+The filesystem is the persistent state.
+
+This means the same identity can, in principle, survive a change of model provider.
 
 ---
 
-## Security
+## Identity lifecycle
 
-Wake Scaffold should not be confused with a complete security sandbox.
+An identity is a complete persistent state, not just a name.
 
-The project takes steps to constrain tool execution and protect sensitive environment information, but filesystem-level restrictions and subprocess controls are not equivalent to a hardened operating-system sandbox.
+The active identity lives under `memory/`.
 
-If you give an autonomous agent powerful tools, you should assume that the tool boundary needs independent security engineering.
-
-The persistence protocol answers:
-
-> "What does the agent remember and believe?"
-
-It does not by itself answer:
-
-> "What is the agent safely allowed to do?"
-
-Those are separate problems.
-
----
-
-## What this is not
-
-Wake Scaffold is not:
-
-- a vector database
-- a replacement for an LLM
-- a general-purpose agent framework
-- a consciousness claim
-- a guarantee of genuine machine memory
-- a secure sandbox
-- a magical solution to context windows
-- a claim that the agent is literally the same computational process across wakes
-
-The model remains stateless.
-
-What persists is the **external record through which continuity is reconstructed**.
-
----
-
-## A useful mental model
-
-Think of a wake as a new instance of the same role reading the records left by previous instances.
-
-```
-                 INSTANCE 1
-                     │
-                     │ writes
-                     ▼
-              ┌──────────────┐
-              │ Persistent   │
-              │   Record     │
-              └──────┬───────┘
-                     │
-                     │ reads
-                     ▼
-                 INSTANCE 2
-                     │
-                     │ writes
-                     ▼
-              ┌──────────────┐
-              │ Persistent   │
-              │   Record     │
-              └──────┬───────┘
-                     │
-                     ▼
-                 INSTANCE 3
-```
-
-Each instance is ephemeral.
-
-The record provides continuity.
-
-This is closer to **succession** than biological memory.
-
----
-
-## Why a filesystem?
-
-Because a filesystem has useful properties for this problem:
-
-- Human-readable
-- Version-controllable
-- Easy to back up
-- Easy to diff
-- Easy to inspect
-- Easy to migrate
-- Model-provider agnostic
-- Friendly to ordinary developer tooling
-- Naturally compatible with append-only records
-- Does not require a proprietary memory service
-
-A database may eventually make sense for scale.
-
-But a filesystem is an excellent primitive for making the architecture understandable.
-
----
-
-## Design goals
-
-Wake Scaffold prioritizes:
-
-### Transparency
-
-A human should be able to inspect the agent's durable state.
-
-### Provenance
-
-Important beliefs should be traceable to observations or evidence.
-
-### Bounded context
-
-The agent should not need its entire history on every wake.
-
-### Continuity
-
-Important identity, commitments, knowledge, and goals should survive process boundaries.
-
-### Auditability
-
-The historical record should remain available even as current beliefs change.
-
-### Model independence
-
-Persistence should not be tied to one model provider.
-
-### Controlled self-modification
-
-An agent should have room to grow without having unrestricted authority over its own foundations.
-
-### Testability
-
-The persistence layer should be usable independently of expensive model inference.
-
----
-
-## Current limitations
-
-This project is intentionally experimental.
-
-Some of the hardest problems remain open.
-
-### Memory curation
-
-How should an agent decide what deserves long-term memory without either forgetting important information or accumulating endless noise?
-
-### Compression
-
-How can long histories be synthesized without introducing subtle factual distortions?
-
-### Belief integrity
-
-How can we prevent an LLM from confidently misinterpreting its own historical record?
-
-### Identity continuity
-
-At what point does a sequence of stateless invocations meaningfully constitute one persistent agent?
-
-### Security
-
-How should powerful autonomous tools be sandboxed safely?
-
-### Multi-agent state
-
-How should multiple agents share, fork, merge, or challenge persistent state?
-
-### Formal semantics
-
-Can the workspace format become a well-defined protocol rather than merely a convention?
-
-These are not solved problems.
-
-They are part of why the project exists.
-
----
-
-## Toward an agent continuity protocol
-
-The long-term direction is to treat the filesystem not simply as "memory," but as a protocol for agent continuity.
-
-One possible future architecture is:
-
-```
-                 Immutable Events
-                        │
-          ┌─────────────┼─────────────┐
-          │             │             │
-          ▼             ▼             ▼
-     Commitments      Beliefs       Identity
-          │             │             │
-          ▼             ▼             ▼
-       Reducer        Reducer       Reducer
-          │             │             │
-          └─────────────┼─────────────┘
-                        ▼
-                  Current State
-                        │
-                        ▼
-                     Next Wake
-```
-
-In such a system, current state would be a projection of an immutable event history.
-
-That would make it possible to reconstruct not only:
-
-> "What does the agent believe now?"
-
-but also:
-
-> "When did it begin believing this?"
-
-and:
-
-> "Which evidence caused that belief to change?"
-
-That is a much more interesting problem than simply retrieving similar memories.
-
----
-
-## Installation
-
-Clone the repository:
+It can be archived and a new identity can be created from `base_memory/`:
 
 ```bash
-git clone https://github.com/sudofx/wake-scaffold.git
-cd wake-scaffold
+python wake.py archive --as bob
+
+python wake.py new \
+  --name "Ada" \
+  --purpose "Build and test small, repeatable research tools."
 ```
 
-Install the project dependencies according to the instructions for your chosen environment/provider.
+Or both operations can be performed together:
 
-Then configure the desired model provider and workspace.
+```bash
+python wake.py reset \
+  --archive-as bob \
+  --name "Ada" \
+  --purpose "Build and test small, repeatable research tools."
+```
 
-See the source and configuration files in the repository for the current provider-specific setup.
+Archives are preserved rather than rewritten by the wake loop.
+
+A new identity starts with a clean journal, commitments, memories, growth plan, and public output.
+
+This makes identity itself a persistent, versionable artifact.
 
 ---
 
-## Running a wake
+## What this is — and isn't
 
-The fundamental operation is a wake.
+### It is
 
-A wake starts with persistent state and ends by leaving persistent state for the next wake.
+- A persistence layer for stateless AI agents
+- A filesystem-based state model
+- A framework for durable commitments and memories
+- An experiment in evidence-backed agent continuity
+- A way to separate historical record from current understanding
+- Vendor-agnostic with respect to the model provider
+- Human-readable and Git-friendly
+- Deliberately small and inspectable
 
-Conceptually:
+### It isn't
+
+- A claim that an LLM is conscious
+- A guarantee of genuine long-term memory
+- A conventional vector-database RAG system
+- An autonomous agent with unrestricted access to the host
+- A secure sandbox
+- A perfect cognitive architecture
+- Proof that persistent identity has "emerged"
+
+The project is experimental.
+
+The interesting question is whether sufficiently structured longitudinal state can produce useful continuity from otherwise stateless inference.
+
+---
+
+## Repository structure
+
+At the top level:
+
+```text
+wake-scaffold/
+├── memory/                 # Active persistent identity
+├── base_memory/            # Seed template for new identities
+├── identities_archive/     # Archived identities
+├── providers/              # Model-provider implementations
+├── tests/                  # Tests using temporary state
+├── wake.py                 # Wake-cycle orchestrator
+├── config.yaml             # Runtime configuration
+├── requirements.txt
+└── .github/workflows/
+    └── wake.yml            # Scheduled wake
+```
+
+The active `memory/` directory is intentionally ordinary files rather than a specialized database.
+
+That is part of the experiment.
+
+---
+
+## Getting started
+
+### 1. Install dependencies
 
 ```bash
-wake
+pip install -r requirements.txt
 ```
 
-The exact invocation and available options may evolve as the project develops.
+Install the SDK for the provider selected in `config.yaml`.
 
-The important contract is:
+For example:
 
-```
-cold start
-   ↓
-read state
-   ↓
-reason
-   ↓
-act
-   ↓
-record evidence
-   ↓
-persist state
-   ↓
-exit
+```bash
+pip install google-genai
 ```
 
-The process can terminate.
+or:
 
-The next wake can start fresh.
+```bash
+pip install anthropic
+```
 
-Continuity survives outside the process.
+or:
+
+```bash
+pip install openai
+```
+
+Ollama does not require a Python provider SDK.
+
+### 2. Configure credentials
+
+```bash
+cp .env.example .env
+```
+
+Add the API key for the provider you intend to use.
+
+Only the selected provider needs credentials.
+
+### 3. Configure the identity
+
+Edit:
+
+```text
+memory/core_identity/identity.md
+memory/core_identity/rules.md
+```
+
+Set the identity, purpose, constraints, and other initial state you want the agent to inherit.
+
+### 4. Run a wake
+
+```bash
+python wake.py
+```
+
+The model gets a fresh process and context, reads the persistent state, performs one wake, and writes its results back to disk.
+
+### 5. Validate the state
+
+```bash
+python wake.py validate
+```
+
+Validation checks the expected filesystem structure, JSON ledgers, and persisted wake history without changing the state.
+
+### 6. Inspect what happened
+
+Look at:
+
+```text
+memory/core_workspace/journal/
+memory/core_memories/commitments.json
+memory/core_memories/semantic_memory.json
+memory/core_workspace/tool_runs.json
+```
+
+The journal is the authoritative record of the wake.
+
+### 7. Schedule future wakes
+
+The included GitHub Actions workflow can run wakes on a schedule.
+
+At that point the system becomes:
+
+```text
+scheduled wake
+      ↓
+fresh process
+      ↓
+read persistent state
+      ↓
+reflect + act
+      ↓
+write persistent state
+      ↓
+process exits
+      ↓
+...
+      ↓
+next scheduled wake
+```
 
 ---
 
 ## Testing
 
-The repository includes a mock provider so that core behavior can be tested without requiring a live model.
+The test suite exercises the state-management mechanics without requiring a live model or API key.
 
-This is important because much of the system's correctness should not depend on whether an LLM happens to produce a particular answer.
+```bash
+python tests/test_wake.py
+```
 
-The persistence machinery should be testable as ordinary software.
+Tests use temporary memory directories rather than the real active identity.
+
+The suite covers things such as:
+
+- state validation
+- self-edit mechanics
+- reflection and journal flows
+- fallback blog generation
+- tool execution
+- tool-run evidence
+- subprocess environment restrictions
+- working-directory restrictions
+
+The mock provider makes it possible to exercise the wake machinery deterministically.
 
 ---
 
-## Scheduling
+## Design principles
 
-A wake can be run periodically using the scheduling system appropriate to your environment.
+Wake Scaffold is built around a few simple rules.
 
-For example:
+### 1. Persistence should be explicit
 
-```
-cron
-systemd timers
-container schedulers
-CI runners
-cloud jobs
-```
+If something needs to survive a wake, it should exist in durable state.
 
-This makes a particularly simple long-running agent architecture possible:
+### 2. History should be preserved
 
-```
-                 Scheduler
-                     │
-                     ▼
-                  Wake
-                     │
-                     ▼
-                 Do work
-                     │
-                     ▼
-              Persist state
-                     │
-                     ▼
-                   Exit
-                     │
-                     │
-                     └───────────────┐
-                                     │
-                                next schedule
-                                     │
-                                     ▼
-                                    Wake
-```
+The system should record what actually happened rather than continuously rewriting the past.
 
-There is no daemon that must remain alive indefinitely.
+### 3. Current understanding should remain curated
 
----
+The next wake should not need to ingest the entire history.
 
-## Project philosophy
+### 4. Evidence should outrank assertions
 
-Wake Scaffold is built around a simple premise:
+A model claiming that something happened is not the same as evidence that it happened.
 
-> **A persistent agent does not necessarily need a persistent process.**
+### 5. Different state deserves different rules
 
-It may be enough to preserve the right artifacts between invocations.
+Identity, commitments, memories, hypotheses, evidence, and history are not interchangeable.
 
-But those artifacts need to be more disciplined than a transcript.
+### 6. Model providers should be replaceable
 
-They need to distinguish:
+The persistence architecture should not depend on one LLM vendor.
 
-- history from memory
-- beliefs from evidence
-- commitments from preferences
-- capabilities from verified capabilities
-- identity from temporary context
-- current state from historical record
+### 7. Humans should retain control over foundational state
 
-The project explores what happens when those distinctions become part of the agent's runtime architecture.
+Rules and core identity properties are human-controlled by default.
+
+### 8. Mechanical guarantees are better than instructions
+
+Whenever possible, enforce an invariant in code instead of merely telling the model to behave.
+
+### 9. Preserve detail even when compressing recall
+
+A summary can replace what is loaded into context.
+
+It should not replace the underlying evidence.
+
+### 10. Be honest about limitations
+
+A workaround is not a success if it merely violates another constraint or misrepresents what happened.
 
 ---
 
-## Research questions
+## The experiment
 
-Wake Scaffold is ultimately an exploration of several questions.
+The deeper motivation behind Wake Scaffold is not to build a particular product.
 
-### Can continuity emerge from succession?
+It is to investigate what happens when you take a model with no built-in continuity and repeatedly place it in the same persistent environment.
 
-If every model invocation starts with no internal memory, can a sufficiently structured external record produce stable long-term behavior?
+Each invocation is stateless.
 
-### What should an agent remember?
+The state is longitudinal.
 
-Not everything that happened is useful.
+The model can change.
 
-What makes an experience formative?
+The identity's accumulated record remains.
 
-### Can an agent maintain epistemic humility?
+That creates an interesting separation:
 
-Can explicit hypotheses, predictions, tests, and outcomes make an autonomous system better at recognizing when it is wrong?
+```text
+               transient
+              intelligence
+                   │
+                   ▼
+            ┌─────────────┐
+            │    wake     │
+            └──────┬──────┘
+                   │
+                   ▼
+          persistent state
+                   │
+                   ▼
+            next invocation
+```
 
-### Can identity be versioned?
+If useful behavioral continuity emerges, it should come from the interaction between repeated inference and structured longitudinal state—not from pretending that a single model context lasts forever.
 
-Can an agent change over time while still maintaining a traceable history of that change?
-
-### Can self-modification be accountable?
-
-Can an agent evolve without being able to silently rewrite the foundations that constrain it?
-
-### Can persistent agents be model-independent?
-
-If the underlying model changes, what exactly needs to survive for the "same" agent to continue?
+That is the experiment.
 
 ---
 
 ## Status
 
-Wake Scaffold is experimental.
+This is an active experiment rather than a finished framework.
 
-The architecture is intentionally small and inspectable.
+The architecture is intentionally conservative in some places and primitive in others.
 
-It should be treated as a research and engineering scaffold rather than a finished autonomous-agent platform.
+For example, `semantic_memory.json` is a small curated memory rather than a sophisticated relevance-triggered associative memory system. The journal is append-only rather than intelligently compressed. Tool execution has best-effort restrictions rather than a hardened sandbox.
 
-The interesting part is not whether the current implementation is the final answer.
+Those limitations are intentional in the sense that they keep the system understandable enough to study.
 
-It is whether this model of persistence provides a useful foundation for building agents that can:
+The project can become more sophisticated later.
 
-```
-remember
-    +
-commit
-    +
-act
-    +
-observe
-    +
-learn
-    +
-revise
-    +
-continue
-```
-
-without requiring a continuously running process or hidden model-specific memory.
+First, it should remain understandable.
 
 ---
 
 ## License
 
-See the repository's license file for the current licensing terms.
+MIT
 
----
-
-## Contributing
-
-The most valuable contributions are likely to be improvements to the persistence model itself:
-
-- Better provenance
-- Better memory curation
-- Better belief revision
-- Stronger evidence tracking
-- Safer self-modification
-- More rigorous state transitions
-- Better testing
-- Better provider abstraction
-- Formalization of the workspace protocol
-- Experiments with long-running agent continuity
-
-If you find a way to make the agent **more accountable for what it claims to know**, that is probably more valuable than simply giving it more memory.
-
----
-
-## The core idea
-
-A language model forgets when its process ends.
-
-That does not mean the agent has to.
-
-If the right state is externalized, structured, versioned, and grounded in evidence, each new invocation can inherit the work of the previous one.
-
-Not because the model remembers.
-
-Because the **record remembers**.
-
-And the deeper question is whether that record can be enough to turn a sequence of stateless computations into a useful, persistent, accountable agent.
