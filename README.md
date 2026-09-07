@@ -249,7 +249,11 @@ does NOT apply it, only these exact blocks do:
   resolving one with real evidence and a conclusion. This is separate
   from `growth_plan.json`: a growth project asks "can I build this?",
   a hypothesis asks "is this true?" (about the agent itself, its
-  environment, or an assumption it's relying on). Moving a hypothesis
+  environment, or an assumption it's relying on). Hypotheses also carry a
+  validation `scope`: `internal` for checks inside the scaffold, or `external`
+  when the claim must transfer to an independent input, task result, or other
+  outcome outside the scaffold. This makes it possible to distinguish useful
+  validation from repeated self-referential checks. Moving a hypothesis
   to any status besides `testing` is rejected outright unless real
   evidence is supplied — evidence has to describe something that
   actually happened, not restate the prediction.

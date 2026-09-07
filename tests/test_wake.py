@@ -759,6 +759,31 @@ class HypothesesTests(WakeTestCase):
         self.assertEqual(hyps[0]["status"], "confirmed")
 
 
+    def test_hypothesis_scope_is_persisted_and_invalid_scope_is_rejected(self):
+        bad = json.dumps({"add": [{"prediction": "This should produce a checkable result outside the scaffold",
+                                    "test_method": "compare the result with an independent task outcome",
+                                    "scope": "sideways"}]})
+        notes = wake.apply_hypotheses_update(bad, FIXED_NOW)
+        self.assertTrue(any("scope must be internal or external" in n for n in notes))
+        data = json.loads((self.memory / "core_memories" / "hypotheses.json").read_text())
+        self.assertEqual(data["hypotheses"], [])
+
+        good = json.dumps({"add": [{"prediction": "This should produce a checkable result outside the scaffold",
+                                     "test_method": "compare the result with an independent task outcome",
+                                     "scope": "external"}]})
+        wake.apply_hypotheses_update(good, FIXED_NOW)
+        data = json.loads((self.memory / "core_memories" / "hypotheses.json").read_text())
+        self.assertEqual(data["hypotheses"][0]["scope"], "external")
+
+    def test_hypothesis_format_marks_scope(self):
+        data = {"hypotheses": [{"id": "h-ext", "status": "untested",
+                                 "scope": "external", "prediction": "A checkable external result will occur",
+                                 "test_method": "compare against an independent task"}]}
+        (self.memory / "core_memories" / "hypotheses.json").write_text(json.dumps(data))
+        formatted = wake.format_hypotheses_for_prompt()
+        self.assertIn("(external validation)", formatted)
+
+
 class SameWakeDevelopmentTests(WakeTestCase):
     def test_failed_tool_can_be_revised_and_rerun_within_same_wake(self):
         journal = "2026-08-31-090000.md"

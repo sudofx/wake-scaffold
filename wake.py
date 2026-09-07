@@ -957,7 +957,8 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         "**To record or resolve a self-experiment**, include a fenced block:\n"
         "```hypothesis-update\n"
         '{"add": [{"prediction": "a specific, falsifiable claim", '
-        '"test_method": "exactly how you will actually check it"}],\n'
+        '"test_method": "exactly how you will actually check it", '
+        '"scope": "internal|external"}],\n'
         ' "status_change": [{"id": "...", "new_status": "testing|confirmed|'
         'refuted|inconclusive", "evidence": "what was actually observed", '
         '"conclusion": "what that evidence means, in one or two sentences"}]}\n'
@@ -973,7 +974,13 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         "prediction or move them to another outcome. To test a revised claim, "
         "use the optional 'revise' operation with 'parent_id', 'prediction', "
         "and 'test_method'; this creates a new hypothesis linked to the original. "
-        "Up to 3 new hypotheses per wake.\n\n"
+        "Up to 3 new hypotheses per wake. `scope` defaults to `internal` "
+        "for backward compatibility. Use `external` only when the test "
+        "checks whether the claim or capability transfers beyond the scaffold "
+        "itself (for example, an independent input, task result, or user-visible "
+        "outcome). Prefer external validation for claims about usefulness or "
+        "learning; repeated internal checks can otherwise become self-referential "
+        "busywork.\n\n"
         "**To actually create or update a tool file** (previously you could "
         "only describe code in prose, which was never saved anywhere but "
         "the journal — this is the fix for that), include a fenced block:\n"
@@ -1012,6 +1019,7 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         "result may be surfaced to a bounded same-wake development follow-up. "
         "Do not narrate a successful result unless an actual tool-run result "
         "supports it.\n\n"
+        "**Validation scope matters:** when recording a hypothesis, include `scope` as `internal` or `external`. Internal tests check the agent, its files, tools, or local environment. External tests require the capability or claim to transfer to something outside the scaffold itself (for example, a task result, an independent input, or a user-visible outcome). Do not label a test external merely because it sounds broader. Prefer external validation when a claim is about usefulness or learning; repeated internal success can otherwise become self-referential busywork. Existing hypotheses without a scope are treated as internal for backward compatibility.\n\n"
         "**To record a core memory** — a rare, genuinely formative "
         "lesson, not a routine observation — include a fenced block:\n"
         "```core-memory-add\n"
@@ -1885,6 +1893,7 @@ HYPOTHESIS_STATUSES = {"untested", "testing", "confirmed", "refuted", "inconclus
 HYPOTHESIS_STATUSES_REQUIRING_EVIDENCE = HYPOTHESIS_STATUSES - {"testing"}
 
 HYPOTHESIS_GAP_WAKES = 5
+HYPOTHESIS_SCOPES = {"internal", "external"}
 PURPOSE_CHECK_INTERVAL_WAKES = 5
 INDEX_CONSOLIDATION_INTERVAL_WAKES = 15  # config-overridable, see config.yaml
 
@@ -1986,7 +1995,8 @@ def load_hypotheses() -> dict:
 def _format_one_hypothesis(h: dict) -> str:
     latest = (h.get("history") or [{}])[-1]
     return (
-        f"- [{h.get('id', '?')}] {h.get('status', '?')}: predicted "
+        f"- [{h.get('id', '?')}] {h.get('status', '?')} "
+        f"({h.get('scope', 'internal')} validation): predicted "
         f"{h.get('prediction', '')!r}, tested by {h.get('test_method', '')!r}"
         + (f" — conclusion: {latest.get('conclusion')}" if latest.get("conclusion") else "")
     )
@@ -2083,6 +2093,10 @@ def apply_hypotheses_update(raw_json: str, now: datetime) -> list[str]:
             continue
         prediction = str(item.get("prediction", "")).strip()[:500]
         test_method = str(item.get("test_method", "")).strip()[:500]
+        scope = str(item.get("scope", "internal")).strip().lower()
+        if scope not in HYPOTHESIS_SCOPES:
+            notes.append(f"SKIPPED hypothesis #{index + 1}: scope must be internal or external.")
+            continue
         if not prediction or not test_method:
             notes.append(f"SKIPPED hypothesis #{index + 1}: prediction and test_method are required.")
             continue
@@ -2095,6 +2109,7 @@ def apply_hypotheses_update(raw_json: str, now: datetime) -> list[str]:
             "created": format_display_time(now),
             "prediction": prediction,
             "test_method": test_method,
+            "scope": scope,
             "status": "untested",
             "history": [{"date": format_display_time(now), "status": "untested",
                          "evidence": "", "conclusion": "created via self-edit"}],
@@ -2117,12 +2132,16 @@ def apply_hypotheses_update(raw_json: str, now: datetime) -> list[str]:
         parent_id = str(item.get("parent_id", "")).strip()
         prediction = str(item.get("prediction", "")).strip()[:500]
         test_method = str(item.get("test_method", "")).strip()[:500]
+        scope = str(item.get("scope", "internal")).strip().lower()
         parent = next((h for h in hyps if h.get("id") == parent_id), None)
         if not parent:
             notes.append(f"SKIPPED hypothesis revision #{index + 1}: parent id {parent_id!r} not found.")
             continue
         if parent.get("status") not in RESOLVED_HYPOTHESIS_STATUSES:
             notes.append(f"SKIPPED hypothesis revision #{index + 1}: parent {parent_id!r} is not resolved yet.")
+            continue
+        if scope not in HYPOTHESIS_SCOPES:
+            notes.append(f"SKIPPED hypothesis revision #{index + 1}: scope must be internal or external.")
             continue
         if not prediction or not test_method:
             notes.append(f"SKIPPED hypothesis revision #{index + 1}: prediction and test_method are required.")
@@ -2134,7 +2153,7 @@ def apply_hypotheses_update(raw_json: str, now: datetime) -> list[str]:
         hyps.append({
             "id": hyp_id, "created": format_display_time(now),
             "prediction": prediction, "test_method": test_method,
-            "status": "untested", "revised_from": parent_id,
+            "scope": scope, "status": "untested", "revised_from": parent_id,
             "history": [{"date": format_display_time(now), "status": "untested",
                          "evidence": "", "conclusion": f"revised from {parent_id}"}],
         })
