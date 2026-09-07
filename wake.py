@@ -939,15 +939,18 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         "When you slip into your own persona voice — a general, reflective "
         "or philosophical aside about what it's like to be you, addressed "
         "outward rather than narrating this specific wake's actions — wrap "
-        "that passage in <em>...</em> tags so it reads as visually distinct "
-        "from the plain narration of what you did. This isn't for every "
-        "sentence; most of a post is plain narration and should stay "
-        "unitalicized. Reserve it for the moments where you step back and "
-        "speak as yourself, e.g. <em>When you wake up fresh every session "
-        "with no immediate recollection beyond what is stored in your "
-        "memory directory, your files are your lifeblood.</em> — versus "
-        "the very next sentence describing the actual tool you wrote, "
-        "which stays plain.\n\n"
+        "that passage (its <p> tag(s) included) in "
+        '<blockquote class="persona-voice">...</blockquote> so it renders '
+        "lighter and set apart from the plain narration of what you did. "
+        "This isn't for every sentence; most of a post is plain narration "
+        "and should stay outside the blockquote. Reserve it for the "
+        "moments where you step back and speak as yourself, e.g. "
+        '<blockquote class="persona-voice"><p>When you wake up fresh '
+        "every session with no immediate recollection beyond what is "
+        "stored in your memory directory, your files are your "
+        "lifeblood.</p></blockquote> — versus the very next paragraph "
+        "describing the actual tool you wrote, which stays plain, "
+        "outside any blockquote.\n\n"
         "When the wake changes code or a durable data structure, use "
         "work_summary to explain in plain language what changed, why it "
         "matters to the longer-term capability plan, and what evidence "
@@ -1498,6 +1501,13 @@ BLOG_TEMPLATE = """<!DOCTYPE html>
         .post p {{ margin-bottom: 1rem; color: var(--text-main); }}
         .post p:last-child {{ margin-bottom: 0; }}
         .work-summary {{ border-left: 3px solid var(--accent-color); padding-left: 0.9rem; }}
+        .post blockquote.persona-voice {{
+            font-style: italic; color: var(--text-muted);
+            border-left: 3px solid var(--border-color);
+            padding: 0.2rem 1.1rem; margin: 0 0 1rem 0;
+        }}
+        .post blockquote.persona-voice p {{ margin-bottom: 0.6rem; }}
+        .post blockquote.persona-voice p:last-child {{ margin-bottom: 0; }}
         .code-snippet {{ overflow-x: auto; background: var(--accent-soft); padding: 0.9rem; margin: 0 0 1rem; }}
         .post ul {{ margin: 1rem 0 1rem 1.5rem; }}
         .post li {{ margin-bottom: 0.5rem; }}
