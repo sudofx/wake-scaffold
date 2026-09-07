@@ -87,12 +87,17 @@
       "title": "Core Workspace State Schema Validation",
       "capability": "Automatically check existence and JSON parse integrity for workspace state stores",
       "next_step": "Inspect execution status of state_schema_checker.py in tool_runs.json in the next wake.",
-      "status": "proposed",
+      "status": "active",
       "history": [
         {
           "date": "Sep 7th, 2026 06:10am",
           "status": "proposed",
           "evidence": "created via self-edit"
+        },
+        {
+          "date": "Sep 7th, 2026 07:57am",
+          "status": "active",
+          "evidence": "Refactored state_schema_checker.py to search candidate paths dynamically and queued verification run."
         }
       ]
     }

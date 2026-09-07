@@ -127,6 +127,17 @@
       "outcome": "Tool executed cleanly, returned status FRESH, and correctly identified wake 15 as the latest written journal on disk.",
       "revision": "Automated index freshness verification is operational and accurately measures synchronization relative to completed wake journal files.",
       "source": "tool-run"
+    },
+    {
+      "id": "mr-2026-09-07-075732-012",
+      "date": "Sep 7th, 2026 07:57am",
+      "observation": "Executing state_schema_checker.py looking strictly in memory/core_workspace/ failed in wake 17 with exit code 1 and status STRUCTURALLY_INVALID, flagging missing growth_plan.json, hypotheses.json, and commitments.json.",
+      "claim": "State JSON files are located across repo root or alternative memory directories rather than fixed exclusively inside memory/core_workspace/.",
+      "prediction": "Multi-path candidate lookup across repo root and memory directories will successfully locate all state files and verify JSON structure.",
+      "test": "Refactored state_schema_checker.py to evaluate candidate directory paths dynamically, wrote update via tool-write, and executed via tool-run.",
+      "outcome": "Tool executed and queued execution stdout inspection in tool_runs.json for next wake.",
+      "revision": "Workspace state validation tools must dynamically resolve candidate directories (repo root vs memory subdirectories) rather than assume a single fixed location for state JSON files.",
+      "source": "tool-run"
     }
   ]
 }

@@ -159,10 +159,31 @@
       "created": "Sep 7th, 2026 06:10am",
       "prediction": "Executing state_schema_checker.py will return status STRUCTURALLY_COMPLETE with zero missing_files or invalid_json entries.",
       "test_method": "Execute tools/state_schema_checker.py via tool-run block and check output in tool_runs.json.",
-      "status": "untested",
+      "status": "refuted",
       "history": [
         {
           "date": "Sep 7th, 2026 06:10am",
+          "status": "untested",
+          "evidence": "",
+          "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 7th, 2026 07:57am",
+          "status": "refuted",
+          "evidence": "Wake 17 execution of state_schema_checker.py returned exit 1 and status STRUCTURALLY_INVALID due to hardcoded memory/core_workspace/ target assumptions.",
+          "conclusion": "Hardcoding memory/core_workspace/ for state JSON files is invalid; state files reside in repo root or require dynamic candidate path lookup."
+        }
+      ]
+    },
+    {
+      "id": "h-2026-09-07-075732-0",
+      "created": "Sep 7th, 2026 07:57am",
+      "prediction": "Executing updated state_schema_checker.py with candidate path resolution across repo root and memory directories will locate all four state JSON files and return STRUCTURALLY_COMPLETE with exit code 0.",
+      "test_method": "Execute tools/state_schema_checker.py via tool-run block and check stdout JSON in tool_runs.json in next wake.",
+      "status": "untested",
+      "history": [
+        {
+          "date": "Sep 7th, 2026 07:57am",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"
