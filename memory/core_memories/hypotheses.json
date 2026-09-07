@@ -8,13 +8,19 @@
       "test_method": "Write tools/validate_memory.py and execute it using tool-run.",
       "scope": "internal",
       "boundary": "same_wake",
-      "status": "untested",
+      "status": "refuted",
       "history": [
         {
           "date": "Sep 7th, 2026 12:17pm",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 7th, 2026 12:46pm",
+          "status": "refuted",
+          "evidence": "Wake 2 execution of validate_memory.py checked current working directory (tools/) without parent directory traversal and failed to locate identity.md.",
+          "conclusion": "Sandboxed Python tools execute inside tools/ directory; explicit parent lookup or path traversal is required to locate workspace root files."
         }
       ]
     }

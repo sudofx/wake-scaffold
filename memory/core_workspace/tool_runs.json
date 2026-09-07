@@ -22,6 +22,17 @@
       "timed_out": false,
       "journal_entry": "2026-09-07-121752.md",
       "phase": "work"
+    },
+    {
+      "when": "Sep 7th, 2026 12:46pm",
+      "filename": "validate_memory.py",
+      "args": [],
+      "exit_code": 0,
+      "stdout": "{\n  \"root_path\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools\",\n  \"checks\": {\n    \"identity.md\": {\n      \"exists\": false,\n      \"size_bytes\": 0\n    },\n    \"rules.md\": {\n      \"exists\": false,\n      \"size_bytes\": 0\n    },\n    \"index.md\": {\n      \"exists\": false,\n      \"size_bytes\": 0\n    },\n    \"commitments.json\": {\n      \"exists\": false,\n      \"valid_json\": false\n    },\n    \"tool_runs.json\": {\n      \"exists\": false,\n      \"valid_json\": false\n    }\n  },\n  \"status\": \"STRUCTURALLY_INVALID\"\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-07-124626.md",
+      "phase": "work"
     }
   ]
 }
