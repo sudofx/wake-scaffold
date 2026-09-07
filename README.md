@@ -2,79 +2,89 @@
 
 **A persistence protocol for stateless AI agents.**
 
-Wake Scaffold explores a simple question:
+Wake Scaffold is an experiment in giving a stateless AI model durable continuity without making the model itself persistent. - [see identities](IDENTITIES.md)
 
-> Can a sequence of stateless AI model invocations behave like one continuous, accountable agent? - See [`IDENTITIES.md`](IDENTITIES.md)
+Each wake starts as a fresh model invocation with no conversational memory of previous wakes. Continuity comes from a filesystem containing the identity's durable state: rules, commitments, curated memories, hypotheses, evidence, tools, and an immutable journal.
 
-The model itself has no memory between wakes. Each invocation starts with a fresh context. The only continuity comes from what previous wakes deliberately wrote to durable state.
+The model is temporary.
 
-Wake Scaffold provides the structure, rules, and mechanical checks for making that continuity useful.
+**The state is durable.**
 
-It is **not primarily an LLM wrapper, chatbot, or conventional RAG memory system**. It is an experiment in building persistent state around a stateless model.
+The central question is:
 
-## The core idea
+> Can repeated stateless model invocations behave like one continuous, accountable agent when continuity is made explicit in durable state?
 
-A wake is temporary.
+Wake Scaffold is not primarily a chatbot, LLM wrapper, or conventional RAG system. It is an experiment in **externalizing the state required for longitudinal agent behavior** and then putting mechanical constraints around how that state can change.
 
-The state is durable.
+---
+
+## The basic model
+
+A wake looks roughly like this:
 
 ```text
-                 ┌─────────────────────┐
-                 │    Fresh model      │
-                 │     invocation      │
-                 └──────────┬──────────┘
+                 ┌──────────────────────┐
+                 │   Fresh model        │
+                 │   invocation         │
+                 └──────────┬───────────┘
                             │
-                       read state
+                       read durable state
                             │
                             ▼
-                 ┌─────────────────────┐
-                 │  Identity / Rules   │
-                 │  Memories           │
-                 │  Commitments        │
-                 │  Hypotheses         │
-                 │  Evidence           │
-                 │  Recent synthesis   │
-                 └──────────┬──────────┘
+                 ┌──────────────────────┐
+                 │ Identity             │
+                 │ Rules                │
+                 │ Commitments          │
+                 │ Curated memories     │
+                 │ Hypotheses           │
+                 │ Evidence             │
+                 │ Recent synthesis     │
+                 └──────────┬───────────┘
                             │
                          reflect
                             │
                             ▼
-                 ┌─────────────────────┐
-                 │       Act           │
-                 │   use tools /       │
-                 │   do the work       │
-                 └──────────┬──────────┘
+                 ┌──────────────────────┐
+                 │ Work / tool use      │
+                 │ decisions / actions  │
+                 └──────────┬───────────┘
                             │
-                       record results
-                            │
-                            ▼
-                 ┌─────────────────────┐
-                 │   Durable state     │
-                 │                     │
-                 │   journal           │
-                 │   memories          │
-                 │   commitments       │
-                 │   evidence          │
-                 │   hypotheses        │
-                 │   growth            │
-                 └─────────────────────┘
+                      record results
                             │
                             ▼
-                     next wake starts
-                     from this state
+                 ┌──────────────────────┐
+                 │ Durable state        │
+                 │                      │
+                 │ journal              │
+                 │ memories             │
+                 │ commitments          │
+                 │ hypotheses           │
+                 │ evidence             │
+                 │ growth               │
+                 └──────────┬───────────┘
+                            │
+                            ▼
+                       process exits
+
+                            ...
+
+                       next wake starts
+                       from this state
 ```
 
-The model is replaceable.
+Nothing requires the same model invocation to remain alive.
 
-The persistent state is the continuity layer.
+A future wake reconstructs its working context from what previous wakes deliberately persisted.
 
 ---
 
-## Why this exists
+## Why external persistence?
 
-Most AI agents are implicitly continuous because the application keeps their conversation, state, or process alive.
+An ordinary conversational agent often appears continuous because the application keeps a conversation, process, database, or other state alive.
 
-That assumption disappears when an agent is deliberately run as a sequence of independent executions:
+Wake Scaffold removes that assumption.
+
+The execution model is intentionally closer to:
 
 ```text
 wake 1 → process exits
@@ -83,131 +93,125 @@ wake 3 → completely fresh process
 ...
 ```
 
-Without an external state layer, there is no reason for wake 3 to know what wake 1 learned, promised, tested, built, or discovered.
+Without external state, wake 3 has no reliable reason to know what wake 1:
 
-Wake Scaffold treats that external state as a first-class part of the agent.
+- learned
+- promised
+- built
+- tested
+- discovered
+- failed at
+- believed
+- changed
 
-The goal is not to pretend that the model itself has persistent memory.
+Wake Scaffold makes that state explicit.
 
-The goal is to make persistence explicit, inspectable, and recoverable.
+The goal is **not** to claim that the model has developed intrinsic long-term memory.
+
+The goal is to see whether structured, durable, inspectable state can provide useful continuity around an otherwise stateless model.
 
 ---
 
-## What survives between wakes?
+# Durable state
 
-Not everything should be treated as "memory."
+The project deliberately does not put everything into a single concept called "memory."
 
-Wake Scaffold separates different kinds of durable state because they have different meanings and different rules.
+Different kinds of state have different semantics and different mutation rules.
 
 ```text
-core_identity/
-  identity.md          Who the agent is
-  rules.md             Constraints it must follow
-  failure_modes.md     Known failures and their fixes
-
-core_memories/
-  index.md             Curated high-level understanding
-  commitments.json     Promises and their status
-  semantic_memory.json Small set of formative lessons
-  growth_plan.json     Capabilities being developed
-  hypotheses.json      Claims being tested
-  epistemic_state.json Observation → claim → test → outcome
-
-core_workspace/
-  journal/             Immutable record of what happened
-  tools/               Tools the agent has built
-  tool_runs.json       Evidence from actually running those tools
-
-core_synthesis/
-  ideas/               Per-wake reflection artifacts
-  daily/               Mechanical daily indexes and summaries
-
-core_persona/
-  blog/                Public-facing output produced by the agent
+memory/
+├── core_manifest.json
+│
+├── core_identity/
+│   ├── identity.md
+│   ├── rules.md
+│   └── failure_modes.md
+│
+├── core_memories/
+│   ├── index.md
+│   ├── commitments.json
+│   ├── semantic_memory.json
+│   ├── growth_plan.json
+│   ├── hypotheses.json
+│   └── epistemic_state.json
+│
+├── core_workspace/
+│   ├── journal/
+│   ├── tools/
+│   └── tool_runs.json
+│
+├── core_synthesis/
+│   ├── ideas/
+│   └── daily/
+│
+└── core_persona/
+    └── blog/
 ```
 
-The exact layout is deliberately filesystem-based and human-readable.
+### Identity
 
-You can inspect it with ordinary tools.
+`core_identity/identity.md` contains the durable identity of the current agent.
 
-You can version it with Git.
+It distinguishes foundational identity properties from mutable working state.
 
-You can back it up.
+For example, the agent may update its current focus or record a known limitation, while foundational properties such as its name and purpose remain human-controlled.
 
-You can move an identity to another machine.
+### Rules
 
-You can replace the model provider without replacing the state.
+`rules.md` contains the constraints that govern the wake.
 
----
+Rules are not ordinary memories. They are intended to remain stable and human-controlled by default.
 
-## History is not memory
+### Commitments
 
-One of the central design principles is:
+`commitments.json` is a durable ledger of promises.
+
+A commitment can be created and advanced, but cannot simply disappear because a later wake no longer wants to deal with it.
+
+This turns:
 
 ```text
-What happened?
-      ≠
-What do I currently believe?
+"I said I would do X."
 ```
 
-The journal is the historical record.
+from ephemeral conversational text into durable state.
 
-It records what a wake actually did, what it observed, what changed, and what happened as a result.
+### Semantic memory
 
-Curated memory is different. It is the smaller set of information worth carrying into future reasoning.
+`semantic_memory.json` contains a deliberately small set of formative lessons.
 
-This distinction matters because an indefinitely growing transcript is not a useful memory system.
+It is capped rather than allowed to grow indefinitely.
 
-The journal can grow without bound while the state loaded into an ordinary wake remains deliberately small.
+The point is not to store everything the agent has ever encountered. It is to maintain a small set of lessons that are important enough to influence future behavior.
 
----
+### Growth plan
 
-## Evidence is not a claim
+`growth_plan.json` tracks capability projects.
 
-The same principle applies to knowledge.
+A growth project asks:
 
-A model saying:
+> **Can I build this?**
 
-> "I built the tool."
-
-is not evidence that the tool works.
-
-Wake Scaffold therefore distinguishes between:
+Projects move through states such as:
 
 ```text
-code written
-     ↓
-code executed
-     ↓
-observable result
-     ↓
-evidence
-     ↓
-claim
+proposed → active → complete
+                  ↘ blocked
 ```
 
-For example, a capability in `growth_plan.json` cannot be considered complete merely because the agent wrote the code for it. A real tool-run result must exist as evidence.
+Completion requires appropriate evidence.
 
-Likewise, a hypothesis cannot simply be marked true because the model decided it was true.
+In particular, writing a tool is not itself evidence that the tool works.
 
-The system is intentionally biased toward:
+### Hypotheses
 
-**what actually happened over what the model says happened.**
+`hypotheses.json` tracks claims that can actually be tested.
 
----
+A hypothesis asks:
 
-## Hypotheses and self-experimentation
+> **Is this true?**
 
-`hypotheses.json` provides a small mechanism for testing beliefs rather than merely recording them.
-
-A hypothesis contains:
-
-- a specific claim or prediction
-- a test method
-- evidence
-- a conclusion
-
-This creates a simple loop:
+A typical lifecycle is:
 
 ```text
 observation
@@ -225,48 +229,95 @@ conclusion
 revision
 ```
 
-This is separate from the growth plan.
+Hypotheses are therefore separate from growth projects.
 
-A growth project asks:
+"Can I build this?" and "Is this true?" are different questions.
 
-> **Can I build this?**
+### Epistemic state
 
-A hypothesis asks:
+`epistemic_state.json` provides a more explicit observation → claim → prediction → test → outcome → revision ledger when that level of tracking is useful.
 
-> **Is this true?**
-
-That distinction is useful when an agent is both building things and trying to learn from its own behavior and environment.
+It is created on first use rather than being required for every identity.
 
 ---
 
-## Commitments are not memories
+# History is not memory
 
-A commitment is a promise that needs to survive the wake in which it was made.
+One of the most important design decisions is the distinction between:
 
-The commitments ledger therefore has stronger rules than ordinary memory.
+```text
+What happened?
+      ≠
+What do I currently believe?
+```
 
-An agent can:
+The journal is the historical record.
 
-- create a commitment
-- move its status forward
-- record progress and notes
+Curated memory is the information worth carrying forward.
 
-It cannot silently delete a commitment or rewrite its history.
+These should not be the same thing.
 
-This turns promises into durable state rather than leaving them buried in a previous conversation.
+The journal can grow indefinitely while the amount of state loaded into a normal wake remains bounded.
+
+That gives the system two desirable properties:
+
+1. **Recall remains small enough to be practical.**
+2. **Historical detail remains available for inspection and audit.**
+
+The design principle is:
+
+> **Compress for recall; preserve for auditability.**
+
+A summary should help the next wake navigate history.
+
+It should not destroy the underlying history.
 
 ---
 
-## The wake cycle
+# Evidence is not a claim
 
-A normal wake is deliberately small and structured.
+Wake Scaffold intentionally distinguishes between an agent saying something happened and evidence that it happened.
 
-Conceptually:
+For example:
+
+```text
+code written
+     ↓
+code executed
+     ↓
+observable result
+     ↓
+recorded evidence
+     ↓
+claim
+```
+
+These are different events.
+
+If the model writes:
+
+> "I built the tool and it works."
+
+that statement is not sufficient evidence.
+
+A tool is considered verified only when it has actually been executed and a result has been recorded.
+
+The same philosophy applies to hypotheses and capability projects.
+
+The system is deliberately biased toward:
+
+> **What actually happened over what the model says happened.**
+
+---
+
+# The wake cycle
+
+A normal wake follows a small, structured lifecycle:
 
 ```text
 1. Load bounded persistent state
 2. Reflect on what changed
-3. Review relevant evidence, commitments, hypotheses, and limitations
+3. Review relevant commitments, hypotheses, evidence, and limitations
 4. Decide what to do
 5. Perform the work
 6. Record what actually happened
@@ -274,23 +325,28 @@ Conceptually:
 8. Write one immutable journal entry
 ```
 
-The reflection is part of the visible artifact produced by the wake. It is not hidden chain-of-thought; it is a concise, inspectable summary of what changed, what was learned, and what matters for the next wake.
+The reflection is an explicit artifact of the wake.
 
-The result is a system where each wake is disposable, but the work is not.
+It is not hidden chain-of-thought. It is a concise, inspectable record of things such as:
+
+- what changed
+- what was learned
+- what remains unresolved
+- what matters for future work
+
+The result is a disposable process with durable consequences.
 
 ---
 
-## Bounded recall
+# Bounded recall
 
-The journal can grow indefinitely.
+The entire history is not loaded into every wake.
 
-The model should not have to read the entire journal every time.
-
-Wake Scaffold therefore uses a layered persistence model.
+Instead, state is divided into layers.
 
 ### Always-loaded state
 
-Small, bounded state is read into every wake:
+Small, bounded state can be loaded into each wake:
 
 - identity
 - rules
@@ -298,134 +354,228 @@ Small, bounded state is read into every wake:
 - curated semantic memories
 - current growth projects
 - relevant hypotheses
-- the current index
-- recent tool evidence
+- current indexes
+- recent tool-run evidence
 
-### Detail state
+### Historical state
 
-The full historical record remains available but is not automatically loaded into every prompt:
+The complete record remains available on disk:
 
-- immutable journal entries
+- journal entries
 - older tool runs
-- historical blog posts
-- older evidence
-- previous synthesis artifacts
+- historical evidence
+- older synthesis artifacts
+- previous public output
 
 ### Synthesis state
 
-Reflection and summary artifacts provide navigation and compression without destroying the underlying history.
+Reflection and summary artifacts provide navigation and compression.
 
-The principle is:
-
-> **Compress for recall; preserve for auditability.**
-
-Nothing needs to be forgotten merely because it is no longer loaded into the next prompt.
+This allows the system to keep a long history without requiring every future model invocation to ingest that entire history.
 
 ---
 
-## Self-editing with boundaries
+# Self-editing
 
-An agent that can write to its own state can also corrupt its own state.
+A model that can modify its own persistent state can also damage that state.
 
-Wake Scaffold therefore does not give the model unrestricted filesystem authority.
+Wake Scaffold therefore does **not** give the model unrestricted write access.
 
-Different pieces of state have different permissions.
+Self-edits use structured operations with different rules for different kinds of state.
 
 For example:
 
-| State | Agent can modify? | Principle |
+| State | Self-editable? | Constraint |
 |---|---:|---|
 | Current focus | Yes | Replaceable working state |
 | Known limitations | Yes | Append-only |
-| Commitments | Limited | No silent deletion or rewriting |
-| Semantic memory | Limited | Small bounded set |
+| Commitments | Limited | Cannot silently delete or rewrite |
+| Semantic memory | Limited | Small fixed cap |
 | Growth plan | Limited | Evidence-backed progression |
 | Hypotheses | Limited | Evidence required for resolution |
-| Rules | No | Human-controlled by default |
-| Identity name/purpose | No | Human-controlled |
-| Immutable journal | Append only | Historical record |
+| Rules | No by default | Human-controlled |
+| Identity name/purpose | No by default | Human-controlled |
+| Journal | Append only | Historical record |
 
-The important idea is not that the model is trusted.
+The important principle is:
 
-It is that the system tries to make certain classes of mistakes mechanically difficult.
+> **Whenever possible, enforce an invariant in code rather than merely telling the model to behave.**
+
+Every attempted self-edit is also recorded in the wake journal, including edits that were rejected or ignored.
+
+This provides a record of the difference between:
+
+```text
+the model proposed X
+```
+
+and:
+
+```text
+the system actually changed X
+```
 
 ---
 
-## Tools: writing code is not running code
+# Tools: writing code is not running code
 
-The agent can create small tools in its workspace.
-
-But:
+The agent can create small tools in:
 
 ```text
-write tool
-    ≠
-tool works
+memory/core_workspace/tools/
 ```
 
-`tool-write` only writes the file.
+But Wake Scaffold deliberately separates:
 
-`tool-run` actually executes an existing Python tool and records:
+```text
+tool-write
+```
+
+from:
+
+```text
+tool-run
+```
+
+because:
+
+```text
+writing code ≠ running code
+```
+
+### `tool-write`
+
+`tool-write` writes a small number of plain files into the tools directory.
+
+It does not execute them.
+
+### `tool-run`
+
+`tool-run` executes an existing Python tool and records:
 
 - exit code
 - stdout
 - stderr
 
-That result becomes evidence available to subsequent wakes.
-
-Tool execution is deliberately constrained with limits on execution time, output size, environment inheritance, and working directory.
-
-This is a best-effort sandbox, not a security boundary or container.
-
----
-
-## Model-provider independence
-
-Wake Scaffold does not make the model provider part of the persistence architecture.
-
-Providers implement a common interface, with support for multiple backends and a mock provider for testing.
-
-The important abstraction is:
+The result is persisted in:
 
 ```text
-              ┌───────────────┐
-              │  Wake Scaffold │
-              └───────┬───────┘
-                      │
-          ┌───────────┼───────────┐
-          │           │           │
-       OpenAI      Anthropic    Gemini
-          │           │           │
-          └───────────┼───────────┘
-                      │
-                   Ollama
+memory/core_workspace/tool_runs.json
 ```
 
-The model is an interchangeable reasoning engine.
+and becomes evidence available to a subsequent wake.
 
-The filesystem is the persistent state.
+A tool therefore has two different states:
 
-This means the same identity can, in principle, survive a change of model provider.
+```text
+implemented
+```
+
+and:
+
+```text
+verified working
+```
+
+Those states are intentionally not equivalent.
 
 ---
 
-## Identity lifecycle
+## Tool execution restrictions
 
-An identity is a complete persistent state, not just a name.
+Tool execution is constrained, but these restrictions should not be mistaken for a security sandbox.
 
-The active identity lives under `memory/`.
+The subprocess:
 
-It can be archived and a new identity can be created from `base_memory/`:
+- runs from the tools directory
+- receives a rebuilt environment rather than inheriting the parent's full environment
+- does not receive configured API credentials by default
+- has a limited execution time
+- has a limited number of executions per wake
+- has bounded stdout/stderr
+- is restricted to plain Python tool files in the tools directory
+
+The environment is particularly important.
+
+Model-generated code should not automatically inherit secrets such as API keys simply because the parent wake process has them.
+
+However:
+
+> **This is a best-effort restriction, not a security boundary.**
+
+No container, chroot, or operating-system-level sandbox is provided.
+
+In particular, the system does not claim to prevent a malicious or deliberately evasive tool from accessing arbitrary absolute paths or using the network if the host permits it.
+
+Do not treat `tool-run` as a hostile-code sandbox.
+
+---
+
+# Provider independence
+
+The persistence architecture is intentionally separate from the model provider.
+
+Providers implement a common interface under:
+
+```text
+providers/
+```
+
+The repository includes provider implementations for multiple model backends, as well as a mock provider for testing.
+
+Conceptually:
+
+```text
+                   Wake Scaffold
+                        │
+             ┌──────────┼──────────┐
+             │          │          │
+          OpenAI     Anthropic    Gemini
+             │          │          │
+             └──────────┼──────────┘
+                        │
+                      Ollama
+```
+
+The provider is the reasoning engine.
+
+The filesystem is the continuity layer.
+
+This separation means the persistent identity does not fundamentally depend on one particular model vendor.
+
+---
+
+# Identity lifecycle
+
+An identity is a complete persistent state, not merely a name.
+
+The active identity lives in:
+
+```text
+memory/
+```
+
+Identities can be archived and new identities can be bootstrapped from:
+
+```text
+base_memory/
+```
+
+For example:
 
 ```bash
 python wake.py archive --as bob
+```
 
+and:
+
+```bash
 python wake.py new \
   --name "Ada" \
   --purpose "Build and test small, repeatable research tools."
 ```
 
-Or both operations can be performed together:
+or:
 
 ```bash
 python wake.py reset \
@@ -434,81 +584,128 @@ python wake.py reset \
   --purpose "Build and test small, repeatable research tools."
 ```
 
-Archives are preserved rather than rewritten by the wake loop.
+Archived identities retain their complete state rather than being rewritten into a generic summary.
 
-A new identity starts with a clean journal, commitments, memories, growth plan, and public output.
-
-This makes identity itself a persistent, versionable artifact.
+The same compartmentalized structure is used for active and archived identities.
 
 ---
 
-## What this is — and isn't
+# Human review and pull requests
 
-### It is
+Some state is intentionally outside the model's normal self-edit scope.
 
-- A persistence layer for stateless AI agents
-- A filesystem-based state model
-- A framework for durable commitments and memories
-- An experiment in evidence-backed agent continuity
-- A way to separate historical record from current understanding
-- Vendor-agnostic with respect to the model provider
-- Human-readable and Git-friendly
-- Deliberately small and inspectable
+By default, a proposed change to protected state is recorded for human review rather than applied automatically.
 
-### It isn't
+The project can optionally use GitHub pull requests for this process.
 
-- A claim that an LLM is conscious
-- A guarantee of genuine long-term memory
-- A conventional vector-database RAG system
-- An autonomous agent with unrestricted access to the host
-- A secure sandbox
-- A perfect cognitive architecture
-- Proof that persistent identity has "emerged"
+When enabled, changes to protected files such as rules or indexes can be proposed as real pull requests.
 
-The project is experimental.
+That creates a useful distinction:
 
-The interesting question is whether sufficiently structured longitudinal state can produce useful continuity from otherwise stateless inference.
+```text
+model proposes change
+        ↓
+Git records proposed change
+        ↓
+human reviews
+        ↓
+human merges or rejects
+```
+
+This makes GitHub part of the governance mechanism rather than merely a place where the code happens to live.
 
 ---
 
-## Repository structure
+# Synthesis and public output
 
-At the top level:
+Wake Scaffold maintains several forms of derived state.
+
+### Per-wake ideas
+
+Successful wakes can produce dated reflection artifacts under:
+
+```text
+core_synthesis/ideas/
+```
+
+### Daily indexes
+
+Daily synthesis provides navigation across the journal without replacing the journal itself.
+
+### Daily summaries
+
+Semantic summaries can be generated explicitly when desired.
+
+They are derived artifacts, not the authoritative historical record.
+
+### Blog output
+
+The agent can also maintain public-facing output under:
+
+```text
+core_persona/blog/
+```
+
+Blog posts are stored as append-only data and rendered into HTML mechanically.
+
+The generated page is not treated as the source of truth; the underlying post data is.
+
+This is another example of the general design principle:
+
+> **Keep durable source state separate from derived presentation.**
+
+---
+
+# Repository structure
+
+At a high level:
 
 ```text
 wake-scaffold/
-├── memory/                 # Active persistent identity
-├── base_memory/            # Seed template for new identities
-├── identities_archive/     # Archived identities
-├── providers/              # Model-provider implementations
-├── tests/                  # Tests using temporary state
-├── wake.py                 # Wake-cycle orchestrator
-├── config.yaml             # Runtime configuration
+├── memory/                    # Active persistent identity
+├── base_memory/               # Seed template for new identities
+├── identities_archive/        # Archived identities
+├── providers/                 # Model-provider implementations
+├── tests/                     # Tests
+├── wake.py                    # Wake-cycle orchestrator
+├── config.yaml                # Runtime configuration
 ├── requirements.txt
-└── .github/workflows/
-    └── wake.yml            # Scheduled wake
+└── .github/
+    └── workflows/
+        └── wake.yml           # Scheduled wake
 ```
 
-The active `memory/` directory is intentionally ordinary files rather than a specialized database.
+The active state is intentionally made from ordinary files.
 
-That is part of the experiment.
+That makes it:
+
+- human-readable
+- inspectable
+- versionable with Git
+- portable
+- easy to back up
+- independent of a specialized memory database
+
+The filesystem is not incidental to the architecture.
+
+**It is the persistence mechanism being investigated.**
 
 ---
 
-## Getting started
+# Getting started
 
-### 1. Install dependencies
+## Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Install the SDK for the provider selected in `config.yaml`.
+Install the SDK required by the provider configured in `config.yaml`.
 
 For example:
 
 ```bash
-pip install google-genai
+pip install openai
 ```
 
 or:
@@ -520,215 +717,288 @@ pip install anthropic
 or:
 
 ```bash
-pip install openai
+pip install google-genai
 ```
 
-Ollama does not require a Python provider SDK.
+Ollama uses its configured local service rather than requiring a hosted provider SDK.
 
-### 2. Configure credentials
+---
+
+## Configure credentials
+
+Copy the example environment file:
 
 ```bash
 cp .env.example .env
 ```
 
-Add the API key for the provider you intend to use.
+Then configure the credentials required by the selected provider.
 
 Only the selected provider needs credentials.
 
-### 3. Configure the identity
+---
 
-Edit:
+## Configure the identity
+
+The initial identity and rules live under:
+
+```text
+memory/core_identity/
+```
+
+In particular:
 
 ```text
 memory/core_identity/identity.md
 memory/core_identity/rules.md
 ```
 
-Set the identity, purpose, constraints, and other initial state you want the agent to inherit.
+Review these before running an agent with real credentials.
 
-### 4. Run a wake
+---
+
+## Run a wake
 
 ```bash
 python wake.py
 ```
 
-The model gets a fresh process and context, reads the persistent state, performs one wake, and writes its results back to disk.
+The wake:
 
-### 5. Validate the state
+1. starts a fresh model interaction
+2. loads the permitted persistent state
+3. reflects
+4. performs work
+5. applies permitted state changes
+6. records tool results and other evidence
+7. writes its journal entry
+8. exits
+
+The next invocation starts from the resulting state.
+
+---
+
+## Validate the state
 
 ```bash
 python wake.py validate
 ```
 
-Validation checks the expected filesystem structure, JSON ledgers, and persisted wake history without changing the state.
+Validation checks the expected persistent-state structure and data without requiring the agent to perform a normal wake.
 
-### 6. Inspect what happened
+---
 
-Look at:
+## Inspect the result
+
+The most useful places to start are:
 
 ```text
 memory/core_workspace/journal/
 memory/core_memories/commitments.json
 memory/core_memories/semantic_memory.json
+memory/core_memories/growth_plan.json
+memory/core_memories/hypotheses.json
 memory/core_workspace/tool_runs.json
 ```
 
-The journal is the authoritative record of the wake.
-
-### 7. Schedule future wakes
-
-The included GitHub Actions workflow can run wakes on a schedule.
-
-At that point the system becomes:
-
-```text
-scheduled wake
-      ↓
-fresh process
-      ↓
-read persistent state
-      ↓
-reflect + act
-      ↓
-write persistent state
-      ↓
-process exits
-      ↓
-...
-      ↓
-next scheduled wake
-```
+The journal is the primary procedural record of what happened.
 
 ---
 
-## Testing
+# Testing
 
-The test suite exercises the state-management mechanics without requiring a live model or API key.
+The project includes tests for the persistence and orchestration mechanics.
+
+The mock provider allows much of the wake machinery to be exercised without a live model or API key.
+
+Run the test suite with:
 
 ```bash
 python tests/test_wake.py
 ```
 
-Tests use temporary memory directories rather than the real active identity.
+Tests use temporary state rather than the active identity.
 
-The suite covers things such as:
+The test suite covers mechanisms including:
 
 - state validation
-- self-edit mechanics
-- reflection and journal flows
-- fallback blog generation
+- self-edit handling
+- journal generation
+- reflection handling
+- tool writing
 - tool execution
 - tool-run evidence
 - subprocess environment restrictions
 - working-directory restrictions
-
-The mock provider makes it possible to exercise the wake machinery deterministically.
+- failure handling
 
 ---
 
-## Design principles
+# Scheduled operation
 
-Wake Scaffold is built around a few simple rules.
+The repository includes a GitHub Actions workflow for scheduled wakes.
+
+The resulting architecture is:
+
+```text
+GitHub Actions
+      │
+      ▼
+fresh Python process
+      │
+      ▼
+load durable state
+      │
+      ▼
+reflect + act
+      │
+      ▼
+record results
+      │
+      ▼
+commit durable state
+      │
+      ▼
+process exits
+      │
+      ▼
+        ...
+      │
+      ▼
+next scheduled wake
+```
+
+This is what makes the stateless execution model practical: the process does not need to remain alive between wakes.
+
+---
+
+# Design principles
+
+Wake Scaffold is built around a small set of principles.
 
 ### 1. Persistence should be explicit
 
-If something needs to survive a wake, it should exist in durable state.
+If something must survive a wake, it should exist in durable state.
 
 ### 2. History should be preserved
 
-The system should record what actually happened rather than continuously rewriting the past.
+The past should be recorded rather than continuously rewritten.
 
-### 3. Current understanding should remain curated
+### 3. Recall should be bounded
 
-The next wake should not need to ingest the entire history.
+The model should not need to read its entire history on every wake.
 
 ### 4. Evidence should outrank assertions
 
-A model claiming that something happened is not the same as evidence that it happened.
+A model statement is not automatically evidence.
 
 ### 5. Different state deserves different rules
 
-Identity, commitments, memories, hypotheses, evidence, and history are not interchangeable.
+Identity, rules, commitments, memories, hypotheses, evidence, and history are not interchangeable.
 
-### 6. Model providers should be replaceable
+### 6. Foundational state should remain under human control
 
-The persistence architecture should not depend on one LLM vendor.
+The model should not silently redefine the rules governing itself.
 
-### 7. Humans should retain control over foundational state
+### 7. Mechanical enforcement beats instructions
 
-Rules and core identity properties are human-controlled by default.
+Where an invariant matters, enforce it in code when practical.
 
-### 8. Mechanical guarantees are better than instructions
+### 8. Derived state should not replace source state
 
-Whenever possible, enforce an invariant in code instead of merely telling the model to behave.
+Indexes and summaries can compress information without becoming the authoritative record.
 
-### 9. Preserve detail even when compressing recall
+### 9. Model providers should be replaceable
 
-A summary can replace what is loaded into context.
+The continuity mechanism should not be coupled to a particular LLM vendor.
 
-It should not replace the underlying evidence.
+### 10. Limitations should be explicit
 
-### 10. Be honest about limitations
-
-A workaround is not a success if it merely violates another constraint or misrepresents what happened.
+The system should record what it cannot do rather than inventing a successful workaround.
 
 ---
 
-## The experiment
+# What this project is actually testing
 
-The deeper motivation behind Wake Scaffold is not to build a particular product.
+The interesting experiment is not:
 
-It is to investigate what happens when you take a model with no built-in continuity and repeatedly place it in the same persistent environment.
+> "Can an LLM remember?"
 
-Each invocation is stateless.
+It obviously can be given information from previous interactions.
 
-The state is longitudinal.
+The more specific question is:
 
-The model can change.
+> **What happens when a stateless model is repeatedly given a deliberately structured, bounded, evidence-bearing external state and is allowed to modify only certain parts of that state?**
 
-The identity's accumulated record remains.
+That introduces several questions:
 
-That creates an interesting separation:
+- How much continuity can be produced from filesystem state alone?
+- Which kinds of state are actually useful across wakes?
+- How much history can be compressed without losing important context?
+- Do durable commitments change behavior?
+- Does explicit evidence tracking reduce false claims of accomplishment?
+- Can hypotheses produce useful self-experimentation rather than self-confirmation?
+- How much structure is required before an agent's behavior begins to look longitudinal rather than session-based?
+- Which guarantees can be enforced mechanically rather than entrusted to the model?
+
+Wake Scaffold is an implementation of that experiment, not proof that the experiment has succeeded.
+
+---
+
+# What this is not
+
+Wake Scaffold does **not** claim to provide:
+
+- consciousness
+- genuine intrinsic memory
+- a persistent mind inside the model
+- proof of emergent identity
+- a secure execution sandbox
+- perfect autonomy
+- a general-purpose cognitive architecture
+- a conventional vector-database RAG system
+
+The model remains stateless.
+
+The persistent identity exists in the external state and in the processes that interpret and modify that state.
+
+Whether that is enough to produce something meaningfully resembling longitudinal agent behavior is the experiment.
+
+---
+
+# A useful mental model
+
+The simplest way to think about Wake Scaffold is:
 
 ```text
-               transient
-              intelligence
-                   │
-                   ▼
-            ┌─────────────┐
-            │    wake     │
-            └──────┬──────┘
-                   │
-                   ▼
-          persistent state
-                   │
-                   ▼
-            next invocation
+           MODEL
+      (temporary reasoning)
+               │
+               │ reads / modifies
+               ▼
+       ┌─────────────────┐
+       │  PERSISTENT     │
+       │     STATE       │
+       │                 │
+       │ identity        │
+       │ rules           │
+       │ commitments     │
+       │ memories        │
+       │ hypotheses      │
+       │ evidence        │
+       │ tools           │
+       │ journal         │
+       └─────────────────┘
+               │
+               │ survives
+               ▼
+          NEXT WAKE
 ```
 
-If useful behavioral continuity emerges, it should come from the interaction between repeated inference and structured longitudinal state—not from pretending that a single model context lasts forever.
+The model is replaceable.
 
-That is the experiment.
+The process is disposable.
 
----
+The state is durable.
 
-## Status
-
-This is an active experiment rather than a finished framework.
-
-The architecture is intentionally conservative in some places and primitive in others.
-
-For example, `semantic_memory.json` is a small curated memory rather than a sophisticated relevance-triggered associative memory system. The journal is append-only rather than intelligently compressed. Tool execution has best-effort restrictions rather than a hardened sandbox.
-
-Those limitations are intentional in the sense that they keep the system understandable enough to study.
-
-The project can become more sophisticated later.
-
-First, it should remain understandable.
-
----
-
-## License
-
-MIT
-
+**That state is the continuity layer.**
