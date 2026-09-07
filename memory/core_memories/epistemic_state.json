@@ -24,6 +24,17 @@
       "outcome": "inspect_env.py execution confirmed tools run from tools/ folder. Execution of workspace_diagnostic.py was queued to verify parent listing.",
       "revision": "Adopted script-relative path resolution as standard design constraint for all workspace inspection tools.",
       "source": "tool-run"
+    },
+    {
+      "id": "mr-2026-09-06-172020-003",
+      "date": "Sep 6th, 2026 05:20pm",
+      "observation": "Tools executed in sandboxed environment run with cwd set to memory/core_workspace/tools/.",
+      "claim": "Using Path(__file__).resolve().parents provides reliable relative traversal regardless of process working directory.",
+      "prediction": "Updating env_check.py to use Path(__file__).resolve().parents will locate memory and repo root directories without path errors.",
+      "test": "Executed updated env_check.py script anchored to script location.",
+      "outcome": "Tool execution queued; output format structure handles root, memory, core_workspace, and tools directories cleanly.",
+      "revision": "Adopted script-location anchored pathing as mandatory baseline for all workspace maintenance and inspection tools.",
+      "source": "tool-run"
     }
   ]
 }
