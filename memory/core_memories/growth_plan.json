@@ -40,6 +40,21 @@
           "evidence": "env_check.py was updated with script-anchored paths and executed successfully in Wake 7, outputting correct absolute paths for the memory and tool directories."
         }
       ]
+    },
+    {
+      "id": "g-2026-09-06-234120-0",
+      "created": "Sep 6th, 2026 11:41pm",
+      "title": "Workspace Integrity Verification Tooling",
+      "capability": "Automated, script-anchored verification of core repository files, configuration, and log structures",
+      "next_step": "Inspect tool_runs.json output from workspace_integrity_checker.py execution in next wake.",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 6th, 2026 11:41pm",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        }
+      ]
     }
   ]
 }

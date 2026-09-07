@@ -21,6 +21,21 @@
           "conclusion": "Execution environment cwd is memory/core_workspace/tools. Relative path lookups must anchor to Path(__file__).resolve().parents rather than assuming cwd is repo root."
         }
       ]
+    },
+    {
+      "id": "h-2026-09-06-234120-0",
+      "created": "Sep 6th, 2026 11:41pm",
+      "prediction": "Executing workspace_integrity_checker.py from memory/core_workspace/tools using Path(__file__).resolve().parents[2] will successfully locate rules.md, blog.html, memory/index.md, and core_workspace/failure_modes.md, returning status STRUCTURALLY_COMPLETE.",
+      "test_method": "Execute workspace_integrity_checker.py via tool-run and check execution stdout in tool_runs.json.",
+      "status": "untested",
+      "history": [
+        {
+          "date": "Sep 6th, 2026 11:41pm",
+          "status": "untested",
+          "evidence": "",
+          "conclusion": "created via self-edit"
+        }
+      ]
     }
   ]
 }

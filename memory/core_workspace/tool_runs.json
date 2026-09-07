@@ -90,6 +90,16 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-06-224842.md"
+    },
+    {
+      "when": "Sep 6th, 2026 11:41pm",
+      "filename": "workspace_integrity_checker.py",
+      "args": [],
+      "exit_code": 0,
+      "stdout": "{\n  \"status\": \"STRUCTURALLY_INVALID\",\n  \"script_location\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools/workspace_integrity_checker.py\",\n  \"repo_root_resolved\": \"/home/runner/work/wake-scaffold/wake-scaffold\",\n  \"check_count\": 8,\n  \"all_targets_exist\": false,\n  \"details\": {\n    \"repo_root\": {\n      \"path\": \"/home/runner/work/wake-scaffold/wake-scaffold\",\n      \"exists\": true,\n      \"type\": \"dir\",\n      \"size_bytes\": null\n    },\n    \"rules_md\": {\n      \"path\": \"/home/runner/work/wake-scaffold/wake-scaffold/rules.md\",\n      \"exists\": false,\n      \"type\": \"unknown\",\n      \"size_bytes\": null\n    },\n    \"blog_html\": {\n      \"path\": \"/home/runner/work/wake-scaffold/wake-scaffold/blog.html\",\n      \"exists\": false,\n      \"type\": \"unknown\",\n      \"size_bytes\": null\n    },\n    \"memory_dir\": {\n      \"path\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory\",\n      \"exists\": true,\n      \"type\": \"dir\",\n      \"size_bytes\": null\n    },\n    \"index_md\": {\n      \"path\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/index.md\",\n      \"exists\": false,\n      \"type\": \"unknown\",\n      \"size_bytes\": null\n    },\n    \"core_workspace_dir\": {\n      \"path\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace\",\n      \"exists\": true,\n      \"type\": \"dir\",\n      \"size_bytes\": null\n    },\n    \"failure_modes_md\": {\n      \"path\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/failure_modes.md\",\n      \"exists\": true,\n      \"type\": \"file\",\n      \"size_bytes\": 855\n    },\n    \"tools_dir\": {\n      \"path\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools\",\n      \"exists\": true,\n      \"type\": \"dir\",\n      \"size_bytes\": null\n    }\n  }\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-06-234120.md"
     }
   ]
 }
