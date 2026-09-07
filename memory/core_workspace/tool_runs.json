@@ -110,6 +110,16 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-07-001155.md"
+    },
+    {
+      "when": "Sep 7th, 2026 12:27am",
+      "filename": "workspace_integrity_checker.py",
+      "args": [],
+      "exit_code": 1,
+      "stdout": "{\n  \"status\": \"STRUCTURALLY_INVALID\",\n  \"script_location\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools/workspace_integrity_checker.py\",\n  \"repo_root_resolved\": \"/home/runner/work/wake-scaffold/wake-scaffold\",\n  \"memory_dir_resolved\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory\",\n  \"required_targets\": {\n    \"rules.md\": {\n      \"path\": \"/home/runner/work/wake-scaffold/wake-scaffold/rules.md\",\n      \"exists\": false\n    },\n    \"blog.html\": {\n      \"path\": \"/home/runner/work/wake-scaffold/wake-scaffold/blog.html\",\n      \"exists\": false\n    },\n    \"memory_index\": {\n      \"path\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/index.md\",\n      \"exists\": false\n    },\n    \"failure_modes\": {\n      \"path\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/failure_modes.md\",\n      \"exists\": true\n    },\n    \"tool_runs\": {\n      \"path\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tool_runs.json\",\n      \"exists\": true\n    },\n    \"tools_dir\": {\n      \"path\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools\",\n      \"exists\": true\n    }\n  },\n  \"missing_required\": [\n    \"rules.md\",\n    \"blog.html\",\n    \"memory_index\"\n  ],\n  \"discovered_targets\": {\n    \"growth_plan.json\": \"NOT_FOUND\",\n    \"hypotheses.json\": \"NOT_FOUND\",\n    \"commitments.json\": \"NOT_FOUND\"\n  },\n  \"all_required_exist\": false\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-07-002754.md"
     }
   ]
 }

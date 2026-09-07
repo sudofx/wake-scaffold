@@ -1,38 +1,57 @@
 import json
+import sys
 from pathlib import Path
 
 def main():
-    script_path = Path(__file__).resolve()
-    tools_dir = script_path.parents[0]
-    core_workspace_dir = script_path.parents[1]
-    memory_dir = script_path.parents[2]
-    repo_root = script_path.parents[3]
+    script = Path(__file__).resolve()
+    tools_dir = script.parent
+    core_workspace = script.parents[1]
+    memory_dir = script.parents[2]
+    repo_root = script.parents[3]
 
-    checks = {
-        "rules.md": (repo_root / "rules.md").exists(),
-        "blog.html": (repo_root / "blog.html").exists(),
-        "memory/index.md": (memory_dir / "index.md").exists(),
-        "core_workspace/failure_modes.md": (core_workspace_dir / "failure_modes.md").exists(),
-        "memory/identity.md": (memory_dir / "identity.md").exists(),
-        "memory/commitments.json": (memory_dir / "commitments.json").exists(),
-        "memory/growth_plan.json": (memory_dir / "growth_plan.json").exists(),
-        "memory/hypotheses.json": (memory_dir / "hypotheses.json").exists()
+    required_targets = {
+        "rules.md": repo_root / "rules.md",
+        "blog.html": repo_root / "blog.html",
+        "memory_index": memory_dir / "index.md",
+        "failure_modes": core_workspace / "failure_modes.md",
+        "tool_runs": core_workspace / "tool_runs.json",
+        "tools_dir": tools_dir,
     }
 
-    all_exist = all(checks.values())
+    discovered_targets = {}
+    for filename in ["growth_plan.json", "hypotheses.json", "commitments.json"]:
+        found_path = None
+        for base in [repo_root, memory_dir, core_workspace]:
+            p = base / filename
+            if p.exists():
+                found_path = p
+                break
+        discovered_targets[filename] = str(found_path) if found_path else "NOT_FOUND"
+
+    target_status = {}
+    missing = []
+    for name, path in required_targets.items():
+        exists = path.exists()
+        target_status[name] = {"path": str(path), "exists": exists}
+        if not exists:
+            missing.append(name)
+
+    all_exist = (len(missing) == 0)
     status = "STRUCTURALLY_COMPLETE" if all_exist else "STRUCTURALLY_INVALID"
 
-    result = {
+    report = {
         "status": status,
-        "script_location": str(script_path),
+        "script_location": str(script),
         "repo_root_resolved": str(repo_root),
         "memory_dir_resolved": str(memory_dir),
-        "check_count": len(checks),
-        "all_targets_exist": all_exist,
-        "details": {k: "EXISTS" if v else "MISSING" for k, v in checks.items()}
+        "required_targets": target_status,
+        "missing_required": missing,
+        "discovered_targets": discovered_targets,
+        "all_required_exist": all_exist
     }
 
-    print(json.dumps(result, indent=2))
+    print(json.dumps(report, indent=2))
+    return 0 if all_exist else 1
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

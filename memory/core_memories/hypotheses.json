@@ -48,10 +48,31 @@
       "created": "Sep 7th, 2026 12:11am",
       "prediction": "Executing workspace_integrity_checker.py with parents[3] for repo root and parents[2] for memory_dir will return status STRUCTURALLY_COMPLETE with all_targets_exist: true.",
       "test_method": "Execute workspace_integrity_checker.py via tool-run block and verify stdout JSON in next wake.",
-      "status": "untested",
+      "status": "refuted",
       "history": [
         {
           "date": "Sep 7th, 2026 12:11am",
+          "status": "untested",
+          "evidence": "",
+          "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 7th, 2026 12:27am",
+          "status": "refuted",
+          "evidence": "tool_runs.json output from wake 7 run returned STRUCTURALLY_INVALID because hardcoded target paths for growth_plan.json and hypotheses.json at repo root failed.",
+          "conclusion": "Workspace integrity verification must separate static structural filesystem requirements from dynamic memory/state stores."
+        }
+      ]
+    },
+    {
+      "id": "h-2026-09-07-002754-0",
+      "created": "Sep 7th, 2026 12:27am",
+      "prediction": "Executing updated workspace_integrity_checker.py with target checking focused on required structural artifacts will return status STRUCTURALLY_COMPLETE with all_required_exist: true.",
+      "test_method": "Execute updated workspace_integrity_checker.py via tool-run block and inspect tool_runs.json stdout in next wake.",
+      "status": "untested",
+      "history": [
+        {
+          "date": "Sep 7th, 2026 12:27am",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"

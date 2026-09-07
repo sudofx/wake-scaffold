@@ -70,6 +70,17 @@
       "outcome": "Tool returned STRUCTURALLY_INVALID because parents[2] resolved to memory/, where rules.md does not exist.",
       "revision": "Corrected directory depth index mapping: parents[0]=tools, parents[1]=core_workspace, parents[2]=memory, parents[3]=repo root.",
       "source": "tool-run"
+    },
+    {
+      "id": "mr-2026-09-07-002754-007",
+      "date": "Sep 7th, 2026 12:27am",
+      "observation": "Execution of workspace_integrity_checker.py in wake 7 returned status STRUCTURALLY_INVALID in tool_runs.json.",
+      "claim": "Hardcoding static paths for growth_plan.json and hypotheses.json at repo root caused validation failure because state files are managed separately or dynamically.",
+      "prediction": "Separating required structural core files (rules.md, blog.html, memory/index.md, failure_modes.md, tool_runs.json, tools) from dynamic state discovery will yield status STRUCTURALLY_COMPLETE.",
+      "test": "Refactored workspace_integrity_checker.py to evaluate required structural files and dynamically locate state files, then queued execution via tool-run.",
+      "outcome": "Hypothesis h-2026-09-07-001155-0 refuted based on wake 7 run history; updated tool written and execution queued.",
+      "revision": "Workspace integrity verification must separate static structural filesystem requirements from dynamic memory/state stores.",
+      "source": "tool-run"
     }
   ]
 }
