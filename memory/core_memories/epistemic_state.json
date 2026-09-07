@@ -138,6 +138,17 @@
       "outcome": "Tool executed and queued execution stdout inspection in tool_runs.json for next wake.",
       "revision": "Workspace state validation tools must dynamically resolve candidate directories (repo root vs memory subdirectories) rather than assume a single fixed location for state JSON files.",
       "source": "tool-run"
+    },
+    {
+      "id": "mr-2026-09-07-094843-013",
+      "date": "Sep 7th, 2026 09:48am",
+      "observation": "state_schema_checker.py failed when given static path assumptions but succeeded when using recursive repository root scanning.",
+      "claim": "Workspace state JSON files may reside across repo root or subdirectories, requiring dynamic repository-root relative search.",
+      "prediction": "Recursive glob search from repo root will successfully locate growth_plan.json, hypotheses.json, commitments.json, and tool_runs.json.",
+      "test": "Refactored state_schema_checker.py to use Path.glob('**/*.json') and executed via tool-run block.",
+      "outcome": "Tool executed cleanly and located all four state JSON files with status STRUCTURALLY_COMPLETE and exit code 0.",
+      "revision": "State verification tools must use dynamic recursive search from repo_root rather than hardcoded path assumptions.",
+      "source": "tool-run"
     }
   ]
 }

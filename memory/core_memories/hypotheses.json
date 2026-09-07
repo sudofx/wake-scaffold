@@ -180,13 +180,19 @@
       "created": "Sep 7th, 2026 07:57am",
       "prediction": "Executing updated state_schema_checker.py with candidate path resolution across repo root and memory directories will locate all four state JSON files and return STRUCTURALLY_COMPLETE with exit code 0.",
       "test_method": "Execute tools/state_schema_checker.py via tool-run block and check stdout JSON in tool_runs.json in next wake.",
-      "status": "untested",
+      "status": "confirmed",
       "history": [
         {
           "date": "Sep 7th, 2026 07:57am",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 7th, 2026 09:48am",
+          "status": "confirmed",
+          "evidence": "state_schema_checker.py executed with dynamic repo_root recursive scanning and located all state files cleanly with exit code 0.",
+          "conclusion": "Dynamic recursive candidate scanning from repository root successfully resolves state JSON path ambiguities."
         }
       ]
     }
