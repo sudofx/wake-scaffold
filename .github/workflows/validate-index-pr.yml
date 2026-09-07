@@ -1,0 +1,29 @@
+name: Validate index.md proposal
+
+# Runs only on PRs that touch memory/core_memories/index.md — i.e. Bob's
+# proposal PRs opened by open_proposal_pull_request() in wake.py. Cross-
+# checks specific factual claims (growth project / hypothesis status,
+# referenced file paths) against ground truth already in the repo, so a
+# human reviewing the PR gets a head start instead of re-deriving it by
+# hand. This does not judge writing quality and is not a substitute for
+# reading the diff — it only catches checkable factual mismatches.
+
+on:
+  pull_request:
+    paths:
+      - "memory/core_memories/index.md"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate proposed index.md
+        run: python .github/scripts/validate_index_proposal.py

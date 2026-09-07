@@ -49,7 +49,12 @@ daily_review_hour: 21
 # — the compressed summary read every wake instead of the full journal —
 # is stale and worth refreshing. Optional and self-judged each time, not
 # a hard trigger; see build_reflection_prompt's consolidation checkpoint.
-index_consolidation_interval_wakes: 15
+# Lowered from 15 to 5: at 15, an operator relying on the proposal-PR
+# workflow can go days without a single consolidation checkpoint firing,
+# let alone an actual proposal. A shorter interval means smaller, more
+# frequent PRs that are faster to review, and drift gets caught before
+# it compounds across a dozen wakes.
+index_consolidation_interval_wakes: 5
 
 # Keep the public HTML page readable as blog_posts.json grows. The source
 # file remains append-only and complete; only the rendered page is capped.
