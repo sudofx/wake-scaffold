@@ -193,6 +193,18 @@
       "stderr": "",
       "timed_out": false,
       "journal_entry": "2026-09-07-075732.md"
+    },
+    {
+      "when": "Sep 7th, 2026 09:39am",
+      "filename": "state_schema_checker.py",
+      "args": [],
+      "exit_code": 1,
+      "stdout": "{\n  \"status\": \"STRUCTURALLY_INVALID\",\n  \"missing_files\": [\n    \"growth_plan.json\",\n    \"hypotheses.json\",\n    \"commitments.json\",\n    \"tool_runs.json\"\n  ],\n  \"invalid_json\": [],\n  \"found_files\": {}\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-07-093925.md",
+      "phase": "work",
+      "hypothesis_id": "h-2026-09-07-075732-0"
     }
   ]
 }
