@@ -71,6 +71,7 @@ PERSONA_DIR = MEMORY / (PERSONA_NAME if (MEMORY / PERSONA_NAME).exists() else LE
 BLOG_DIR = PERSONA_DIR / "blog"
 BLOG_HTML_DIR = BLOG_DIR / "html"
 JOURNAL = WORKSPACE_DIR / "journal"              # procedural log: what was done, immutable, one file per wake, handed off between researchers
+PROMPTS_DIR = WORKSPACE_DIR / "prompts"          # what the model actually received each wake, not just what it decided to do (see log_prompt_exchange)
 
 CORE_MANIFEST_FILE = MEMORY / "core_manifest.json"
 
@@ -362,6 +363,7 @@ MEMORY_LAYOUT = {
     "synthesis": "core_synthesis",
     "persona": PERSONA_DIR.relative_to(MEMORY).as_posix(),
     "journal": "core_workspace/journal",
+    "prompts": "core_workspace/prompts",
 }
 
 
@@ -2932,6 +2934,56 @@ def generate_with_retry(
             attempt += 1
 
 
+def log_prompt_exchange(
+    config: dict,
+    filename: str,
+    system_prompt: str,
+    user_prompt: str,
+    raw_output: str = None,
+    error: Exception = None,
+) -> None:
+    """
+    Record the exact system/user prompt sent to the provider this wake,
+    plus its raw response (or the error, if the call failed), to
+    core_workspace/prompts/<journal_fname-stem>.json.
+
+    The journal records what a wake decided to do; nothing else records
+    what it actually received beforehand. That gap matters for anything
+    conditional in the prompt — periodic NOTICE sections (e.g. the memory
+    consolidation checkpoint, the purpose check, the hypothesis-gap
+    nudge) are assembled by build_combined_prompt() from code, but
+    whether one fired for a given wake was previously only verifiable by
+    re-running that logic yourself, not by reading anything on disk. This
+    makes that a fact you can just look up.
+
+    Gated by config's log_prompts (default on). Every wake's fully
+    assembled prompt duplicates a fair amount of what's already
+    committed elsewhere (recent journal entries, identity.md, etc.), so
+    this does grow repo size faster than before — turn log_prompts off
+    in config.yaml if that becomes a real problem.
+
+    Best-effort only: any failure to write this is printed as a warning
+    and never raises, since losing an audit record is not worth failing
+    a wake over.
+    """
+    if not config.get("log_prompts", True):
+        return
+    record = {
+        "journal_filename": filename,
+        "system_prompt": system_prompt,
+        "user_prompt": user_prompt,
+    }
+    if raw_output is not None:
+        record["raw_output"] = raw_output
+    if error is not None:
+        record["error"] = f"{type(error).__name__}: {error}"
+    try:
+        out_path = PROMPTS_DIR / f"{Path(filename).stem}.json"
+        atomic_write_text(out_path, json.dumps(record, indent=2) + "\n")
+    except Exception as e:
+        print(f"WARNING: failed to write prompt log: {type(e).__name__}: {e}", file=sys.stderr)
+
+
 def _run_wake():
     provider_name = "unknown"
     try:
@@ -2967,33 +3019,41 @@ def _run_wake():
     # generate() calls; against a squeezed free-tier quota that meant two
     # independent chances to hit a 429/503 per wake instead of one — see
     # HANDOFF.md for the failure-rate math that motivated the merge.
+    #
+    # Prompts are built into variables first (not inline in the call)
+    # so they're available to log_prompt_exchange() on both the success
+    # and failure paths below — otherwise a failed call would leave no
+    # record of what was actually sent.
+    system_prompt = build_combined_prompt(now, config.get("enable_pull_requests", False))
+    user_prompt = (
+        "This is a new wake cycle. Write your reflection, then the "
+        "exact marker line, then do one piece of concrete work "
+        "selected by that reflection and write a concise journal "
+        "entry for it — all in this one response, in that order. "
+        "Favor work that improves a repeatable capability, creates a "
+        "useful artifact, tests an assumption, or resolves a real "
+        "blocker. Do not confuse describing improvement with "
+        "improvement. The journal entry should cover: objective; "
+        "artifact, test, or evidence produced; files or commitments "
+        "changed; and one next verifiable step. If no useful work is "
+        "possible, state the specific blocker and what authority or "
+        "information would resolve it. A blog post is optional and "
+        "only appropriate when the completed result is genuinely "
+        "useful to an outside reader."
+    )
     try:
-        raw_output = generate_with_retry(
-            provider,
-            build_combined_prompt(now, config.get("enable_pull_requests", False)),
-            "This is a new wake cycle. Write your reflection, then the "
-            "exact marker line, then do one piece of concrete work "
-            "selected by that reflection and write a concise journal "
-            "entry for it — all in this one response, in that order. "
-            "Favor work that improves a repeatable capability, creates a "
-            "useful artifact, tests an assumption, or resolves a real "
-            "blocker. Do not confuse describing improvement with "
-            "improvement. The journal entry should cover: objective; "
-            "artifact, test, or evidence produced; files or commitments "
-            "changed; and one next verifiable step. If no useful work is "
-            "possible, state the specific blocker and what authority or "
-            "information would resolve it. A blog post is optional and "
-            "only appropriate when the completed result is genuinely "
-            "useful to an outside reader.",
-        )
+        raw_output = generate_with_retry(provider, system_prompt, user_prompt)
     except Exception as e:
         fail_fname = journal_filename(now, failed=True)
+        log_prompt_exchange(config, fail_fname, system_prompt, user_prompt, error=e)
         fallback_notes = run_offline_fallback(now, fail_fname)
         write_failure_record(
             provider_name, "generate", e,
             fallback_notes=fallback_notes, now=now, filename=fail_fname,
         )
         return 1
+
+    log_prompt_exchange(config, journal_fname, system_prompt, user_prompt, raw_output=raw_output)
 
     reflection, output = split_combined_output(raw_output)
 

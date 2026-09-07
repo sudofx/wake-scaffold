@@ -80,7 +80,7 @@ class WakeTestCase(unittest.TestCase):
                 "MEMORY", "JOURNAL", "IDENTITY_DIR", "MEMORIES_DIR",
                 "WORKSPACE_DIR", "TOOLS_DIR", "TOOL_RUNS_FILE", "SYNTHESIS_DIR",
                 "PERSONA_DIR", "BLOG_DIR", "BLOG_HTML_DIR",
-                "EPISTEMIC_STATE_FILE", "CORE_MANIFEST_FILE",
+                "EPISTEMIC_STATE_FILE", "CORE_MANIFEST_FILE", "PROMPTS_DIR",
             )
         }
         wake.MEMORY = self.memory
@@ -96,6 +96,7 @@ class WakeTestCase(unittest.TestCase):
         wake.BLOG_HTML_DIR = self.memory / "core_persona" / "blog" / "html"
         wake.EPISTEMIC_STATE_FILE = self.memory / "core_memories" / "epistemic_state.json"
         wake.CORE_MANIFEST_FILE = self.memory / "core_manifest.json"
+        wake.PROMPTS_DIR = self.memory / "core_workspace" / "prompts"
 
     def tearDown(self):
         for name, value in self._orig.items():
@@ -610,6 +611,118 @@ class OfflineFallbackTests(WakeTestCase):
         text = path.read_text()
         self.assertIn("Offline fallback (no model call, $0 cost)", text)
         self.assertIn("RAN tools/validate_memory.py", text)
+
+
+class PromptLoggingTests(WakeTestCase):
+    """Item under test: log_prompt_exchange and its wiring into _run_wake —
+    real evidence that what the model actually received gets recorded,
+    not just what it decided to do afterward. Uses provider: mock and a
+    real _run_wake() call end to end where possible, per this repo's own
+    standard of not trusting an implementation until it's actually run."""
+
+    def _base_config(self, **overrides):
+        cfg = {
+            "provider": "mock",
+            "timezone": "America/Los_Angeles",
+            "enable_pull_requests": False,
+            "daily_review_hour": 21,
+            "index_consolidation_interval_wakes": 15,
+            "recent_blog_posts": 20,
+            "log_prompts": True,
+        }
+        cfg.update(overrides)
+        return cfg
+
+    def setUp(self):
+        super().setUp()
+        self._orig_load_config = wake.load_config
+        self.addCleanup(setattr, wake, "load_config", self._orig_load_config)
+
+    def _prompt_files(self):
+        d = self.memory / "core_workspace" / "prompts"
+        return list(d.glob("*.json")) if d.exists() else []
+
+    def test_direct_call_writes_expected_fields(self):
+        wake.log_prompt_exchange(
+            {"log_prompts": True}, "2026-09-07-000000.md",
+            "sys prompt text", "user prompt text", raw_output="model said this",
+        )
+        files = self._prompt_files()
+        self.assertEqual(len(files), 1)
+        record = json.loads(files[0].read_text())
+        self.assertEqual(record["system_prompt"], "sys prompt text")
+        self.assertEqual(record["user_prompt"], "user prompt text")
+        self.assertEqual(record["raw_output"], "model said this")
+        self.assertNotIn("error", record)
+        self.assertEqual(files[0].name, "2026-09-07-000000.json")
+
+    def test_direct_call_records_error_not_raw_output(self):
+        wake.log_prompt_exchange(
+            {"log_prompts": True}, "2026-09-07-FAILED-000000.md",
+            "sys", "user", error=RuntimeError("503 model overloaded"),
+        )
+        files = self._prompt_files()
+        self.assertEqual(len(files), 1)
+        record = json.loads(files[0].read_text())
+        self.assertIn("RuntimeError", record["error"])
+        self.assertIn("503 model overloaded", record["error"])
+        self.assertNotIn("raw_output", record)
+
+    def test_disabled_writes_nothing(self):
+        wake.log_prompt_exchange(
+            {"log_prompts": False}, "2026-09-07-000000.md",
+            "sys", "user", raw_output="should never be written",
+        )
+        self.assertEqual(self._prompt_files(), [])
+
+    def test_defaults_on_when_key_absent(self):
+        wake.log_prompt_exchange(
+            {}, "2026-09-07-000000.md", "sys", "user", raw_output="x",
+        )
+        self.assertEqual(len(self._prompt_files()), 1)
+
+    def test_end_to_end_successful_wake_logs_full_exchange(self):
+        wake.load_config = lambda: self._base_config()
+        wake._run_wake()
+        files = self._prompt_files()
+        self.assertEqual(len(files), 1, files)
+        record = json.loads(files[0].read_text())
+        self.assertIn("IDENTITY", record["system_prompt"])
+        self.assertIn("new wake cycle", record["user_prompt"])
+        self.assertIn("mock reflection for testing", record["raw_output"])
+        # The logged filename should match the journal entry this same
+        # wake actually produced, so the two can be correlated by name.
+        journal_files = list((self.memory / "core_workspace" / "journal").glob("*.md"))
+        self.assertEqual(len(journal_files), 1)
+        self.assertEqual(files[0].stem, journal_files[0].stem)
+
+    def test_end_to_end_disabled_produces_no_prompt_log(self):
+        wake.load_config = lambda: self._base_config(log_prompts=False)
+        wake._run_wake()
+        self.assertEqual(self._prompt_files(), [])
+        # The wake itself should still have run normally.
+        journal_files = list((self.memory / "core_workspace" / "journal").glob("*.md"))
+        self.assertEqual(len(journal_files), 1)
+
+    def test_end_to_end_failed_generate_still_logs_prompt_with_error(self):
+        wake.load_config = lambda: self._base_config()
+
+        def boom(*args, **kwargs):
+            raise RuntimeError("simulated provider failure")
+
+        orig_retry = wake.generate_with_retry
+        wake.generate_with_retry = boom
+        self.addCleanup(setattr, wake, "generate_with_retry", orig_retry)
+
+        rc = wake._run_wake()
+        self.assertEqual(rc, 1)
+
+        files = self._prompt_files()
+        self.assertEqual(len(files), 1, files)
+        record = json.loads(files[0].read_text())
+        self.assertIn("simulated provider failure", record["error"])
+        self.assertNotIn("raw_output", record)
+        self.assertIn("IDENTITY", record["system_prompt"])
 
 
 class HypothesesTests(WakeTestCase):

@@ -39,6 +39,19 @@ timezone: America/Los_Angeles
 # wake either way.
 enable_pull_requests: true
 
+# Whether to write the exact system/user prompt sent to the model each
+# wake, and its raw response (or the error, if the call failed), to
+# memory/core_workspace/prompts/<wake-timestamp>.json. The journal only
+# records what a wake decided to do; this is the only record of what it
+# actually received first — the one way to confirm, rather than assume,
+# that a conditional prompt section (e.g. the memory consolidation
+# checkpoint, the purpose check) genuinely fired for a given wake.
+# On by default. Turn off if repo growth becomes a real concern: every
+# wake's assembled prompt duplicates a fair amount of what's already
+# committed elsewhere (recent journal entries, identity.md, etc.), so
+# this does add committed data faster than journal entries alone did.
+log_prompts: true
+
 # Local hour (24h, in `timezone` above) after which a wake is treated as a
 # likely last-wake-of-the-day and nudged to look back across the whole day
 # rather than just this wake. Approximate on purpose — cron timing isn't
