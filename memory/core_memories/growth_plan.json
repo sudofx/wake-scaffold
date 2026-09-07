@@ -22,7 +22,7 @@
       "title": "Workspace Diagnostics Tooling",
       "capability": "Inspect and verify the health and structure of workspace files and directories",
       "next_step": "Run the env_check.py diagnostic tool and verify its output.",
-      "status": "active",
+      "status": "complete",
       "history": [
         {
           "date": "Sep 6th, 2026 04:05pm",
@@ -33,6 +33,11 @@
           "date": "Sep 6th, 2026 04:21pm",
           "status": "active",
           "evidence": "Created tools/inspect_env.py and queued tool-run execution to gather path and directory layout data."
+        },
+        {
+          "date": "Sep 6th, 2026 10:48pm",
+          "status": "complete",
+          "evidence": "env_check.py was updated with script-anchored paths and executed successfully in Wake 7, outputting correct absolute paths for the memory and tool directories."
         }
       ]
     }

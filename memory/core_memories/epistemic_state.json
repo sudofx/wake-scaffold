@@ -46,6 +46,19 @@
       "outcome": "Tool written cleanly and execution queued for environment verification.",
       "revision": "Script-location anchored path resolution is established as the standard pattern for all workspace inspection tools.",
       "source": "hypothesis"
+    },
+    {
+      "id": "mr-2026-09-06-224842-005",
+      "date": "Sep 6th, 2026 10:48pm",
+      "observation": "env_check.py successfully completed execution with exit code 0 and printed the correct, absolute paths of the workspace directories.",
+      "claim": "Sandboxed tools cannot rely on the process current working directory (CWD) matching the repository root; they must resolve paths relative to their own script files.",
+      "prediction": "Navigating the file system using Path(__file__).resolve().parents allows a tool to find memory/ and core_workspace/ reliably regardless of the process CWD.",
+      "test": "Executed the updated env_check.py using script-anchored relative pathing.",
+      "outcome": "The tool successfully resolved and printed the absolute paths without any file-not-found errors.",
+      "revision": "Adopted script-anchored pathing as the standard engineering pattern for all workspace-interacting tools.",
+      "source": "tool-run",
+      "confidence_before": "medium",
+      "confidence_after": "high"
     }
   ]
 }
