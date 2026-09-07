@@ -173,6 +173,16 @@
       "stderr": "/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools/failure_mode_logger.py:16: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).\n  timestamp = datetime.utcnow().strftime(\"%Y-%m-%d %H:%M:%S UTC\")\n",
       "timed_out": false,
       "journal_entry": "2026-09-07-041604.md"
+    },
+    {
+      "when": "Sep 7th, 2026 06:10am",
+      "filename": "state_schema_checker.py",
+      "args": [],
+      "exit_code": 1,
+      "stdout": "{\n  \"status\": \"STRUCTURALLY_INVALID\",\n  \"missing_files\": [\n    \"growth_plan: /home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/growth_plan.json\",\n    \"hypotheses: /home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/hypotheses.json\",\n    \"commitments: /home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/commitments.json\"\n  ],\n  \"invalid_json\": [],\n  \"validated_files\": [\n    \"tool_runs: /home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tool_runs.json\"\n  ]\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-07-061047.md"
     }
   ]
 }

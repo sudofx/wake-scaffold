@@ -80,6 +80,21 @@
           "evidence": "created via self-edit"
         }
       ]
+    },
+    {
+      "id": "g-2026-09-07-061047-0",
+      "created": "Sep 7th, 2026 06:10am",
+      "title": "Core Workspace State Schema Validation",
+      "capability": "Automatically check existence and JSON parse integrity for workspace state stores",
+      "next_step": "Inspect execution status of state_schema_checker.py in tool_runs.json in the next wake.",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 7th, 2026 06:10am",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        }
+      ]
     }
   ]
 }
