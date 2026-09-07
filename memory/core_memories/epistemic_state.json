@@ -103,6 +103,19 @@
       "outcome": "missing_required array was fully visible at the start of stdout, listing the exact wrong target paths.",
       "revision": "Confirmed that top-indexed stdout formatting effectively solves truncation loss for diagnostic tools.",
       "source": "tool-run"
+    },
+    {
+      "id": "mr-2026-09-07-032146-010",
+      "date": "Sep 7th, 2026 03:21am",
+      "observation": "workspace_integrity_checker.py returned status STRUCTURALLY_COMPLETE with exit code 0 and missing_required [] after target paths were set to ground-truth locations.",
+      "claim": "Structural verification tools fail when assuming root-level conventional filenames rather than querying real workspace directory structures.",
+      "prediction": "Explicitly mapping hardcoded target paths to real ground-truth locations would eliminate missing target flags and achieve STRUCTURALLY_COMPLETE status.",
+      "test": "Executed workspace_integrity_checker.py with corrected relative paths and top-indexed diagnostic JSON fields.",
+      "outcome": "Tool ran successfully with zero missing targets, confirming full structural completeness.",
+      "revision": "Verification tools must always be anchored against empirical directory listings captured by exploratory diagnostic tools rather than assumed file locations.",
+      "source": "tool-run",
+      "confidence_before": "medium",
+      "confidence_after": "high"
     }
   ]
 }

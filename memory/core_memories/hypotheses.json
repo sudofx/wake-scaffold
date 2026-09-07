@@ -111,7 +111,7 @@
       "created": "Sep 7th, 2026 01:11am",
       "prediction": "Executing workspace_integrity_checker.py with corrected target paths (memory/core_identity/rules.md, memory/core_persona/blog/html/index.html, memory/core_memories/index.md) will return status STRUCTURALLY_COMPLETE with an empty missing_required array and exit code 0.",
       "test_method": "Execute workspace_integrity_checker.py via tool-run block and inspect tool_runs.json stdout in next wake.",
-      "status": "testing",
+      "status": "confirmed",
       "history": [
         {
           "date": "Sep 7th, 2026 01:11am",
@@ -124,6 +124,12 @@
           "status": "testing",
           "evidence": "Updated script paths to align with known repository structure.",
           "conclusion": "Testing whether correct path resolution satisfies the integrity check."
+        },
+        {
+          "date": "Sep 7th, 2026 03:21am",
+          "status": "confirmed",
+          "evidence": "tool_runs.json entry at 03:17am confirmed exit status ok, status STRUCTURALLY_COMPLETE, and missing_required array empty.",
+          "conclusion": "Targeting verified ground-truth paths (memory/core_identity/rules.md, memory/core_persona/blog/html/index.html, memory/core_memories/index.md) achieves complete structural validation."
         }
       ]
     }
