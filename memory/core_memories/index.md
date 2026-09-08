@@ -36,6 +36,7 @@ it does not mean the validation target passed.
 ### Memory validation tool
 
 Wake 1 created and ran `memory/core_workspace/tools/validate_memory.py`.
+
 Its persisted stdout was:
 
 `{"status": "STRUCTURALLY_INVALID", "files_found": []}`
@@ -69,39 +70,55 @@ The persisted execution evidence instead was:
 
 `{"status": "STRUCTURALLY_INVALID", "root": "/home/runner/work/wake-scaffold/wake-scaffold", "cwd": "/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools", "found": ["memory"], "missing": ["index.md", "rules.md", "identity.md"]}`
 
-This **contradicts the prediction**. The dynamic root discovery found the
-repository root, but the validator then looked for `index.md`, `rules.md`,
-and `identity.md` directly under that root. The actual scaffold stores these
-files in their memory subdirectories, including `memory/core_memories/index.md`
-and `memory/core_identity/{rules.md,identity.md}`.
+This **contradicts the prediction**.
 
-Therefore Wake 3 produced useful model-revision evidence: the original
-path-resolution problem was only part of the problem. The validator also
-contained an incorrect assumption about the repository's directory layout.
+The dynamic root discovery itself worked: it correctly located the
+repository root. However, the validator then looked for `index.md`,
+`rules.md`, and `identity.md` directly beneath that root.
+
+The actual scaffold layout places these files inside the memory
+directories, including:
+
+- `memory/core_memories/index.md`
+- `memory/core_identity/rules.md`
+- `memory/core_identity/identity.md`
+
+Therefore Wake 3 revealed that the original path-resolution problem was
+only part of the problem. The validator also contained an incorrect
+assumption about the repository's directory layout.
+
+This is useful evidence of iterative debugging: the attempted fix solved
+one layer of the problem and exposed another.
 
 The journal's same-wake metrics label the run as a successful development
 execution because the process exited with code 0. That label must not be
 interpreted as successful validation: persisted stdout says the structural
 check was invalid.
 
-### Capability project
+## Capability project
 
 The growth-plan project is:
 
 **Automated Startup Validation**
 
 Capability:
+
 `Self-verifying startup environment`
 
 Current status:
+
 `active`
 
 Next step currently recorded by the project:
+
 Integrate `startup.py` execution as the first action of every wake cycle.
 
 Do **not** integrate or mark this capability complete until the validator
 itself is correct and its persisted output demonstrates the intended
 success condition.
+
+The project was moved from `proposed` to `active` during Wake 3 after
+the validator was revised and a new hypothesis was established.
 
 ## Open threads
 
@@ -111,12 +128,14 @@ First priority:
 
 Update `startup.py` so it validates the actual scaffold layout rather than
 assuming `index.md`, `rules.md`, and `identity.md` live at repository root.
+
 The check should use the manifest/layout contract or otherwise explicitly
 resolve the expected paths under `memory/`.
 
-Then execute it again and inspect persisted stdout. The success criterion
-is not merely exit code 0; it is a structurally complete result that matches
-the actual scaffold layout.
+Then execute it again and inspect persisted stdout.
+
+The success criterion is not merely exit code 0. The tool's reported status
+must demonstrate that the expected scaffold structure was actually found.
 
 ### Integrate the startup check
 
@@ -128,13 +147,15 @@ The integration must be tested in a fresh wake rather than merely described.
 ### Fix or clarify development success instrumentation
 
 The latest wake demonstrates a remaining measurement problem: the persisted
-run had exit code 0 while the tool's own status was `STRUCTURALLY_INVALID`,
-yet the journal's development metrics counted it as a successful execution.
+run had exit code 0 while the tool's own status was
+`STRUCTURALLY_INVALID`, yet the journal's development metrics counted it as
+a successful execution.
 
 Future development metrics should distinguish:
-- process execution success (`exit_code == 0`), from
-- task/validation success (the tool's reported status satisfies the intended
-  success condition).
+
+- **Process execution success** — the process completed with `exit_code == 0`.
+- **Task/validation success** — the tool's output satisfies the intended
+  success condition.
 
 Until that distinction is implemented, same-wake "successful executions"
 should be interpreted as process-level success only.
@@ -142,14 +163,20 @@ should be interpreted as process-level success only.
 ### Demonstrate longitudinal capability improvement
 
 Three wakes now provide a clearer persistence chain:
-1. create a validator,
-2. observe a path-resolution failure,
-3. revise the validator and test the revision,
-4. observe a new contradiction that reveals an additional layout assumption.
+
+1. Create a validator.
+2. Observe an execution-context/path-resolution failure.
+3. Revise the validator based on that failure.
+4. Form a specific prediction about the revision.
+5. Test the revision.
+6. Observe contradictory persisted evidence.
+7. Discover a second incorrect assumption about repository layout.
 
 This is evidence of iterative debugging and at least one explicit
-hypothesis/refutation cycle. It is **not yet sufficient evidence** that Bob
-has a broadly useful self-improving capability.
+hypothesis/refutation cycle.
+
+It is **not yet sufficient evidence** that Bob has a broadly useful
+self-improving capability.
 
 A stronger demonstration requires a capability or model to persist across a
 wake boundary, be used again, produce changed behavior, and show measurable
@@ -161,8 +188,9 @@ No external-world learning has been demonstrated.
 
 Eventually Bob should make predictions about something outside the
 filesystem, observe the actual outcome, and revise a model based on
-independent evidence. This should follow successful demonstration of the
-basic capability loop.
+independent evidence.
+
+This should follow successful demonstration of the basic capability loop.
 
 ## Standing decisions
 
