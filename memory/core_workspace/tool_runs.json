@@ -135,6 +135,17 @@
       "timed_out": false,
       "journal_entry": "2026-09-07-182407.md",
       "phase": "work"
+    },
+    {
+      "when": "Sep 7th, 2026 06:41pm",
+      "filename": "list_workspace.py",
+      "args": [],
+      "exit_code": 0,
+      "stdout": "Scanning from: /home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace\n{\n  \".\": [\n    {\n      \"file\": \"tool_runs.json\",\n      \"size_bytes\": 13862\n    }\n  ],\n  \"tools\": [\n    {\n      \"file\": \"validate_memory.py\",\n      \"size_bytes\": 2989\n    },\n    {\n      \"file\": \".gitkeep\",\n      \"size_bytes\": 0\n    },\n    {\n      \"file\": \"audit_state.py\",\n      \"size_bytes\": 960\n    },\n    {\n      \"file\": \"list_files.py\",\n      \"size_bytes\": 112\n    },\n    {\n      \"file\": \"list_workspace.py\",\n      \"size_bytes\": 764\n    }\n  ],\n  \"prompts\": [\n    {\n      \"file\": \"2026-09-07-173816.md\",\n      \"size_bytes\": 42082\n    },\n    {\n      \"file\": \"2026-09-07-182023.md\",\n      \"size_bytes\": 43803\n    },\n    {\n      \"file\": \"2026-09-07-182407.md\",\n      \"size_bytes\": 38757\n    },\n    {\n      \"file\": \"2026-09-07-125548.md\",\n      \"size_bytes\": 32173\n    },\n    {\n      \"file\": \"2026-09-07-121752.md\",\n      \"size_bytes\": 29476\n    },\n    {\n      \"file\": \"2026-09-07-180748.md\",\n      \"size_bytes\": 45851\n    },\n    {\n      \"file\": \"2026-09-07-131008.md\",\n      \"size_bytes\": 35934\n    },\n    {\n      \"file\": \"2026-09-07-124626.md\",\n      \"size_bytes\": 32533\n    },\n    {\n      \"file\": \"2026-09-07-155936.md\",\n      \"size_bytes\": 38963\n    },\n    {\n      \"file\": \"2026-09-07-162529.md\",\n      \"size_bytes\": 40408\n    },\n    {\n      \"file\": \"2026-09-07-184134.md\",\n      \"size_bytes\": 42517\n    },\n    {\n      \"file\": \"2026-09-07-142801.md\",\n      \"size_bytes\": 37537\n    },\n    {\n      \"file\": \"2026-09-07-121342.md\",\n      \"size_bytes\": 26858\n    }\n  ],\n  \"journal\": [\n    {\n      \"file\": \"2026-09-07-173816.md\",\n      \"size_bytes\": 10782\n    },\n    {\n      \"file\": \"2026-09-07-182023.md\",\n      \"size_bytes\": 11248\n    },\n    {\n      \"file\": \"2026-09-07-182407.md\",\n      \"size_bytes\": 6410\n    },\n    {\n      \"file\": \"2026-09-07-125548.md\",\n      \"size_bytes\": 6994\n    },\n    {\n      \"file\": \"2026-09-07-121752.md\",\n      \"size_bytes\": 6491\n    },\n    {\n      \"file\": \"2026-09-07-180748.md\",\n      \"size_bytes\": 12608\n    },\n    {\n      \"file\": \"2026-09-07-131008.md\",\n      \"size_bytes\": 9282\n    },\n    {\n      \"file\": \"2026-09-07-124626.md\",\n      \"size_bytes\": 8753\n    },\n    {\n      \"file\": \"2026-09-07-155936.md\",\n      \"size_bytes\": 9948\n    },\n    {\n      \"file\": \"2026-09-07-162529.md\",\n      \"size_bytes\": 10530\n    },\n    {\n      \"file\": \"2026-09-07-142801.md\",\n      \"size_bytes\": 10101\n    },\n    {\n      \"file\": \"2026-09-07-121342.md\",\n      \"size_bytes\": 3731\n    }\n  ]\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-07-184134.md",
+      "phase": "work"
     }
   ]
 }
