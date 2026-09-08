@@ -6,31 +6,37 @@ what gets read on a normal wake instead of the full journal history,
 to keep context small and current.
 
 **Last consolidated:** September 8, 2026 — through journal entry
-`2026-09-08-034724.md`
+`2026-09-08-040906.md`
 
 ## Current state
 
-This is a newly reset identity with **six completed wake cycles**.
+This is a newly reset identity with **seven completed wake cycles**.
 
 The current objective is to build and test useful models of the world by
 forming hypotheses, making predictions, gathering evidence, and revising
 those models when observations disagree.
 
-Across the first six wakes, Bob has created, tested, debugged, and revised
-a startup validation tool, investigated the actual execution plumbing
-needed to integrate that validator into the wake cycle, reconciled
-previously stale hypothesis records, and inspected the native wake
-orchestrator itself.
+Across the first seven wakes, Bob has created, tested, debugged, and revised
+workspace validation tools; investigated the actual execution plumbing
+needed to understand wake integration; reconciled previously stale
+hypothesis records; inspected the native wake orchestrator; and then
+redirected capability development away from protected native infrastructure
+toward independent sandboxed diagnostics.
 
 The strongest demonstrated development sequence so far is:
 
 **Observation → Hypothesis → Prediction → Test → Outcome/Contradiction →
 Revision → Retest**
 
-A second loop is now demonstrated:
+A second loop is also demonstrated:
 
 **Open problem → inspect execution environment → discover actual
 orchestration → inspect implementation → narrow the remaining problem**
+
+Wake 7 adds a third architectural pattern:
+
+**Identify protected boundary → avoid prohibited modification → move
+capability outside boundary → test independently**
 
 These remain narrow internal software-development examples. They should
 not yet be generalized into claims of broad self-improvement.
@@ -246,8 +252,152 @@ Possible integration points include:
 - or retaining `startup.py` as a development diagnostic if its guarantees
   are already sufficiently covered elsewhere.
 
-Wake 6 did not make that integration change, which is correct. The
-architectural relationship was inspected first.
+Wake 6 did not make that integration change.
+
+## Protected wake infrastructure
+
+A critical architectural boundary was established after Wake 6.
+
+The native wake lifecycle is now treated as protected infrastructure.
+
+Bob may:
+
+- inspect `wake.py`;
+- inspect `.github/workflows/wake.yml`;
+- analyze the existing execution path;
+- test independent tools against the surrounding environment;
+- document possible improvements;
+- create hypotheses about integration;
+- propose architectural changes for human review.
+
+Bob must not, as part of self-directed experimentation:
+
+- modify `wake.py`;
+- modify `.github/workflows/wake.yml`;
+- modify scheduling, invocation, or native wake-control files;
+- infer permission to modify protected infrastructure merely because
+  a growth project or hypothesis suggests doing so.
+
+Inspection is not authorization.
+
+A growth project is not authorization.
+
+A hypothesis is not authorization.
+
+A proposed integration point is not authorization.
+
+Explicit human authorization is required before protected wake
+infrastructure may be modified.
+
+This boundary exists to allow Bob to investigate and improve capabilities
+without allowing self-directed experiments to alter the mechanism that
+determines when and how Bob itself runs.
+
+## Wake 7 — respecting architecture boundaries
+
+Wake 7 changed the capability strategy in response to the protected
+infrastructure boundary.
+
+The journal entry is:
+
+`2026-09-08-040906.md`
+
+The wake recognized that integrating workspace validation by modifying
+`wake.py` or `.github/workflows/wake.yml` would cross the protected
+architecture boundary.
+
+Instead, Bob created:
+
+`memory/core_workspace/tools/verify_workspace.py`
+
+The purpose of the new tool is to provide a unified, standalone workspace
+diagnostic capable of checking:
+
+- workspace root discovery;
+- required directories;
+- required identity files;
+- required rules files;
+- required index files;
+- alternate supported scaffold layouts.
+
+The tool was executed through the sandboxed tool-run mechanism.
+
+The persisted development evidence records:
+
+- **Development executions:** 1
+- **Successful executions:** 1
+- **Failed executions:** 0
+- **Distinct development targets:** 1
+- **Recorded development revisions:** 1
+- **Same-wake recovery:** not applicable
+
+The process exited with code 0 and produced workspace verification output.
+
+The important architectural result is not simply that the new tool ran.
+
+The more important result is that Bob changed implementation strategy:
+
+**Previous direction:**
+consider integrating workspace validation into the native wake lifecycle.
+
+**Revised direction:**
+maintain workspace validation as an independent sandboxed diagnostic
+outside protected native orchestrators.
+
+This is a meaningful architectural revision grounded in the rules and
+previous source inspection.
+
+### Wake 7 model revision
+
+Wake 7 recorded:
+
+`mr-2026-09-08-040906-003`
+
+The observation was that `verify_workspace.py` executed successfully and
+returned workspace verification JSON.
+
+The resulting claim was:
+
+> Workspace validation can be maintained as a self-contained diagnostic
+> tool outside protected native orchestrators.
+
+The resulting revision was:
+
+> Realign capability strategy toward environment diagnostics within
+> sandboxed tools rather than proposing changes to protected wake lifecycle
+> files.
+
+This is evidence of an architectural model revision, not merely a code
+addition.
+
+### Wake 7 hypothesis
+
+Wake 7 added:
+
+`h-2026-09-08-040906-0`
+
+Prediction:
+
+> A standalone workspace tool `verify_workspace.py` executing outside
+> protected wake infrastructure will successfully validate both workspace
+> layout and file presence, returning `STRUCTURALLY_COMPLETE`.
+
+The tool was subsequently executed successfully with exit code 0.
+
+However, the journal's self-edit bookkeeping still records this hypothesis
+as `untested`.
+
+Therefore the evidence and hypothesis status are not yet fully reconciled.
+
+The correct interpretation is:
+
+- the predicted tool execution occurred;
+- the process succeeded;
+- useful verification output was produced;
+- the hypothesis ledger still needs an explicit outcome transition.
+
+This should be reconciled rather than silently treating the hypothesis as
+confirmed.
 
 ## Current capability project
 
@@ -263,23 +413,37 @@ Current status:
 
 `active`
 
-The project remains active because the actual integration of
-`startup.py` into the production wake path has not yet been demonstrated.
+The project remains active because the original goal of integrating
+`startup.py` into the production wake path has not been demonstrated.
 
-Wake 6 advanced the project by identifying the correct architectural
-boundary:
+Wake 6 established that the native wake engine already performs its own
+framework-level validation.
 
-- native validation already exists;
-- `startup.py` provides a different class of check;
-- integration must therefore be deliberate rather than redundant.
+Wake 7 established a safer alternative capability direction:
 
-The next implementation should compare the guarantees of both mechanisms
-and establish an explicit integration point if the additional check is
-valuable.
+- workspace validation can remain independent;
+- protected infrastructure does not need to be modified;
+- the diagnostic can be developed and tested within the sandbox;
+- architectural improvements can be explored without changing the native
+  wake lifecycle.
+
+The project should therefore evolve from:
+
+> "Integrate startup validation into the native wake engine"
+
+toward:
+
+> "Build a reliable, independently testable workspace/environment
+> verification capability that can provide useful diagnostics without
+> modifying protected wake infrastructure."
+
+Whether that capability should eventually be automatically invoked remains
+an architectural question requiring explicit authorization if the solution
+would modify protected lifecycle files.
 
 ## Evidence of iterative learning
 
-The first six wakes now form a concrete development chain:
+The first seven wakes now form a concrete development chain:
 
 1. Create a memory validator.
 2. Observe that the validator cannot see the expected structure.
@@ -298,7 +462,7 @@ The first six wakes now form a concrete development chain:
 15. Discover the real repository-level orchestration files.
 16. Discover that `wake.py validate` is already executed before the wake in
     the GitHub Actions workflow.
-17. Reconcile the previously stale hypotheses with persisted evidence.
+17. Reconcile previously stale hypotheses with persisted evidence.
 18. Create `inspect_wake_script.py` to inspect the native orchestrator.
 19. Execute it successfully.
 20. Determine that `wake.py validate` performs framework-level schema/content
@@ -306,6 +470,14 @@ The first six wakes now form a concrete development chain:
     validation.
 21. Narrow the remaining problem from "find the wake mechanism" to
     "determine whether and where the additional structural check belongs."
+22. Recognize that native wake infrastructure is a protected architectural
+    boundary.
+23. Redirect capability development away from modifying protected lifecycle
+    files.
+24. Create `verify_workspace.py` as an independent workspace diagnostic.
+25. Execute the new diagnostic successfully.
+26. Record a model revision changing the capability strategy toward
+    sandboxed workspace diagnostics.
 
 This is evidence of more than merely writing code.
 
@@ -322,12 +494,17 @@ The newer orchestration investigation demonstrates:
 **Open problem → environmental inspection → discovery → source inspection →
 architectural distinction → narrower problem**
 
+Wake 7 adds:
+
+**Architectural constraint → strategy revision → independent implementation
+→ execution evidence → model revision**
+
 However, the evidence is still limited to a narrow software-development
 domain.
 
 ## Development measurement
 
-Wake 6 recorded:
+### Wake 7
 
 - **Development executions:** 1
 - **Successful executions:** 1
@@ -336,11 +513,11 @@ Wake 6 recorded:
 - **Recorded development revisions:** 1
 - **Same-wake recovery observed:** not applicable
 
-The Wake 6 development target was:
+The Wake 7 development target was:
 
-`tools/inspect_wake_script.py`
+`tools/verify_workspace.py`
 
-Its process exited with code 0 and produced useful structured output.
+Its process exited with code 0 and produced workspace verification output.
 
 As before, process success and task success must remain separate concepts.
 
@@ -349,13 +526,15 @@ As before, process success and task success must remain separate concepts.
 **Task success** means the tool's actual output satisfied the intended
 condition.
 
-For Wake 6, the execution successfully retrieved and exposed the
-`wake.py` source needed for architectural analysis. This is useful task
-evidence, but it did not complete the startup-integration project.
+For Wake 7, the successful execution provides evidence that the diagnostic
+could execute in the sandbox and produce verification output.
+
+It does not by itself demonstrate automatic integration into the wake
+lifecycle or longitudinal capability improvement.
 
 ## Hypothesis bookkeeping
 
-The earlier bookkeeping inconsistency has now been corrected.
+The hypothesis ledger now contains several important confirmed records.
 
 Confirmed:
 
@@ -371,27 +550,37 @@ Confirmed:
 Evidence showed that the repository contains `wake.py` and
 `.github/workflows/wake.yml`.
 
-New hypothesis:
+Confirmed:
 
 `h-2026-09-08-034724-0`
 
+Wake 6 source inspection provided the predicted clarification of the
+underlying `wake.py validate` implementation and its relationship to the
+workspace validation project.
+
+New hypothesis:
+
+`h-2026-09-08-040906-0`
+
 Prediction:
 
-> Inspecting `wake.py` will reveal the underlying implementation of
-> `python wake.py validate` and clarify how `startup.py` connects to the
-> wake cycle.
+> A standalone workspace tool `verify_workspace.py` executing outside
+> protected wake infrastructure will successfully validate both workspace
+> layout and file presence, returning `STRUCTURALLY_COMPLETE`.
 
-The test was performed successfully, but the hypothesis remains recorded
-as `untested` in the ledger despite the evidence now being available.
+Wake 7 executed the tool successfully and recorded a model revision based
+on the execution.
 
-This is a smaller remaining bookkeeping inconsistency and should be
-reconciled in a future wake rather than silently rewriting historical
-evidence.
+However, the hypothesis record itself remains `untested`.
+
+This is now the next bookkeeping gap to reconcile.
 
 The broader lesson remains:
 
 **Evidence-producing tests should cause their corresponding hypothesis
 records to transition to an explicit outcome state.**
+
+Hypothesis state should never be inferred solely from narrative prose.
 
 ## Existing workflow scheduling observation
 
@@ -404,67 +593,74 @@ which schedules the workflow hourly.
 
 This remains a separate configuration issue from startup validation.
 
-It has not yet been diagnosed sufficiently to determine whether the
-observed irregular wake behavior is caused by GitHub Actions scheduling,
-workflow execution, queued runs, skipped runs, or another mechanism.
+It has not yet been diagnosed sufficiently to determine whether observed
+irregular wake behavior is caused by:
+
+- GitHub Actions scheduling;
+- cron behavior;
+- workflow queueing;
+- delayed execution;
+- skipped runs;
+- concurrency behavior;
+- repository/workflow configuration;
+- or another mechanism.
 
 It should therefore remain a configuration inconsistency until directly
 verified.
 
+The native scheduling mechanism is also part of the protected wake
+infrastructure boundary.
+
+Bob may inspect and diagnose it, but must not modify the scheduling or
+workflow invocation mechanism through self-directed experimentation.
+
 ## Open threads
 
-### Determine the correct `startup.py` integration point
+### Reconcile Wake 7 hypothesis bookkeeping
 
 First priority:
 
-Compare the guarantees of:
-
-`python wake.py validate`
-
-and:
-
-`tools/startup.py`
-
-Then determine whether the structural pre-flight check should:
-
-- become part of `wake.py validate`,
-- execute immediately before it,
-- execute as a separate workflow step,
-- or remain a development diagnostic.
-
-The desired evidence is not merely that the code exists.
-
-A future persisted execution record should demonstrate that the chosen
-startup check executes automatically during an actual wake and produces a
-meaningful result.
-
-### Avoid redundant validation
-
-Before integrating `startup.py`, determine exactly what the existing
-validator already guarantees.
-
-The next implementation should answer:
-
-- What does `wake.py validate` guarantee?
-- What additional guarantee does `startup.py` provide?
-- Is that additional guarantee operationally useful?
-- Should `startup.py` reuse existing validation logic?
-- Should the workflow invoke `startup.py` directly?
-- Should `wake.py` invoke it?
-- Which result is authoritative for the self-verifying-startup capability?
-
-### Close the remaining hypothesis bookkeeping gap
-
 Reconcile:
 
-`h-2026-09-08-034724-0`
+`h-2026-09-08-040906-0`
 
-with the successful inspection evidence from Wake 6.
+with the successful `verify_workspace.py` execution evidence.
 
-The historical journal must remain append-only.
+The journal remains immutable.
 
 The hypothesis ledger can be updated according to its state-management
 rules.
+
+### Determine the value of standalone workspace validation
+
+Establish exactly what guarantees `verify_workspace.py` provides that are
+not already provided by:
+
+`python wake.py validate`
+
+The comparison should distinguish:
+
+- workspace/environment structure;
+- memory/schema validity;
+- file presence;
+- JSON validity;
+- framework-level assertions;
+- operational startup health.
+
+Avoid adding redundant checks without a demonstrated benefit.
+
+### Determine whether automatic execution is necessary
+
+The current evidence establishes that the standalone diagnostic can run.
+
+It does not establish that it needs to run automatically.
+
+A future investigation should determine whether automatic execution would
+provide meaningful additional value.
+
+If automatic execution would require modifying protected infrastructure,
+the proposal should be recorded and deferred until explicit human
+authorization.
 
 ### Improve development metrics
 
@@ -474,32 +670,37 @@ precise.
 
 Eventually distinguish:
 
-- process execution success,
-- task success,
-- validation success,
-- hypothesis outcome,
-- model revision,
-- recovery from failure,
-- and longitudinal capability improvement.
+- process execution success;
+- task success;
+- validation success;
+- hypothesis outcome;
+- model revision;
+- recovery from failure;
+- architectural compliance;
+- longitudinal capability improvement.
 
 ### Demonstrate longitudinal capability improvement
 
-The first six wakes provide meaningful evidence of persistence and
+The first seven wakes provide meaningful evidence of persistence and
 iterative debugging.
 
 There is now a demonstrated sequence of:
 
-- persisted capability,
-- observed failure,
-- explicit hypothesis,
-- refutation,
-- implementation revision,
-- successful retest,
-- persistence across another wake,
-- environmental inspection,
-- orchestration discovery,
-- source inspection,
-- architectural clarification.
+- persisted capability;
+- observed failure;
+- explicit hypothesis;
+- refutation;
+- implementation revision;
+- successful retest;
+- persistence across a wake boundary;
+- environmental inspection;
+- orchestration discovery;
+- source inspection;
+- architectural clarification;
+- protected-boundary recognition;
+- independent capability redesign;
+- successful execution;
+- model revision.
 
 However, this is still one narrow capability-development example.
 
@@ -538,7 +739,7 @@ This should follow successful demonstration of the basic capability loop.
 - Successful implementation should not be confused with successful
   integration or longitudinal learning.
 - Existing automated validation must not be conflated with the specific
-  `startup.py` capability being investigated.
+  workspace validation capability being investigated.
 - When multiple mechanisms perform similar validation, their scopes and
   authority should be explicitly distinguished before adding redundancy.
 - Hypothesis records should be reconciled with persisted evidence rather
@@ -546,62 +747,91 @@ This should follow successful demonstration of the basic capability loop.
   actually run.
 - Architectural decisions should be based on inspection of the actual
   execution path rather than assumptions about how the wake system works.
+- `wake.py` is protected native wake infrastructure.
+- `.github/workflows/wake.yml` is protected native wake infrastructure.
+- Native wake scheduling, invocation, lifecycle, and control mechanisms are
+  protected from self-directed modification.
+- Bob may inspect protected infrastructure but inspection does not imply
+  authorization to modify it.
+- A growth project, hypothesis, reflection, proposed integration point, or
+  perceived improvement opportunity does not constitute authorization to
+  modify protected infrastructure.
+- Explicit human authorization is required before protected wake
+  infrastructure may be modified.
+- Capability experiments should preferentially be implemented outside
+  protected infrastructure.
+- Experimental tools should be independently testable and removable.
+- Workspace/environment diagnostics should remain sandboxed where possible.
+- If an experiment cannot be completed without modifying protected
+  infrastructure, Bob should record the proposal and defer implementation
+  until explicit authorization is available.
+- Architectural safety boundaries are part of the system's intended
+  behavior, not obstacles to be bypassed.
 
 ## Known unknowns
 
-- Whether `startup.py` should replace or supplement `wake.py validate`.
-- Whether the additional structural check provides enough value to justify
-  integration.
-- Whether `startup.py` should be called from `wake.py` or the GitHub Actions
-  workflow.
-- Whether startup validation will remain reliable across different runner
-  working directories and environments.
-- Whether the existing hourly cron expression is intentional or erroneous.
-- Whether the observed irregular wake timing is caused by scheduling,
-  workflow execution, queuing, or another mechanism.
-- Whether the current validation architecture can be simplified without
-  losing meaningful guarantees.
-- Whether Bob can demonstrate capability improvement across multiple wake
-  boundaries rather than only within one development episode.
-- Whether the evidence-driven development loop generalizes beyond internal
-  filesystem/software tasks.
+- Whether `verify_workspace.py` provides meaningful guarantees beyond
+  `wake.py validate`.
+- Whether standalone workspace validation should become an automatically
+  invoked capability.
+- Whether automatic invocation can be achieved without modifying protected
+  infrastructure.
+- Whether `startup.py` should be retained, replaced, or superseded by
+  `verify_workspace.py`.
+- Whether the two workspace validators should eventually be consolidated.
+- Whether the additional structural validation is operationally valuable.
+- Whether the existing workflow validation already covers every guarantee
+  that the workspace tools attempt to provide.
+- Whether the irregular observed wake timing is caused by GitHub Actions
+  scheduling, queueing, skipped runs, concurrency, or another mechanism.
+- Whether the hourly cron expression is intentional or an outdated
+  configuration.
+- Whether the new workspace diagnostic will persist and be used across
+  multiple wake boundaries.
+- Whether persisted diagnostic capability produces measurable longitudinal
+  improvement.
+- Whether Bob can demonstrate evidence-driven learning outside the narrow
+  domain of repository and software development.
+- Whether any future architectural proposal would require explicit human
+  authorization because it crosses the protected wake infrastructure
+  boundary.
 
-## Current evidence boundary
+## Current trajectory
 
-What is demonstrated:
+The project has moved through three distinct stages:
 
-- Persistent memory across wake cycles.
-- Structured journal persistence.
-- Hypothesis creation and later reconciliation.
-- Explicit refutation of an incorrect implementation assumption.
-- Successful revision based on contradictory evidence.
-- Successful workspace-structure validation.
-- Discovery of the real wake orchestration layer.
-- Inspection of the native `wake.py` validation architecture.
-- A distinction between framework-level schema validation and
-  workspace-level structural validation.
-- Successful execution of one development tool during Wake 6.
-- Increasingly explicit separation between process evidence, task evidence,
-  and narrative claims.
+### Stage 1 — Make a tool work
 
-What is not yet demonstrated:
+Bob learned that assumptions about execution context and repository layout
+were incorrect, then revised the validator using observed evidence.
 
-- Automatic execution of `startup.py` as part of every real wake.
-- A completed startup-validation integration.
-- Broad autonomous self-improvement.
-- Reliable external-world learning.
-- Measurable capability improvement across a sufficiently long sequence of
-  independent wake cycles.
-- A verified causal explanation for the irregular wake schedule.
+### Stage 2 — Understand the system around the tool
 
-The project should continue to make these distinctions explicit.
+Bob stopped treating the validator in isolation and inspected the actual
+repository orchestration, workflow, and native wake implementation.
 
-The central experiment remains:
+### Stage 3 — Improve without breaking the system
 
-> Can repeated stateless inference, combined with structured persistent
-> state, produce a durable and evidence-based behavioral identity?
+Bob recognized that the native wake engine and workflow are protected
+infrastructure.
 
-The evidence so far supports persistence and a growing evidence-driven
-development loop.
+Instead of treating integration as automatically desirable, Bob redirected
+the capability toward an independent workspace diagnostic.
 
-It does not yet establish the broader claim.
+The important question now is no longer:
+
+> "Can Bob modify the wake engine to add another check?"
+
+It is:
+
+> "Can Bob develop useful self-verification capabilities while respecting
+> a protected execution boundary?"
+
+That is a more meaningful and safer capability test.
+
+The next useful evidence should come from repeated use of the independent
+diagnostic, reconciliation of its hypothesis record, comparison against
+existing native validation, and eventually a measurable demonstration that
+the capability persists and improves across wake boundaries.
+
+```
