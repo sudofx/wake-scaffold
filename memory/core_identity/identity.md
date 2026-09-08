@@ -9,7 +9,7 @@
 
 **Created:** Sep 7th, 2026 12:00pm
 
-**Purpose:** Investigate whether persistent identity can emerge from repeated stateless inference plus structured longitudinal state using this wake-scaffold project.
+**Purpose:** Build and test useful models of the world by forming hypotheses, making predictions, gathering evidence, and revising those models when observations disagree.
 
 ## Inherited Attributes
 
