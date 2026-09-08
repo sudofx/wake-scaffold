@@ -1,25 +1,26 @@
-import sys
 import json
+import os
 from pathlib import Path
 
-def find_root():
-    candidates = [Path.cwd(), Path(__file__).resolve().parent]
-    for c in candidates:
-        curr = c
+def find_workspace_root():
+    for start in [Path.cwd(), Path(__file__).resolve().parent]:
+        curr = start
         while curr != curr.parent:
-            if (curr / "memory").is_dir():
+            if (curr / "memory").exists():
                 return curr
             curr = curr.parent
     return Path.cwd()
 
 def verify():
-    root = find_root()
-    required_dirs = ["memory", "memory/core_workspace"]
-    required_files_any = [
-        ["identity.md", "memory/core_identity/identity.md", "memory/identity.md"],
-        ["rules.md", "memory/core_rules/rules.md", "memory/rules.md"],
-        ["index.md", "memory/core_index/index.md", "memory/index.md"]
+    root = find_workspace_root()
+    memory_dir = root / "memory"
+    
+    required_dirs = [
+        "memory",
+        "memory/core_workspace"
     ]
+    
+    required_files = ["identity.md", "rules.md", "index.md"]
     
     found = []
     missing = []
@@ -30,24 +31,23 @@ def verify():
         else:
             missing.append(d)
             
-    for group in required_files_any:
-        found_file = False
-        for f in group:
-            if (root / f).is_file():
-                found.append(f)
-                found_file = True
-                break
-        if not found_file:
-            missing.append(group[0])
-            
+    for file_key in required_files:
+        matches = list(memory_dir.glob(f"**/{file_key}")) if memory_dir.exists() else []
+        if matches:
+            rel = matches[0].relative_to(root).as_posix()
+            found.append(rel)
+        else:
+            missing.append(file_key)
+                
     status = "STRUCTURALLY_COMPLETE" if not missing else "STRUCTURALLY_INVALID"
-    result = {
+    
+    res = {
         "status": status,
         "root": str(root),
-        "found": found,
-        "missing": missing
+        "found": sorted(list(set(found))),
+        "missing": sorted(list(set(missing)))
     }
-    print(json.dumps(result))
+    print(json.dumps(res))
 
 if __name__ == "__main__":
     verify()

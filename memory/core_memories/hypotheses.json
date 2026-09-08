@@ -100,10 +100,33 @@
       "test_method": "Write tools/verify_workspace.py and execute via tool-run block, inspecting output status.",
       "scope": "internal",
       "boundary": "same_wake",
-      "status": "untested",
+      "status": "refuted",
       "history": [
         {
           "date": "Sep 8th, 2026 04:09am",
+          "status": "untested",
+          "evidence": "",
+          "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 8th, 2026 04:44am",
+          "status": "refuted",
+          "evidence": "Wake 7 tool run output showed STRUCTURALLY_INVALID with missing ['index.md', 'rules.md'] because the initial script checked the repository root directly instead of subfolders.",
+          "conclusion": "The initial verify_workspace.py implementation failed layout discovery due to missing subpath checks for core_identity and core_memories."
+        }
+      ]
+    },
+    {
+      "id": "h-2026-09-08-044425-0",
+      "created": "Sep 8th, 2026 04:44am",
+      "prediction": "The revised verify_workspace.py tool with recursive memory/ subfolder dynamic path resolution will successfully locate identity.md, rules.md, and index.md, returning STRUCTURALLY_COMPLETE.",
+      "test_method": "Execute tools/verify_workspace.py via tool-run block and check output JSON status.",
+      "scope": "internal",
+      "boundary": "same_wake",
+      "status": "untested",
+      "history": [
+        {
+          "date": "Sep 8th, 2026 04:44am",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"
