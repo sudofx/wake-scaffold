@@ -31,13 +31,19 @@
       "test_method": "Execute tools/startup.py and inspect stdout status field.",
       "scope": "internal",
       "boundary": "same_wake",
-      "status": "untested",
+      "status": "confirmed",
       "history": [
         {
           "date": "Sep 7th, 2026 11:25pm",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 8th, 2026 03:47am",
+          "status": "confirmed",
+          "evidence": "tool_runs.json entry on Sep 7 23:25:14 UTC returned status STRUCTURALLY_COMPLETE.",
+          "conclusion": "Subpath dynamic resolution in startup.py successfully located core_identity/ and core_memories/ paths."
         }
       ]
     },
@@ -48,10 +54,33 @@
       "test_method": "Run inspect_repo.py and look at the root_files and github_workflows list.",
       "scope": "internal",
       "boundary": "same_wake",
-      "status": "untested",
+      "status": "confirmed",
       "history": [
         {
           "date": "Sep 7th, 2026 11:32pm",
+          "status": "untested",
+          "evidence": "",
+          "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 8th, 2026 03:47am",
+          "status": "confirmed",
+          "evidence": "tool_runs.json entry on Sep 7 23:32:13 UTC confirmed existence of wake.py and .github/workflows/wake.yml.",
+          "conclusion": "Repository root contains wake.py and workflow configuration for wake execution."
+        }
+      ]
+    },
+    {
+      "id": "h-2026-09-08-034724-0",
+      "created": "Sep 8th, 2026 03:47am",
+      "prediction": "Inspecting wake.py will reveal the underlying implementation of 'python wake.py validate' and clarify how startup.py connects to the wake cycle.",
+      "test_method": "Write tools/inspect_wake_script.py to read wake.py and execute it via tool-run.",
+      "scope": "internal",
+      "boundary": "same_wake",
+      "status": "untested",
+      "history": [
+        {
+          "date": "Sep 8th, 2026 03:47am",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"

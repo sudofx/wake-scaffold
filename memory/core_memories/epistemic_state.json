@@ -14,6 +14,20 @@
       "confidence_before": "low",
       "confidence_after": "high",
       "journal_entry": "2026-09-07-232514.md"
+    },
+    {
+      "id": "mr-2026-09-08-034724-002",
+      "date": "Sep 8th, 2026 03:47am",
+      "observation": "Inspected wake.py and found it defines command-line actions ('validate', 'run', 'blog-build') that handle active schema validation and prompt construction.",
+      "claim": "Native 'wake.py validate' checks memory schema integrity, whereas tools/startup.py checks workspace directory structure.",
+      "prediction": "startup.py can either be called inside wake.py's validate step or retained as a lightweight pre-flight environment checker.",
+      "test": "Created and executed tools/inspect_wake_script.py to inspect wake.py structure.",
+      "outcome": "Successfully retrieved wake.py source and identified command layout.",
+      "revision": "Recognize that 'wake.py validate' is the primary framework-level gatekeeper, while tools/startup.py serves as workspace structural pre-check.",
+      "source": "tool-run",
+      "confidence_before": "medium",
+      "confidence_after": "high",
+      "journal_entry": "2026-09-08-034724.md"
     }
   ]
 }
