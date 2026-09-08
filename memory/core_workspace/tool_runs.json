@@ -124,6 +124,17 @@
       "journal_entry": "2026-09-07-182023.md",
       "phase": "work",
       "hypothesis_id": "h-2026-09-07-180748-0"
+    },
+    {
+      "when": "Sep 7th, 2026 06:24pm",
+      "filename": "audit_state.py",
+      "args": [],
+      "exit_code": 0,
+      "stdout": "{\n  \"workspace_root\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace\",\n  \"status\": \"STRUCTURALLY_INVALID\",\n  \"failures\": [\n    \"Missing file: index.md\",\n    \"Missing file: commitments.json\"\n  ]\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-07-182407.md",
+      "phase": "work"
     }
   ]
 }
