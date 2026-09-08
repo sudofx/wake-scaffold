@@ -1,4 +1,22 @@
 {
   "_comment": "Self-experiment tracker: prediction -> test method -> real evidence -> conclusion. Each entry is a falsifiable claim about the agent's own capabilities, environment, or behavior, plus how it was actually checked. New identities start with none.",
-  "hypotheses": []
+  "hypotheses": [
+    {
+      "id": "h-2026-09-08-131805-0",
+      "created": "Sep 8th, 2026 01:18pm",
+      "prediction": "verify_environment.py will execute in the sandboxed environment and output a JSON status report indicating structural completeness for available core files.",
+      "test_method": "Execute tools/verify_environment.py via tool-run and inspect stdout in tool run history.",
+      "scope": "internal",
+      "boundary": "same_wake",
+      "status": "untested",
+      "history": [
+        {
+          "date": "Sep 8th, 2026 01:18pm",
+          "status": "untested",
+          "evidence": "",
+          "conclusion": "created via self-edit"
+        }
+      ]
+    }
+  ]
 }
