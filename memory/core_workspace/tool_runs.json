@@ -89,6 +89,18 @@
       "timed_out": false,
       "journal_entry": "2026-09-07-162529.md",
       "phase": "work"
+    },
+    {
+      "when": "Sep 7th, 2026 05:38pm",
+      "filename": "audit_state.py",
+      "args": [],
+      "exit_code": 0,
+      "stdout": "{\n  \"workspace_root\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory\",\n  \"status\": \"STRUCTURALLY_INVALID\",\n  \"audits\": {\n    \"markdown_files\": {\n      \"core_identity/identity.md\": {\n        \"exists\": true,\n        \"size_bytes\": 1031\n      },\n      \"core_identity/rules.md\": {\n        \"exists\": true,\n        \"size_bytes\": 7121\n      },\n      \"index.md\": {\n        \"exists\": false,\n        \"size_bytes\": 0\n      },\n      \"failure_modes.md\": {\n        \"exists\": false,\n        \"size_bytes\": 0\n      }\n    },\n    \"json_files\": {\n      \"commitments.json\": {\n        \"exists\": false,\n        \"valid_json\": false,\n        \"count\": 0\n      },\n      \"tool_runs.json\": {\n        \"exists\": false,\n        \"valid_json\": false,\n        \"count\": 0\n      }\n    },\n    \"tool_consistency\": {\n      \"tools_directory_exists\": false,\n      \"tools_found_on_disk\": [],\n      \"execution_counts_by_tool\": {},\n      \"referenced_tools_missing_from_disk\": []\n    }\n  }\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-07-173816.md",
+      "phase": "work",
+      "hypothesis_id": "h-2026-09-07-162529-0"
     }
   ]
 }
