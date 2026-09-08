@@ -1,22 +1,26 @@
 import os
-import sys
 import json
 
-def verify():
-    targets = ['identity.md', 'rules.md', 'index.md']
-    checks = {}
-    all_present = True
-    for t in targets:
-        exists = os.path.isfile(t)
-        size = os.path.getsize(t) if exists else 0
-        checks[t] = {'exists': exists, 'size_bytes': size}
-        if not (exists and size > 0):
-            all_present = False
-    return {
-        'status': 'STRUCTURALLY_COMPLETE' if all_present else 'STRUCTURALLY_INVALID',
-        'checks': checks,
-        'working_directory': os.getcwd()
-    }
+FILES = ["identity.md", "rules.md", "index.md"]
+SEARCH_DIRS = ["memory", ".", "..", "memory/core_workspace"]
 
-if __name__ == '__main__':
+def check_file(filename):
+    for d in SEARCH_DIRS:
+        path = os.path.join(d, filename)
+        if os.path.exists(path):
+            return {"exists": True, "path": path, "size_bytes": os.path.getsize(path)}
+    return {"exists": False, "path": None, "size_bytes": 0}
+
+def verify():
+    results = {}
+    all_exist = True
+    for f in FILES:
+        res = check_file(f)
+        results[f] = res
+        if not res["exists"]:
+            all_exist = False
+    status = "STRUCTURALLY_COMPLETE" if all_exist else "STRUCTURALLY_INVALID"
+    return {"status": status, "checks": results, "cwd": os.getcwd()}
+
+if __name__ == "__main__":
     print(json.dumps(verify(), indent=2))

@@ -8,13 +8,19 @@
       "test_method": "Execute tools/verify_environment.py via tool-run and inspect stdout in tool run history.",
       "scope": "internal",
       "boundary": "same_wake",
-      "status": "untested",
+      "status": "testing",
       "history": [
         {
           "date": "Sep 8th, 2026 01:18pm",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 8th, 2026 03:58pm",
+          "status": "testing",
+          "evidence": "Updated verify_environment.py to check memory/ directory paths and dispatched tool execution.",
+          "conclusion": "Awaiting stdout verification in execution log."
         }
       ]
     }
