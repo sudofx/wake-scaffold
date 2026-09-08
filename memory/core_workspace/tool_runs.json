@@ -101,6 +101,17 @@
       "journal_entry": "2026-09-07-173816.md",
       "phase": "work",
       "hypothesis_id": "h-2026-09-07-162529-0"
+    },
+    {
+      "when": "Sep 7th, 2026 06:07pm",
+      "filename": "audit_state.py",
+      "args": [],
+      "exit_code": 0,
+      "stdout": "{\n  \"workspace_root\": \"/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace\",\n  \"status\": \"STRUCTURALLY_INVALID\",\n  \"failures\": [\n    \"Missing core markdown file: identity.md\",\n    \"Missing core markdown file: rules.md\",\n    \"Missing core markdown file: index.md\",\n    \"Missing state JSON file: commitments.json\"\n  ],\n  \"audits\": {\n    \"markdown_files\": {\n      \"identity.md\": {\n        \"exists\": false\n      },\n      \"rules.md\": {\n        \"exists\": false\n      },\n      \"index.md\": {\n        \"exists\": false\n      }\n    },\n    \"json_files\": {\n      \"commitments.json\": {\n        \"exists\": false\n      },\n      \"tool_runs.json\": {\n        \"exists\": true,\n        \"path\": \"tool_runs.json\",\n        \"valid_json\": true,\n        \"item_count\": 2\n      }\n    },\n    \"tools_cross_check\": {\n      \"existing_tool_files\": [\n        \"validate_memory.py\",\n        \".gitkeep\",\n        \"audit_state.py\",\n        \"list_files.py\"\n      ],\n      \"referenced_tools_in_history\": []\n    }\n  }\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-07-180748.md",
+      "phase": "work"
     }
   ]
 }
