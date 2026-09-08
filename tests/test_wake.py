@@ -1449,6 +1449,24 @@ class IdentityLifecycleTests(unittest.TestCase):
             json.dumps({"filename": "metrics_tool.py", "args": [], "hypothesis_id": "h-metrics"}),
             FIXED_NOW, journal, phase="development", development_iteration=2,
         )
+        # A real revision must actually be persisted (via record_model_revision,
+        # attributed to this journal) for it to be counted — passing a note
+        # that merely mentions "OVERWROTE tools/" must NOT be enough. Regression
+        # guard for the original bug: revisions were previously counted by
+        # substring-matching development_notes text, which happened to give the
+        # right number here by coincidence while reading 0 in production for
+        # the far more common case of a revision recorded outside the
+        # follow-up loop (see test_zero_metrics_bug_from_182407_is_fixed below).
+        wake.record_model_revision(
+            FIXED_NOW,
+            observation="metrics_tool.py exited 1 on first run",
+            claim="the tool was broken",
+            prediction="fixing it will make it exit 0",
+            test="rewrote and reran metrics_tool.py",
+            outcome="exit code 0",
+            revision="confirmed the fix",
+            journal_entry=journal,
+        )
 
         metrics = wake.build_development_metrics(
             journal,
@@ -1463,9 +1481,117 @@ class IdentityLifecycleTests(unittest.TestCase):
         self.assertIn("Same-wake recovery observed:** yes", metrics)
         self.assertIn("do not establish longitudinal learning", metrics)
 
+    def test_zero_metrics_bug_from_182407_is_fixed(self):
+        # Regression test for the exact failure class in
+        # memory/core_workspace/journal/2026-09-07-182407.md (see
+        # HANDOFF.md "Fix Same-Wake Development Metrics"): a tool is
+        # refined and run successfully in the *initial* response (phase
+        # == "work", since no failure ever triggered the same-wake
+        # follow-up loop), and a model revision is recorded for the same
+        # wake. Previously every metric below read 0 despite this real,
+        # persisted evidence.
+        journal = "2026-09-07-182407.md"
+        wake.TOOLS_DIR.mkdir(parents=True, exist_ok=True)
+        wake.TOOL_RUNS_FILE.write_text(json.dumps({"runs": []}) + "\n")
+        wake.apply_tool_write(
+            json.dumps({"files": [{"filename": "audit_state.py", "content": "print('STRUCTURALLY_COMPLETE')\n"}]}),
+            FIXED_NOW, journal,
+        )
+        notes = wake.apply_tool_run(
+            json.dumps({"filename": "audit_state.py", "args": []}),
+            FIXED_NOW, journal,  # no phase kwarg -> defaults to "work", exactly like the real wake
+        )
+        self.assertIn("exit code 0", notes[0])
+        wake.record_model_revision(
+            FIXED_NOW,
+            observation="audit_state.py reported STRUCTURALLY_COMPLETE",
+            claim="the memory layout is structurally sound",
+            prediction="a pre-commit check could rely on this signal",
+            test="ran audit_state.py against the current memory/ tree",
+            outcome="STRUCTURALLY_COMPLETE",
+            revision="raised confidence in the audit tool from medium to high",
+            confidence_before="medium",
+            confidence_after="high",
+            journal_entry=journal,
+        )
 
-if __name__ == "__main__":
-    unittest.main(verbosity=2)
+        metrics = wake.build_development_metrics(journal, [])
+        self.assertIn("Development executions:** 1", metrics)
+        self.assertIn("Successful executions:** 1", metrics)
+        self.assertIn("Failed executions:** 0", metrics)
+        self.assertIn("Distinct development targets:** 1", metrics)
+        self.assertIn("Recorded development revisions:** 1", metrics)
+        self.assertIn("Same-wake recovery observed:** not applicable", metrics)
+
+    def test_development_metrics_isolate_previous_wakes(self):
+        older_journal = "2026-08-30-090000.md"
+        current_journal = "2026-08-31-090000.md"
+        wake.TOOLS_DIR.mkdir(parents=True, exist_ok=True)
+        wake.TOOL_RUNS_FILE.write_text(json.dumps({"runs": []}) + "\n")
+
+        wake.apply_tool_write(
+            json.dumps({"files": [{"filename": "old_tool.py", "content": "print('ok')\n"}]}),
+            FIXED_NOW, older_journal,
+        )
+        wake.apply_tool_run(
+            json.dumps({"filename": "old_tool.py", "args": []}),
+            FIXED_NOW, older_journal,
+        )
+        wake.record_model_revision(
+            FIXED_NOW,
+            observation="old wake observation", claim="old claim",
+            prediction="old prediction", test="old test",
+            outcome="old outcome", revision="old revision",
+            journal_entry=older_journal,
+        )
+
+        metrics = wake.build_development_metrics(current_journal, [])
+        self.assertIn("Development executions:** 0", metrics)
+        self.assertIn("Recorded development revisions:** 0", metrics)
+        self.assertIn("Same-wake recovery observed:** no development execution occurred.", metrics)
+
+    def test_offline_fallback_runs_do_not_count_as_development(self):
+        journal = "2026-08-31-090000-FAILED.md"
+        wake.TOOLS_DIR.mkdir(parents=True, exist_ok=True)
+        wake.TOOL_RUNS_FILE.write_text(json.dumps({"runs": []}) + "\n")
+        wake.apply_tool_write(
+            json.dumps({"files": [{"filename": "validate_memory.py", "content": "print('ok')\n"}]}),
+            FIXED_NOW, journal,
+        )
+        wake.run_offline_fallback(FIXED_NOW, journal)
+
+        metrics = wake.build_development_metrics(journal, [])
+        self.assertIn("Development executions:** 0", metrics)
+        self.assertIn("Same-wake recovery observed:** no development execution occurred.", metrics)
+
+    def test_same_wake_recovery_requires_failure_before_success(self):
+        # A success followed later by an unrelated failure is not a
+        # "recovery" — order matters, not just the aggregate presence of
+        # both a success and a failure.
+        journal = "2026-08-31-130000.md"
+        wake.TOOLS_DIR.mkdir(parents=True, exist_ok=True)
+        wake.TOOL_RUNS_FILE.write_text(json.dumps({"runs": []}) + "\n")
+        wake.apply_tool_write(
+            json.dumps({"files": [{"filename": "a.py", "content": "print('ok')\n"}]}),
+            FIXED_NOW, journal,
+        )
+        wake.apply_tool_run(json.dumps({"filename": "a.py", "args": []}), FIXED_NOW, journal)
+        wake.apply_tool_write(
+            json.dumps({"files": [{"filename": "b.py", "content": "raise SystemExit(1)\n"}]}),
+            FIXED_NOW, journal,
+        )
+        wake.apply_tool_run(json.dumps({"filename": "b.py", "args": []}), FIXED_NOW, journal)
+
+        metrics = wake.build_development_metrics(journal, [])
+        self.assertIn("Development executions:** 2", metrics)
+        self.assertIn("Successful executions:** 1", metrics)
+        self.assertIn("Failed executions:** 1", metrics)
+        self.assertIn(
+            "Same-wake recovery observed:** no successful development execution followed the recorded failures.",
+            metrics,
+        )
+
+
 
 class DevelopmentCausalTraceTests(WakeTestCase):
     def test_causal_trace_preserves_failure_and_success_and_marks_longitudinal_pending(self):
@@ -1498,3 +1624,7 @@ class DevelopmentCausalTraceTests(WakeTestCase):
         self.assertIn("revised after observed failure", trace)
         self.assertIn("Local development result", trace)
         self.assertIn("Longitudinal validation", trace)
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)

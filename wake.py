@@ -170,6 +170,7 @@ def record_model_revision(
     source: str = "self-report",
     confidence_before: str = "",
     confidence_after: str = "",
+    journal_entry: str = "",
 ) -> str:
     """
     Record an explicit observation -> claim -> prediction -> test -> outcome
@@ -179,6 +180,15 @@ def record_model_revision(
     the journal is the immutable narrative record; hypotheses are individual
     self-experiments; this ledger records the broader epistemic event in which
     evidence changed (or failed to change) the model.
+
+    journal_entry attributes the revision to the wake that recorded it (the
+    same filename tool_runs.json entries carry as "journal_entry" — see
+    apply_tool_run()). Without this, same-wake metrics have no way to tell
+    "a revision was recorded this wake" apart from "a revision exists
+    somewhere in history" — see build_development_metrics() /
+    model_revisions_for_journal(). Left blank, a revision simply won't match
+    any current-wake filter, which is the safe default for old records that
+    predate this field rather than a migration that guesses their wake.
     """
     required = {
         "observation": observation,
@@ -211,10 +221,28 @@ def record_model_revision(
         entry["confidence_before"] = confidence_before.strip()[:200]
     if confidence_after.strip():
         entry["confidence_after"] = confidence_after.strip()[:200]
+    if journal_entry.strip():
+        entry["journal_entry"] = journal_entry.strip()
 
     data["revisions"].append(entry)
     save_epistemic_state(data)
     return revision_id
+
+
+def model_revisions_for_journal(journal_fname: str) -> list[dict]:
+    """Return persisted model revisions attributable to this wake.
+
+    Mirrors tool_runs_for_journal(): the source of truth for "did a
+    revision happen this wake" is the journal_entry attribution written
+    by record_model_revision(), not any parsing of journal/development
+    prose. A revision recorded before this attribution field existed
+    simply won't match any journal_fname and is correctly excluded
+    rather than guessed into the current wake.
+    """
+    return [
+        rev for rev in load_epistemic_state().get("revisions", [])
+        if rev.get("journal_entry") == journal_fname
+    ]
 
 
 def build_epistemic_context() -> str:
@@ -2526,20 +2554,43 @@ def apply_tool_run(
 def build_development_metrics(journal_fname: str, development_notes: list[str] | None = None) -> str:
     """Render mechanically derived same-wake development metrics.
 
-    These are deliberately derived from persisted tool-run records and the
-    visible development notes rather than asking the model to estimate its
-    own performance.  They measure the immediate value of same-wake
-    iteration without claiming that a local fix is longitudinal learning.
+    Scope: every persisted tool execution for this wake counts as
+    development activity, except mechanical "offline" fallback runs (see
+    run_offline_fallback() — those happen with no model call at all, on a
+    different journal filename, so excluding them is defensive rather than
+    load-bearing). This matches build_development_causal_trace()'s scope
+    and the "elif tool_runs_for_journal(...)" condition in main() that
+    decides whether this section is shown at all.
+
+    A previous version filtered to phase == "development" only — the
+    narrower subset tagged exclusively by the same-wake recovery
+    follow-up loop (see apply_development_output()). That meant a wake
+    which wrote a tool, ran it, and succeeded on the first try — no
+    failure, so no follow-up loop, so no phase == "development" runs at
+    all — reported all-zero metrics directly beneath a causal trace
+    showing exactly that work. See HANDOFF.md ("Fix Same-Wake
+    Development Metrics") for the journal entry that surfaced this
+    (2026-09-07-182407.md: a tool was refined and run successfully and a
+    model revision was recorded, and every metric below still read zero).
+
+    Revisions are read from the persisted epistemic-state ledger
+    (record_model_revision() / epistemic_state.json), filtered to this
+    wake's journal_entry attribution — not scraped from development_notes
+    text. development_notes is only ever populated by the follow-up loop,
+    so counting substrings in it silently missed every revision recorded
+    during the initial response, which is the common case (see the
+    182407 example above: one successful run, one revision, no follow-up
+    loop, so development_notes was empty and revisions read 0 even
+    though a revision really was persisted).
+
+    development_notes is still accepted (build_development_causal_trace
+    displays it) but no longer drives any of the counts below.
     """
     runs = [
         run for run in tool_runs_for_journal(journal_fname)
-        if run.get("phase") == "development"
+        if run.get("phase") != "offline"
     ]
-    notes = development_notes or []
-    revisions = sum(
-        1 for note in notes
-        if "WROTE tools/" in note or "OVERWROTE tools/" in note
-    )
+    revisions = model_revisions_for_journal(journal_fname)
     successful = sum(1 for run in runs if run.get("exit_code") == 0)
     failed = sum(1 for run in runs if run.get("exit_code") != 0)
     targets = {(run.get("filename"), tuple(run.get("args", []))) for run in runs}
@@ -2547,6 +2598,18 @@ def build_development_metrics(journal_fname: str, development_notes: list[str] |
         run.get("development_iteration") for run in runs
         if isinstance(run.get("development_iteration"), int)
     ]
+
+    # Recovery requires an actual failed-then-succeeded sequence, not just
+    # "at least one of each" irrespective of order (two runs against
+    # unrelated targets could succeed then fail, which is not a recovery).
+    recovery_observed = False
+    failure_seen = False
+    for run in runs:
+        if run.get("exit_code") != 0:
+            failure_seen = True
+        elif failure_seen:
+            recovery_observed = True
+            break
 
     lines = [
         "## Same-wake development metrics",
@@ -2557,11 +2620,11 @@ def build_development_metrics(journal_fname: str, development_notes: list[str] |
         f"- **Successful executions:** {successful}",
         f"- **Failed executions:** {failed}",
         f"- **Distinct development targets:** {len(targets)}",
-        f"- **Recorded development revisions:** {revisions}",
+        f"- **Recorded development revisions:** {len(revisions)}",
     ]
     if iterations:
         lines.append(f"- **Highest development iteration:** {max(iterations)}")
-    if runs and failed and successful:
+    if runs and failed and recovery_observed:
         lines.append(
             "- **Same-wake recovery observed:** yes — at least one development "
             "failure was followed by a successful development execution."
@@ -2586,7 +2649,10 @@ def build_development_causal_trace(journal_fname: str, development_notes: list[s
     execution evidence.  A successful final run establishes local development
     success; it does not establish that the lesson survived a wake boundary.
     """
-    runs = tool_runs_for_journal(journal_fname)
+    runs = [
+        run for run in tool_runs_for_journal(journal_fname)
+        if run.get("phase") != "offline"
+    ]
     if not runs and not development_notes:
         return "No same-wake development sequence occurred."
 
@@ -2945,6 +3011,7 @@ def apply_self_edits(model_output: str, config: dict, now: datetime, journal_fna
                             confidence_after=str(
                                 revision_data.get("confidence_after", "")
                             ),
+                            journal_entry=journal_fname,
                         )
                         all_notes.append(
                             f"RECORDED model revision {revision_id}: "
