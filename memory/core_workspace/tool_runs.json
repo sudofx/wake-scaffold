@@ -67,6 +67,17 @@
       "journal_entry": "2026-09-08-034724.md",
       "phase": "work",
       "hypothesis_id": "h-2026-09-08-034700-0"
+    },
+    {
+      "when": "Sep 8th, 2026 04:09am",
+      "filename": "verify_workspace.py",
+      "args": [],
+      "exit_code": 0,
+      "stdout": "{\"status\": \"STRUCTURALLY_INVALID\", \"root\": \"/home/runner/work/wake-scaffold/wake-scaffold\", \"found\": [\"memory\", \"memory/core_workspace\", \"memory/core_identity/identity.md\"], \"missing\": [\"rules.md\", \"index.md\"]}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-08-040906.md",
+      "phase": "work"
     }
   ]
 }
