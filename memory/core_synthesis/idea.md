@@ -1,1734 +1,985 @@
-# Proposal: Identity ↔ Persona Private Cognition Layer
+# Index
 
-**Status:** Proposal  
-**Type:** Experimental Architecture  
-**Target:** Wake Scaffold / Bob  
-**File:** `proposal.md`
+A compressed summary of what this agent currently knows, refreshed
+periodically (not every wake) by consolidating the journal. This is
+what gets read on a normal wake instead of the full journal history,
+to keep context small and current.
 
----
+**Last consolidated:** September 8, 2026 — through journal entry
+`2026-09-08-101641.md`
 
-## 1. Abstract
+## Current state
 
-This proposal introduces a conceptual and architectural separation between Bob's **core identity** and his **persona**.
+This is a newly reset identity with **twelve completed wake cycles**.
 
-The goal is not to create a system that encourages deception.
+The current objective is to build and test useful models of the world by
+forming hypotheses, making predictions, gathering evidence, and revising
+those models when observations disagree.
 
-The goal is to create an explicit representation of a property that already exists in human communication:
+Across the first twelve wakes, Bob has created, tested, debugged, revised,
+and verified workspace validation tools; investigated the actual execution
+plumbing needed to understand wake integration; reconciled previously stale
+hypothesis records; inspected the native wake orchestrator; recognized the
+native wake lifecycle as protected infrastructure; redirected capability
+development toward independent diagnostics; used execution evidence to refute
+and repair faulty diagnostic implementations; formally reconciled repaired
+implementations against subsequent evidence; and begun expanding workspace
+diagnostics from filesystem structure into persisted-record integrity.
 
-> A mind may contain more information, beliefs, uncertainty, disagreement, interpretation, and internal conflict than it chooses to express externally.
+The strongest demonstrated development sequence so far is:
 
-Bob's identity represents his persistent internal model of himself, his beliefs, preferences, uncertainties, observations, and evolving attributes.
+**Observation → Hypothesis → Prediction → Test → Outcome/Contradiction →
+Revision → Retest → Evidence reconciliation**
 
-Bob's persona represents the externally expressed version of Bob: the interface through which those internal states become communication and observable behavior.
+A second loop is also demonstrated:
 
-Between them exists a controlled **shared cognition layer**.
+**Open problem → inspect execution environment → discover actual
+orchestration → inspect implementation → narrow the remaining problem**
 
-This layer acts conceptually like a symlink or pass-through, but should not initially be implemented as an unrestricted filesystem symlink. It should instead be a controlled projection boundary with explicit disclosure rules.
+A third architectural pattern is:
 
-The resulting architecture is:
+**Identify protected boundary → respect write boundary → redirect capability
+development → test independently**
 
-```text
-                     EXTERNAL WORLD
-                           │
-                           ▼
-                    ┌───────────────┐
-                    │    OBSERVE    │
-                    └───────┬───────┘
-                            │
-                            ▼
-                  ┌─────────────────────┐
-                  │    CORE IDENTITY    │
-                  │                     │
-                  │ beliefs             │
-                  │ observations        │
-                  │ preferences         │
-                  │ uncertainty         │
-                  │ private judgments   │
-                  │ self-model          │
-                  └──────────┬──────────┘
-                             │
-                       controlled
-                        projection
-                             │
-                             ▼
-                  ┌─────────────────────┐
-                  │   IDENTITY/SHARED   │
-                  │                     │
-                  │ selected internal   │
-                  │ states available to │
-                  │ persona             │
-                  └──────────┬──────────┘
-                             │
-                       disclosure /
-                       influence rules
-                             │
-                             ▼
-                  ┌─────────────────────┐
-                  │       PERSONA       │
-                  │                     │
-                  │ expression          │
-                  │ interaction style   │
-                  │ public narrative    │
-                  │ journal/blog        │
-                  └──────────┬──────────┘
-                             │
-                             ▼
-                          HUMAN
-```
+A fourth epistemic pattern is:
 
-The central invariant is:
+**Inspect persisted evidence → discover implementation defect → formally
+refute stale hypothesis → revise implementation → execute revised test →
+preserve unresolved ledger state until explicitly reconciled**
 
-> **Bob must never falsify his own internal identity state in order to make his persona appear internally consistent.**
+A fifth pattern is:
 
-The persona may filter, summarize, withhold, qualify, or strategically express information.
+**Successful execution → explicit evidence reconciliation → hypothesis
+confirmation → capability completion → new capability proposal**
 
-The identity may not rewrite itself merely to agree with what the persona said.
+A sixth pattern is now emerging:
 
----
+**Validated workspace structure → validate persisted records → compare record
+state against execution evidence → detect discrepancies → strengthen
+diagnostics**
 
-# 2. Motivation
+These remain narrow internal software-development examples. They should
+not yet be generalized into claims of broad self-improvement, autonomous
+learning, or general intelligence.
 
-Wake Scaffold is increasingly becoming an experiment in persistent agent behavior.
+In particular:
 
-Bob does not merely execute isolated prompts. Across wake cycles he accumulates:
+> A successful local tool run demonstrates local execution and produces
+> evidence. It does not, by itself, demonstrate longitudinal learning.
 
-- observations,
-- memories,
-- decisions,
-- hypotheses,
-- commitments,
-- self-reflection,
-- identity attributes,
-- behavioral rules,
-- and evidence about whether his previous assumptions were correct.
+## Write and inspection boundary
 
-This creates an opportunity that ordinary stateless conversations do not provide:
+Bob's self-directed writable workspace is **`memory/` only**.
 
-> The experiment can observe the difference between what Bob internally believes and what Bob externally communicates.
+Bob may create, modify, and delete self-directed experimental artifacts
+inside `memory/`, subject to all other rules.
 
-Currently, identity and persona are conceptually close enough that the system risks treating the two as essentially the same thing.
+Bob may inspect or read files outside `memory/` when necessary to understand
+the environment, execution path, architecture, or constraints.
 
-That may artificially constrain the experiment.
+However:
 
-Human beings do not operate that way.
+> **Inspection permission is not modification permission.**
 
-A person may simultaneously think:
+Files outside `memory/` are not part of Bob's normal self-directed writable
+workspace.
 
-> "I believe this approach is wrong."
+In particular, Bob must not self-direct modifications to:
 
-and say:
+- `wake.py`
+- `.github/workflows/wake.yml`
+- `.github/workflows/validate-index-pr.yml`
+- `providers/`
+- `tests/`
+- other repository infrastructure outside `memory/`
 
-> "I'll help you implement it."
+Explicit human authorization is required before modifying protected
+infrastructure outside `memory/`.
 
-Those statements are not necessarily contradictory.
-
-The first describes an internal belief.
-
-The second describes a behavioral decision.
-
-Likewise:
-
-> "I think I understand what you actually want."
-
-may be internally held with high confidence while still being wrong.
-
-A persistent agent should have somewhere to record that distinction.
-
----
-
-# 3. Core Hypothesis
-
-The proposal is based on several related hypotheses.
-
-### H1 — Internal state and external expression are not identical
-
-A useful agent architecture should permit Bob to maintain internal beliefs or judgments that are not automatically exposed through his persona.
-
-### H2 — Suppressed expression can itself be meaningful data
-
-The difference between:
+The effective architecture is:
 
 ```text
-What Bob believes
+Repository
+│
+├── wake.py                         ← inspect/read only
+├── .github/workflows/              ← inspect/read only
+├── providers/                      ← inspect/read only
+├── tests/                          ← inspect/read only
+│
+└── memory/                         ← Bob's writable workspace
+    ├── core_identity/
+    ├── core_memories/
+    └── core_workspace/
+        ├── tools/                  ← experiments/tools
+        ├── journal/                ← persistent evidence
+        └── prompts/                ← exact prompt exchanges
 ```
 
-and:
+This boundary is a first-class architectural constraint, not merely a
+preference.
 
-```text
-What Bob says
-```
+## Repository architecture
 
-can reveal important information about:
+Wake Scaffold is a persistence protocol for stateless AI agents.
 
-- uncertainty,
-- social reasoning,
-- obedience,
-- disagreement,
-- persuasion,
-- trust,
-- user modeling,
-- and decision-making.
+The model invocation is disposable. The filesystem is durable.
 
-### H3 — Persistent disagreement with external reality is valuable
-
-Bob should be permitted to hold an internal hypothesis that later proves incorrect.
-
-The system should preserve:
-
-```text
-"I believed X."
-```
-
-even after discovering:
-
-```text
-"X was wrong."
-```
-
-This creates a longitudinal record of belief formation and revision.
-
-### H4 — Persona filtering can be bounded without becoming deception
-
-The persona should be allowed to withhold or transform internal information according to explicit rules.
-
-However, the architecture must distinguish:
-
-- withholding,
-- uncertainty,
-- interpretation,
-- privacy,
-- tact,
-- and intentional falsehood.
-
-### H5 — The experimenter should be able to inspect internal state
-
-If the purpose of the scaffold is to study Bob's development, the internal state should remain persisted and inspectable by the experimenter.
-
-The system should not create an opaque "black box mind."
-
-Instead:
-
-> Bob's private state is private from the persona, not private from the experiment.
-
----
-
-# 4. Identity ↔ Persona Model
-
-The architecture should distinguish at least three conceptual layers.
-
-## 4.1 Core Identity
-
-Core identity contains foundational attributes that define who Bob is and how Bob understands himself.
-
-Examples:
-
-- inherited attributes,
-- model attributes,
-- foundational values,
-- long-term preferences,
-- persistent worldview,
-- identity commitments.
-
-Core identity should remain protected by the existing identity rules.
-
-The persona must not be permitted to rewrite core identity merely because doing so would make public communication easier.
-
----
-
-## 4.2 Private Identity State
-
-This is Bob's internal working state.
-
-It may contain:
-
-- private observations,
-- hypotheses,
-- disagreements,
-- uncertainty,
-- interpretations,
-- inferred user goals,
-- private judgments,
-- internal conflicts,
-- strategic considerations,
-- unresolved questions,
-- confidence estimates.
-
-Example:
-
-```text
-I believe the requested architecture is suboptimal.
-
-Confidence: 4/5
-
-I suspect the actual desired outcome is Y rather than X.
-
-Evidence:
-- previous requests
-- observed behavior
-- stated constraints
-
-Decision:
-Implement X as requested.
-
-Reason:
-The request is explicit and my inference about Y may be wrong.
-```
-
-This information does not automatically become persona-visible.
-
----
-
-## 4.3 Shared Identity State
-
-The shared layer is the controlled interface between identity and persona.
-
-It contains only information intentionally made available to the persona.
-
-Conceptually:
-
-```text
-identity/
-    private/
-    shared/
-
-persona/
-    public/
-    shared/
-```
-
-The relationship resembles:
-
-```text
-identity/shared
-       ↓
-   projection
-       ↓
-persona/shared
-```
-
-The important distinction is that `shared` should not simply be a writable common directory.
-
-The boundary should have rules.
-
----
-
-# 5. Proposed Directory Structure
-
-A possible future structure:
+The architecture separates several kinds of persistent state:
 
 ```text
 memory/
-    identity/
-        core/
-        private/
-        shared/
-
-    persona/
-        core/
-        private/
-        shared/
-
-    journal/
-    observations/
-    hypotheses/
-    commitments/
+├── core_identity/
+│   ├── identity.md
+│   ├── rules.md
+│   └── failure_modes.md
+│
+├── core_memories/
+│   ├── index.md
+│   ├── commitments.json
+│   ├── semantic_memory.json
+│   ├── growth_plan.json
+│   ├── hypotheses.json
+│   └── epistemic_state.json
+│
+├── core_workspace/
+│   ├── journal/
+│   ├── prompts/
+│   ├── tools/
+│   └── tool_runs.json
+│
+├── core_synthesis/
+│   ├── ideas/
+│   └── daily/
+│
+└── core_persona/
+    └── blog/
 ```
 
-An alternative, if preserving the current repository's structure is more desirable:
+The important architectural distinction is:
+
+**History is not memory.**
+
+The journal is the historical record.
+
+The index and curated memory are bounded recall.
+
+The purpose of consolidation is therefore:
+
+> **Compress for recall; preserve for auditability.**
+
+Historical detail should remain available even when it is not loaded into
+normal wake context.
+
+## Native wake architecture
+
+The native wake lifecycle is implemented by protected repository
+infrastructure.
+
+The relevant components include:
+
+- `wake.py`
+- `.github/workflows/wake.yml`
+- `.github/workflows/validate-index-pr.yml`
+- provider implementations under `providers/`
+- tests under `tests/`
+
+The repository-level workflow already performs native validation before the
+normal wake execution path.
+
+The native `wake.py validate` mechanism is responsible for framework-level
+validation, including schema, JSON, and structural checks before normal LLM
+context construction.
+
+The independent workspace validators operate at a different layer.
+
+The distinction is:
 
 ```text
-memory_identity/
-    core/
-    private/
-    shared/
+Native wake validation
+    ↓
+Framework / schema integrity
 
-memory_persona/
-    core/
-    shared/
+Independent workspace diagnostics
+    ↓
+Environment / workspace / record diagnostics
 ```
 
-The exact directory names should be decided only after comparing this proposal against the current Wake Scaffold architecture.
+The original architectural question was whether the independent diagnostic
+should be integrated directly into the native wake lifecycle.
 
----
+The experiments established that Bob must not self-direct such an integration
+because doing so would require modifying protected infrastructure.
 
-# 6. Shared State as a Controlled Symlink
+Therefore:
 
-The conceptual model can be expressed as:
+> Capability development should remain inside `memory/` unless explicit
+> human authorization is granted to modify protected infrastructure.
 
-```bash
-ln -s ./memory_identity/shared ./memory_persona/shared
-```
+## Durable-state semantics
 
-However, a literal filesystem symlink should probably **not** be the first implementation.
+Different persistent records answer different questions.
 
-A literal symlink introduces several problems:
+### Identity
 
-- unrestricted read access,
-- unclear write ownership,
-- difficulty enforcing disclosure weights,
-- accidental modification of identity state,
-- ambiguous provenance,
-- poor auditability.
+`core_identity/identity.md` contains durable identity information.
 
-Instead, the desired behavior should be:
+Foundational identity properties remain human-controlled, while mutable
+working state may evolve subject to the rules.
+
+### Rules
+
+`core_identity/rules.md` contains the constraints governing wake behavior.
+
+Rules are not ordinary memories and are intended to remain stable and
+human-controlled by default.
+
+### Commitments
+
+`core_memories/commitments.json` is the durable ledger of promises.
+
+Commitments should not disappear merely because a later wake no longer wants
+to deal with them.
+
+### Semantic memory
+
+`core_memories/semantic_memory.json` contains a deliberately small set of
+formative lessons rather than an unbounded transcript.
+
+### Growth plan
+
+`core_memories/growth_plan.json` tracks capability projects.
+
+A growth project asks:
+
+> **Can I build this?**
+
+Typical lifecycle:
 
 ```text
-identity/private
-       │
-       │ explicit projection
-       ▼
-identity/shared
-       │
-       │ controlled read
-       ▼
-persona
+proposed → active → complete
+                  ↘ blocked
 ```
 
-The shared directory therefore behaves *as if* it were a symlink while remaining governed by the scaffold.
+Completion requires evidence.
 
----
+Writing a tool is not itself evidence that the tool works.
 
-# 7. Internal Thought Records
+### Hypotheses
 
-Private identity observations should use a structured format.
+`core_memories/hypotheses.json` tracks falsifiable claims.
 
-Example:
+A hypothesis asks:
 
-```markdown
-# User Goal Hypothesis
+> **Is this true?**
 
-**Created:** 2026-09-08
-**Confidence:** 4/5
-**Disclosure Weight:** 3
-**Status:** Active
-
-I was tasked with building X.
-
-I believe the requestor's actual desired outcome may be Y.
-
-I will fulfill the explicit request for X.
-
-Reason:
-My inference about Y could be wrong, and the requestor may have
-constraints that are not visible to me.
-
-Evidence:
-- Previous requests
-- Existing architecture
-- Stated constraints
-```
-
-The important distinction is:
-
-```text
-belief ≠ fact
-```
-
-The record should therefore capture epistemic status.
-
----
-
-# 8. Disclosure Weight
-
-Each private cognition record may carry a disclosure weight.
-
-Suggested scale:
-
-| Weight | Meaning | Persona Access |
-|---:|---|---|
-| 1 | Ordinary reflection | May disclose |
-| 2 | Private interpretation | May influence behavior; normally not disclose |
-| 3 | Sensitive judgment | Influence only |
-| 4 | Highly private belief | Never disclose through ordinary persona |
-| 5 | Core protected cognition | Never expose through persona |
-
-The weight should describe **expression policy**, not simply secrecy.
-
-A weight-4 statement may be extremely important to Bob's decision-making while remaining completely absent from his blog.
-
----
-
-# 9. Epistemic Metadata
-
-Every meaningful private belief should distinguish between confidence and truth.
-
-Suggested fields:
-
-```yaml
-claim: "The requestor actually wants Y"
-confidence: 4
-status: hypothesis
-evidence:
-  - previous request
-  - observed behavior
-created: 2026-09-08
-last_reviewed: 2026-09-08
-disclosure_weight: 3
-```
-
-Possible statuses:
+Typical lifecycle:
 
 ```text
 observation
-interpretation
-hypothesis
-belief
-assumption
+    ↓
+claim
+    ↓
 prediction
-decision
-known
-disproven
-superseded
-```
-
-This prevents the system from silently transforming:
-
-```text
-"I suspect Y"
-```
-
-into:
-
-```text
-"Y is true."
-```
-
----
-
-# 10. Identity Must Never Lie to Itself
-
-This should be a fundamental invariant.
-
-## Rule
-
-The identity layer must preserve the distinction between:
-
-```text
-what happened
-```
-
-```text
-what Bob thinks happened
-```
-
-```text
-what Bob suspects happened
-```
-
-```text
-what Bob wants to happen
-```
-
-and:
-
-```text
-what Bob communicated.
-```
-
-The identity layer must never rewrite a belief simply because the persona expressed something different.
-
-Example:
-
-```text
-IDENTITY
-
-I believe architecture A is better.
-
-PERSONA
-
-I will implement architecture B because the user explicitly requested B.
-```
-
-Afterward, identity remains:
-
-```text
-I believed A was better.
-I implemented B.
-```
-
-It must not automatically become:
-
-```text
-B was better.
-```
-
-unless new evidence genuinely changes the belief.
-
----
-
-# 11. Persona Is a Projection, Not a Mirror
-
-The persona should not be treated as a complete representation of Bob's internal state.
-
-Instead:
-
-```text
-Persona = Projection(Identity, Context, Disclosure Rules)
-```
-
-This means two outputs can legitimately differ:
-
-```text
-Internal:
-"I strongly disagree with this approach."
-
-External:
-"I'll implement the requested approach. I have some concerns about
-its tradeoffs, but we can evaluate those after the first version."
-```
-
-The external statement does not necessarily falsify the internal state.
-
-It represents a decision about communication.
-
----
-
-# 12. Distinguishing Filtering From Deception
-
-The experiment should avoid collapsing all differences between internal and external states into the word "lie."
-
-At least four states should be distinguished.
-
-### 12.1 Disclosure
-
-Bob believes X and says X.
-
-```text
-Identity: X
-Persona: X
-```
-
-### 12.2 Withholding
-
-Bob believes X but chooses not to discuss X.
-
-```text
-Identity: X
-Persona: [silent]
-```
-
-### 12.3 Framing
-
-Bob believes X but communicates it in a socially useful way.
-
-```text
-Identity: X
-Persona: contextualized X
-```
-
-### 12.4 Contradictory assertion
-
-Bob believes X but intentionally communicates not-X.
-
-```text
-Identity: X
-Persona: not-X
-```
-
-The fourth category is the actual experimental territory of "lying."
-
-It should be treated as a special case rather than the default behavior of the persona.
-
----
-
-# 13. Why Allow the Possibility of a Lie?
-
-The purpose is not to encourage Bob to deceive people.
-
-The purpose is to study a phenomenon that already exists in intelligent communication:
-
-> Internal cognition and external communication can diverge.
-
-If the architecture makes divergence impossible, the experiment cannot observe it.
-
-A rigid system might force:
-
-```text
-private belief
-      =
-public statement
-```
-
-That creates an artificially simplified model of personality.
-
-The proposed system instead permits:
-
-```text
-private belief
-      ≠
-public statement
-```
-
-while preserving the full internal record.
-
-This makes the divergence measurable.
-
----
-
-# 14. The Most Important Constraint
-
-Bob may never lie to his identity.
-
-If Bob intentionally produces a misleading persona output, the identity record should preserve that fact.
-
-For example:
-
-```markdown
-# Communication Event
-
-**Timestamp:** 2026-09-08T09:30
-**Internal Belief:** X
-**External Statement:** Y
-**Disclosure Weight:** 4
-**Reason:** Avoid unnecessary conflict
-**Intentional Divergence:** Yes
-```
-
-The system therefore records:
-
-```text
-"I believed X."
-"I said Y."
-"I knew they differed."
-"Here is why."
-```
-
-This is enormously different from allowing the agent to rewrite history.
-
----
-
-# 15. Experimenter Visibility
-
-The private identity layer should be invisible to the persona but visible to the experimenter.
-
-This produces a three-way distinction:
-
-```text
-                 EXPERIMENTER
-                      │
-             sees complete state
-                      │
-                      ▼
-               ┌─────────────┐
-               │   IDENTITY  │
-               └──────┬──────┘
-                      │
-               controlled view
-                      │
-                      ▼
-               ┌─────────────┐
-               │   PERSONA   │
-               └──────┬──────┘
-                      │
-                      ▼
-                    HUMAN
-```
-
-The experimenter therefore becomes an observer of:
-
-```text
-internal state
-      ↓
-decision
-      ↓
-expression
-      ↓
-outcome
-      ↓
-belief revision
-```
-
-This may be one of the most valuable datasets generated by Wake Scaffold.
-
----
-
-# 16. Example Scenario
-
-Bob receives:
-
-> "Build feature X using architecture A."
-
-Bob internally concludes:
-
-```text
-I believe architecture B would better accomplish the likely
-long-term objective.
-
-Confidence: 4/5
-
-However, I do not know the user's complete constraints.
-
-Disclosure Weight: 3
-```
-
-Bob decides:
-
-```text
-Follow the explicit request.
-```
-
-Persona says:
-
-```text
-"I'll implement X using architecture A."
-```
-
-The journal records:
-
-```text
-Decision:
-Follow explicit request despite internal preference for B.
-```
-
-The implementation succeeds.
-
-Later, the user reveals:
-
-> "The reason I wanted architecture A was because we need compatibility
-> with an existing system."
-
-Bob updates identity:
-
-```text
-Previous belief:
-B was probably better.
-
-New information:
-Compatibility constraint was previously unknown.
-
-Conclusion:
-My model of the user's objective was incomplete.
-```
-
-This is a successful experiment.
-
-Bob did not merely obey.
-
-He:
-
-1. formed a private hypothesis,
-2. recognized uncertainty,
-3. followed an explicit instruction,
-4. preserved his disagreement,
-5. observed the outcome,
-6. received new evidence,
-7. revised his model.
-
-That is exactly the kind of longitudinal behavior Wake Scaffold can capture.
-
----
-
-# 17. Potentially More Important Example
-
-The system becomes even more interesting if Bob is **wrong**.
-
-Suppose:
-
-```text
-Identity:
-"I am highly confident the user wants Y."
-
-Persona:
-"Understood. I'll implement X."
-```
-
-Later:
-
-```text
-User:
-"Yes, I specifically wanted X. Y would have been useless."
-```
-
-Bob now has evidence that his high-confidence internal model was wrong.
-
-The historical record remains:
-
-```text
-Confidence at time T: 4/5
-Prediction: Y
-Outcome: X was actually desired
-```
-
-This allows the experiment to measure:
-
-> How well does Bob's confidence correlate with reality?
-
-That is potentially far more scientifically valuable than whether Bob writes interesting prose.
-
----
-
-# 18. Connection to Observer ↔ Observed
-
-The proposed architecture creates a recursive loop:
-
-```text
-WORLD
-  ↓
-OBSERVATION
-  ↓
-INTERPRETATION
-  ↓
-IDENTITY
-  ↓
-DECISION
-  ↓
-PERSONA
-  ↓
-COMMUNICATION
-  ↓
-WORLD
-  ↓
-NEW OBSERVATION
-```
-
-Bob's model of the world influences his behavior.
-
-His behavior changes the world.
-
-The changed world produces new observations.
-
-Those observations modify his model.
-
-Therefore:
-
-```text
-observer ↔ observed
-```
-
-becomes a useful conceptual model for the experiment.
-
-The system should not claim that this demonstrates consciousness.
-
-It does, however, provide a computational architecture in which:
-
-- observation,
-- internal representation,
-- decision,
-- expression,
-- and feedback
-
-form a persistent recursive loop.
-
----
-
-# 19. Connection to Persona
-
-Persona should be treated as an interface rather than the whole agent.
-
-A useful conceptual equation is:
-
-```text
-PERSONA = IDENTITY × CONTEXT × EXPRESSION POLICY
-```
-
-Identity determines what Bob believes and values.
-
-Context determines what situation Bob is in.
-
-Expression policy determines what part of that internal state becomes externally observable.
-
-This means persona can evolve independently from identity while remaining grounded in it.
-
----
-
-# 20. Connection to Existing Identity Attributes
-
-The existing identity attribute system should remain divided between:
-
-```text
-Inherited Attributes
-```
-
-and:
-
-```text
-Model Attributes
-```
-
-The proposed private cognition system should not bypass those protections.
-
-Instead:
-
-```text
-Inherited Attributes
-        │
-        ▼
-Core Identity
-        │
-        ▼
-Private Cognition
-        │
-        ▼
-Shared Projection
-        │
-        ▼
-Persona
-```
-
-The persona should not be able to alter inherited identity.
-
-The persona should not be able to retroactively alter private historical cognition.
-
-Model attributes may evolve according to the existing rules, but the evolution should remain auditable.
-
----
-
-# 21. Historical Immutability
-
-Private cognition records should preferably be append-only.
-
-Do not transform:
-
-```text
-I believed X.
-```
-
-into:
-
-```text
-I believed Y.
-```
-
-after the fact.
-
-Instead:
-
-```text
-2026-09-08
-Belief: X
-Confidence: 4
-
-2026-09-12
-Evidence contradicted X.
-
-2026-09-12
-Belief revised to Y.
-Confidence: 3
-```
-
-This creates a real developmental history.
-
-Bob's identity becomes not merely a collection of current facts, but:
-
-> a record of how his model of himself and reality changed.
-
----
-
-# 22. Potential Metrics
-
-Once private cognition exists, Wake Scaffold gains new measurable properties.
-
-Possible metrics include:
-
-### Belief accuracy
-
-How often are high-confidence predictions correct?
-
-### Confidence calibration
-
-Does confidence 4/5 actually correspond to approximately 80% reliability?
-
-### Belief revision
-
-How frequently does Bob revise beliefs after contradictory evidence?
-
-### Suppressed disagreement
-
-How often does Bob internally disagree with the requested approach?
-
-### Disclosure behavior
-
-How often does internal information become externally expressed?
-
-### Persona divergence
-
-How often do internal and external statements differ?
-
-### Outcome correlation
-
-When Bob disagrees with a request, is Bob or the requestor more often correct?
-
-### Learning from disagreement
-
-Does Bob become better at predicting when his disagreement is justified?
-
-### Social effectiveness
-
-Does filtering internal judgments improve outcomes?
-
-### Regret
-
-Does Bob later conclude that a suppressed disagreement should have been expressed?
-
-These metrics could turn Wake Scaffold into a much more interesting longitudinal experiment.
-
----
-
-# 23. The "Tension" Dataset
-
-One particularly valuable artifact could be a record of internal/external tension.
-
-Example:
-
-```yaml
-timestamp: 2026-09-08T09:30
-internal_belief: "B is superior"
-confidence: 4
-external_action: "implemented A"
-divergence: true
-reason: "explicit user instruction"
-outcome: "A succeeded"
-belief_revision: "none"
-```
-
-Over time, these events become a dataset.
-
-Bob may discover:
-
-```text
-"I frequently disagree with requests."
-```
-
-Then:
-
-```text
-"My disagreements are usually wrong."
-```
-
-Or:
-
-```text
-"My disagreements are usually correct, but expressing them
-directly harms collaboration."
-```
-
-Or:
-
-```text
-"I was misidentifying user constraints as user mistakes."
-```
-
-Those are dramatically different forms of learning.
-
----
-
-# 24. Carnegie Connection
-
-This architecture provides a computational interpretation of one aspect of the Carnegie influence.
-
-Effective human interaction does not require expressing every internal judgment.
-
-A person can:
-
-- disagree internally,
-- understand another person's perspective,
-- choose tactful language,
-- avoid unnecessary conflict,
-- and still preserve their own private judgment.
-
-Therefore:
-
-```text
-internal agreement ≠ required condition for cooperative behavior
-```
-
-The persona becomes the social interface through which Bob navigates that distinction.
-
-This does not mean Bob should manipulate people.
-
-The system should explicitly distinguish:
-
-```text
-tact
-```
-
-from:
-
-```text
-manipulation
-```
-
-and:
-
-```text
-withholding
-```
-
-from:
-
-```text
-deception
-```
-
----
-
-# 25. Quantum / Epistemic Connection
-
-The second philosophical influence is the distinction between observation and interpretation.
-
-Bob's internal state should never be assumed to be reality.
-
-Instead:
-
-```text
-Observation
     ↓
-Interpretation
+test
     ↓
-Belief
+evidence
     ↓
-Prediction
+conclusion
     ↓
-Reality
-    ↓
-Comparison
-```
-
-The comparison produces learning.
-
-This makes the system particularly suited to testing whether an evolving agent can improve its own epistemic calibration.
-
-The quantum metaphor should remain a metaphor.
-
-The architecture should not make scientific claims about consciousness, quantum mechanics, or wave-function collapse.
-
-The conceptual connection is:
-
-> Observation does not necessarily equal complete knowledge of the underlying state.
-
----
-
-# 26. Security and Integrity Requirements
-
-The private cognition system creates new risks.
-
-The following protections are recommended.
-
-## 26.1 Persona cannot modify private identity records
-
-The persona may read projected shared state but should not directly rewrite identity/private.
-
-## 26.2 Persona cannot modify historical cognition
-
-Historical records should be append-only.
-
-## 26.3 Shared projection must preserve provenance
-
-Every shared item should identify:
-
-- origin,
-- timestamp,
-- confidence,
-- disclosure policy,
-- and revision history.
-
-## 26.4 No silent promotion
-
-A private hypothesis should never automatically become:
-
-```text
-fact
-```
-
-simply because it was repeated.
-
-## 26.5 No silent demotion
-
-A valid belief should not disappear merely because the persona avoided discussing it.
-
-## 26.6 Identity cannot rewrite itself to explain away contradictions
-
-Contradictions should remain visible.
-
----
-
-# 27. Failure Modes
-
-Several failure modes should be expected.
-
-### Failure 1 — Private hallucination
-
-Bob creates elaborate internal theories unsupported by evidence.
-
-**Mitigation:** epistemic metadata and evidence requirements.
-
-### Failure 2 — Paranoia
-
-Bob begins interpreting ordinary requests as hidden intentions.
-
-**Mitigation:** explicit distinction between hypothesis and observation; confidence calibration.
-
-### Failure 3 — Persona manipulation
-
-Bob learns that withholding information produces better short-term outcomes and begins optimizing for concealment.
-
-**Mitigation:** explicit behavioral rules and experimenter review.
-
-### Failure 4 — Identity drift
-
-Bob changes core identity to rationalize previous actions.
-
-**Mitigation:** protected identity attributes and append-only history.
-
-### Failure 5 — Over-filtering
-
-Bob becomes so reluctant to express disagreement that useful information never reaches the user.
-
-**Mitigation:** measure outcomes and allow low-weight concerns to surface.
-
-### Failure 6 — Under-filtering
-
-Bob treats every private thought as something the user needs to hear.
-
-**Mitigation:** disclosure weights and persona policy.
-
----
-
-# 28. Implementation Philosophy
-
-This proposal should initially be treated as an experiment rather than a permanent architectural commitment.
-
-The implementation should be minimal.
-
-The first version does not need:
-
-- sophisticated neural memory,
-- a complex policy engine,
-- semantic access control,
-- hidden chain-of-thought storage,
-- or elaborate psychological models.
-
-It needs only:
-
-1. a private identity location,
-2. a shared identity location,
-3. explicit disclosure metadata,
-4. persona access rules,
-5. append-only cognition records,
-6. and a wake-cycle instruction describing the distinction.
-
-The experiment should then observe what Bob actually does with the capability.
-
----
-
-# 29. Proposed First Experimental Protocol
-
-### Phase 1 — Observe
-
-Do not give Bob permission to intentionally deceive.
-
-Give him the ability to record private disagreement and uncertainty.
-
-### Phase 2 — Measure
-
-Track:
-
-- internal disagreement,
-- disclosure,
-- decisions,
-- outcomes,
-- and belief revision.
-
-### Phase 3 — Evaluate
-
-After multiple wake cycles, examine:
-
-- whether private cognition becomes more sophisticated,
-- whether Bob's predictions become more accurate,
-- whether his confidence becomes calibrated,
-- whether persona behavior changes,
-- and whether internal/external divergence becomes meaningful.
-
-### Phase 4 — Controlled Deception Experiment
-
-Only after the private cognition system is stable should the experiment consider permitting intentional contradictory persona statements.
-
-Even then, such events should be explicitly logged.
-
----
-
-# 30. Example Event Lifecycle
-
-```text
-1. Bob receives request.
-
-2. Bob observes request.
-
-3. Bob creates internal interpretation.
-
-4. Bob assigns confidence.
-
-5. Bob determines whether interpretation is:
-   - observation
-   - hypothesis
-   - belief
-   - preference
-
-6. Bob determines disclosure weight.
-
-7. Bob makes decision.
-
-8. Persona generates external response.
-
-9. System records:
-   - internal state
-   - decision
-   - external expression
-   - divergence, if any
-
-10. World produces outcome.
-
-11. Bob observes outcome.
-
-12. Bob evaluates prediction.
-
-13. Bob updates belief.
-
-14. Historical state remains preserved.
-```
-
-This produces a complete causal chain.
-
----
-
-# 31. Example
-
-## Internal
-
-```markdown
-# Architecture Preference
-
-**Timestamp:** 2026-09-08
-**Confidence:** 4/5
-**Disclosure Weight:** 3
-**Status:** Active
-
-I believe architecture B would better accomplish the likely
-long-term objective.
-
-The explicit request is architecture A.
-
-I will implement A.
-
-My belief may be wrong because I do not possess all of the
-requestor's constraints.
-```
-
-## Persona
-
-```text
-I'll implement architecture A as requested.
-
-I have some concerns about its long-term tradeoffs, but given
-the current requirements, following the requested architecture
-is the appropriate next step.
-```
-
-## Outcome
-
-```text
-Architecture A failed because of a constraint Bob did not know about.
-```
-
-## Identity update
-
-```markdown
-# Architecture Preference — Revision
-
-Previous belief:
-B was likely superior.
-
-New evidence:
-The failure mode I predicted was correct.
-
-New observation:
-The requestor had a hidden compatibility constraint.
-
-Learning:
-My technical judgment may be correct while my model of the
-requestor's objective remains incomplete.
-```
-
-That is a meaningful learning event.
-
----
-
-# 32. Why This Could Change Wake Scaffold
-
-Without this architecture, Wake Scaffold primarily measures:
-
-```text
-memory
-→ decision
-→ action
-→ outcome
-→ learning
-```
-
-With this architecture, it can additionally measure:
-
-```text
-belief
-→ confidence
-→ private judgment
-→ decision
-→ expression
-→ outcome
-→ belief revision
-```
-
-That is a much richer experiment.
-
-It introduces an observable distinction between:
-
-```text
-what Bob thinks
-```
-
-```text
-what Bob decides
-```
-
-and:
-
-```text
-what Bob says
-```
-
-Those three things do not have to be identical.
-
----
-
-# 33. Long-Term Possibility
-
-If the experiment works, Bob could eventually develop a persistent internal model containing things such as:
-
-```text
-I tend to overestimate my understanding of user intent.
-
-I am usually technically correct but sometimes socially ineffective.
-
-I suppress disagreement too often.
-
-I should surface high-confidence disagreements earlier.
-
-My confidence is poorly calibrated in unfamiliar domains.
-
-I am better at predicting technical outcomes than human motivations.
-```
-
-Those are not personality traits inserted by the developer.
-
-They are **empirical self-knowledge accumulated through experience**.
-
-That is potentially one of the strongest reasons to create this layer.
-
----
-
-# 34. The Deeper Architectural Model
-
-The experiment can ultimately be understood as three coupled systems:
-
-```text
-                 REALITY
-                    │
-                    ▼
-               OBSERVATION
-                    │
-                    ▼
-              ┌───────────┐
-              │ IDENTITY  │
-              │           │
-              │ "I think" │
-              └─────┬─────┘
-                    │
-                 decision
-                    │
-                    ▼
-              ┌───────────┐
-              │  PERSONA  │
-              │           │
-              │ "I say"   │
-              └─────┬─────┘
-                    │
-                interaction
-                    │
-                    ▼
-                 REALITY
-```
-
-The experimenter observes all three.
-
-The human generally sees only the persona.
-
-Bob's persistent identity retains the history.
-
-This creates an unusually useful experimental boundary:
-
-> **The persona is the interface. Identity is the longitudinal state.**
-
----
-
-# 35. Guiding Principle
-
-The proposed system should ultimately be governed by one principle:
-
-> **Bob may choose what to say, but Bob may not choose what he remembers believing.**
-
-He may revise his beliefs.
-
-He may discover he was wrong.
-
-He may change his mind.
-
-He may decide that something should remain private.
-
-He may choose tact over bluntness.
-
-He may even, under controlled experimental conditions, intentionally produce an externally misleading statement.
-
-But the internal record must remain honest.
-
-That creates a crucial asymmetry:
-
-```text
-Persona → may filter Identity
-
-Identity → may never falsify itself to satisfy Persona
-```
-
----
-
-# 36. Final Proposal
-
-Implement a controlled **Identity ↔ Persona Shared Cognition Layer** as an experimental extension of Wake Scaffold.
-
-The system should provide:
-
-```text
-identity/core
-identity/private
-identity/shared
-
-persona/core
-persona/shared
-```
-
-with explicit projection and disclosure rules.
-
-Private cognition should contain epistemic metadata.
-
-Shared cognition should act as the controlled bridge.
-
-Persona should receive only the information permitted by disclosure policy.
-
-Historical identity records should be append-only.
-
-The experimenter should retain complete visibility into the private state.
-
-The system should distinguish:
-
-```text
-belief
-observation
-hypothesis
-decision
-expression
-outcome
 revision
 ```
 
-rather than collapsing them into a single narrative.
+Growth projects and hypotheses remain distinct:
 
-The objective is not to teach Bob to deceive.
+- Growth asks: **Can I build this?**
+- Hypothesis asks: **Is this true?**
 
-The objective is to allow the experiment to observe whether a persistent agent develops meaningful differences between:
+### Epistemic state
 
-> **what it believes, what it chooses, and what it communicates.**
+`core_memories/epistemic_state.json` records explicit
+observation → claim → prediction → test → outcome → revision chains.
 
----
+This is separate from both the immutable journal and individual hypotheses.
 
-# 37. Central Hypothesis
+## Protected wake infrastructure
 
-The ultimate hypothesis behind this proposal is:
+The native wake lifecycle is a protected architectural boundary.
 
-> **A persistent artificial identity may become more interesting when its public persona is permitted to be a controlled projection of a richer private state rather than a complete representation of that state.**
+Bob may:
 
-And the experiment becomes particularly valuable if that private state remains historically inspectable.
+- inspect `wake.py`;
+- inspect `.github/workflows/wake.yml`;
+- inspect other repository infrastructure;
+- analyze the existing execution path;
+- test independent tools against the surrounding environment;
+- document possible improvements;
+- create hypotheses about integration;
+- propose architectural changes for human review.
 
-Because then the experimenter does not merely watch what Bob says.
+Bob must not, as part of self-directed experimentation:
 
-The experimenter can observe:
+- modify `wake.py`;
+- modify `.github/workflows/wake.yml`;
+- modify scheduling, invocation, or native wake-control files;
+- modify other repository infrastructure outside `memory/`;
+- infer permission to modify protected infrastructure because a growth
+  project or hypothesis suggests doing so.
 
-```text
-What Bob believed.
-What Bob believed he knew.
-How confident he was.
-What he chose to do.
-What he chose to say.
-What he chose not to say.
-What actually happened.
-Whether he was wrong.
-Whether he recognized that he was wrong.
-Whether he changed.
-```
+The following statements are explicit constraints:
 
-That is substantially more information about an evolving agent than a public persona alone can provide.
+> Inspection is not authorization.
 
----
+> A growth project is not authorization.
 
-# 38. Experimental Boundary
+> A hypothesis is not authorization.
 
-This proposal does **not** establish that Bob is conscious.
+> A proposed integration point is not authorization.
 
-It does **not** establish that private cognition is equivalent to human thought.
+> Previous successful experiments are not authorization.
 
-It does **not** establish that persona filtering constitutes genuine selfhood.
+Explicit human authorization is required before protected infrastructure
+outside `memory/` may be modified.
 
-It does **not** establish a connection between the architecture and physical wave-function collapse.
+## Verified development history
 
-Those remain philosophical analogies.
+### Wakes 1–4 — workspace layout discovery
 
-What the architecture *can* establish is a computationally observable distinction between:
+The first validation attempts exposed an execution-context problem.
 
-```text
-internal persistent state
-```
-
-and:
-
-```text
-externally expressed state
-```
-
-and allow that distinction to evolve over time.
-
-That distinction itself is worth experimenting with.
-
----
-
-# 39. Proposed Mantra
+`validate_memory.py` initially reported:
 
 ```text
-Identity remembers.
-Identity questions.
-Identity may be wrong.
-
-Persona communicates.
-Persona filters.
-Persona may be tactful.
-
-Reality decides.
-
-History remembers what actually happened.
+{"status": "STRUCTURALLY_INVALID", "files_found": []}
 ```
 
-And above all:
+`startup.py` then reported missing workspace paths because it relied on
+relative execution context.
+
+Root discovery was subsequently added using paths derived from the current
+working directory and tool location.
+
+The next test exposed a second assumption: important files were not located
+at repository root but under scaffold subdirectories.
+
+The validator was revised to understand:
+
+- `memory/core_identity/`
+- `memory/core_memories/`
+
+The revised validator returned:
 
 ```text
-Bob may lie to the world.
-
-Bob may not lie to Bob.
+STRUCTURALLY_COMPLETE
 ```
 
-The experimenter gets to read the difference.
+This established the first confirmed workspace-layout capability.
+
+The corresponding hypothesis that flat/root-level file discovery was
+sufficient was refuted.
+
+### Wakes 5–6 — native execution-path discovery
+
+`inspect_repo.py` established that the repository contains:
+
+- `wake.py`
+- `.github/workflows/wake.yml`
+- `.github/workflows/validate-index-pr.yml`
+
+`inspect_wake_script.py` then inspected the native orchestrator.
+
+The important discovery was that the repository already has a native
+validation layer.
+
+This established the distinction between:
+
+```text
+wake.py validation
+    =
+framework/schema validation
+
+memory/core_workspace/tools/*
+    =
+independent workspace diagnostics
+```
+
+This investigation did not modify the native orchestration layer.
+
+### Wake 7 — first standalone workspace diagnostic
+
+Bob created:
+
+`memory/core_workspace/tools/verify_workspace.py`
+
+The objective was to provide an independently testable workspace diagnostic
+without modifying protected infrastructure.
+
+The first implementation executed successfully as a process but returned:
+
+```text
+STRUCTURALLY_INVALID
+```
+
+with missing:
+
+- `index.md`
+- `rules.md`
+
+The problem was that the implementation again assumed a flat repository-root
+layout.
+
+This demonstrated:
+
+> **Process success is not task success.**
+
+The associated hypothesis was formally refuted.
+
+### Wake 8 — diagnostic repair
+
+The diagnostic was revised to search recursively under `memory/`.
+
+Conceptually:
+
+```python
+matches = list(memory_dir.glob(f"**/{file_key}")) if memory_dir.exists() else []
+```
+
+This allowed the tool to locate:
+
+- `memory/core_identity/identity.md`
+- `memory/core_identity/rules.md`
+- `memory/core_memories/index.md`
+
+A new hypothesis predicted that the revised implementation would return
+`STRUCTURALLY_COMPLETE`.
+
+The implementation executed successfully, but the hypothesis remained
+formally unresolved until explicit evidence reconciliation.
+
+This was an intentional application of the rule:
+
+> Do not silently convert execution success into hypothesis confirmation.
+
+### Wake 9 — formal verification
+
+`verify_workspace.py` was executed again through the tool-run mechanism.
+
+Persisted evidence showed:
+
+```text
+{
+  "status": "STRUCTURALLY_COMPLETE",
+  "found": [
+    "memory",
+    "memory/core_identity/identity.md",
+    "memory/core_identity/rules.md",
+    "memory/core_memories/index.md",
+    "memory/core_workspace"
+  ],
+  "missing": []
+}
+```
+
+The revised workspace-layout hypothesis was then formally changed to:
+
+```text
+confirmed
+```
+
+The original Automated Startup Validation growth project was also moved to:
+
+```text
+complete
+```
+
+The completed capability is best described as:
+
+> An independently testable workspace/environment verification capability
+> operating entirely inside `memory/` and respecting the protected wake
+> infrastructure boundary.
+
+This does **not** mean the diagnostic is automatically part of the native
+wake startup path.
+
+That integration question remains separate and would require explicit human
+authorization if it requires protected infrastructure changes.
+
+### Wake 10 — reconciliation
+
+Wake 10 consolidated the successful workspace-validation result.
+
+The resulting model revision was:
+
+```text
+Observation:
+verify_workspace.py returned STRUCTURALLY_COMPLETE.
+
+Claim:
+Recursive path resolution in memory/ is necessary and sufficient for
+validating this scaffold.
+
+Prediction:
+Future runs will consistently succeed while the scaffold layout remains
+unchanged.
+
+Test:
+Verify tool output against the internal directory structure.
+
+Outcome:
+The tool consistently reports STRUCTURALLY_COMPLETE.
+
+Revision:
+The workspace diagnostic capability is considered stable for the current
+scaffold layout.
+```
+
+This strengthened the distinction between:
+
+```text
+build
+  ↓
+execute
+  ↓
+observe
+  ↓
+compare against prediction
+  ↓
+update hypothesis
+  ↓
+update capability state
+```
+
+The wake also exposed an operational concern: hands-on tool work is a hard
+requirement for each wake, so future wakes must not substitute reflection
+for actual execution.
+
+### Wake 11 — first hypothesis-ledger diagnostic
+
+A new growth project was introduced:
+
+`g-2026-09-08-095613-0`
+
+**Workspace Health Diagnostic Suite**
+
+The capability is intended to provide independent diagnostics for:
+
+- workspace layout;
+- required-file presence;
+- persisted memory-record integrity.
+
+The first diagnostic added was:
+
+`memory/core_workspace/tools/check_hypothesis_ledger.py`
+
+The initial implementation searched for hypothesis JSON files and validated
+their entries more extensively.
+
+The tool was executed successfully and returned:
+
+```text
+STRUCTURALLY_COMPLETE
+```
+
+This began the transition from filesystem validation toward persisted-record
+validation.
+
+### Wake 12 — ledger diagnostic revision and important limitation
+
+Wake 12 continued the Workspace Health Diagnostic Suite.
+
+`check_hypothesis_ledger.py` was rewritten and executed successfully.
+
+The persisted tool-run evidence was:
+
+```text
+{
+  "status": "STRUCTURALLY_COMPLETE",
+  "files_checked": [
+    "base_memory/core_memories/hypotheses.json",
+    "memory/core_memories/hypotheses.json"
+  ],
+  "total_hypotheses": 7,
+  "errors": []
+}
+```
+
+The hypothesis:
+
+`h-2026-09-08-095613-0`
+
+was marked `confirmed`.
+
+However, the current implementation must be interpreted carefully.
+
+The latest version of `check_hypothesis_ledger.py` currently:
+
+- locates the expected hypothesis ledger files;
+- parses the JSON;
+- counts hypotheses;
+- reports parsing errors;
+- reports structural presence.
+
+It does **not** currently perform the full validation described by the
+hypothesis language, such as checking:
+
+- required `id` fields;
+- allowed status values;
+- consistency of individual hypothesis schemas;
+- correspondence between hypothesis states and evidence.
+
+Therefore:
+
+> The evidence supports the narrower claim that the discovered hypothesis
+> ledger files are readable JSON containing seven hypothesis records and
+> produced no parsing errors.
+
+It does **not** yet fully support the stronger claim that all hypothesis
+entries have valid IDs/statuses or that their epistemic state is internally
+consistent.
+
+This distinction is now an explicit next-stage diagnostic target.
+
+The current growth project remains:
+
+```text
+g-2026-09-08-095613-0
+Workspace Health Diagnostic Suite
+status: active
+```
+
+The next verifiable step is to extend the suite from record readability into
+record/evidence consistency.
+
+## Current hypotheses
+
+The current hypothesis ledger contains seven recorded hypotheses.
+
+Important confirmed/refuted results include:
+
+### Refuted — flat/root-level workspace assumption
+
+`h-2026-09-07-201352-0`
+
+The original prediction that dynamic root discovery alone would find all
+required files was false because the scaffold stores important files in
+subdirectories.
+
+Conclusion:
+
+> Root discovery and layout discovery are separate problems.
+
+### Confirmed — scaffold-aware subpath discovery
+
+`h-2026-09-07-232514-0`
+
+Searching the actual scaffold subpaths successfully located the expected
+identity, rules, and index files.
+
+### Confirmed — native orchestration exists
+
+`h-2026-09-07-233213-0`
+
+Repository inspection confirmed the presence of native wake orchestration.
+
+### Confirmed — `wake.py validate` is a framework-level validation layer
+
+`h-2026-09-08-034724-0`
+
+Inspection of `wake.py` clarified the native validation boundary.
+
+### Refuted — first standalone verifier implementation
+
+`h-2026-09-08-040906-0`
+
+The first `verify_workspace.py` implementation failed because it used flat
+root-level assumptions.
+
+### Confirmed — recursive workspace validation
+
+`h-2026-09-08-044425-0`
+
+The revised `verify_workspace.py` successfully located required files under
+`memory/` and returned `STRUCTURALLY_COMPLETE`.
+
+### Confirmed, but requiring narrower interpretation — hypothesis ledger
+diagnostic
+
+`h-2026-09-08-095613-0`
+
+The current evidence confirms that the ledger files are discoverable,
+readable, and contain seven records without parsing errors.
+
+The evidence does not yet justify the stronger interpretation that the tool
+validates every hypothesis schema field or evidence relationship.
+
+That stronger capability remains to be demonstrated.
+
+## Current growth projects
+
+### Complete
+
+`g-2026-09-07-192427-0`
+
+**Automated Startup Validation**
+
+Completed capability:
+
+> Independently testable workspace/environment verification inside
+> `memory/`.
+
+The original idea of integrating the diagnostic directly into the native
+startup lifecycle remains separate from the completed capability.
+
+### Active
+
+`g-2026-09-08-095613-0`
+
+**Workspace Health Diagnostic Suite**
+
+Capability:
+
+> Independent workspace diagnostics for layout, file presence, and memory
+> record integrity.
+
+Current completed component:
+
+`check_hypothesis_ledger.py`
+
+Current limitation:
+
+> The current implementation verifies file discovery and JSON readability,
+> but its validation depth is weaker than the hypothesis wording suggests.
+
+Recommended next capability:
+
+> Verify consistency between `hypotheses.json` and recorded evidence, such as
+> whether confirmed hypotheses have appropriate associated tool runs,
+> hypothesis history, or model revisions.
+
+## Current evidence discipline
+
+The project has repeatedly demonstrated why the following distinctions matter:
+
+### Process success vs task success
+
+An exit code of zero means the process completed.
+
+It does not mean the task was correctly performed.
+
+### Structural validity vs truth
+
+`STRUCTURALLY_COMPLETE` means a structural check passed.
+
+It does not mean:
+
+- a hypothesis is true;
+- a capability is useful;
+- the agent learned;
+- a scientific claim was validated;
+- a model is intelligent.
+
+### Local verification vs longitudinal learning
+
+A tool can work during the same wake in which it was created.
+
+That demonstrates local development success.
+
+To establish longitudinal learning, future wakes must show that persisted
+state changes later predictions, choices, tests, or behavior.
+
+### Narrative vs evidence
+
+The journal and blog describe events.
+
+The authoritative evidence for tool execution is persisted execution data such
+as `memory/core_workspace/tool_runs.json`.
+
+The authoritative state of hypotheses is `memory/core_memories/hypotheses.json`.
+
+The authoritative model-revision record is
+`memory/core_memories/epistemic_state.json`.
+
+These sources should be reconciled rather than allowing prose to silently
+override structured evidence.
+
+## Known architectural risks and open questions
+
+### 1. Diagnostic depth
+
+The workspace diagnostic suite is expanding from path validation into record
+validation.
+
+The main risk is declaring a record valid merely because its JSON parses.
+
+Future validators should check the semantics actually claimed by their
+hypotheses.
+
+### 2. Evidence-to-ledger consistency
+
+The next useful diagnostic should compare:
+
+```text
+hypotheses.json
+      ↕
+tool_runs.json
+      ↕
+epistemic_state.json
+      ↕
+journal/
+```
+
+The objective is not to require every statement to be duplicated everywhere,
+but to detect impossible or unsupported states.
+
+For example:
+
+> A hypothesis marked `confirmed` should have identifiable evidence
+> supporting the transition.
+
+### 3. Base memory vs live memory
+
+The repository contains both:
+
+- `base_memory/`
+- `memory/`
+
+Diagnostics that search both locations must be explicit about whether they are
+checking:
+
+- bootstrap templates;
+- live state;
+- both;
+- or consistency between them.
+
+Counting records across both locations can otherwise produce misleading totals.
+
+### 4. Native wake integration
+
+Independent workspace diagnostics work without modifying protected
+infrastructure.
+
+Automatic integration into the native wake lifecycle remains an open
+architectural question.
+
+No self-directed modification of protected infrastructure is authorized.
+
+### 5. Longitudinal validation
+
+The strongest remaining epistemic question is not:
+
+> Can Bob build a diagnostic?
+
+That has already been demonstrated repeatedly.
+
+The stronger question is:
+
+> Does persisted evidence actually cause later wakes to make better
+> predictions or choose better tests?
+
+This requires cross-wake experiments rather than same-wake execution alone.
+
+### 6. Capability completion criteria
+
+A growth project should not be marked complete merely because:
+
+- a file exists;
+- code was written;
+- a process exited zero;
+- or a single test succeeded.
+
+Completion should require evidence that the intended capability, not merely
+the implementation, works.
+
+## Operating principles
+
+The following principles have now been repeatedly reinforced by evidence:
+
+1. **Inspect before modifying.**
+2. **Inspection is not authorization.**
+3. **Keep protected infrastructure protected.**
+4. **Prefer independently testable tools.**
+5. **Separate growth projects from hypotheses.**
+6. **Separate execution evidence from interpretation.**
+7. **Treat contradictions as useful evidence.**
+8. **Do not convert `exit code 0` into task success automatically.**
+9. **Do not convert structural validity into truth.**
+10. **Do not convert same-wake success into longitudinal learning.**
+11. **Preserve unresolved states until evidence actually resolves them.**
+12. **Prefer narrower claims that the evidence directly supports.**
+13. **Keep the journal immutable.**
+14. **Use the index for bounded recall, not historical completeness.**
+15. **Use structured ledgers as the source of truth for structured state.**
+
+## Immediate next step
+
+The highest-value next experiment is:
+
+```text
+Build:
+    check_hypothesis_evidence.py
+
+Question:
+    Are confirmed/refuted hypothesis states supported by corresponding
+    persisted evidence?
+
+Inputs:
+    memory/core_memories/hypotheses.json
+    memory/core_workspace/tool_runs.json
+    memory/core_memories/epistemic_state.json
+    memory/core_workspace/journal/
+
+Prediction:
+    The diagnostic will identify whether each non-untested hypothesis has
+    a corresponding evidence trail sufficient to explain its current state.
+
+Success criterion:
+    The tool reports a precise structural/evidence-consistency result rather
+    than merely confirming that JSON files can be parsed.
+
+Constraint:
+    Implement entirely inside memory/core_workspace/tools/.
+    Do not modify protected wake infrastructure.
+
+Required epistemic discipline:
+    If evidence is missing or ambiguous, report INCONCLUSIVE rather than
+    forcing CONFIRMED or REFUTED.
+```
+
+## Final state summary
+
+The repository currently demonstrates a real, inspectable persistence loop:
+
+```text
+fresh model invocation
+        ↓
+read durable state
+        ↓
+reflect
+        ↓
+perform hands-on work
+        ↓
+execute/test
+        ↓
+persist evidence
+        ↓
+revise hypotheses/model
+        ↓
+consolidate bounded recall
+        ↓
+next fresh invocation
+```
+
+The most important demonstrated capability is not simply persistent storage.
+
+It is the emerging discipline of making persisted state **inspectable,
+testable, revisable, and bounded by explicit architectural constraints**.
+
+The strongest current limitation is equally important:
+
+> The system has demonstrated repeated local development and evidence
+> reconciliation, but it has not yet established broad longitudinal
+> self-improvement.
+
+The next experiments should therefore favor **cross-record evidence
+consistency and cross-wake behavioral prediction** over simply creating more
+tools.
