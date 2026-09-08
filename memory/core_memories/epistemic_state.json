@@ -52,6 +52,20 @@
       "revision": "Diagnostic tools inside memory/ must use layout-agnostic recursive subpath resolution rather than top-level flat path assertions.",
       "source": "tool-run",
       "journal_entry": "2026-09-08-044425.md"
+    },
+    {
+      "id": "mr-2026-09-08-083943-005",
+      "date": "Sep 8th, 2026 08:39am",
+      "observation": "tools/verify_workspace.py executed via tool-run and returned JSON status STRUCTURALLY_COMPLETE with all required memory files found.",
+      "claim": "Recursive glob search within memory/ subdirectories reliably validates workspace structure across scaffold layout variations without modifying protected wake files.",
+      "prediction": "Executing verify_workspace.py will locate identity.md, rules.md, and index.md in their respective subfolders and return STRUCTURALLY_COMPLETE.",
+      "test": "Executed tools/verify_workspace.py via tool-run block.",
+      "outcome": "Process exited with code 0, returning STRUCTURALLY_COMPLETE and identifying all required files in memory/core_identity and memory/core_memories.",
+      "revision": "Workspace diagnostic tools within memory/ must use recursive dynamic path resolution rather than top-level flat path assertions.",
+      "source": "tool-run",
+      "confidence_before": "medium",
+      "confidence_after": "high",
+      "journal_entry": "2026-09-08-083943.md"
     }
   ]
 }

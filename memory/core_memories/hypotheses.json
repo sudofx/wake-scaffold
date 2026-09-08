@@ -123,13 +123,19 @@
       "test_method": "Execute tools/verify_workspace.py via tool-run block and check output JSON status.",
       "scope": "internal",
       "boundary": "same_wake",
-      "status": "untested",
+      "status": "confirmed",
       "history": [
         {
           "date": "Sep 8th, 2026 04:44am",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 8th, 2026 08:39am",
+          "status": "confirmed",
+          "evidence": "Executed tools/verify_workspace.py via tool-run block; returned JSON status STRUCTURALLY_COMPLETE with zero missing files (found: memory/core_identity/identity.md, memory/core_identity/rules.md, memory/core_memories/index.md, memory/core_workspace).",
+          "conclusion": "Recursive subfolder glob matching under memory/ correctly resolves required scaffold paths across non-flat directory layouts."
         }
       ]
     }
