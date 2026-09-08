@@ -1,4 +1,20 @@
 {
   "_comment": "A small, evidence-oriented backlog of capability projects. Projects are not evidence by themselves; their history must record what was built, tested, or learned.",
-  "projects": []
+  "projects": [
+    {
+      "id": "g-2026-09-08-105852-0",
+      "created": "Sep 8th, 2026 10:58am",
+      "title": "Environment Integrity Verification",
+      "capability": "Ability to confirm memory files exist and are accessible",
+      "next_step": "Automate verification run at wake startup",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 8th, 2026 10:58am",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        }
+      ]
+    }
+  ]
 }
