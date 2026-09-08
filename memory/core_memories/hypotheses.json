@@ -8,10 +8,33 @@
       "test_method": "Execute tools/startup.py and inspect stdout status field.",
       "scope": "internal",
       "boundary": "same_wake",
-      "status": "untested",
+      "status": "refuted",
       "history": [
         {
           "date": "Sep 7th, 2026 08:13pm",
+          "status": "untested",
+          "evidence": "",
+          "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 7th, 2026 11:25pm",
+          "status": "refuted",
+          "evidence": "Wake 3 execution stdout returned STRUCTURALLY_INVALID with missing: ['index.md', 'rules.md', 'identity.md'] because files exist in memory subdirectories rather than repo root.",
+          "conclusion": "Root discovery succeeded, but flat file assumptions failed."
+        }
+      ]
+    },
+    {
+      "id": "h-2026-09-07-232514-0",
+      "created": "Sep 7th, 2026 11:25pm",
+      "prediction": "startup.py searching scaffold subpaths (memory/core_identity/, memory/core_memories/) will find all required files and return STRUCTURALLY_COMPLETE.",
+      "test_method": "Execute tools/startup.py and inspect stdout status field.",
+      "scope": "internal",
+      "boundary": "same_wake",
+      "status": "untested",
+      "history": [
+        {
+          "date": "Sep 7th, 2026 11:25pm",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"

@@ -1,57 +1,71 @@
-import json
 import os
+import sys
+import json
 from pathlib import Path
 
 def find_workspace_root():
-    cwd = Path.cwd().resolve()
-    file_path = Path(__file__).resolve()
-    
-    candidates = [cwd, file_path.parent, file_path.parent.parent]
-    
-    for candidate in candidates:
-        if (candidate / "memory").exists() or (candidate / "index.md").exists():
-            return candidate, cwd, file_path
-            
-    for start in [cwd, file_path.parent]:
+    candidates = [Path.cwd(), Path(__file__).resolve().parent]
+    for start in candidates:
         curr = start
         while curr != curr.parent:
-            if (curr / "memory").exists() or (curr / "index.md").exists():
-                return curr, cwd, file_path
+            if (curr / "memory").is_dir():
+                return curr
             curr = curr.parent
+    return Path.cwd()
 
-    return None, cwd, file_path
-
-def main():
-    root, cwd, file_path = find_workspace_root()
+def validate():
+    root = find_workspace_root()
+    checks = {
+        "memory": root / "memory",
+        "core_workspace": root / "memory" / "core_workspace",
+        "identity.md": [
+            root / "memory" / "core_identity" / "identity.md",
+            root / "memory" / "identity.md",
+            root / "identity.md"
+        ],
+        "rules.md": [
+            root / "memory" / "core_identity" / "rules.md",
+            root / "memory" / "rules.md",
+            root / "rules.md"
+        ],
+        "index.md": [
+            root / "memory" / "core_memories" / "index.md",
+            root / "memory" / "index.md",
+            root / "index.md"
+        ]
+    }
     
-    if root is None:
-        print(json.dumps({
-            "status": "STRUCTURALLY_INVALID",
-            "cwd": str(cwd),
-            "file_path": str(file_path),
-            "error": "Workspace root not found"
-        }))
-        return
-
-    required = ["memory", "index.md", "rules.md", "identity.md"]
     found = []
     missing = []
     
-    for item in required:
-        if (root / item).exists():
-            found.append(item)
+    for name, path_item in checks.items():
+        if isinstance(path_item, list):
+            if any(p.exists() for p in path_item):
+                found.append(name)
+            else:
+                missing.append(name)
         else:
-            missing.append(item)
-            
-    status = "STRUCTURALLY_COMPLETE" if not missing else "STRUCTURALLY_INVALID"
-    
-    print(json.dumps({
-        "status": status,
-        "root": str(root),
-        "cwd": str(cwd),
-        "found": found,
-        "missing": missing
-    }))
+            if path_item.exists():
+                found.append(name)
+            else:
+                missing.append(name)
+                
+    if not missing:
+        result = {
+            "status": "STRUCTURALLY_COMPLETE",
+            "root": str(root),
+            "found": found
+        }
+    else:
+        result = {
+            "status": "STRUCTURALLY_INVALID",
+            "root": str(root),
+            "cwd": str(Path.cwd()),
+            "found": found,
+            "missing": missing
+        }
+        
+    print(json.dumps(result))
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    validate()

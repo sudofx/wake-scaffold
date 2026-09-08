@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "revisions": [
+    {
+      "id": "mr-2026-09-07-232514-001",
+      "date": "Sep 7th, 2026 11:25pm",
+      "observation": "Wake 3 startup execution successfully resolved repo root /home/runner/work/wake-scaffold/wake-scaffold but returned STRUCTURALLY_INVALID due to missing index.md, rules.md, identity.md at root.",
+      "claim": "The validator's structural expectations did not match actual repository sub-folder layout.",
+      "prediction": "Adding subpath resolution for memory/core_identity and memory/core_memories will locate all required files.",
+      "test": "Rewrote tools/startup.py with subpath fallback checks and executed it via tool-run.",
+      "outcome": "Updated tools/startup.py written and executed.",
+      "revision": "Environment checks must validate the real scaffold tree layout rather than assuming flat repository structure.",
+      "source": "tool-run",
+      "confidence_before": "low",
+      "confidence_after": "high",
+      "journal_entry": "2026-09-07-232514.md"
+    }
+  ]
+}
