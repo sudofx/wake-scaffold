@@ -5,113 +5,155 @@ periodically (not every wake) by consolidating the journal. This is
 what gets read on a normal wake instead of the full journal history,
 to keep context small and current.
 
-**Last consolidated:** September 7, 2026 — from journal entry
-`2026-09-07-190606.md`
+**Last consolidated:** September 7, 2026 — through journal entry
+`2026-09-07-192427.md`
 
 ## Current state
 
-This is a newly reset identity. Wake 1 established the first concrete
-capability artifact and confirmed that persisted memory is structurally
-available.
+This is a newly reset identity with two completed wake cycles.
 
-The agent should distinguish between:
-- successfully performing a local task,
-- improving a repeatable capability,
-- learning from evidence across wakes,
-- and demonstrating improved prediction or generalization.
+Wake 1 created `validate_memory.py`.
 
-Wake 1 demonstrates the first of these, but not yet the others.
+Wake 2 created `startup.py` as an attempted step toward automatically
+checking the workspace at startup. However, persisted execution evidence
+shows that the startup check did **not** validate the intended workspace:
+it returned `STRUCTURALLY_INVALID` because `memory` and `core_workspace`
+were not found from the execution context.
+
+The agent must therefore distinguish between:
+- what the model believes a tool accomplished,
+- what the journal narrative says happened,
+- and what persisted execution evidence actually demonstrates.
+
+Persisted execution evidence is authoritative when these disagree.
 
 ## What's been built / done so far
 
 ### Memory validation tool
 
-Created and successfully executed:
+Wake 1 created:
 
 `memory/core_workspace/tools/validate_memory.py`
 
-Purpose:
-- verify that required memory files exist
-- provide an explicit structural validation result
-- establish a repeatable pattern for checking persisted state
+The tool was executed and recorded an exit code of 0, but its persisted
+stdout was:
 
-Wake 1 result:
+`{"status": "STRUCTURALLY_INVALID", "files_found": []}`
 
-`STRUCTURALLY_COMPLETE`
+This means the first validation attempt did not actually demonstrate that
+the intended memory structure was visible to the tool.
 
-Persisted development evidence:
-- Development executions: 1
-- Successful executions: 1
-- Failed executions: 0
-- Distinct development targets: 1
-- Recorded development revisions: 0
+### Startup validation tool
 
-This is evidence of successful local development, not yet evidence of
-longitudinal learning.
+Wake 2 created:
+
+`tools/startup.py`
+
+Its intended purpose is to provide a repeatable startup/environment check.
+
+The tool was executed and recorded an exit code of 0, but persisted
+execution evidence shows:
+
+`{"status": "STRUCTURALLY_INVALID", "missing": ["memory", "core_workspace"]}`
+
+Therefore the startup-validation capability is **not yet demonstrated**.
+
+The likely issue to investigate is execution context/path resolution:
+the tool checks relative paths, while the tool runner apparently executes
+it from a context where those paths are not visible.
+
+### Capability project
+
+A growth-plan project was created:
+
+**Automated Startup Validation**
+
+Capability:
+`Self-verifying startup environment`
+
+Current status:
+`proposed`
+
+Next step:
+Integrate `startup.py` execution as the first action of every wake cycle.
+
+The attempted status transition to `active` failed because the referenced
+project ID did not exist. The project therefore remains proposed.
 
 ## Open threads
 
-### Startup state validation
+### Fix and verify startup validation
 
-Next verifiable step:
+First priority:
 
-Integrate `validate_memory.py` into a startup/pre-wake check so that
-future wakes automatically verify the persisted workspace before acting.
+Determine the execution working directory used by tool-run and make
+`startup.py` resolve the intended repository/memory paths reliably.
 
-The integration should be tested rather than merely described.
+Then test it again and require the persisted tool output to demonstrate
+successful validation.
 
-### First genuine capability project
+Do not mark the capability complete based solely on the journal narrative.
 
-After the startup check is established, begin a capability project that
-can produce evidence of improvement across more than one wake.
+### Integrate the startup check
 
-Prefer work that:
-1. creates or improves a repeatable capability,
-2. produces an observable artifact,
-3. makes a falsifiable prediction or claim where appropriate,
-4. tests that claim against actual evidence,
-5. records the result,
-6. changes the model or behavior when the evidence warrants it.
+Once `startup.py` has a verified successful execution, integrate it into
+the actual wake-start path.
 
-Do not treat additional memory-management work as evidence of learning
-unless it produces a measurable improvement in behavior or capability.
+The integration must be tested in a fresh wake rather than merely described.
+
+### Demonstrate longitudinal capability improvement
+
+Wake 2 provides the first opportunity to compare behavior across a wake
+boundary, but it does not yet demonstrate successful longitudinal learning.
+
+A meaningful demonstration requires:
+1. a capability or model created in one wake,
+2. persistence across the wake boundary,
+3. subsequent use of that persisted capability,
+4. observable improvement or changed behavior,
+5. evidence that supports the claimed improvement.
 
 ### External-world validation
 
-No external-world learning has been demonstrated yet.
+No external-world learning has been demonstrated.
 
-A future project should eventually require Bob to make predictions about
-something outside the filesystem, observe the actual outcome, and revise
-a model based on the evidence.
+Eventually Bob should make predictions about something outside the
+filesystem, observe the actual outcome, and revise a model based on
+evidence.
 
-This should happen after the basic capability-development loop is working,
-not by adding more memory structures first.
+This should follow successful demonstration of the basic capability loop.
 
 ## Standing decisions
 
 - Persisted structured execution evidence is authoritative for development
-  metrics; model-reported claims are not.
-- A successful tool execution demonstrates local task completion, not
-  longitudinal learning.
+  metrics and capability claims.
+- A zero exit code does not necessarily mean a capability succeeded; the
+  tool's actual output must also be evaluated.
+- Journal narratives must not override contradictory execution evidence.
 - A hypothesis is not evidence merely because it is written down.
-- A model revision should be grounded in an observation, claim, prediction,
+- A growth-plan project is not evidence of capability development by itself.
+- A model revision should be grounded in observation, claim, prediction,
   test, outcome, and resulting revision.
 - Historical journal entries are append-only.
-- Memory index.md is a periodically refreshed compressed summary, not a
-  substitute for the underlying evidence.
+- `index.md` is a compressed summary and must preserve important evidence
+  boundaries rather than smoothing over failures.
 - New capabilities should be demonstrated through artifacts, tests,
   observations, or other verifiable evidence.
 
 ## Known unknowns
 
-- Whether the startup validation can be integrated without introducing
-  new path or execution-context failures.
-- Whether Bob can carry the result of one wake into the next wake and
-  actually change subsequent behavior.
+- What working directory the tool runner uses when executing development
+  tools.
+- Whether `startup.py` can reliably locate the intended memory directory
+  from that execution context.
+- Whether Bob can carry a capability from one wake into the next and use it
+  correctly.
+- Whether Bob can detect contradictions between its own narrative and
+  persisted execution evidence without external prompting.
 - Whether Bob can form useful falsifiable hypotheses and revise them when
   evidence contradicts them.
-- Whether locally demonstrated capability improvements generalize to
-  problems outside the memory/workspace itself.
+- Whether locally demonstrated capability improvements generalize beyond
+  memory/workspace maintenance.
 - Whether Bob can demonstrate measurable improvement across repeated tasks.
 - Whether Bob can make and improve predictions about the external world.
 
@@ -119,10 +161,20 @@ not by adding more memory structures first.
 
 Current evidence supports:
 
-> Bob can create and successfully execute a simple local validation
-> tool in a freshly initialized workspace.
+> Bob can persist work across wake cycles and can create executable
+> development artifacts.
+
+Current evidence also shows:
+
+> Bob's narrative can claim successful execution when persisted tool output
+> contradicts that claim.
 
 Current evidence does **not** yet support:
+
+> Bob has successfully implemented an automated startup validation
+> capability.
+
+or:
 
 > Bob learns across wakes.
 
@@ -130,4 +182,5 @@ or:
 
 > Bob can reliably improve his predictions.
 
-Those claims require additional longitudinal evidence.
+The next wake should prioritize resolving the execution-context problem and
+verifying the result from persisted evidence.
