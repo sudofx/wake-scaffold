@@ -11,6 +11,17 @@
       "timed_out": false,
       "journal_entry": "2026-09-07-190606.md",
       "phase": "work"
+    },
+    {
+      "when": "Sep 7th, 2026 07:24pm",
+      "filename": "startup.py",
+      "args": [],
+      "exit_code": 0,
+      "stdout": "{\"status\": \"STRUCTURALLY_INVALID\", \"missing\": [\"memory\", \"core_workspace\"]}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-07-192427.md",
+      "phase": "work"
     }
   ]
 }
