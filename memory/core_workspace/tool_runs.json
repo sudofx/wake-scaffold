@@ -112,6 +112,18 @@
       "timed_out": false,
       "journal_entry": "2026-09-07-180748.md",
       "phase": "work"
+    },
+    {
+      "when": "Sep 7th, 2026 06:20pm",
+      "filename": "audit_state.py",
+      "args": [],
+      "exit_code": 0,
+      "stdout": "{\n  \"workspace_root\": \"/home/runner/work/wake-scaffold/wake-scaffold\",\n  \"status\": \"STRUCTURALLY_INVALID\",\n  \"failures\": [\n    \"Missing core markdown file: memory/core_workspace/index.md\",\n    \"Missing core JSON file: memory/core_workspace/commitments.json\",\n    \"tool_runs.json is not a JSON list\"\n  ],\n  \"audits\": {\n    \"markdown_files\": {\n      \"memory/core_identity/identity.md\": {\n        \"exists\": true,\n        \"size_bytes\": 2245\n      },\n      \"memory/core_identity/rules.md\": {\n        \"exists\": true,\n        \"size_bytes\": 6327\n      },\n      \"memory/core_workspace/index.md\": {\n        \"exists\": false,\n        \"size_bytes\": 0\n      }\n    },\n    \"json_files\": {\n      \"memory/core_workspace/commitments.json\": {\n        \"exists\": false,\n        \"valid_json\": false\n      },\n      \"memory/core_workspace/tool_runs.json\": {\n        \"exists\": true,\n        \"valid_json\": true,\n        \"type\": \"dict\"\n      }\n    }\n  }\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "journal_entry": "2026-09-07-182023.md",
+      "phase": "work",
+      "hypothesis_id": "h-2026-09-07-180748-0"
     }
   ]
 }

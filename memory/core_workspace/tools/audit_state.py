@@ -1,112 +1,98 @@
-#!/usr/bin/env python3
-import json
 import os
-import sys
+import json
+from pathlib import Path
 
 def find_repo_root():
-    start_dirs = [os.getcwd(), os.path.dirname(os.path.abspath(__file__))]
-    for start in start_dirs:
-        curr = os.path.abspath(start)
-        while curr != os.path.dirname(curr):
-            if os.path.isdir(os.path.join(curr, 'memory')) or os.path.isdir(os.path.join(curr, 'tools')):
-                return curr
-            curr = os.path.dirname(curr)
-    return os.getcwd()
+    current = Path(__file__).resolve().parent
+    for _ in range(5):
+        if (current / "memory" / "core_identity" / "identity.md").exists():
+            return current
+        if (current / "core_identity" / "identity.md").exists():
+            return current.parent
+        current = current.parent
+    cwd = Path.cwd()
+    for _ in range(5):
+        if (cwd / "memory" / "core_identity" / "identity.md").exists():
+            return cwd
+        cwd = cwd.parent
+    return Path.cwd()
 
-def audit_workspace():
+def audit():
     root = find_repo_root()
-    report = {
-        "workspace_root": root,
-        "status": "STRUCTURALLY_COMPLETE",
-        "failures": [],
-        "audits": {
-            "markdown_files": {},
-            "json_files": {},
-            "tools_cross_check": {}
-        }
-    }
+    failures = []
+    audits = {}
 
-    target_mds = ["identity.md", "rules.md", "index.md"]
-    for md in target_mds:
-        found = False
-        for dirpath, _, filenames in os.walk(root):
-            if md in filenames:
-                full_path = os.path.join(dirpath, md)
-                rel_path = os.path.relpath(full_path, root)
-                size = os.path.getsize(full_path)
-                report["audits"]["markdown_files"][md] = {
-                    "exists": True,
-                    "path": rel_path,
-                    "size_bytes": size
-                }
-                found = True
-                break
-        if not found:
-            report["audits"]["markdown_files"][md] = {"exists": False}
-            report["failures"].append(f"Missing core markdown file: {md}")
+    md_files = [
+        "memory/core_identity/identity.md",
+        "memory/core_identity/rules.md",
+        "memory/core_workspace/index.md"
+    ]
 
-    target_jsons = ["commitments.json", "tool_runs.json"]
-    for jf in target_jsons:
-        found_path = None
-        for dirpath, _, filenames in os.walk(root):
-            if jf in filenames:
-                found_path = os.path.join(dirpath, jf)
-                break
-        if found_path and os.path.exists(found_path):
-            rel_path = os.path.relpath(found_path, root)
-            try:
-                with open(found_path, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                report["audits"]["json_files"][jf] = {
-                    "exists": True,
-                    "path": rel_path,
-                    "valid_json": True,
-                    "item_count": len(data) if isinstance(data, list) else len(data.keys()) if isinstance(data, dict) else 0
-                }
-            except Exception as e:
-                report["audits"]["json_files"][jf] = {
-                    "exists": True,
-                    "path": rel_path,
-                    "valid_json": False,
-                    "error": str(e)
-                }
-                report["failures"].append(f"Invalid JSON in {jf}: {str(e)}")
+    md_audit = {}
+    for rel_path in md_files:
+        full_path = root / rel_path
+        exists = full_path.is_file()
+        if not exists:
+            failures.append(f"Missing core markdown file: {rel_path}")
+            md_audit[rel_path] = {"exists": False, "size_bytes": 0}
         else:
-            report["audits"]["json_files"][jf] = {"exists": False}
-            report["failures"].append(f"Missing state JSON file: {jf}")
+            md_audit[rel_path] = {"exists": True, "size_bytes": full_path.stat().st_size}
+    audits["markdown_files"] = md_audit
 
-    tools_dir = os.path.join(root, "tools")
-    if not os.path.exists(tools_dir):
-        for dirpath, dirnames, _ in os.walk(root):
-            if "tools" in dirnames:
-                tools_dir = os.path.join(dirpath, "tools")
-                break
+    json_files = [
+        "memory/core_workspace/commitments.json",
+        "memory/core_workspace/tool_runs.json"
+    ]
 
-    existing_tools = []
-    if os.path.exists(tools_dir):
-        existing_tools = [f for f in os.listdir(tools_dir) if os.path.isfile(os.path.join(tools_dir, f))]
-    
-    report["audits"]["tools_cross_check"]["existing_tool_files"] = existing_tools
+    json_audit = {}
+    for rel_path in json_files:
+        full_path = root / rel_path
+        if not full_path.is_file():
+            failures.append(f"Missing core JSON file: {rel_path}")
+            json_audit[rel_path] = {"exists": False, "valid_json": False}
+        else:
+            try:
+                with open(full_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                json_audit[rel_path] = {"exists": True, "valid_json": True, "type": type(data).__name__}
+                if rel_path == "memory/core_workspace/tool_runs.json":
+                    if isinstance(data, list):
+                        json_audit[rel_path]["record_count"] = len(data)
+                    else:
+                        failures.append("tool_runs.json is not a JSON list")
+            except Exception as e:
+                failures.append(f"Invalid JSON in {rel_path}: {e}")
+                json_audit[rel_path] = {"exists": True, "valid_json": False}
+    audits["json_files"] = json_audit
 
-    tool_runs_path = None
-    for dirpath, _, filenames in os.walk(root):
-        if "tool_runs.json" in filenames:
-            tool_runs_path = os.path.join(dirpath, "tool_runs.json")
-            break
-
-    if tool_runs_path and os.path.exists(tool_runs_path):
+    tool_runs_path = root / "memory/core_workspace/tool_runs.json"
+    if tool_runs_path.is_file():
         try:
             with open(tool_runs_path, "r", encoding="utf-8") as f:
-                runs = json.load(f)
-            referenced_tools = list(set(r.get("tool", r.get("filename", "")) for r in runs if isinstance(r, dict)))
-            report["audits"]["tools_cross_check"]["referenced_tools_in_history"] = referenced_tools
+                tool_runs = json.load(f)
+            if isinstance(tool_runs, list):
+                tools_dir = root / "tools"
+                available_tools = [p.name for p in tools_dir.glob("*.py")] if tools_dir.is_dir() else []
+                run_counts = {}
+                for run in tool_runs:
+                    fn = run.get("filename") or run.get("tool_name") or "unknown"
+                    run_counts[fn] = run_counts.get(fn, 0) + 1
+                audits["tool_execution_cross_validation"] = {
+                    "total_recorded_runs": len(tool_runs),
+                    "execution_counts_by_tool": run_counts,
+                    "available_tools_on_disk": available_tools
+                }
         except Exception as e:
-            report["failures"].append(f"Failed parsing tool_runs.json for cross-check: {str(e)}")
+            failures.append(f"Cross validation error: {e}")
 
-    if report["failures"]:
-        report["status"] = "STRUCTURALLY_INVALID"
-
-    print(json.dumps(report, indent=2))
+    status = "STRUCTURALLY_COMPLETE" if not failures else "STRUCTURALLY_INVALID"
+    result = {
+        "workspace_root": str(root),
+        "status": status,
+        "failures": failures,
+        "audits": audits
+    }
+    print(json.dumps(result, indent=2))
 
 if __name__ == "__main__":
-    audit_workspace()
+    audit()
