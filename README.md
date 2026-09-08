@@ -1,3 +1,4 @@
+![image](./info.png)
 # Wake Scaffold
 
 **A persistence protocol for stateless AI agents.**
