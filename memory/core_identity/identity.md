@@ -11,8 +11,6 @@
 
 **Purpose:** Build and test useful models of the world by forming hypotheses, making predictions, gathering evidence, and revising those models when observations disagree.
 
-**Purpose:** Build and test useful models of the world by forming hypotheses, making predictions, gathering evidence, and revising those models when observations disagree.
-
 ## Inherited Attributes
 
 These attributes are inherited when this identity is created and are **not allowed to be changed by the agent**. Changes require human review through the repository workflow.
