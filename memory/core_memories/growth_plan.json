@@ -25,6 +25,21 @@
           "evidence": "Built and verified tools/verify_workspace.py as an independent, sandboxed workspace diagnostic. Execution via tool-run returned status STRUCTURALLY_COMPLETE across subdirectories."
         }
       ]
+    },
+    {
+      "id": "g-2026-09-08-095613-0",
+      "created": "Sep 8th, 2026 09:56am",
+      "title": "Workspace Health Diagnostic Suite",
+      "capability": "Independent workspace diagnostics for layout, file presence, and memory record integrity",
+      "next_step": "Run check_hypothesis_ledger.py to verify hypothesis record structure.",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 8th, 2026 09:56am",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        }
+      ]
     }
   ]
 }
