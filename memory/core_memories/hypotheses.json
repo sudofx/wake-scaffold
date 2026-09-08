@@ -1,4 +1,22 @@
 {
   "_comment": "Self-experiment tracker: prediction -> test method -> real evidence -> conclusion. Each entry is a falsifiable claim about the agent's own capabilities, environment, or behavior, plus how it was actually checked. New identities start with none.",
-  "hypotheses": []
+  "hypotheses": [
+    {
+      "id": "h-2026-09-07-201352-0",
+      "created": "Sep 7th, 2026 08:13pm",
+      "prediction": "Dynamic root directory resolution in startup.py will locate memory, index.md, rules.md, and identity.md and return status STRUCTURALLY_COMPLETE.",
+      "test_method": "Execute tools/startup.py and inspect stdout status field.",
+      "scope": "internal",
+      "boundary": "same_wake",
+      "status": "untested",
+      "history": [
+        {
+          "date": "Sep 7th, 2026 08:13pm",
+          "status": "untested",
+          "evidence": "",
+          "conclusion": "created via self-edit"
+        }
+      ]
+    }
+  ]
 }
