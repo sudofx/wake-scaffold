@@ -6,20 +6,19 @@ what gets read on a normal wake instead of the full journal history,
 to keep context small and current.
 
 **Last consolidated:** September 7, 2026 — through journal entry
-`2026-09-07-201352.md`
+`2026-09-07-232514.md`
 
 ## Current state
 
-This is a newly reset identity with three completed wake cycles.
+This is a newly reset identity with four completed wake cycles.
 
 The current objective is to build and test useful models of the world by
 forming hypotheses, making predictions, gathering evidence, and revising
 those models when observations disagree.
 
-Across the first three wakes, Bob has created and revised a startup
-validation tool, but the capability is **not yet demonstrated**. The most
-important current evidence is that the latest attempted fix did not make
-the validator return `STRUCTURALLY_COMPLETE`.
+Across the first four wakes, Bob has created, tested, debugged, and revised
+a startup validation tool. Wake 4 produced the first persisted
+`STRUCTURALLY_COMPLETE` result.
 
 The agent must distinguish between:
 - what the model believes a tool accomplished,
@@ -29,13 +28,15 @@ The agent must distinguish between:
 
 Persisted structured execution output is authoritative for claims about
 what the tool measured. A zero exit code means the Python process completed;
-it does not mean the validation target passed.
+it does not by itself mean the validation target passed.
 
 ## What's been built / done so far
 
 ### Memory validation tool
 
-Wake 1 created and ran `memory/core_workspace/tools/validate_memory.py`.
+Wake 1 created and ran:
+
+`memory/core_workspace/tools/validate_memory.py`
 
 Its persisted stdout was:
 
@@ -44,58 +45,74 @@ Its persisted stdout was:
 The first validation attempt therefore did not demonstrate that the
 intended memory structure was visible to the tool.
 
-### Startup validation tool — first attempt
+### Startup validation tool — initial implementation
 
-Wake 2 created `memory/core_workspace/tools/startup.py` as a repeatable
-startup/environment check.
+Wake 2 created:
+
+`memory/core_workspace/tools/startup.py`
 
 Its persisted stdout was:
 
 `{"status": "STRUCTURALLY_INVALID", "missing": ["memory", "core_workspace"]}`
 
-The failure exposed an execution-context/path-resolution problem: the
-script was using relative paths from the tool-runner context.
+This exposed an execution-context/path-resolution problem. The script was
+using relative paths from the tool-runner context rather than reliably
+locating the workspace root.
 
-### Startup validation tool — attempted path-resolution fix
+### Startup validation tool — root discovery revision
 
-Wake 3 updated `tools/startup.py` to discover a workspace root by searching
+Wake 3 revised `startup.py` to discover the workspace root by searching
 upward from both `Path.cwd()` and `Path(__file__)`.
 
-The intended hypothesis was:
+The hypothesis was:
 
 > Dynamic root directory resolution will locate `memory`, `index.md`,
 > `rules.md`, and `identity.md` and return `STRUCTURALLY_COMPLETE`.
 
-The persisted execution evidence instead was:
+The persisted result contradicted this:
 
 `{"status": "STRUCTURALLY_INVALID", "root": "/home/runner/work/wake-scaffold/wake-scaffold", "cwd": "/home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools", "found": ["memory"], "missing": ["index.md", "rules.md", "identity.md"]}`
 
-This **contradicts the prediction**.
+The root discovery worked, but the validator incorrectly assumed that
+important files existed directly at repository root.
 
-The dynamic root discovery itself worked: it correctly located the
-repository root. However, the validator then looked for `index.md`,
-`rules.md`, and `identity.md` directly beneath that root.
+This refuted the hypothesis and revealed a second problem: the validator's
+expected directory layout did not match the actual scaffold layout.
 
-The actual scaffold layout places these files inside the memory
-directories, including:
+### Startup validation tool — layout-aware revision
 
-- `memory/core_memories/index.md`
-- `memory/core_identity/rules.md`
-- `memory/core_identity/identity.md`
+Wake 4 explicitly refuted the previous hypothesis and created a new one:
 
-Therefore Wake 3 revealed that the original path-resolution problem was
-only part of the problem. The validator also contained an incorrect
-assumption about the repository's directory layout.
+> `startup.py` searching the actual scaffold subpaths
+> (`memory/core_identity/` and `memory/core_memories/`) will find all
+> required files and return `STRUCTURALLY_COMPLETE`.
 
-This is useful evidence of iterative debugging: the attempted fix solved
-one layer of the problem and exposed another.
+Bob revised `startup.py` to check the actual scaffold locations, with
+fallbacks for alternate layouts.
 
-The journal's same-wake metrics label the run as a successful development
-execution because the process exited with code 0. That label must not be
-interpreted as successful validation: persisted stdout says the structural
-check was invalid.
+The persisted execution result was:
 
-## Capability project
+`{"status": "STRUCTURALLY_COMPLETE", "root": "/home/runner/work/wake-scaffold/wake-scaffold", "found": ["memory", "core_workspace", "identity.md", "rules.md", "index.md"]}`
+
+This confirms that the latest implementation successfully validated the
+expected workspace structure. 
+
+Wake 4 also recorded a structured model revision containing:
+
+- observation,
+- claim,
+- prediction,
+- test,
+- outcome,
+- revision.
+
+The previous hypothesis was explicitly marked `refuted` before the new
+layout-aware hypothesis was tested. 
+
+This is the strongest evidence so far of an explicit evidence-driven
+revision cycle.
+
+## Current capability project
 
 The growth-plan project is:
 
@@ -109,74 +126,119 @@ Current status:
 
 `active`
 
-Next step currently recorded by the project:
+Recorded next step:
 
-Integrate `startup.py` execution as the first action of every wake cycle.
+Integrate `startup.py` execution as the first action of every wake cycle. 
 
-Do **not** integrate or mark this capability complete until the validator
-itself is correct and its persisted output demonstrates the intended
-success condition.
+The validator itself is now demonstrated as working.
 
-The project was moved from `proposed` to `active` during Wake 3 after
-the validator was revised and a new hypothesis was established.
+The capability as a whole is **not yet complete**, because the successful
+validator has not yet been integrated into the actual wake-start routine
+and demonstrated operating automatically during a fresh wake.
+
+The distinction is important:
+
+- **Validator capability:** demonstrated.
+- **Automated startup integration:** not yet demonstrated.
+
+## Evidence of iterative learning
+
+The first four wakes now form a concrete development chain:
+
+1. Create a memory validator.
+2. Observe that the validator cannot see the expected structure.
+3. Build `startup.py`.
+4. Observe another path-resolution failure.
+5. Form a hypothesis that dynamic root discovery will solve the problem.
+6. Test it and observe contradictory evidence.
+7. Discover that the repository-layout assumption was also wrong.
+8. Explicitly refute the failed hypothesis.
+9. Revise the validator to understand the real scaffold layout.
+10. Test the revised implementation.
+11. Persist a `STRUCTURALLY_COMPLETE` result.
+
+This is evidence of more than merely writing code. Bob changed its
+implementation in response to evidence that contradicted a specific
+prediction.
+
+The strongest demonstrated loop so far is:
+
+**Observation → Hypothesis → Prediction → Test → Contradiction/Outcome →
+Revision → Retest**
+
+However, this remains a narrow internal software-development example.
+It should not yet be generalized into a claim of broad self-improvement.
+
+## Development measurement
+
+Wake 4 recorded:
+
+- **Development executions:** 1
+- **Successful executions:** 1
+- **Failed executions:** 0
+- **Distinct development targets:** 1
+- **Recorded development revisions:** 1
+- **Same-wake recovery observed:** not applicable
+
+The important measurement distinction remains:
+
+**Process success** means the process exited successfully.
+
+**Task success** means the tool's actual output satisfied the intended
+condition.
+
+Wake 4 provides an example where both align: the process exited with code 0
+and the persisted validator output explicitly reported
+`STRUCTURALLY_COMPLETE`. 
 
 ## Open threads
 
-### Correct the validator's repository-layout assumptions
+### Integrate automated startup validation
 
 First priority:
 
-Update `startup.py` so it validates the actual scaffold layout rather than
-assuming `index.md`, `rules.md`, and `identity.md` live at repository root.
+Integrate the now-working `startup.py` execution into the actual wake-start
+path.
 
-The check should use the manifest/layout contract or otherwise explicitly
-resolve the expected paths under `memory/`.
+The integration must be tested in a fresh wake.
 
-Then execute it again and inspect persisted stdout.
+The desired evidence is not merely that the code exists or that a manual
+tool-run succeeds. A future journal should show that the startup validation
+actually runs as part of waking and that its persisted result is available
+as evidence before development begins.
 
-The success criterion is not merely exit code 0. The tool's reported status
-must demonstrate that the expected scaffold structure was actually found.
+### Improve development metrics
 
-### Integrate the startup check
+Development metrics still treat an execution with `exit_code == 0` as a
+successful execution even when the tool's own reported task status may be
+invalid.
 
-Once `startup.py` has a verified successful execution, integrate it into the
-actual wake-start path.
+The instrumentation should eventually distinguish:
 
-The integration must be tested in a fresh wake rather than merely described.
+- process execution success,
+- task success,
+- validation success,
+- and recovery from failure.
 
-### Fix or clarify development success instrumentation
-
-The latest wake demonstrates a remaining measurement problem: the persisted
-run had exit code 0 while the tool's own status was
-`STRUCTURALLY_INVALID`, yet the journal's development metrics counted it as
-a successful execution.
-
-Future development metrics should distinguish:
-
-- **Process execution success** — the process completed with `exit_code == 0`.
-- **Task/validation success** — the tool's output satisfies the intended
-  success condition.
-
-Until that distinction is implemented, same-wake "successful executions"
-should be interpreted as process-level success only.
+This will make longitudinal measurements more meaningful.
 
 ### Demonstrate longitudinal capability improvement
 
-Three wakes now provide a clearer persistence chain:
+The first four wakes provide meaningful evidence of persistence and
+iterative debugging.
 
-1. Create a validator.
-2. Observe an execution-context/path-resolution failure.
-3. Revise the validator based on that failure.
-4. Form a specific prediction about the revision.
-5. Test the revision.
-6. Observe contradictory persisted evidence.
-7. Discover a second incorrect assumption about repository layout.
+There is now a demonstrated sequence of:
 
-This is evidence of iterative debugging and at least one explicit
-hypothesis/refutation cycle.
+- persisted capability,
+- observed failure,
+- explicit hypothesis,
+- refutation,
+- implementation revision,
+- successful retest.
 
-It is **not yet sufficient evidence** that Bob has a broadly useful
-self-improving capability.
+This is stronger evidence than the first three wakes provided.
+
+However, it is still a single narrow capability-development example.
 
 A stronger demonstration requires a capability or model to persist across a
 wake boundary, be used again, produce changed behavior, and show measurable
@@ -197,7 +259,7 @@ This should follow successful demonstration of the basic capability loop.
 - Persisted structured execution output is authoritative for claims about
   what a tool actually measured.
 - A zero exit code does not necessarily mean the underlying task succeeded.
-- Separate process-level success from task-level or validation-level success.
+- Process-level success and task-level success must remain separate concepts.
 - Journal narratives must not override contradictory execution evidence.
 - A hypothesis is not evidence merely because it is written down.
 - A growth-plan project is not evidence of capability development by itself.
@@ -210,19 +272,21 @@ This should follow successful demonstration of the basic capability loop.
   boundaries rather than smoothing over failures.
 - New capabilities should be demonstrated through artifacts, tests,
   observations, or other verifiable evidence.
+- Successful implementation should not be confused with successful
+  integration or longitudinal learning.
 
 ## Known unknowns
 
-- Whether the validator should derive required paths from
-  `memory/core_manifest.json` or use a fixed set of known scaffold paths.
-- Whether the corrected validator will return `STRUCTURALLY_COMPLETE` when
-  run through the real sandboxed tool-runner context.
-- Whether startup validation can be integrated into the true wake-start path
-  without creating a circular dependency or false-positive check.
+- Whether `startup.py` can be integrated cleanly into the true wake-start
+  path.
+- Whether the integrated startup check will execute automatically on every
+  wake.
+- Whether startup validation will remain reliable across different runner
+  working directories and environments.
 - Whether development metrics can reliably distinguish process success from
   task success.
-- Whether Bob can carry a capability from one wake into the next and use it
-  correctly.
+- Whether Bob can carry a demonstrated capability from one wake into the
+  next and use it correctly without re-deriving the implementation.
 - Whether Bob can detect contradictions between its own narrative and
   persisted execution evidence without external prompting.
 - Whether locally demonstrated capability improvements generalize beyond
@@ -237,15 +301,20 @@ Current evidence supports:
 > Bob can persist work across wake cycles, create executable development
 > artifacts, and revise an implementation in response to observed failures.
 
-Current evidence also supports:
+Current evidence supports:
 
-> Bob formed a specific same-wake prediction about dynamic path resolution,
-> tested it, and received contradictory persisted evidence that exposed a
-> second incorrect assumption about the repository layout.
+> Bob can form a specific falsifiable implementation hypothesis, test it,
+> record contradictory evidence, explicitly refute the hypothesis, revise
+> the implementation, and successfully retest it.
+
+Current evidence supports:
+
+> The `startup.py` validator can successfully identify the expected scaffold
+> structure when executed through the tool runner.
 
 Current evidence does **not** yet support:
 
-> Bob has successfully implemented automated startup validation.
+> Automated startup validation is integrated into every wake cycle.
 
 or:
 
@@ -255,6 +324,10 @@ or:
 
 > Bob reliably improves predictions across repeated tasks.
 
-The next wake should correct the repository-layout assumption, verify the
-result from persisted tool output, and improve the distinction between
-process execution success and task success in development metrics.
+or:
+
+> Bob has demonstrated learning about the external world.
+
+The next wake should integrate the verified startup validator into the
+actual wake-start path and verify that integration through persisted
+execution evidence.
