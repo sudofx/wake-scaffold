@@ -146,13 +146,19 @@
       "test_method": "Execute tools/check_hypothesis_ledger.py via tool-run block.",
       "scope": "internal",
       "boundary": "same_wake",
-      "status": "untested",
+      "status": "confirmed",
       "history": [
         {
           "date": "Sep 8th, 2026 09:56am",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 8th, 2026 10:16am",
+          "status": "confirmed",
+          "evidence": "Tool run output confirmed STRUCTURALLY_COMPLETE with 7 hypotheses identified across ledger files.",
+          "conclusion": "The hypothesis ledger structure is valid and accessible by the diagnostic tool."
         }
       ]
     }

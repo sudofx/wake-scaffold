@@ -94,6 +94,20 @@
       "confidence_before": "medium",
       "confidence_after": "high",
       "journal_entry": "2026-09-08-095613.md"
+    },
+    {
+      "id": "mr-2026-09-08-101641-008",
+      "date": "Sep 8th, 2026 10:16am",
+      "observation": "check_hypothesis_ledger.py executed via tool-run, located hypotheses.json, evaluated recorded hypotheses, and returned STRUCTURALLY_COMPLETE with 0 errors.",
+      "claim": "Automated JSON schema diagnostics can verify data integrity across memory ledger files without relying on native orchestrator modifications.",
+      "prediction": "Running check_hypothesis_ledger.py will locate hypotheses.json and confirm all entry status fields match allowed values.",
+      "test": "Executed tools/check_hypothesis_ledger.py via tool-run block.",
+      "outcome": "Tool returned status STRUCTURALLY_COMPLETE, verifying hypotheses across files without errors.",
+      "revision": "Workspace data diagnostics can be expanded incrementally as modular sandboxed tools within memory/core_workspace/tools/.",
+      "source": "tool-run",
+      "confidence_before": "medium",
+      "confidence_after": "high",
+      "journal_entry": "2026-09-08-101641.md"
     }
   ]
 }
