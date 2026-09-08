@@ -658,7 +658,7 @@ class PromptLoggingTests(WakeTestCase):
 
     def _prompt_files(self):
         d = self.memory / "core_workspace" / "prompts"
-        return list(d.glob("*.json")) if d.exists() else []
+        return list(d.glob("*.md")) if d.exists() else []
 
     def test_direct_call_writes_expected_fields(self):
         wake.log_prompt_exchange(
@@ -667,12 +667,13 @@ class PromptLoggingTests(WakeTestCase):
         )
         files = self._prompt_files()
         self.assertEqual(len(files), 1)
-        record = json.loads(files[0].read_text())
-        self.assertEqual(record["system_prompt"], "sys prompt text")
-        self.assertEqual(record["user_prompt"], "user prompt text")
-        self.assertEqual(record["raw_output"], "model said this")
-        self.assertNotIn("error", record)
-        self.assertEqual(files[0].name, "2026-09-07-000000.json")
+        text = files[0].read_text()
+        self.assertIn("# Prompt Exchange", text)
+        self.assertIn("## System prompt\n\nsys prompt text", text)
+        self.assertIn("## User prompt\n\nuser prompt text", text)
+        self.assertIn("## Raw output\n\nmodel said this", text)
+        self.assertNotIn("## Error", text)
+        self.assertEqual(files[0].name, "2026-09-07-000000.md")
 
     def test_direct_call_records_error_not_raw_output(self):
         wake.log_prompt_exchange(
@@ -681,10 +682,9 @@ class PromptLoggingTests(WakeTestCase):
         )
         files = self._prompt_files()
         self.assertEqual(len(files), 1)
-        record = json.loads(files[0].read_text())
-        self.assertIn("RuntimeError", record["error"])
-        self.assertIn("503 model overloaded", record["error"])
-        self.assertNotIn("raw_output", record)
+        text = files[0].read_text()
+        self.assertIn("## Error\n\nRuntimeError: 503 model overloaded", text)
+        self.assertNotIn("## Raw output", text)
 
     def test_disabled_writes_nothing(self):
         wake.log_prompt_exchange(
@@ -704,10 +704,10 @@ class PromptLoggingTests(WakeTestCase):
         wake._run_wake()
         files = self._prompt_files()
         self.assertEqual(len(files), 1, files)
-        record = json.loads(files[0].read_text())
-        self.assertIn("IDENTITY", record["system_prompt"])
-        self.assertIn("new wake cycle", record["user_prompt"])
-        self.assertIn("mock reflection for testing", record["raw_output"])
+        text = files[0].read_text()
+        self.assertIn("IDENTITY", text)
+        self.assertIn("new wake cycle", text)
+        self.assertIn("mock reflection for testing", text)
         # The logged filename should match the journal entry this same
         # wake actually produced, so the two can be correlated by name.
         journal_files = list((self.memory / "core_workspace" / "journal").glob("*.md"))
@@ -737,10 +737,10 @@ class PromptLoggingTests(WakeTestCase):
 
         files = self._prompt_files()
         self.assertEqual(len(files), 1, files)
-        record = json.loads(files[0].read_text())
-        self.assertIn("simulated provider failure", record["error"])
-        self.assertNotIn("raw_output", record)
-        self.assertIn("IDENTITY", record["system_prompt"])
+        text = files[0].read_text()
+        self.assertIn("## Error\n\nRuntimeError: simulated provider failure", text)
+        self.assertNotIn("## Raw output", text)
+        self.assertIn("IDENTITY", text)
 
 
 class HypothesesTests(WakeTestCase):
@@ -914,12 +914,12 @@ class SameWakeDevelopmentTests(WakeTestCase):
             {}, "2026-08-31-090000.md", "system 2", "user 2", raw_output="out 2",
             exchange_label="development-2",
         )
-        first = wake.PROMPTS_DIR / "2026-08-31-090000-development-1.json"
-        second = wake.PROMPTS_DIR / "2026-08-31-090000-development-2.json"
+        first = wake.PROMPTS_DIR / "2026-08-31-090000-development-1.md"
+        second = wake.PROMPTS_DIR / "2026-08-31-090000-development-2.md"
         self.assertTrue(first.is_file())
         self.assertTrue(second.is_file())
-        self.assertEqual(json.loads(first.read_text())["raw_output"], "out 1")
-        self.assertEqual(json.loads(second.read_text())["raw_output"], "out 2")
+        self.assertIn("## Raw output\n\nout 1", first.read_text())
+        self.assertIn("## Raw output\n\nout 2", second.read_text())
 
 
 class ToolRunSandboxTests(WakeTestCase):

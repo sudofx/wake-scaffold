@@ -3307,7 +3307,7 @@ def log_prompt_exchange(
     """
     Record the exact system/user prompt sent to the provider this wake,
     plus its raw response (or the error, if the call failed), to
-    core_workspace/prompts/<journal_fname-stem>.json.
+    core_workspace/prompts/<journal_fname-stem>.md.
 
     The journal records what a wake decided to do; nothing else records
     what it actually received beforehand. That gap matters for anything
@@ -3341,8 +3341,25 @@ def log_prompt_exchange(
         record["error"] = f"{type(error).__name__}: {error}"
     try:
         suffix = f"-{exchange_label}" if exchange_label else ""
-        out_path = PROMPTS_DIR / f"{Path(filename).stem}{suffix}.json"
-        atomic_write_text(out_path, json.dumps(record, indent=2) + "\n")
+        out_path = PROMPTS_DIR / f"{Path(filename).stem}{suffix}.md"
+        lines = [
+            "# Prompt Exchange",
+            "",
+            f"- **Journal filename:** `{record['journal_filename']}`",
+            "",
+            "## System prompt",
+            "",
+            record["system_prompt"],
+            "",
+            "## User prompt",
+            "",
+            record["user_prompt"],
+        ]
+        if "raw_output" in record:
+            lines.extend(["", "## Raw output", "", record["raw_output"]])
+        if "error" in record:
+            lines.extend(["", "## Error", "", record["error"]])
+        atomic_write_text(out_path, "\n".join(lines).rstrip() + "\n")
     except Exception as e:
         print(f"WARNING: failed to write prompt log: {type(e).__name__}: {e}", file=sys.stderr)
 

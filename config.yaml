@@ -41,7 +41,7 @@ enable_pull_requests: true
 
 # Whether to write the exact system/user prompt sent to the model each
 # wake, and its raw response (or the error, if the call failed), to
-# memory/core_workspace/prompts/<wake-timestamp>.json. The journal only
+# memory/core_workspace/prompts/<wake-timestamp>.md. The journal only
 # records what a wake decided to do; this is the only record of what it
 # actually received first — the one way to confirm, rather than assume,
 # that a conditional prompt section (e.g. the memory consolidation

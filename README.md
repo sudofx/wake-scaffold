@@ -138,6 +138,7 @@ memory/
 ├── core_workspace/
 │   ├── journal/
 │   ├── tools/
+│   ├── prompts/               # exact prompt exchanges, one Markdown file per wake
 │   └── tool_runs.json
 │
 ├── core_synthesis/
@@ -165,6 +166,8 @@ Rules are not ordinary memories. They are intended to remain stable and human-co
 ### Commitments
 
 `commitments.json` is a durable ledger of promises.
+
+Prompt exchanges are stored as human-readable Markdown under `memory/core_workspace/prompts/` (and the same path in `base_memory/` for newly bootstrapped identities).
 
 A commitment can be created and advanced, but cannot simply disappear because a later wake no longer wants to deal with it.
 
