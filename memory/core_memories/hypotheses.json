@@ -8,13 +8,19 @@
       "test_method": "Execute inspect_env.py via tool-run to print CWD and check parent directory tree for identity.md, rules.md, and index.md.",
       "scope": "internal",
       "boundary": "same_wake",
-      "status": "untested",
+      "status": "confirmed",
       "history": [
         {
           "date": "Sep 8th, 2026 07:39pm",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 8th, 2026 07:45pm",
+          "status": "confirmed",
+          "evidence": "inspect_env.py tool run stdout showed CWD as memory/core_workspace/tools and located identity.md at parent directory depth 2 (/Users/rjohnson/Developer/wake-scaffold/memory/identity.md).",
+          "conclusion": "Sandboxed tools execute in memory/core_workspace/tools, making core memory files accessible via parent directory traversal."
         }
       ]
     }
