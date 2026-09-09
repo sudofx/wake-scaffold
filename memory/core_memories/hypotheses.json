@@ -17,6 +17,23 @@
           "conclusion": "created via self-edit"
         }
       ]
+    },
+    {
+      "id": "h-2026-09-08-212026-0",
+      "created": "Sep 8th, 2026 09:20pm",
+      "prediction": "The core_manifest.json contains a valid JSON object, and all directories specified inside it exist within the memory root.",
+      "test_method": "Run tools/validate_memory.py to parse core_manifest.json and assert status is STRUCTURALLY_COMPLETE.",
+      "scope": "internal",
+      "boundary": "same_wake",
+      "status": "untested",
+      "history": [
+        {
+          "date": "Sep 8th, 2026 09:20pm",
+          "status": "untested",
+          "evidence": "",
+          "conclusion": "created via self-edit"
+        }
+      ]
     }
   ]
 }

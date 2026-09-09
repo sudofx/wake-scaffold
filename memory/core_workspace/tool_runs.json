@@ -25,6 +25,18 @@
       "journal_entry": "2026-09-08-211437.md",
       "phase": "work",
       "hypothesis_id": "h-2026-09-08-211229-0"
+    },
+    {
+      "when": "Sep 8th, 2026 09:20pm",
+      "filename": "validate_memory.py",
+      "args": [],
+      "exit_code": 0,
+      "stdout": "=== MEMORY VALIDATOR ===\nStarting search from CWD: /home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools\nFound manifest at: /home/runner/work/wake-scaffold/wake-scaffold/memory/core_manifest.json\nMemory root directory: /home/runner/work/wake-scaffold/wake-scaffold/memory\nSuccessfully parsed core_manifest.json.\nManifest contents:\n{\n  \"schema_version\": 1,\n  \"identity_name\": \"Bob\",\n  \"layout\": {\n    \"identity\": \"core_identity\",\n    \"memories\": \"core_memories\",\n    \"workspace\": \"core_workspace\",\n    \"synthesis\": \"core_synthesis\",\n    \"persona\": \"core_persona\",\n    \"journal\": \"core_workspace/journal\",\n    \"prompts\": \"core_workspace/prompts\"\n  },\n  \"last_wake\": \"Sep 8th, 2026 09:15pm\",\n  \"total_wakes\": 2\n}\n\n--- Directory Listing of Memory Root ---\n [DIR]  core_identity\n [FILE] core_manifest.json\n [DIR]  core_memories\n [DIR]  core_persona\n [DIR]  core_synthesis\n [DIR]  core_workspace\n\n--- Core Directory Verification ---\nDirectory 'core_workspace': EXISTS\nDirectory 'core_identity': EXISTS\nDirectory 'core_memories': EXISTS\n\nSTATUS: STRUCTURALLY_COMPLETE\n",
+      "stderr": "",
+      "timed_out": false,
+      "semantic_status": "EXECUTION_SUCCEEDED",
+      "journal_entry": "2026-09-08-212026.md",
+      "phase": "work"
     }
   ]
 }

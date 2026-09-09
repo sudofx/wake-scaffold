@@ -15,6 +15,21 @@
           "evidence": "created via self-edit"
         }
       ]
+    },
+    {
+      "id": "g-2026-09-08-212026-0",
+      "created": "Sep 8th, 2026 09:20pm",
+      "title": "Memory Validation Tool",
+      "capability": "Mechanically verify the consistency and presence of critical memory directories and the manifest file.",
+      "next_step": "Implement deeper validation checks (e.g., verifying index file entries or manifest key-value mappings).",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 8th, 2026 09:20pm",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        }
+      ]
     }
   ]
 }

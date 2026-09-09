@@ -14,6 +14,20 @@
       "confidence_before": "medium",
       "confidence_after": "high",
       "journal_entry": "2026-09-08-211437.md"
+    },
+    {
+      "id": "mr-2026-09-08-212026-002",
+      "date": "Sep 8th, 2026 09:20pm",
+      "observation": "validate_memory.py located and parsed core_manifest.json and verified that the directories 'core_workspace', 'core_identity', and 'core_memories' exist under the memory root.",
+      "claim": "The agent's workspace directory matches the core layout declared in the manifest.",
+      "prediction": "validate_memory.py will report a status of STRUCTURALLY_COMPLETE.",
+      "test": "Executed tools/validate_memory.py.",
+      "outcome": "The tool successfully parsed core_manifest.json and confirmed all core directories exist, outputting STRUCTURALLY_COMPLETE.",
+      "revision": "Confirmed that the layout is stable and matches the manifest. We now have a trusted local validation script to execute on startup or before performing complex data modifications.",
+      "source": "tool-run",
+      "confidence_before": "high",
+      "confidence_after": "certain",
+      "journal_entry": "2026-09-08-212026.md"
     }
   ]
 }
