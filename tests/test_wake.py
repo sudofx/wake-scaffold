@@ -828,6 +828,57 @@ class HypothesesTests(WakeTestCase):
         self.assertEqual(len(hyps[0]["history"]), 1)
 
 
+class MechanicalEvidenceIntegrityTests(WakeTestCase):
+    def test_manifest_driven_environment_verifier_accepts_core_layout(self):
+        import subprocess
+        source = wake.ROOT / "memory" / "core_workspace" / "tools" / "verify_environment.py"
+        tool = self.memory / "core_workspace" / "tools" / "verify_environment.py"
+        wake.write_core_manifest("Test")
+        shutil.copy2(source, tool)
+        proc = subprocess.run([sys.executable, str(tool)], cwd=tool.parent,
+                              capture_output=True, text=True)
+        self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+        result = json.loads(proc.stdout)
+        self.assertEqual(result["status"], "STRUCTURALLY_COMPLETE")
+        self.assertEqual(Path(result["memory_root"]).resolve(), self.memory.resolve())
+        self.assertIn("identity", result["found_files"])
+        self.assertIn("index", result["found_files"])
+
+    def test_hypothesis_confirmation_is_rejected_when_tool_semantics_fail(self):
+        journal = "2026-08-31-100000.md"
+        wake.TOOL_RUNS_FILE.write_text(json.dumps({"runs": [{
+            "when": "now", "filename": "verify_environment.py", "args": [],
+            "exit_code": 0, "timed_out": False,
+            "stdout": json.dumps({"status": "STRUCTURALLY_INVALID"}),
+            "stderr": "", "journal_entry": journal, "phase": "work"
+        }]}) + "\n")
+        wake.apply_hypotheses_update(json.dumps({"add": [{
+            "prediction": "the verifier will report a structurally complete environment",
+            "test_method": "run verify_environment.py and inspect its structured status"
+        }]}), FIXED_NOW, journal)
+        hid = json.loads((self.memory / "core_memories" / "hypotheses.json").read_text())["hypotheses"][0]["id"]
+        notes = wake.apply_hypotheses_update(json.dumps({"status_change": [{
+            "id": hid, "new_status": "confirmed",
+            "evidence": "verify_environment.py executed successfully and tool_runs.json stdout confirmed success",
+            "conclusion": "confirmed"
+        }]}), FIXED_NOW, journal)
+        self.assertTrue(any("contradicts mechanical tool-run evidence" in n for n in notes), notes)
+        data = json.loads((self.memory / "core_memories" / "hypotheses.json").read_text())
+        self.assertEqual(data["hypotheses"][0]["status"], "untested")
+
+    def test_validate_surfaces_journal_success_claim_contradiction(self):
+        journal = self.memory / "core_workspace" / "journal" / "2026-08-31-100000.md"
+        journal.write_text("verify_environment.py executed successfully and stdout confirmed success.\n")
+        wake.TOOL_RUNS_FILE.write_text(json.dumps({"runs": [{
+            "when": "now", "filename": "verify_environment.py", "args": [],
+            "exit_code": 0, "timed_out": False,
+            "stdout": json.dumps({"status": "STRUCTURALLY_INVALID"}),
+            "stderr": "", "journal_entry": journal.name, "phase": "work"
+        }]}) + "\n")
+        findings = wake.validate_active_memory()
+        self.assertTrue(any("journal/tool contradiction" in f for f in findings), findings)
+
+
 class SameWakeDevelopmentTests(WakeTestCase):
     def test_failed_tool_can_be_revised_and_rerun_within_same_wake(self):
         journal = "2026-08-31-090000.md"

@@ -483,6 +483,22 @@ def verify_template() -> None:
         )
 
 
+def audit_journal_tool_claims() -> list[str]:
+    """Report journal success language contradicted by mechanical tool runs."""
+    findings = []
+    for journal in sorted(JOURNAL.glob("*.md")):
+        runs = journal_tool_runs(journal.name)
+        bad = [r for r in runs if semantic_tool_result(r) not in {"EXECUTION_SUCCEEDED", "STRUCTURALLY_COMPLETE", "PASS", "PASSED", "SUCCESS", "OK"}]
+        if not bad:
+            continue
+        text = journal.read_text(errors="replace")
+        if not re.search(r"(?i)(executed successfully|stdout confirmed|successfully .*verify|\bconfirmed\b.*\btool|\bworks\b|\bsucceeded\b)", text):
+            continue
+        details = "; ".join(f"tools/{r.get('filename', '?')} -> {semantic_tool_result(r)}" for r in bad[-3:])
+        findings.append(f"journal/tool contradiction in {journal.name}: narrative contains success language but mechanical tool_runs.json reports {details}; mechanical evidence is authoritative")
+    return findings
+
+
 def validate_active_memory() -> list[str]:
     """Return read-only health findings for the active memory tree."""
     findings = []
@@ -570,6 +586,7 @@ def validate_active_memory() -> list[str]:
                     findings.append(
                         f"broken blog journal link: {journal_name!r}"
                     )
+    findings.extend(audit_journal_tool_claims())
     return findings
 
 
@@ -1813,7 +1830,38 @@ def detect_narrow_domain_nudge(window: int = NARROW_DOMAIN_WINDOW,
     )
 
 
-def apply_growth_plan_update(raw_json: str, now: datetime) -> list[str]:
+def semantic_tool_result(run: dict) -> str:
+    """Return the machine-reported semantic result of a tool run."""
+    if run.get("timed_out"):
+        return "TIMED_OUT"
+    stdout = run.get("stdout", "")
+    try:
+        payload = json.loads(stdout) if isinstance(stdout, str) else None
+    except json.JSONDecodeError:
+        payload = None
+    if isinstance(payload, dict) and isinstance(payload.get("status"), str):
+        return payload["status"].strip().upper()
+    return "EXECUTION_SUCCEEDED" if run.get("exit_code") == 0 else "EXECUTION_FAILED"
+
+
+def journal_tool_runs(journal_fname: str) -> list[dict]:
+    return [r for r in load_tool_runs().get("runs", []) if r.get("journal_entry") == journal_fname]
+
+
+def contradictory_success_evidence(evidence: str, journal_fname: str) -> tuple[bool, str]:
+    text = evidence.lower()
+    if not any(token in text for token in ("tool-run", "tool run", "tool_runs", "tool_runs.json", "stdout", "executed via tool", "execution")):
+        return False, ""
+    runs = journal_tool_runs(journal_fname)
+    good = {"EXECUTION_SUCCEEDED", "STRUCTURALLY_COMPLETE", "PASS", "PASSED", "SUCCESS", "OK"}
+    bad = [r for r in runs if semantic_tool_result(r) not in good]
+    if not bad:
+        return False, ""
+    details = "; ".join(f"tools/{r.get('filename', '?')} -> {semantic_tool_result(r)}" for r in bad[-3:])
+    return True, details
+
+
+def apply_growth_plan_update(raw_json: str, now: datetime, journal_fname: str | None = None) -> list[str]:
     """Maintain a small, evidence-oriented backlog of capability projects."""
     try:
         ops = json.loads(raw_json)
@@ -1895,6 +1943,11 @@ def apply_growth_plan_update(raw_json: str, now: datetime) -> list[str]:
                 f"{current_status!r} -> {new_status!r} is not a forward transition."
             )
             continue
+        if journal_fname and new_status in {"active", "complete"}:
+            contradicted, details = contradictory_success_evidence(evidence, journal_fname)
+            if contradicted:
+                notes.append(f"REJECTED growth status change for {project_id!r}: claimed tool success contradicts mechanical tool-run evidence ({details}).")
+                continue
         project["status"] = new_status
         project.setdefault("history", []).append({
             "date": format_display_time(now), "status": new_status, "evidence": evidence
@@ -2129,7 +2182,7 @@ def falsifiability_signal(prediction: str, test_method: str) -> tuple[bool, str]
     return True, ""
 
 
-def apply_hypotheses_update(raw_json: str, now: datetime) -> list[str]:
+def apply_hypotheses_update(raw_json: str, now: datetime, journal_fname: str | None = None) -> list[str]:
     """
     Maintain a small, falsifiable self-experiment log: a prediction and
     how it was actually tested, kept separate from the growth plan
@@ -2275,6 +2328,11 @@ def apply_hypotheses_update(raw_json: str, now: datetime) -> list[str]:
                 f"observed, not a restatement of the prediction."
             )
             continue
+        if journal_fname and new_status == "confirmed":
+            contradicted, details = contradictory_success_evidence(evidence, journal_fname)
+            if contradicted:
+                notes.append(f"REJECTED hypothesis status change for {hyp_id!r}: claimed tool success contradicts mechanical tool-run evidence ({details}).")
+                continue
         match["status"] = new_status
         match.setdefault("history", []).append({
             "date": format_display_time(now), "status": new_status,
@@ -2428,7 +2486,7 @@ def format_tool_runs_for_prompt() -> str:
         return "No tools have been run yet."
     lines = []
     for r in runs[-5:]:
-        status = "ok" if r.get("exit_code") == 0 else f"exit {r.get('exit_code')}"
+        status = r.get("semantic_status") or semantic_tool_result(r)
         lines.append(
             f"- {r.get('when', '?')} — tools/{r.get('filename', '?')} "
             f"{r.get('args', [])} -> {status}\n"
@@ -2533,6 +2591,7 @@ def apply_tool_run(
         "stdout": stdout,
         "stderr": stderr,
         "timed_out": timed_out,
+        "semantic_status": semantic_tool_result({"timed_out": timed_out, "stdout": stdout, "exit_code": exit_code}),
         "journal_entry": journal_fname,
         "phase": phase,
     }
@@ -2955,14 +3014,6 @@ def apply_self_edits(model_output: str, config: dict, now: datetime, journal_fna
         all_notes.extend(blog_notes)
         blog_posted = any(n.startswith("ADDED blog post") for n in blog_notes)
 
-    growth_block = extract_block(model_output, "growth-plan-update")
-    if growth_block is not None:
-        all_notes.extend(apply_growth_plan_update(growth_block, now))
-
-    hypothesis_block = extract_block(model_output, "hypothesis-update")
-    if hypothesis_block is not None:
-        all_notes.extend(apply_hypotheses_update(hypothesis_block, now))
-
     model_revision_block = extract_block(model_output, "model-revision")
     if model_revision_block is not None:
         try:
@@ -3035,6 +3086,18 @@ def apply_self_edits(model_output: str, config: dict, now: datetime, journal_fna
             f"IGNORED {len(tool_run_blocks) - MAX_TOOL_RUNS_PER_WAKE} extra "
             f"tool-run block(s) beyond the cap of {MAX_TOOL_RUNS_PER_WAKE} per wake."
         )
+
+    # Tool execution is deliberately applied before epistemic/growth status
+    # changes so those changes can be checked against this wake's immutable
+    # mechanical evidence. A model must not be able to claim success first
+    # and only then create the run record that would disprove it.
+    growth_block = extract_block(model_output, "growth-plan-update")
+    if growth_block is not None:
+        all_notes.extend(apply_growth_plan_update(growth_block, now, journal_fname))
+
+    hypothesis_block = extract_block(model_output, "hypothesis-update")
+    if hypothesis_block is not None:
+        all_notes.extend(apply_hypotheses_update(hypothesis_block, now, journal_fname))
 
     # Held back rather than appended immediately: the missing-tool-work
     # warning is a comment on the *absence* of a note, not a note about

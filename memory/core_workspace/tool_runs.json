@@ -1,27 +1,4 @@
 {
   "_comment": "Last MAX_TOOL_RUN_HISTORY tool executions (stdout/stderr/exit code), written by tool-run and read back as evidence next wake. New identities start with none.",
-  "runs": [
-    {
-      "when": "Sep 8th, 2026 07:39pm",
-      "filename": "inspect_env.py",
-      "args": [],
-      "exit_code": 0,
-      "stdout": "CWD: /Users/rjohnson/Developer/wake-scaffold/memory/core_workspace/tools\nCWD contents:\n  .gitkeep\n  inspect_env.py\n\nParent directory traversal:\n\n--- Depth 0: /Users/rjohnson/Developer/wake-scaffold/memory/core_workspace/tools ---\n  Contents (2 items): ['.gitkeep', 'inspect_env.py']\n  Target 'identity.md': NOT FOUND\n  Target 'rules.md': NOT FOUND\n  Target 'index.md': NOT FOUND\n  Target 'memory': NOT FOUND\n  Target 'core_workspace': NOT FOUND\n\n--- Depth 1: /Users/rjohnson/Developer/wake-scaffold/memory/core_workspace ---\n  Contents (5 items): ['journal', 'tools', '.DS_Store', 'tool_runs.json', 'prompts']\n  Target 'identity.md': NOT FOUND\n  Target 'rules.md': NOT FOUND\n  Target 'index.md': NOT FOUND\n  Target 'memory': NOT FOUND\n  Target 'core_workspace': NOT FOUND\n\n--- Depth 2: /Users/rjohnson/Developer/wake-scaffold/memory ---\n  Contents (7 items): ['core_memories', 'core_synthesis', '.DS_Store', 'core_workspace', 'core_manifest.json', 'core_persona', 'core_identity']\n  Target 'identity.md': NOT FOUND\n  Target 'rules.md': NOT FOUND\n  Target 'index.md': NOT FOUND\n  Target 'memory': NOT FOUND\n  Target 'core_workspace': EXISTS\n\n--- Depth 3: /Users/rjohnson/Developer/wake-scaffold ---\n  Contents (21 items): ['info.png', '.wake.lock', '.DS_Store', 'memory', 'LICENSE', 'requirements.txt', '.pytest_cache', 'providers', 'tests', 'config.yaml']\n  Target 'identity.md': NOT FOUND\n  Target 'rules.md': NOT FOUND\n  Target 'index.md': NOT FOUND\n  Target 'memory': EXISTS\n  Target 'core_workspace': NOT FOUND\n\n--- Depth 4: /Users/rjohnson/Developer ---\n  Contents (11 items): ['NetOrbit', 'Tokyonight-GTK-Theme', 'pure-bootstrap', 'Docker', 'python-digitalocean-backup', '.DS_Store', 'app', 'MacTahoe-icon-theme', 'MacTahoe-gtk-theme', 'wake-scaffold']\n  Target 'identity.md': NOT FOUND\n  Target 'rules.md': NOT FOUND\n  Target 'index.md': NOT FOUND\n  Target 'memory': NOT FOUND\n  Target 'core_workspace': NOT FOUND\n",
-      "stderr": "",
-      "timed_out": false,
-      "journal_entry": "2026-09-08-193957.md",
-      "phase": "work"
-    },
-    {
-      "when": "Sep 8th, 2026 07:45pm",
-      "filename": "verify_environment.py",
-      "args": [],
-      "exit_code": 0,
-      "stdout": "{\n  \"status\": \"STRUCTURALLY_INVALID\",\n  \"cwd\": \"/Users/rjohnson/Developer/wake-scaffold/memory/core_workspace/tools\",\n  \"missing\": [\n    \"identity.md\",\n    \"rules.md\",\n    \"index.md\"\n  ],\n  \"mechanism\": \"Could not locate memory root directory containing all required core memory files.\"\n}\n",
-      "stderr": "",
-      "timed_out": false,
-      "journal_entry": "2026-09-08-194523.md",
-      "phase": "work"
-    }
-  ]
+  "runs": []
 }

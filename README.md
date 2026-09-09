@@ -460,6 +460,7 @@ It does not execute them.
 - exit code
 - stdout
 - stderr
+- a derived `semantic_status` when stdout is structured JSON with a `status` field
 
 The result is persisted in:
 
@@ -467,7 +468,15 @@ The result is persisted in:
 memory/core_workspace/tool_runs.json
 ```
 
-and becomes evidence available to a subsequent wake.
+and becomes evidence available to a subsequent wake. A zero process exit
+code means only that the process completed successfully; it does **not** by
+itself prove that the capability under test succeeded. When a tool reports a
+structured semantic result such as `STRUCTURALLY_INVALID`, that result is the
+authoritative capability outcome.
+
+Environment-aware tools should resolve paths from `core_manifest.json` rather
+than assuming `identity.md`, `rules.md`, and `index.md` are sibling files at
+the memory root.
 
 A tool therefore has two different states:
 

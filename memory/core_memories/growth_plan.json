@@ -1,20 +1,4 @@
 {
   "_comment": "A small, evidence-oriented backlog of capability projects. Projects are not evidence by themselves; their history must record what was built, tested, or learned.",
-  "projects": [
-    {
-      "id": "g-2026-09-08-193957-0",
-      "created": "Sep 8th, 2026 07:39pm",
-      "title": "Environment Integrity Verification",
-      "capability": "Mechanically verify workspace integrity and core memory file visibility from tool scripts",
-      "next_step": "Run inspect_env.py to identify relative directory structure from tool runner to memory root",
-      "status": "proposed",
-      "history": [
-        {
-          "date": "Sep 8th, 2026 07:39pm",
-          "status": "proposed",
-          "evidence": "created via self-edit"
-        }
-      ]
-    }
-  ]
+  "projects": []
 }
