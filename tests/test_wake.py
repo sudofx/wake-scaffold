@@ -857,6 +857,9 @@ class MechanicalEvidenceIntegrityTests(WakeTestCase):
             "test_method": "run verify_environment.py and inspect its structured status"
         }]}), FIXED_NOW, journal)
         hid = json.loads((self.memory / "core_memories" / "hypotheses.json").read_text())["hypotheses"][0]["id"]
+        runs = json.loads(wake.TOOL_RUNS_FILE.read_text())
+        runs["runs"][0]["hypothesis_id"] = hid
+        wake.TOOL_RUNS_FILE.write_text(json.dumps(runs) + "\n")
         notes = wake.apply_hypotheses_update(json.dumps({"status_change": [{
             "id": hid, "new_status": "confirmed",
             "evidence": "verify_environment.py executed successfully and tool_runs.json stdout confirmed success",
@@ -877,6 +880,129 @@ class MechanicalEvidenceIntegrityTests(WakeTestCase):
         }]}) + "\n")
         findings = wake.validate_active_memory()
         self.assertTrue(any("journal/tool contradiction" in f for f in findings), findings)
+
+
+class ManifestValidatorTests(WakeTestCase):
+    def _run_validator(self):
+        import subprocess
+        tool = self.memory / "core_workspace" / "tools" / "validate_workspace.py"
+        return subprocess.run(
+            [sys.executable, str(tool), "."],
+            cwd=tool.parent, capture_output=True, text=True, check=False,
+        )
+
+    def test_manifest_validator_accepts_declared_core_layout(self):
+        wake.write_core_manifest("Test")
+        proc = self._run_validator()
+        self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+        report = json.loads(proc.stdout)
+        self.assertEqual(report["status"], "STRUCTURALLY_COMPLETE")
+        self.assertEqual(Path(report["detected_root"]).resolve(), self.memory.resolve())
+        self.assertIn("identity/identity.md", report["found"])
+        self.assertIn("memories/index.md", report["found"])
+        self.assertIn("workspace/tool_runs.json", report["found"])
+
+    def test_manifest_validator_rejects_missing_declared_artifact(self):
+        wake.write_core_manifest("Test")
+        (self.memory / "core_identity" / "rules.md").unlink()
+        proc = self._run_validator()
+        self.assertEqual(proc.returncode, 1)
+        report = json.loads(proc.stdout)
+        self.assertEqual(report["status"], "STRUCTURALLY_INVALID")
+        self.assertIn("core_identity/rules.md", report["missing"])
+
+    def test_manifest_validator_fails_without_manifest(self):
+        proc = self._run_validator()
+        self.assertEqual(proc.returncode, 1)
+        report = json.loads(proc.stdout)
+        self.assertEqual(report["status"], "STRUCTURALLY_INVALID")
+        self.assertIn("core_manifest.json", report["missing"])
+
+
+class EvidencePromotionTests(WakeTestCase):
+    def test_exit_zero_without_capability_status_cannot_confirm_tool_hypothesis(self):
+        journal = "2026-08-31-100000.md"
+        wake.TOOL_RUNS_FILE.write_text(json.dumps({"runs": [{
+            "when": "now", "filename": "generic.py", "args": [],
+            "exit_code": 0, "timed_out": False, "stdout": "ok\n",
+            "stderr": "", "journal_entry": journal, "phase": "work",
+            "hypothesis_id": "h-2026-08-31-090000-0"
+        }]}) + "\n")
+        wake.apply_hypotheses_update(json.dumps({"add": [{
+            "prediction": "the generic tool will report an explicit capability success status",
+            "test_method": "run generic.py and inspect its structured status"
+        }]}), FIXED_NOW, journal)
+        data = json.loads((self.memory / "core_memories" / "hypotheses.json").read_text())
+        hid = data["hypotheses"][0]["id"]
+        # Link the mechanical run to the actual hypothesis id.
+        runs = json.loads(wake.TOOL_RUNS_FILE.read_text())
+        runs["runs"][0]["hypothesis_id"] = hid
+        wake.TOOL_RUNS_FILE.write_text(json.dumps(runs) + "\n")
+        notes = wake.apply_hypotheses_update(json.dumps({"status_change": [{
+            "id": hid, "new_status": "confirmed",
+            "evidence": "generic.py executed successfully and tool_runs.json recorded the result",
+            "conclusion": "confirmed"
+        }]}), FIXED_NOW, journal)
+        self.assertTrue(any("no matching capability-success run" in n for n in notes), notes)
+        data = json.loads((self.memory / "core_memories" / "hypotheses.json").read_text())
+        self.assertEqual(data["hypotheses"][0]["status"], "untested")
+
+    def test_successful_semantic_result_can_confirm_matching_hypothesis(self):
+        journal = "2026-08-31-100000.md"
+        wake.apply_hypotheses_update(json.dumps({"add": [{
+            "prediction": "the validator will report STRUCTURALLY_COMPLETE",
+            "test_method": "run validator and inspect its structured status"
+        }]}), FIXED_NOW, journal)
+        data = json.loads((self.memory / "core_memories" / "hypotheses.json").read_text())
+        hid = data["hypotheses"][0]["id"]
+        wake.TOOL_RUNS_FILE.write_text(json.dumps({"runs": [{
+            "when": "now", "filename": "validate_workspace.py", "args": [],
+            "exit_code": 0, "timed_out": False,
+            "stdout": json.dumps({"status": "STRUCTURALLY_COMPLETE"}),
+            "stderr": "", "journal_entry": journal, "phase": "work",
+            "hypothesis_id": hid
+        }]}) + "\n")
+        notes = wake.apply_hypotheses_update(json.dumps({"status_change": [{
+            "id": hid, "new_status": "confirmed",
+            "evidence": "validate_workspace.py tool-run reported STRUCTURALLY_COMPLETE",
+            "conclusion": "confirmed"
+        }]}), FIXED_NOW, journal)
+        self.assertTrue(any(n.startswith("UPDATED hypothesis") for n in notes), notes)
+
+    def test_growth_promotion_requires_explicit_capability_success(self):
+        journal = "2026-08-31-100000.md"
+        wake.apply_growth_plan_update(json.dumps({"add": [{
+            "title": "Validator capability",
+            "capability": "verify the declared workspace structure",
+            "next_step": "run validator and inspect semantic status"
+        }]}), FIXED_NOW, journal)
+        data = json.loads((self.memory / "core_memories" / "growth_plan.json").read_text())
+        gid = data["projects"][0]["id"]
+        wake.TOOL_RUNS_FILE.write_text(json.dumps({"runs": [{
+            "when": "now", "filename": "validator.py", "args": [],
+            "exit_code": 0, "timed_out": False,
+            "stdout": json.dumps({"status": "EXECUTION_SUCCEEDED"}),
+            "stderr": "", "journal_entry": journal, "phase": "work"
+        }]}) + "\n")
+        notes = wake.apply_growth_plan_update(json.dumps({"status_change": [{
+            "id": gid, "new_status": "active",
+            "evidence": "validator.py tool-run executed successfully"
+        }]}), FIXED_NOW, journal)
+        self.assertTrue(any("no matching capability-success run" in n for n in notes), notes)
+        data = json.loads((self.memory / "core_memories" / "growth_plan.json").read_text())
+        self.assertEqual(data["projects"][0]["status"], "proposed")
+
+    def test_semantic_failure_with_exit_zero_counts_as_unresolved_development_failure(self):
+        journal = "2026-08-31-100000.md"
+        wake.TOOL_RUNS_FILE.write_text(json.dumps({"runs": [{
+            "when": "now", "filename": "validator.py", "args": [],
+            "exit_code": 0, "timed_out": False,
+            "stdout": json.dumps({"status": "STRUCTURALLY_INVALID"}),
+            "stderr": "", "journal_entry": journal, "phase": "development"
+        }]}) + "\n")
+        failed = wake.unresolved_failed_tool_runs_for_journal(journal)
+        self.assertEqual(len(failed), 1)
+        self.assertEqual(wake.semantic_tool_result(failed[0]), "STRUCTURALLY_INVALID")
 
 
 class SameWakeDevelopmentTests(WakeTestCase):

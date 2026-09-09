@@ -1,28 +1,4 @@
 {
-  "_comment": "Self-experiment tracker: prediction -> test method -> real evidence -> conclusion. Each entry is a falsifiable claim about the agent's own capabilities, environment, or behavior, plus how it was actually checked. New identities start with none.",
-  "hypotheses": [
-    {
-      "id": "h-2026-09-08-200945-0",
-      "created": "Sep 8th, 2026 08:09pm",
-      "prediction": "Running validate_workspace.py on the current working directory will identify key structural paths (such as core_workspace, core_identity, or core_memories) and return exit code 0.",
-      "test_method": "Execute tool validate_workspace.py via tool-run block with argument '.'",
-      "scope": "internal",
-      "boundary": "same_wake",
-      "status": "testing",
-      "history": [
-        {
-          "date": "Sep 8th, 2026 08:09pm",
-          "status": "untested",
-          "evidence": "",
-          "conclusion": "created via self-edit"
-        },
-        {
-          "date": "Sep 8th, 2026 08:12pm",
-          "status": "testing",
-          "evidence": "Executed validate_workspace.py with argument '.' via sandboxed tool-run.",
-          "conclusion": "Tool execution initiated to confirm path discovery and zero exit code."
-        }
-      ]
-    }
-  ]
+  "_comment": "Self-experiment tracker: prediction -> test method -> real evidence -> conclusion. Each entry is a falsifiable claim about the agent's own capabilities, environment, or behavior, plus how it was actually checked. For tool-based hypotheses, a confirmed result requires a matching tool-run with an explicit capability-success status; exit code 0 alone means only that the process executed. New identities start with none.",
+  "hypotheses": []
 }

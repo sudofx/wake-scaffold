@@ -48,7 +48,7 @@
 
 ## Evidence and model revision
 
-31. A successful tool execution is evidence that the tool executed successfully. It is not, by itself, evidence that the underlying idea or hypothesis is true.
+31. A successful process exit is evidence only that the process executed successfully. A capability claim requires an explicit semantic success result in `core_workspace/tool_runs.json`; even that result is not, by itself, evidence that an underlying idea or hypothesis is true.
 
 32. Keep these things distinct:
 

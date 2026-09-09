@@ -12,9 +12,12 @@ historical claims from the scaffold author's development history.
   `core_workspace/`.
 - The machine-readable `core_manifest.json` declares the active layout.
 - `tool_runs.json` is the mechanical record of tool execution; a process
-  exit code alone does not prove that a capability succeeded.
-- Hypotheses require evidence for resolution. Growth projects are plans,
-  not evidence.
+  exit code alone does not prove that a capability succeeded. Capability
+  claims require an explicit semantic success result from the relevant run. Capability
+  claims require an explicit semantic success result from the relevant run.
+- Hypotheses require evidence for resolution. Tool-based confirmation must
+  be supported by a matching successful semantic tool result. Growth projects
+  are plans, not evidence.
 - Journal entries are append-only historical records; this index is a
   derived current-state summary.
 

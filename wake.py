@@ -1027,7 +1027,9 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         "run it (via a tool-run block, this wake or an earlier one) and can "
         "cite a real result from the TOOL RUN HISTORY section above in the "
         "evidence field. Until then, leave it 'active' and say what running "
-        "it next would tell you.\n\n"
+        "it next would tell you. For any tool-based active/complete transition, "
+        "include the relevant hypothesis id in the evidence when one exists; the "
+        "mechanical run record, not the prose claim, is authoritative.\n\n"
         "**To record or resolve a self-experiment**, include a fenced block:\n"
         "```hypothesis-update\n"
         '{"add": [{"prediction": "a specific, falsifiable claim", '
@@ -1043,7 +1045,10 @@ def build_journal_prompt(reflection: str, now: datetime, enable_pull_requests: b
         "must describe something that actually happened (a tool-run result, "
         "a file you inspected, a test you performed), never a restatement of "
         "the prediction — moving to any status besides 'testing' without "
-        "real evidence is rejected outright. Resolved hypotheses (confirmed, "
+        "real evidence is rejected outright. If the evidence relies on a "
+        "tool-run, that run must be linked to this hypothesis and must report an "
+        "explicit capability-success status; a bare exit code 0 is execution "
+        "evidence, not capability confirmation. Resolved hypotheses (confirmed, "
         "refuted, or inconclusive) are historically final: do not rewrite their "
         "prediction or move them to another outcome. To test a revised claim, "
         "use the optional 'revise' operation with 'parent_id', 'prediction', "
@@ -1830,6 +1835,10 @@ def detect_narrow_domain_nudge(window: int = NARROW_DOMAIN_WINDOW,
     )
 
 
+CAPABILITY_SUCCESS_STATUSES = {"STRUCTURALLY_COMPLETE", "PASS", "PASSED", "SUCCESS", "OK"}
+CAPABILITY_FAILURE_STATUSES = {"STRUCTURALLY_INVALID", "FAIL", "FAILED", "ERROR", "INVALID", "INCONCLUSIVE", "TIMED_OUT", "EXECUTION_FAILED"}
+
+
 def semantic_tool_result(run: dict) -> str:
     """Return the machine-reported semantic result of a tool run."""
     if run.get("timed_out"):
@@ -1844,21 +1853,73 @@ def semantic_tool_result(run: dict) -> str:
     return "EXECUTION_SUCCEEDED" if run.get("exit_code") == 0 else "EXECUTION_FAILED"
 
 
+def capability_success(run: dict) -> bool:
+    """True only when the tool produced an explicit success result.
+
+    EXECUTION_SUCCEEDED is intentionally not included: a process can exit 0
+    while reporting that the capability under test is invalid or incomplete.
+    """
+    return semantic_tool_result(run) in CAPABILITY_SUCCESS_STATUSES
+
+
+def capability_failure(run: dict) -> bool:
+    """True when execution failed or the tool explicitly reported failure."""
+    status = semantic_tool_result(run)
+    return status in CAPABILITY_FAILURE_STATUSES or run.get("exit_code") != 0
+
+
 def journal_tool_runs(journal_fname: str) -> list[dict]:
     return [r for r in load_tool_runs().get("runs", []) if r.get("journal_entry") == journal_fname]
 
 
-def contradictory_success_evidence(evidence: str, journal_fname: str) -> tuple[bool, str]:
+def evidence_mentions_tool(evidence: str) -> bool:
     text = evidence.lower()
-    if not any(token in text for token in ("tool-run", "tool run", "tool_runs", "tool_runs.json", "stdout", "executed via tool", "execution")):
+    return any(token in text for token in (
+        "tool-run", "tool run", "tool_runs", "tool_runs.json",
+        "stdout", "executed via tool", "execution", "semantic_status",
+    ))
+
+
+def tool_evidence_for_hypothesis(hypothesis_id: str, journal_fname: str) -> list[dict]:
+    return [
+        run for run in journal_tool_runs(journal_fname)
+        if run.get("hypothesis_id") == hypothesis_id
+    ]
+
+
+def contradictory_success_evidence(evidence: str, journal_fname: str, hypothesis_id: str | None = None) -> tuple[bool, str]:
+    if not evidence_mentions_tool(evidence):
         return False, ""
-    runs = journal_tool_runs(journal_fname)
-    good = {"EXECUTION_SUCCEEDED", "STRUCTURALLY_COMPLETE", "PASS", "PASSED", "SUCCESS", "OK"}
-    bad = [r for r in runs if semantic_tool_result(r) not in good]
+    runs = tool_evidence_for_hypothesis(hypothesis_id, journal_fname) if hypothesis_id else journal_tool_runs(journal_fname)
+    bad = [r for r in runs if semantic_tool_result(r) in CAPABILITY_FAILURE_STATUSES]
     if not bad:
         return False, ""
-    details = "; ".join(f"tools/{r.get('filename', '?')} -> {semantic_tool_result(r)}" for r in bad[-3:])
+    details = "; ".join(
+        f"tools/{r.get('filename', '?')} -> {semantic_tool_result(r)}"
+        for r in bad[-3:]
+    )
     return True, details
+
+
+def supporting_tool_evidence(evidence: str, journal_fname: str, hypothesis_id: str | None = None) -> tuple[bool, str]:
+    """Check whether a tool-based claim has explicit mechanical support.
+
+    A bare exit code is not sufficient. The linked run must have an explicit
+    capability-success status such as STRUCTURALLY_COMPLETE/PASS/SUCCESS.
+    """
+    if not evidence_mentions_tool(evidence):
+        return True, ""
+    runs = tool_evidence_for_hypothesis(hypothesis_id, journal_fname) if hypothesis_id else journal_tool_runs(journal_fname)
+    if not runs:
+        return False, "no matching tool-run evidence was recorded for this claim"
+    good = [r for r in runs if capability_success(r)]
+    if not good:
+        details = "; ".join(
+            f"tools/{r.get('filename', '?')} -> {semantic_tool_result(r)}"
+            for r in runs[-3:]
+        )
+        return False, f"no matching capability-success run; recorded results: {details}"
+    return True, ""
 
 
 def apply_growth_plan_update(raw_json: str, now: datetime, journal_fname: str | None = None) -> list[str]:
@@ -1947,6 +2008,10 @@ def apply_growth_plan_update(raw_json: str, now: datetime, journal_fname: str | 
             contradicted, details = contradictory_success_evidence(evidence, journal_fname)
             if contradicted:
                 notes.append(f"REJECTED growth status change for {project_id!r}: claimed tool success contradicts mechanical tool-run evidence ({details}).")
+                continue
+            supported, details = supporting_tool_evidence(evidence, journal_fname)
+            if not supported:
+                notes.append(f"REJECTED growth status change for {project_id!r}: {details}.")
                 continue
         project["status"] = new_status
         project.setdefault("history", []).append({
@@ -2329,9 +2394,13 @@ def apply_hypotheses_update(raw_json: str, now: datetime, journal_fname: str | N
             )
             continue
         if journal_fname and new_status == "confirmed":
-            contradicted, details = contradictory_success_evidence(evidence, journal_fname)
+            contradicted, details = contradictory_success_evidence(evidence, journal_fname, hyp_id)
             if contradicted:
                 notes.append(f"REJECTED hypothesis status change for {hyp_id!r}: claimed tool success contradicts mechanical tool-run evidence ({details}).")
+                continue
+            supported, details = supporting_tool_evidence(evidence, journal_fname, hyp_id)
+            if not supported:
+                notes.append(f"REJECTED hypothesis status change for {hyp_id!r}: {details}.")
                 continue
         match["status"] = new_status
         match.setdefault("history", []).append({
@@ -2778,7 +2847,7 @@ def unresolved_failed_tool_runs_for_journal(journal_fname: str) -> list[dict]:
     for run in tool_runs_for_journal(journal_fname):
         key = (run.get("filename"), tuple(run.get("args", [])))
         latest[key] = run
-    return [run for run in latest.values() if run.get("exit_code") != 0]
+    return [run for run in latest.values() if capability_failure(run)]
 
 
 def build_development_followup_prompt(

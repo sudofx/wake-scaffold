@@ -5,4 +5,4 @@ their Status/Folder/Blog cells updated in place — never hand-edit this file.
 
 | Identity | Status | Folder | Blog | Notes |
 |---|---|---|---|---|
-| Bob | active | `memory/` | [blog](https://htmlpreview.github.io/?https://raw.githubusercontent.com/sudofx/wake-scaffold/refs/heads/master/memory/core_persona/blog/html/index.html) | created Sep 8th, 2026 08:08pm |
+| Bob | active | `memory/` | [blog](https://htmlpreview.github.io/?https://raw.githubusercontent.com/sudofx/wake-scaffold/refs/heads/master/memory/core_persona/blog/html/index.html) | created Sep 8th, 2026 08:28pm |
