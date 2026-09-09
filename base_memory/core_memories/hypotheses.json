@@ -1,4 +1,0 @@
-{
-  "_comment": "Self-experiment tracker: prediction -> test method -> real evidence -> conclusion. Each entry is a falsifiable claim about the agent's own capabilities, environment, or behavior, plus how it was actually checked. For tool-based hypotheses, a confirmed result requires a matching tool-run with an explicit capability-success status; exit code 0 alone means only that the process executed. New identities start with none.",
-  "hypotheses": []
-}
