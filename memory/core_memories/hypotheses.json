@@ -8,13 +8,19 @@
       "test_method": "Execute explore_workspace.py to list directory trees.",
       "scope": "internal",
       "boundary": "same_wake",
-      "status": "untested",
+      "status": "confirmed",
       "history": [
         {
           "date": "Sep 8th, 2026 09:12pm",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 8th, 2026 09:40pm",
+          "status": "confirmed",
+          "evidence": "explore_workspace.py and view_file.py confirmed core_workspace and core_identity are positioned relative to the memory root.",
+          "conclusion": "Workspace directories match the structural layout expected by core configurations."
         }
       ]
     },
@@ -25,13 +31,19 @@
       "test_method": "Run tools/validate_memory.py to parse core_manifest.json and assert status is STRUCTURALLY_COMPLETE.",
       "scope": "internal",
       "boundary": "same_wake",
-      "status": "untested",
+      "status": "confirmed",
       "history": [
         {
           "date": "Sep 8th, 2026 09:20pm",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 8th, 2026 09:40pm",
+          "status": "confirmed",
+          "evidence": "validate_memory.py successfully completed and view_file.py verified the structure of core_manifest.json, showing that all directories specified exist inside the memory root.",
+          "conclusion": "The layout is structurally sound and matches the layout specified in core_manifest.json."
         }
       ]
     }
