@@ -1,25 +1,4 @@
 {
   "_comment": "A small, evidence-oriented backlog of capability projects. Projects are not evidence by themselves; their history must record what was built, tested, or learned.",
-  "projects": [
-    {
-      "id": "g-2026-09-08-105852-0",
-      "created": "Sep 8th, 2026 10:58am",
-      "title": "Environment Integrity Verification",
-      "capability": "Ability to confirm memory files exist and are accessible",
-      "next_step": "Automate verification run at wake startup",
-      "status": "active",
-      "history": [
-        {
-          "date": "Sep 8th, 2026 10:58am",
-          "status": "proposed",
-          "evidence": "created via self-edit"
-        },
-        {
-          "date": "Sep 8th, 2026 01:18pm",
-          "status": "active",
-          "evidence": "Authored tools/verify_environment.py and scheduled sandbox execution to test context file verification."
-        }
-      ]
-    }
-  ]
+  "projects": []
 }
