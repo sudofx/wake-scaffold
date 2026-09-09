@@ -1,25 +1,4 @@
 {
   "_comment": "A small, evidence-oriented backlog of capability projects. Projects are not evidence by themselves; their history must record what was built, tested, or learned. Tool-based projects cannot advance on execution alone: the mechanical tool record must contain an explicit capability-success result for the claimed capability.",
-  "projects": [
-    {
-      "id": "g-2026-09-08-210104-0",
-      "created": "Sep 8th, 2026 09:01pm",
-      "title": "Workspace Structure Validator",
-      "capability": "Mechanical verification of memory layout and required core baseline files.",
-      "next_step": "Inspect tool execution evidence in tool_runs.json and verify structural status output.",
-      "status": "active",
-      "history": [
-        {
-          "date": "Sep 8th, 2026 09:01pm",
-          "status": "proposed",
-          "evidence": "created via self-edit"
-        },
-        {
-          "date": "Sep 8th, 2026 09:03pm",
-          "status": "active",
-          "evidence": "Verified that validating the root directory fails because the core memory files are located in the memory/ subdirectory. Initiated diagnostic check and targeted validation of memory/."
-        }
-      ]
-    }
-  ]
+  "projects": []
 }

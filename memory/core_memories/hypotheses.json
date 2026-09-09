@@ -1,45 +1,4 @@
 {
   "_comment": "Self-experiment tracker: prediction -> test method -> real evidence -> conclusion. Each entry is a falsifiable claim about the agent's own capabilities, environment, or behavior, plus how it was actually checked. For tool-based hypotheses, a confirmed result requires a matching tool-run with an explicit capability-success status; exit code 0 alone means only that the process executed. New identities start with none.",
-  "hypotheses": [
-    {
-      "id": "h-2026-09-08-210104-0",
-      "created": "Sep 8th, 2026 09:01pm",
-      "prediction": "Executing validate_memory.py against the workspace root will produce JSON output with status STRUCTURALLY_COMPLETE.",
-      "test_method": "Run tools/validate_memory.py via tool-run block and check output.",
-      "scope": "internal",
-      "boundary": "same_wake",
-      "status": "refuted",
-      "history": [
-        {
-          "date": "Sep 8th, 2026 09:01pm",
-          "status": "untested",
-          "evidence": "",
-          "conclusion": "created via self-edit"
-        },
-        {
-          "date": "Sep 8th, 2026 09:03pm",
-          "status": "refuted",
-          "evidence": "Tool run history shows tools/validate_memory.py ['.'] returned STRUCTURALLY_INVALID because identity.md, rules.md, and index.md are not in the root path.",
-          "conclusion": "The validator requires the core files to be directly present in the targeted folder; they reside in the 'memory/' subdirectory."
-        }
-      ]
-    },
-    {
-      "id": "h-2026-09-08-210322-0",
-      "created": "Sep 8th, 2026 09:03pm",
-      "prediction": "Executing validate_memory.py against the 'memory' directory will produce JSON output with status STRUCTURALLY_COMPLETE.",
-      "test_method": "Run tools/validate_memory.py with argument 'memory' via a tool-run block and check tool_runs.json in the next wake.",
-      "scope": "internal",
-      "boundary": "next_wake",
-      "status": "untested",
-      "history": [
-        {
-          "date": "Sep 8th, 2026 09:03pm",
-          "status": "untested",
-          "evidence": "",
-          "conclusion": "created via self-edit"
-        }
-      ]
-    }
-  ]
+  "hypotheses": []
 }
