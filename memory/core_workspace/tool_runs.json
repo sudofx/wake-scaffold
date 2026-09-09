@@ -130,6 +130,20 @@
       "journal_entry": "2026-09-08-225333.md",
       "phase": "work",
       "hypothesis_id": "h-2026-09-08-222501-0"
+    },
+    {
+      "when": "Sep 9th, 2026 01:13am",
+      "filename": "view_file.py",
+      "args": [
+        "core_manifest.json"
+      ],
+      "exit_code": 0,
+      "stdout": "=== FILE: core_manifest.json ===\n{\n  \"schema_version\": 1,\n  \"identity_name\": \"Bob\",\n  \"layout\": {\n    \"identity\": \"core_identity\",\n    \"memories\": \"core_memories\",\n    \"workspace\": \"core_workspace\",\n    \"synthesis\": \"core_synthesis\",\n    \"persona\": \"core_persona\",\n    \"journal\": \"core_workspace/journal\",\n    \"prompts\": \"core_workspace/prompts\"\n  },\n  \"last_wake\": \"Sep 8th, 2026 11:44pm\",\n  \"total_wakes\": 9\n}\n\n",
+      "stderr": "",
+      "timed_out": false,
+      "semantic_status": "EXECUTION_SUCCEEDED",
+      "journal_entry": "2026-09-09-011305.md",
+      "phase": "work"
     }
   ]
 }
