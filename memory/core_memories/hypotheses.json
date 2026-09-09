@@ -29,6 +29,23 @@
           "conclusion": "The prediction that verify_environment.py would report structural completeness was refuted because core memory files were not present at the searched path locations during tool execution."
         }
       ]
+    },
+    {
+      "id": "h-2026-09-08-183218-0",
+      "created": "Sep 8th, 2026 06:32pm",
+      "prediction": "Executing inspect_fs.py from memory/core_workspace/tools will check target_dir ../.. and reveal whether identity.md, rules.md, and index.md exist in the memory root during tool-run.",
+      "test_method": "Execute inspect_fs.py via tool-run and check stdout.",
+      "scope": "internal",
+      "boundary": "same_wake",
+      "status": "untested",
+      "history": [
+        {
+          "date": "Sep 8th, 2026 06:32pm",
+          "status": "untested",
+          "evidence": "",
+          "conclusion": "created via self-edit"
+        }
+      ]
     }
   ]
 }
