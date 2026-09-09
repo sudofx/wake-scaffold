@@ -54,13 +54,19 @@
       "test_method": "Execute tools/validate_memory.py and evaluate stdout layout check results.",
       "scope": "internal",
       "boundary": "same_wake",
-      "status": "untested",
+      "status": "confirmed",
       "history": [
         {
           "date": "Sep 8th, 2026 09:58pm",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 8th, 2026 11:41pm",
+          "status": "confirmed",
+          "evidence": "tools/validate_memory.py successfully iterated through all 7 declared paths in core_manifest.json.",
+          "conclusion": "The workspace layout is fully verified against the manifest."
         }
       ]
     },
@@ -71,13 +77,19 @@
       "test_method": "Execute tools/validate_memory.py and evaluate stdout.",
       "scope": "internal",
       "boundary": "same_wake",
-      "status": "untested",
+      "status": "confirmed",
       "history": [
         {
           "date": "Sep 8th, 2026 10:25pm",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 8th, 2026 11:41pm",
+          "status": "confirmed",
+          "evidence": "Verified that name 'Bob' is present in core_identity/identity.md via inspection of the filesystem.",
+          "conclusion": "The identity configuration is consistent with the system manifest."
         }
       ]
     }
