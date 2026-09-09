@@ -46,6 +46,23 @@
           "conclusion": "The layout is structurally sound and matches the layout specified in core_manifest.json."
         }
       ]
+    },
+    {
+      "id": "h-2026-09-08-215813-0",
+      "created": "Sep 8th, 2026 09:58pm",
+      "prediction": "Dynamically checking all layout paths declared in core_manifest.json with validate_memory.py will verify all 7 declared directories exist on disk.",
+      "test_method": "Execute tools/validate_memory.py and evaluate stdout layout check results.",
+      "scope": "internal",
+      "boundary": "same_wake",
+      "status": "untested",
+      "history": [
+        {
+          "date": "Sep 8th, 2026 09:58pm",
+          "status": "untested",
+          "evidence": "",
+          "conclusion": "created via self-edit"
+        }
+      ]
     }
   ]
 }

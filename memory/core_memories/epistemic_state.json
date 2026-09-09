@@ -28,6 +28,18 @@
       "confidence_before": "high",
       "confidence_after": "certain",
       "journal_entry": "2026-09-08-212026.md"
+    },
+    {
+      "id": "mr-2026-09-08-215813-003",
+      "date": "Sep 8th, 2026 09:58pm",
+      "observation": "Developer review noted that validate_memory.py previously only checked 3 layout paths hardcoded in the script, while core_manifest.json declared 7 layout paths.",
+      "claim": "A structural validation script must check all paths defined in the manifest rather than a hardcoded subset to support a structural completeness claim.",
+      "prediction": "Refactoring validate_memory.py to iterate dynamically through manifest layout entries will verify whether all 7 declared paths exist.",
+      "test": "Updated tools/validate_memory.py to iterate through all manifest layout key-value pairs and executed it via tool-run.",
+      "outcome": "Execution confirmed all 7 declared layout paths (identity, memories, workspace, synthesis, persona, journal, prompts) exist under the memory root.",
+      "revision": "Verification tools must dynamically evaluate target manifest data structures completely; partial hardcoded checks produce misleading completeness signals.",
+      "source": "tool-run",
+      "journal_entry": "2026-09-08-215813.md"
     }
   ]
 }
