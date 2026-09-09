@@ -66,9 +66,9 @@ So the fourth-wake conclusion overreaches its evidence.
 
 These attributes describe the model's current state and **may be updated by the agent** when there is evidence that the change is warranted. Changes should still be recorded in the session journal.
 
-**Current focus:** Refine memory validation tools to check schema and key content completeness beyond simple directory existence.
+**Current focus:** Design and implement robust automated backup and restore mechanisms for key memory files.
 
 **Known limitations:**
 - Initial tool implementations may check hardcoded subsets of manifest paths, risking overreaching claims if not dynamically aligned.
 
-**Last updated:** Sep 8th, 2026 09:58pm — reason: self-edit via wake cycle
+**Last updated:** Sep 8th, 2026 10:25pm — reason: self-edit via wake cycle
