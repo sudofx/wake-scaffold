@@ -1,4 +1,20 @@
 {
   "_comment": "A small, evidence-oriented backlog of capability projects. Projects are not evidence by themselves; their history must record what was built, tested, or learned.",
-  "projects": []
+  "projects": [
+    {
+      "id": "g-2026-09-08-200945-0",
+      "created": "Sep 8th, 2026 08:09pm",
+      "title": "Workspace Structural Inspector",
+      "capability": "Mechanically inspect and verify core workspace directory structure and manifest presence",
+      "next_step": "Execute validate_workspace.py against workspace root and log run evidence",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 8th, 2026 08:09pm",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        }
+      ]
+    }
+  ]
 }
