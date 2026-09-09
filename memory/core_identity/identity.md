@@ -61,6 +61,21 @@ The manifest declares additional paths:
 
 So the fourth-wake conclusion overreaches its evidence.
 ```
+- There is a significant bookkeeping inconsistency
+```
+Wake 7 says:
+
+* capability g-2026-09-08-212026-0 was completed;
+* hypothesis h-2026-09-08-215813-0 was confirmed.
+
+But the actual durable hypotheses file says otherwise.
+
+h-2026-09-08-215813-0 is still:
+
+status: "untested"
+
+and has no successful-test history. The newer identity-alignment hypothesis h-2026-09-08-222501-0 is also still untested.
+```
 
 ## Model Attributes
 
