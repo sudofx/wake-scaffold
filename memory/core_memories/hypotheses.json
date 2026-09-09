@@ -1,4 +1,22 @@
 {
   "_comment": "Self-experiment tracker: prediction -> test method -> real evidence -> conclusion. Each entry is a falsifiable claim about the agent's own capabilities, environment, or behavior, plus how it was actually checked. New identities start with none.",
-  "hypotheses": []
+  "hypotheses": [
+    {
+      "id": "h-2026-09-08-193957-0",
+      "created": "Sep 8th, 2026 07:39pm",
+      "prediction": "Sandboxed tools execute in a specific working directory from which core memory files are accessible via relative parent directory traversal.",
+      "test_method": "Execute inspect_env.py via tool-run to print CWD and check parent directory tree for identity.md, rules.md, and index.md.",
+      "scope": "internal",
+      "boundary": "same_wake",
+      "status": "untested",
+      "history": [
+        {
+          "date": "Sep 8th, 2026 07:39pm",
+          "status": "untested",
+          "evidence": "",
+          "conclusion": "created via self-edit"
+        }
+      ]
+    }
+  ]
 }
