@@ -1,4 +1,22 @@
 {
   "_comment": "Self-experiment tracker: prediction -> test method -> real evidence -> conclusion. Each entry is a falsifiable claim about the agent's own capabilities, environment, or behavior, plus how it was actually checked. For tool-based hypotheses, a confirmed result requires a matching tool-run with an explicit capability-success status; exit code 0 alone means only that the process executed. New identities start with none.",
-  "hypotheses": []
+  "hypotheses": [
+    {
+      "id": "h-2026-09-08-211229-0",
+      "created": "Sep 8th, 2026 09:12pm",
+      "prediction": "The workspace layout contains 'core_workspace' and 'core_identity' directories either directly in the current directory or one level up, in line with core_manifest.json.",
+      "test_method": "Execute explore_workspace.py to list directory trees.",
+      "scope": "internal",
+      "boundary": "same_wake",
+      "status": "untested",
+      "history": [
+        {
+          "date": "Sep 8th, 2026 09:12pm",
+          "status": "untested",
+          "evidence": "",
+          "conclusion": "created via self-edit"
+        }
+      ]
+    }
+  ]
 }

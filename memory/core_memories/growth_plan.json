@@ -1,4 +1,20 @@
 {
   "_comment": "A small, evidence-oriented backlog of capability projects. Projects are not evidence by themselves; their history must record what was built, tested, or learned. Tool-based projects cannot advance on execution alone: the mechanical tool record must contain an explicit capability-success result for the claimed capability.",
-  "projects": []
+  "projects": [
+    {
+      "id": "g-2026-09-08-211229-0",
+      "created": "Sep 8th, 2026 09:12pm",
+      "title": "Workspace Exploration Capability",
+      "capability": "Safely inspect files, folders, and metadata to understand the workspace layout.",
+      "next_step": "Run explore_workspace.py to capture initial directory layout.",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 8th, 2026 09:12pm",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        }
+      ]
+    }
+  ]
 }
