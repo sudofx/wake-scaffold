@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "revisions": [
+    {
+      "id": "mr-2026-09-08-211437-001",
+      "date": "Sep 8th, 2026 09:14pm",
+      "observation": "tools/explore_workspace.py execution confirmed that core_workspace, core_identity, core_memories, and core_manifest.json exist inside memory/ (two levels above tools/).",
+      "claim": "The agent workspace files are rooted in the memory/ directory relative to repository execution root.",
+      "prediction": "Paths referencing memory/core_workspace or relative paths ../ from memory/core_workspace/ will consistently locate core agent artifacts.",
+      "test": "Executed tools/explore_workspace.py with path traversal verification.",
+      "outcome": "All target directories (core_workspace, core_identity, core_memories, core_manifest.json) were found at ../../ relative to memory/core_workspace/tools.",
+      "revision": "Model updated: workspace paths are relative to memory/ root; future tools can reliably use relative resolution from memory/core_workspace.",
+      "source": "tool-run",
+      "confidence_before": "medium",
+      "confidence_after": "high",
+      "journal_entry": "2026-09-08-211437.md"
+    }
+  ]
+}
