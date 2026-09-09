@@ -1,0 +1,1158 @@
+{
+  "schema": 1,
+  "generated": "2026-09-09T20:35:21.308431+00:00",
+  "mode": "deterministic fixture simulation",
+  "api_calls": 0,
+  "cycles": 100,
+  "fresh_processes": 104,
+  "checks": {
+    "fresh_sessions": {
+      "passed": true,
+      "detail": "Each cycle launches and exits a separate interpreter; durable context version increases by one."
+    },
+    "commitment_handoff": {
+      "passed": true,
+      "count": 99,
+      "detail": "Alternating fixture-a and fixture-b inherit obligations with no additional human reminder."
+    },
+    "evidence_lifecycle": {
+      "passed": true,
+      "detail": "Baseline claim, new supporting measurement, then counterexample and retraction; all citations retained."
+    },
+    "longitudinal": {
+      "passed": true,
+      "accepted_cycles": 100
+    },
+    "causal_state": {
+      "passed": true,
+      "control": "Fresh process, cycle 101. I received 1 open obligation(s) from durable state and reviewed the runtime receipt. Today's focus: continuity. This is a deterministic rehearsal, not a live model result.",
+      "intervention": "Fresh process, cycle 101. I received 1 open obligation(s) from durable state and reviewed the runtime receipt. Today's focus: evidence quality. This is a deterministic rehearsal, not a live model result.",
+      "detail": "Identical state copies, same provider, same next cycle. Only persisted focus differs."
+    },
+    "invalid_transition": {
+      "passed": true,
+      "reason": "Action is not allowed: 'change_rules'",
+      "invocation": "w-f71619a78f3346db"
+    },
+    "recovery": {
+      "passed": true,
+      "detail": "After-start death, uncommitted transaction death, and corrupted projection recover without changing accepted state."
+    },
+    "audit_reconstruction": {
+      "passed": true,
+      "head": "4c5f205afe0060e30bf71b9b7e807c99001501dd21dbe16d1206995aa9cc1aad",
+      "detail": "Observer reconstructs exact objective, beliefs, commitments, evidence, journal and invocations using JSONL alone."
+    }
+  },
+  "commands": [
+    {
+      "arguments": [
+        "init"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "observe",
+        "--source",
+        "fixture:sensor",
+        "--text",
+        "Synthetic baseline: sensor reading 10, tolerance 9\u201311."
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "observe",
+        "--source",
+        "fixture:sensor",
+        "--text",
+        "Synthetic second measurement: sensor reading 10.2, tolerance 9\u201311."
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "observe",
+        "--source",
+        "fixture:sensor",
+        "--text",
+        "Synthetic counterexample: sensor reading 17, outside tolerance 9\u201311."
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "focus",
+        "evidence quality",
+        "--reason",
+        "Controlled intervention; change persisted focus only."
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--model",
+        "fixture-a"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--crash-at",
+        "after-start"
+      ],
+      "exit_code": 85
+    },
+    {
+      "arguments": [
+        "recover"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "wake",
+        "--provider",
+        "fixture",
+        "--crash-at",
+        "during-commit"
+      ],
+      "exit_code": 86
+    },
+    {
+      "arguments": [
+        "recover"
+      ],
+      "exit_code": 0
+    },
+    {
+      "arguments": [
+        "recover"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "limitations": [
+    "No live model comprehension tested.",
+    "Evidence references are validated; semantic truth is not.",
+    "Single filesystem writer; quota accounting does not span separate state directories.",
+    "Hash chain requires an independently retained head to detect total rewrites or truncation."
+  ]
+}
