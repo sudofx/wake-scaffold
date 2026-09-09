@@ -1,4 +1,36 @@
 {
   "_comment": "Last MAX_TOOL_RUN_HISTORY tool executions (stdout/stderr/exit code), written by tool-run and read back as evidence next wake. New identities start with none.",
-  "runs": []
+  "runs": [
+    {
+      "when": "Sep 8th, 2026 08:12pm",
+      "filename": "validate_workspace.py",
+      "args": [
+        "."
+      ],
+      "exit_code": 1,
+      "stdout": "{\n  \"target_directory\": \"/Users/rjohnson/Developer/wake-scaffold/memory/core_workspace/tools\",\n  \"valid\": false,\n  \"found_items\": {},\n  \"missing_items\": [\n    \"core_workspace\",\n    \"core_identity\",\n    \"core_memories\",\n    \"rules.md\",\n    \"index.md\",\n    \"identity.md\"\n  ]\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "semantic_status": "EXECUTION_FAILED",
+      "journal_entry": "2026-09-08-201236.md",
+      "phase": "work",
+      "hypothesis_id": "h-2026-09-08-200945-0"
+    },
+    {
+      "when": "Sep 8th, 2026 08:12pm",
+      "filename": "validate_workspace.py",
+      "args": [
+        "."
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"start_directory\": \"/Users/rjohnson/Developer/wake-scaffold/memory/core_workspace/tools\",\n  \"detected_root\": \"/Users/rjohnson/Developer/wake-scaffold/memory\",\n  \"valid\": true,\n  \"found_items\": {\n    \"core_workspace\": \"directory\",\n    \"core_identity\": \"directory\",\n    \"core_memories\": \"directory\"\n  },\n  \"missing_items\": [\n    \"rules.md\",\n    \"index.md\",\n    \"identity.md\"\n  ]\n}\n",
+      "stderr": "",
+      "timed_out": false,
+      "semantic_status": "EXECUTION_SUCCEEDED",
+      "journal_entry": "2026-09-08-201236.md",
+      "phase": "development",
+      "development_iteration": 1,
+      "hypothesis_id": "h-2026-09-08-200945-0"
+    }
+  ]
 }

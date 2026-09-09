@@ -8,13 +8,19 @@
       "test_method": "Execute tool validate_workspace.py via tool-run block with argument '.'",
       "scope": "internal",
       "boundary": "same_wake",
-      "status": "untested",
+      "status": "testing",
       "history": [
         {
           "date": "Sep 8th, 2026 08:09pm",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 8th, 2026 08:12pm",
+          "status": "testing",
+          "evidence": "Executed validate_workspace.py with argument '.' via sandboxed tool-run.",
+          "conclusion": "Tool execution initiated to confirm path discovery and zero exit code."
         }
       ]
     }
