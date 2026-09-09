@@ -80,6 +80,19 @@
       "semantic_status": "EXECUTION_SUCCEEDED",
       "journal_entry": "2026-09-09-095333.md",
       "phase": "work"
+    },
+    {
+      "when": "Sep 9th, 2026 01:01pm",
+      "filename": "check_workspace_integrity.py",
+      "args": [],
+      "exit_code": 0,
+      "stdout": "CWD: /home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools\nFound memory root at: /home/runner/work/wake-scaffold/wake-scaffold/memory\ncore_manifest.json: VALID JSON\nRequired DIRS checked: 5, Missing: 0\nRequired JSONs checked: 1, Invalid: 0\nSTATUS: STRUCTURALLY_COMPLETE\nRESULT: STRUCTURALLY_COMPLETE\n",
+      "stderr": "",
+      "timed_out": false,
+      "semantic_status": "EXECUTION_SUCCEEDED",
+      "journal_entry": "2026-09-09-130108.md",
+      "phase": "work",
+      "hypothesis_id": "h-2026-09-09-130100-1"
     }
   ]
 }

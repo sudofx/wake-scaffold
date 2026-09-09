@@ -23,6 +23,23 @@
           "conclusion": "The default workspace validation script fails because the core files are not located in the target directory searched by the tool, refuting the expectation of immediate structural completeness."
         }
       ]
+    },
+    {
+      "id": "h-2026-09-09-130108-0",
+      "created": "Sep 9th, 2026 01:01pm",
+      "prediction": "Executing tools/check_workspace_integrity.py will dynamically locate core_manifest.json, validate workspace layout and JSON integrity, and return STRUCTURALLY_COMPLETE.",
+      "test_method": "Run tools/check_workspace_integrity.py via tool-run block.",
+      "scope": "internal",
+      "boundary": "same_wake",
+      "status": "untested",
+      "history": [
+        {
+          "date": "Sep 9th, 2026 01:01pm",
+          "status": "untested",
+          "evidence": "",
+          "conclusion": "created via self-edit"
+        }
+      ]
     }
   ]
 }
