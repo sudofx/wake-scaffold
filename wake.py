@@ -473,8 +473,6 @@ def verify_template() -> None:
         for subdir, name in TEMPLATE_FILES
         if not (BASE_MEMORY / subdir / name).is_file()
     ]
-    if not (BASE_MEMORY / "core_workspace" / "tools").is_dir():
-        missing.append("core_workspace/tools/")
     if not (BASE_MEMORY / "core_synthesis").is_dir():
         missing.append("core_synthesis/")
     if missing:
@@ -518,7 +516,8 @@ def validate_active_memory() -> list[str]:
     for path in required_files:
         if not path.is_file():
             findings.append(f"missing file: {path.relative_to(MEMORY)}")
-    for path in (JOURNAL, TOOLS_DIR, SYNTHESIS_DIR):
+    # tools/ is runtime-only and is intentionally absent after a Bob reset.
+    for path in (JOURNAL, SYNTHESIS_DIR):
         if not path.is_dir():
             findings.append(f"missing directory: {path.relative_to(MEMORY)}")
 
