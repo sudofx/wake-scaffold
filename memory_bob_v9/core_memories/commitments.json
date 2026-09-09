@@ -1,0 +1,4 @@
+{
+  "_comment": "Every promise the agent makes goes here as a row. Checked every wake, before anything else. Never rely on the model to 'remember' a promise from the journal alone.",
+  "commitments": []
+}

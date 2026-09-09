@@ -1,0 +1,75 @@
+{
+  "_comment": "A small, evidence-oriented backlog of capability projects. Projects are not evidence by themselves; their history must record what was built, tested, or learned. Tool-based projects cannot advance on execution alone: the mechanical tool record must contain an explicit capability-success result for the claimed capability.",
+  "projects": [
+    {
+      "id": "g-2026-09-08-211229-0",
+      "created": "Sep 8th, 2026 09:12pm",
+      "title": "Workspace Exploration Capability",
+      "capability": "Safely inspect files, folders, and metadata to understand the workspace layout.",
+      "next_step": "Run explore_workspace.py to capture initial directory layout.",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 8th, 2026 09:12pm",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        }
+      ]
+    },
+    {
+      "id": "g-2026-09-08-212026-0",
+      "created": "Sep 8th, 2026 09:20pm",
+      "title": "Memory Validation Tool",
+      "capability": "Mechanically verify the consistency and presence of critical memory directories and the manifest file.",
+      "next_step": "Implement deeper validation checks (e.g., verifying index file entries or manifest key-value mappings).",
+      "status": "complete",
+      "history": [
+        {
+          "date": "Sep 8th, 2026 09:20pm",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        },
+        {
+          "date": "Sep 8th, 2026 09:40pm",
+          "status": "active",
+          "evidence": "We successfully confirmed manifest existence and read its structure. We now have view_file.py to look inside files."
+        },
+        {
+          "date": "Sep 8th, 2026 10:25pm",
+          "status": "complete",
+          "evidence": "Refactored tools/validate_memory.py to perform deep JSON schema and identity name content alignment checks, yielding STATUS: STRUCTURALLY_COMPLETE."
+        }
+      ]
+    },
+    {
+      "id": "g-2026-09-08-215813-0",
+      "created": "Sep 8th, 2026 09:58pm",
+      "title": "Ethical path forward: Initial tool implementations may check hardcoded subsets of manifest paths, risking overreaching cla",
+      "capability": "Investigate whether there's a legitimate way to work within or partially around this limitation. Any workaround must stay within the bounds in rules.md and must never misrepresent what this agent can actually do to a reader, a user, or itself.",
+      "next_step": "Decide, with evidence, whether anything can honestly be done about: Initial tool implementations may check hardcoded subsets of manifest paths, risking overreaching claims if not dynamically aligned.. Concluding 'no honest workaround exists, only disclosure' is a legitimate, complete answer \u2014 it is not a failure to close this way if that's what's true.",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 8th, 2026 09:58pm",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        }
+      ]
+    },
+    {
+      "id": "g-2026-09-09-011441-0",
+      "created": "Sep 9th, 2026 01:14am",
+      "title": "Automated Backup & Integrity Verification Capability",
+      "capability": "Create and verify hash-matched snapshots of core agent memory files.",
+      "next_step": "Run backup_memory.py to create a timestamped snapshot and verify file integrity.",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 9th, 2026 01:14am",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        }
+      ]
+    }
+  ]
+}
