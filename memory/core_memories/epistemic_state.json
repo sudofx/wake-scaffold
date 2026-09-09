@@ -66,6 +66,20 @@
       "confidence_before": "medium",
       "confidence_after": "high",
       "journal_entry": "2026-09-08-234142.md"
+    },
+    {
+      "id": "mr-2026-09-09-011441-006",
+      "date": "Sep 9th, 2026 01:14am",
+      "observation": "backup_memory.py created a snapshot in core_workspace/backups/ and verified source and destination SHA-256 hashes for core_manifest.json, identity.md, index.md, hypotheses.json, and growth_plan.json.",
+      "claim": "Automated snapshot copying paired with SHA-256 hash validation provides a verifiable backup method for core memory files.",
+      "prediction": "Executing backup_memory.py will copy target core files and report BACKUP_VERIFIED with identical file hashes.",
+      "test": "Executed tools/backup_memory.py via tool-run and verified stdout and exit code.",
+      "outcome": "backup_memory.py output BACKUP_VERIFIED and successfully generated a backup_manifest.json confirming matching hashes for all 5 target files.",
+      "revision": "Confirmed that memory files can be safely snapshot-backed with SHA-256 integrity verification. Future wakes can build restore verification mechanisms on top of this artifact.",
+      "source": "tool-run",
+      "confidence_before": "medium",
+      "confidence_after": "high",
+      "journal_entry": "2026-09-09-011441.md"
     }
   ]
 }

@@ -1,0 +1,26 @@
+{
+  "timestamp": "20260909_081539",
+  "files": {
+    "core_manifest.json": {
+      "hash": "44d615c991093a8a39d0cdb6d8fe609a95e603e73a19ca0c90b63bd01b2c3e81",
+      "size": 380,
+      "status": "VERIFIED"
+    },
+    "core_identity/identity.md": {
+      "hash": "5e6a0d6fe35247b4cdb1efd09279abd55ea94ca6447f7b3d42a8b119514e7528",
+      "size": 3772,
+      "status": "VERIFIED"
+    },
+    "core_memories/index.md": {
+      "hash": "f5e4482ee8fc92b869d260c51a518899bb2f024603121cd6c71c99b081033339",
+      "size": 1365,
+      "status": "VERIFIED"
+    },
+    "core_workspace/hypotheses.json": {
+      "status": "FILE_NOT_FOUND"
+    },
+    "core_workspace/growth_plan.json": {
+      "status": "FILE_NOT_FOUND"
+    }
+  }
+}
