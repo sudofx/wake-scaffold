@@ -8,13 +8,19 @@
       "test_method": "Run tools/validate_workspace.py via tool-run block and check output.",
       "scope": "internal",
       "boundary": "same_wake",
-      "status": "untested",
+      "status": "refuted",
       "history": [
         {
           "date": "Sep 9th, 2026 01:43am",
           "status": "untested",
           "evidence": "",
           "conclusion": "created via self-edit"
+        },
+        {
+          "date": "Sep 9th, 2026 01:47am",
+          "status": "refuted",
+          "evidence": "tool_runs.json shows validate_workspace.py returned STRUCTURALLY_INVALID with missing files (rules.md, index.md, etc.) when run against current directories.",
+          "conclusion": "The default workspace validation script fails because the core files are not located in the target directory searched by the tool, refuting the expectation of immediate structural completeness."
         }
       ]
     }

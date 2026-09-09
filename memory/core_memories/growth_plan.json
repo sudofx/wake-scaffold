@@ -7,12 +7,17 @@
       "title": "Workspace Integrity Validation",
       "capability": "Automated verification of workspace file presence and core JSON validity.",
       "next_step": "Run validate_workspace.py in the sandboxed environment and verify tool run output.",
-      "status": "proposed",
+      "status": "active",
       "history": [
         {
           "date": "Sep 9th, 2026 01:43am",
           "status": "proposed",
           "evidence": "created via self-edit"
+        },
+        {
+          "date": "Sep 9th, 2026 01:47am",
+          "status": "active",
+          "evidence": "We have updated the hypothesis to refuted and launched explore_workspace.py to find where the core files are so we can repair workspace validation."
         }
       ]
     }
