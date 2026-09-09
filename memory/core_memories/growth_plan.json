@@ -1,4 +1,20 @@
 {
   "_comment": "A small, evidence-oriented backlog of capability projects. Projects are not evidence by themselves; their history must record what was built, tested, or learned. Tool-based projects cannot advance on execution alone: the mechanical tool record must contain an explicit capability-success result for the claimed capability.",
-  "projects": []
+  "projects": [
+    {
+      "id": "g-2026-09-09-014317-0",
+      "created": "Sep 9th, 2026 01:43am",
+      "title": "Workspace Integrity Validation",
+      "capability": "Automated verification of workspace file presence and core JSON validity.",
+      "next_step": "Run validate_workspace.py in the sandboxed environment and verify tool run output.",
+      "status": "proposed",
+      "history": [
+        {
+          "date": "Sep 9th, 2026 01:43am",
+          "status": "proposed",
+          "evidence": "created via self-edit"
+        }
+      ]
+    }
+  ]
 }

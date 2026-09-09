@@ -1,4 +1,49 @@
 {
   "_comment": "Last MAX_TOOL_RUN_HISTORY tool executions (stdout/stderr/exit code), written by tool-run and read back as evidence next wake. New identities start with none.",
-  "runs": []
+  "runs": [
+    {
+      "when": "Sep 9th, 2026 01:43am",
+      "filename": "validate_workspace.py",
+      "args": [
+        "."
+      ],
+      "exit_code": 1,
+      "stdout": "STATUS: FOUND=0 MISSING=7 JSON_OK=0 JSON_ERR=0\nMissing files: ['rules.md', 'index.md', 'identity.md', 'growth_plan.md', 'hypotheses.md', 'commitments.md', 'tool_runs.json']\nRESULT: STRUCTURALLY_INVALID\n",
+      "stderr": "",
+      "timed_out": false,
+      "semantic_status": "EXECUTION_FAILED",
+      "journal_entry": "2026-09-09-014317.md",
+      "phase": "work"
+    },
+    {
+      "when": "Sep 9th, 2026 01:43am",
+      "filename": "validate_workspace.py",
+      "args": [
+        "."
+      ],
+      "exit_code": 1,
+      "stdout": "CWD: /home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools\nTarget dir: . -> Resolved root: ..\nDirectory contents of '..': ['tools', 'prompts', 'journal', 'tool_runs.json']\nSTATUS: FOUND=1 MISSING=6 JSON_OK=1 JSON_ERR=0\nMissing files: ['rules.md', 'index.md', 'identity.md', 'growth_plan.md', 'hypotheses.md', 'commitments.md']\nRESULT: STRUCTURALLY_INVALID\n",
+      "stderr": "",
+      "timed_out": false,
+      "semantic_status": "EXECUTION_FAILED",
+      "journal_entry": "2026-09-09-014317.md",
+      "phase": "development",
+      "development_iteration": 1
+    },
+    {
+      "when": "Sep 9th, 2026 01:43am",
+      "filename": "validate_workspace.py",
+      "args": [
+        "."
+      ],
+      "exit_code": 1,
+      "stdout": "CWD: /home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools\nTarget dir: . -> Resolved root: .\nDirectory contents of '.': ['validate_workspace.py', '.gitkeep']\nSTATUS: FOUND=0 MISSING=7 JSON_OK=0 JSON_ERR=0\nMissing files: ['rules.md', 'index.md', 'identity.md', 'growth_plan.md', 'hypotheses.md', 'commitments.md', 'tool_runs.json']\nRESULT: STRUCTURALLY_INVALID\n",
+      "stderr": "",
+      "timed_out": false,
+      "semantic_status": "EXECUTION_FAILED",
+      "journal_entry": "2026-09-09-014317.md",
+      "phase": "development",
+      "development_iteration": 2
+    }
+  ]
 }
