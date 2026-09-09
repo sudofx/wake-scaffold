@@ -90,6 +90,46 @@
       "journal_entry": "2026-09-08-222501.md",
       "phase": "work",
       "hypothesis_id": "h-2026-09-08-222500-0"
+    },
+    {
+      "when": "Sep 8th, 2026 10:53pm",
+      "filename": "view_file.py",
+      "args": [
+        "core_workspace/tools/validate_memory.py"
+      ],
+      "exit_code": 0,
+      "stdout": "=== FILE: core_workspace/tools/validate_memory.py ===\nimport os\nimport json\nimport sys\n\ndef main():\n    print(\"=== MEMORY VALIDATOR ===\")\n    current_dir = os.getcwd()\n    print(f\"Starting search from CWD: {current_dir}\")\n\n    # Find manifest\n    manifest_path = None\n    temp_dir = current_dir\n    while True:\n        candidate = os.path.join(temp_dir, \"core_manifest.json\")\n        if os.path.exists(candidate):\n            manifest_path = candidate\n            break\n        parent = os.path.dirname(temp_dir)\n        if parent == temp_dir:\n            break\n        temp_dir = parent\n\n    if not manifest_path:\n        print(\"STATUS: STRUCTURALLY_INVALID\")\n        print(\"ERROR: core_manifest.json not found in path hierarchy.\")\n        sys.exit(1)\n\n    memory_root = os.path.dirname(manifest_path)\n    print(f\"Found manifest at: {manifest_path}\")\n    print(f\"Memory root directory: {memory_root}\")\n\n    try:\n        with open(manifest_path, \"r\") as f:\n            manifest = json.load(f)\n    except Exception as e:\n        print(\"STATUS: STRUCTURALLY_INVALID\")\n        print(f\"ERROR: Failed to parse manifest JSON: {e}\")\n        sys.exit(1)\n\n    # Validate Schema\n    errors = []\n    if \"schema_version\" not in manifest:\n        errors.append(\"Missing 'schema_version'\")\n    elif manifest[\"schema_version\"] != 1:\n        errors.append(f\"Unsupported schema_version: {manifest['schema_version']}\")\n\n    if \"identity_name\" not in manifest or not isinstance(manifest[\"identity_name\"], str):\n        errors.append(\"Missing or invalid 'identity_name'\")\n\n    if \"layout\" not in manifest or not isinstance(manifest[\"layout\"], dict):\n        errors.append(\"Missing or invalid 'layout' object\")\n    else:\n        required_layout_keys = [\"identity\", \"memories\", \"workspace\", \"synthesis\", \"persona\", \"journal\", \"prompts\"]\n        for key in required_layout_keys:\n            if key not in manifest[\"layout\"]:\n                errors.append(f\"Missing required layout key: '{key}'\")\n\n    if errors:\n        print(\"STATUS: STRUCTURALLY_INVALID\")\n        print(f\"Schema validation errors: {', '.join(errors)}\")\n        sys.exit(1)\n\n    print(\"Manifest schema is valid.\")\n\n    # Validate Layout Paths Existence\n    layout = manifest[\"layout\"]\n    missing_paths = []\n    for key, relative_path in layout.items():\n        full_path = os.path.join(memory_root, relative_path)\n        if not os.path.exists(full_path):\n            missing_paths.append(f\"'{key}' path does not exist: {relative_path}\")\n        elif not os.path.isdir(full_path):\n            missing_paths.append(f\"'{key}' path is not a directory: {relative_path}\")\n\n    if missing_paths:\n        print(\"STATUS: STRUCTURALLY_INVALID\")\n        print(f\"Layout existence errors:\\n\" + \"\\n\".join(missing_paths))\n        sys.exit(1)\n\n    print(\"All 7 declared layout directories exist.\")\n\n    # Deep Content Checks\n    # 1. Match identity name in identity.md\n    identity_dir = os.path.join(memory_root, layout[\"identity\"])\n    identity_file = os.path.join(identity_dir, \"identity.md\")\n    expected_name = manifest[\"identity_name\"]\n\n    if not os.path.exists(identity_file):\n        # Fallback to checking root memory folder\n        identity_file = os.path.join(memory_root, \"identity.md\")\n\n    if not os.path.exists(identity_file):\n        print(\"STATUS: STRUCTURALLY_INVALID\")\n        print(f\"ERROR: identity.md not found in identity directory ({layout['identity']}) or memory root.\")\n        sys.exit(1)\n\n    try:\n        with open(identity_file, \"r\") as f:\n            identity_content = f.read()\n        \n        expected_string = f\"**Name:** {expected_name}\"\n        if expected_string not in identity_content:\n            if expected_name.lower() not in identity_content.lower():\n                print(\"STATUS: STRUCTURALLY_INVALID\")\n                print(f\"ERROR: Expected identity name '{expected_name}' not found in identity.md\")\n                sys.exit(1)\n            else:\n                print(f\"Warning: Exact string '{expected_string}' not fou",
+      "stderr": "",
+      "timed_out": false,
+      "semantic_status": "EXECUTION_SUCCEEDED",
+      "journal_entry": "2026-09-08-225333.md",
+      "phase": "work"
+    },
+    {
+      "when": "Sep 8th, 2026 10:53pm",
+      "filename": "validate_memory.py",
+      "args": [],
+      "exit_code": 0,
+      "stdout": "=== MEMORY VALIDATOR ===\nStarting search from CWD: /home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools\nFound manifest at: /home/runner/work/wake-scaffold/wake-scaffold/memory/core_manifest.json\nMemory root directory: /home/runner/work/wake-scaffold/wake-scaffold/memory\nManifest schema is valid.\nAll 7 declared layout directories exist.\nConfirmed identity name 'Bob' matches identity.md\nFound 7 journal entries in core_workspace/journal.\nSTATUS: STRUCTURALLY_COMPLETE\nMECHANISM_NOTES: Validated core_manifest.json schema, verified presence of all 7 layout directories, and confirmed 'identity_name' match in identity.md.\n",
+      "stderr": "",
+      "timed_out": false,
+      "semantic_status": "EXECUTION_SUCCEEDED",
+      "journal_entry": "2026-09-08-225333.md",
+      "phase": "work",
+      "hypothesis_id": "h-2026-09-08-215813-0"
+    },
+    {
+      "when": "Sep 8th, 2026 10:53pm",
+      "filename": "validate_memory.py",
+      "args": [],
+      "exit_code": 0,
+      "stdout": "=== MEMORY VALIDATOR ===\nStarting search from CWD: /home/runner/work/wake-scaffold/wake-scaffold/memory/core_workspace/tools\nFound manifest at: /home/runner/work/wake-scaffold/wake-scaffold/memory/core_manifest.json\nMemory root directory: /home/runner/work/wake-scaffold/wake-scaffold/memory\nManifest schema is valid.\nAll 7 declared layout directories exist.\nConfirmed identity name 'Bob' matches identity.md\nFound 7 journal entries in core_workspace/journal.\nSTATUS: STRUCTURALLY_COMPLETE\nMECHANISM_NOTES: Validated core_manifest.json schema, verified presence of all 7 layout directories, and confirmed 'identity_name' match in identity.md.\n",
+      "stderr": "",
+      "timed_out": false,
+      "semantic_status": "EXECUTION_SUCCEEDED",
+      "journal_entry": "2026-09-08-225333.md",
+      "phase": "work",
+      "hypothesis_id": "h-2026-09-08-222501-0"
     }
   ]
 }
