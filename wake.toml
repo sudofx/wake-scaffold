@@ -10,4 +10,4 @@ timeout_seconds = 60
 # Explicit opt-in: use an API project with billing disabled.
 free_tier_confirmed = true
 # Optional public journal publishing after each scheduled run. Read docs/operations.md first.
-publish_reports = false
+publish_reports = true
