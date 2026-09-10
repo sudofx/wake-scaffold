@@ -1,5 +1,5 @@
 {
   "status": "failed",
-  "id": "w-be704d3b5f344629",
-  "reason": "Gemini HTTP 400; attempt counted, no automatic retry"
+  "id": "w-fce69561329e4615",
+  "reason": "Gemini HTTP 503; attempt counted, no automatic retry"
 }
