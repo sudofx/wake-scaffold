@@ -1,5 +1,5 @@
 {
-  "status": "failed",
-  "id": "w-d28240a6109c46e4",
-  "reason": "Gemini HTTP 503; attempt counted, no automatic retry"
+  "status": "rejected",
+  "id": "w-4a7b46207fcc4c2b",
+  "reason": "Belief fields must be exactly: type id statement confidence status evidence reason"
 }
