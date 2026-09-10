@@ -122,9 +122,13 @@ class Gemini:
         require(bool(os.environ.get("GEMINI_API_KEY")), "GEMINI_API_KEY is missing")
 
     def propose(self, request):
-        body = {"systemInstruction": {"parts": [{"text": request["system"]}]},
+        # Keep the exact contract in the durable request and prompt. Gemini's
+        # constrained decoder rejects this action union on the deployed model;
+        # JSON mode plus our unchanged validator avoids that transport failure.
+        system = request["system"] + "\nResponse contract (JSON Schema):\n" + json.dumps(request.get("response_schema", SCHEMA))
+        body = {"systemInstruction": {"parts": [{"text": system}]},
                 "contents": [{"role": "user", "parts": [{"text": json.dumps(request["context"])}]}],
-                "generationConfig": {"responseMimeType": "application/json", "responseJsonSchema": SCHEMA,
+                "generationConfig": {"responseMimeType": "application/json",
                                      "maxOutputTokens": self.config["max_output_tokens"]}}
         if self.model in ("gemini-3.7-flash", "gemini-3.8-flash"):
             body["generationConfig"]["thinkingConfig"] = {"thinkingLevel": "low"}

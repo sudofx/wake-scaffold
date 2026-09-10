@@ -230,7 +230,7 @@ class SystemTests(unittest.TestCase):
             self.assertEqual(network.call_count, 1)
             request = network.call_args.args[0]
             self.assertNotIn("test-key", request.full_url)
-            self.assertIn("responseJsonSchema", json.loads(request.data)["generationConfig"])
+            self.assertEqual(json.loads(request.data)["generationConfig"]["responseMimeType"], "application/json")
 
 
 if __name__ == "__main__":

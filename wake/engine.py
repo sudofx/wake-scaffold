@@ -111,8 +111,9 @@ class Engine:
                 "base_version": state["version"], "previous_head": head,
                 "inherited_commitments": [k for k, v in state["commitments"].items() if v["status"] == "open"],
                 "scope": "Receipt proves state delivery to the provider boundary, not model comprehension."})})
-        from .providers import RESEARCH_SYSTEM
-        request = {"system": SYSTEM + (RESEARCH_SYSTEM if state.get("charter") else ""), "context": self.context(state, receipt)}
+        from .providers import RESEARCH_SYSTEM, SCHEMA
+        request = {"system": SYSTEM + (RESEARCH_SYSTEM if state.get("charter") else ""),
+                   "context": self.context(state, receipt), "response_schema": SCHEMA}
         if state.get("charter") and len(canonical(request)) > self.config["max_context_chars"]:
             request["context"]["recent_journal"] = []
             request["context"]["notebooks"] = request["context"]["notebooks"][-4:]

@@ -91,7 +91,9 @@ class CloudWorkflowTests(unittest.TestCase):
                 return json.dumps({"candidates":[{"finishReason":"STOP", "content":{"parts":[{"text":"{}"}]}}]}).encode()
         with patch.dict("os.environ", {"GEMINI_API_KEY":"test-key"}), patch("urllib.request.urlopen", return_value=Response()) as network:
             Gemini({**DEFAULTS, "free_tier_confirmed":True}).propose({"system":"rules", "context":{}})
-        schema = json.loads(network.call_args.args[0].data)["generationConfig"]["responseJsonSchema"]
+        body = json.loads(network.call_args.args[0].data)
+        self.assertNotIn("responseJsonSchema", body["generationConfig"])
+        schema = json.loads(body["systemInstruction"]["parts"][0]["text"].split("Response contract (JSON Schema):\n")[1])
         variants = {s["properties"]["type"]["enum"][0]:s for s in schema["properties"]["actions"]["items"]["anyOf"]}
         project = variants["project"]
         self.assertEqual(set(project["properties"]), set("type id title question domain status next_step reason".split()))
