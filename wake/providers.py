@@ -114,6 +114,8 @@ class Gemini:
                 "contents": [{"role": "user", "parts": [{"text": json.dumps(request["context"])}]}],
                 "generationConfig": {"responseMimeType": "application/json", "responseJsonSchema": SCHEMA,
                                      "maxOutputTokens": self.config["max_output_tokens"]}}
+        if self.model in ("gemini-3.7-flash", "gemini-3.8-flash"):
+            body["generationConfig"]["thinkingConfig"] = {"thinkingLevel": "low"}
         req = urllib.request.Request(
             f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent",
             data=json.dumps(body).encode(), headers={"Content-Type": "application/json",

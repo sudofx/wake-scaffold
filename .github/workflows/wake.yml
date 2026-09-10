@@ -60,7 +60,7 @@ jobs:
             cat site/operation.json >> "$GITHUB_STEP_SUMMARY"
           fi
       - name: Flag a wake requiring attention
-        if: steps.cycle.outcome == 'failure'
+        if: always() && steps.cycle.outcome == 'failure'
         run: exit 1
 
   publish:

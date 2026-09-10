@@ -1,11 +1,11 @@
 timezone = "America/Los_Angeles"
 objective = "Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process."
 provider = "gemini"
-model = "gemini-2.5-flash"
+model = "gemini-3.7-flash"
 # Local ceiling, not a claim about Google's current allowance.
 daily_call_limit = 20
 max_context_chars = 48000
-max_output_tokens = 4096
+max_output_tokens = 8192
 timeout_seconds = 60
 # Explicit opt-in: use an API project with billing disabled.
 free_tier_confirmed = true
