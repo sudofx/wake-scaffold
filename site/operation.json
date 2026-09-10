@@ -1,5 +1,5 @@
 {
-  "status": "failed",
-  "id": "w-b018820a11ce427a",
-  "reason": "Gemini HTTP 503; attempt counted, no automatic retry"
+  "status": "rejected",
+  "id": "w-f63a315032264b59",
+  "reason": "Project fields must be exactly: type id title question domain status next_step reason"
 }
