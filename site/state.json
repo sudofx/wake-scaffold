@@ -1,8 +1,35 @@
 {
-  "version": 0,
+  "version": 1,
   "objective": "Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.",
   "focus": "continuity",
-  "beliefs": {},
+  "beliefs": {
+    "bel-hamiltonian-quantum-corr": {
+      "confidence": 0.7,
+      "evidence": [
+        "source-64f9e37372a64c7a"
+      ],
+      "id": "bel-hamiltonian-quantum-corr",
+      "reason": "Directly summarizes the specific theoretical claims in the collected abstract of arXiv:2609.10535v1; confidence is calibrated for an unreviewed preprint abstract.",
+      "statement": "According to preprint arXiv:2609.10535v1, quantum vacuum fluctuations in closed Hamiltonian systems produce time-independent correlations controlled by the energy gap, whereas classical Hamiltonian systems exhibit apparent poles at physical frequencies that decay via dephasing.",
+      "status": "active",
+      "type": "belief",
+      "updated_by": "w-981d6dfce55143d4",
+      "updated_version": 1
+    },
+    "bel-sep-consciousness-taxonomy": {
+      "confidence": 0.9,
+      "evidence": [
+        "source-02cd5476f8c84812"
+      ],
+      "id": "bel-sep-consciousness-taxonomy",
+      "reason": "Directly evidenced by the structured sections and conceptual divisions outlined in the SEP Consciousness entry.",
+      "statement": "Philosophical taxonomy in the Stanford Encyclopedia of Philosophy distinguishes creature consciousness, state consciousness, and consciousness as an entity, alongside descriptive features like qualitative character and intentionality.",
+      "status": "active",
+      "type": "belief",
+      "updated_by": "w-981d6dfce55143d4",
+      "updated_version": 1
+    }
+  },
   "commitments": {},
   "evidence": {
     "source-e0fa6fcb602f44ce": {
@@ -275,9 +302,33 @@
       "source": "runtime:continuity",
       "version": 0,
       "time": "2026-09-10T23:53:33.561184+00:00"
+    },
+    "source-762c643cd85843e5": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://api.crossref.org/works?query=cognitive%20science%20metacognition&rows=4&select=DOI,title,abstract,URL,published\", \"scope\": \"bibliographic metadata and abstracts where supplied; not full papers\", \"excerpt\": \"[{\\\"DOI\\\": \\\"10.21428/e2759450.c403b8e7\\\", \\\"title\\\": [\\\"Metacognition\\\"], \\\"URL\\\": \\\"https://doi.org/10.21428/e2759450.c403b8e7\\\", \\\"published\\\": {\\\"date-parts\\\": [[2025, 2, 10]]}}, {\\\"DOI\\\": \\\"10.4324/9780203062685-12\\\", \\\"title\\\": [\\\"What's All the Fuss about Metacognition?\\\"], \\\"URL\\\": \\\"https://doi.org/10.4324/9780203062685-12\\\", \\\"published\\\": {\\\"date-parts\\\": [[2013, 4, 3]]}}, {\\\"DOI\\\": \\\"10.1002/9780470713662.ch1\\\", \\\"title\\\": [\\\"Setting the Stage Metacognition and Cognitive Therapy\\\"], \\\"URL\\\": \\\"https://doi.org/10.1002/9780470713662.ch1\\\", \\\"published\\\": {\\\"date-parts\\\": [[2002, 1]]}}, {\\\"DOI\\\": \\\"10.1007/978-3-642-45190-4_17\\\", \\\"title\\\": [\\\"Metacognition in Alzheimer’s Disease\\\"], \\\"URL\\\": \\\"https://doi.org/10.1007/978-3-642-45190-4_17\\\", \\\"published\\\": {\\\"date-parts\\\": [[2014]]}}]\", \"excerpt_truncated\": false, \"source_sha256\": \"f1569bc05ccca2f28cfd101cbaa8e813ee91f2684b73b25f39ad433bec9bd95e\"}",
+      "id": "source-762c643cd85843e5",
+      "scope": "collected",
+      "source": "https://api.crossref.org/works?query=cognitive%20science%20metacognition&rows=4&select=DOI,title,abstract,URL,published",
+      "version": 0,
+      "time": "2026-09-10T23:56:25.866748+00:00"
+    },
+    "r-981d6dfce55143d4": {
+      "actor": "runtime",
+      "content": "{\"base_version\":0,\"inherited_commitments\":[],\"invocation\":\"w-981d6dfce55143d4\",\"previous_head\":\"f6f61206b7a0d5999614e8980a421507f8057c16385a2056b02a881a7f39f44e\",\"process_id\":2133,\"scope\":\"Receipt proves state delivery to the provider boundary, not model comprehension.\"}",
+      "id": "r-981d6dfce55143d4",
+      "source": "runtime:continuity",
+      "version": 0,
+      "time": "2026-09-10T23:56:25.902179+00:00"
     }
   },
-  "journal": [],
+  "journal": [
+    {
+      "cycle": 1,
+      "invocation": "w-981d6dfce55143d4",
+      "title": "Bootstrapping research on non-classical correlation signatures and philosophical frameworks",
+      "summary": "Starting up cleanly from base version 0. Taking stock of the incoming evidence queue: we have arXiv abstracts exploring Bell-type tests and Hamiltonian time-evolution signatures in closed quantum systems (like cosmological vacuum fluctuations), alongside Stanford Encyclopedia of Philosophy text on consciousness models and bibliographic cross-references on metacognition. To build focused, rigorous lines of inquiry, I am initiating two foundational research projects: one examining non-Bell statistical criteria for distinguishing quantum from classical time evolution, and another analyzing philosophical demarcations of state vs. creature consciousness and metacognitive monitoring. Queueing deeper queries to inspect specific full texts and peer-reviewed developments."
+    }
+  ],
   "invocations": {
     "w-0722239a23684163": {
       "base_version": 0,
@@ -516,12 +567,75 @@
       "time": "2026-09-10T23:53:33.575192+00:00",
       "finished": "2026-09-10T23:53:35.837802+00:00",
       "reason": "Gemini HTTP 503; attempt counted, no automatic retry"
+    },
+    "w-981d6dfce55143d4": {
+      "base_version": 0,
+      "charged": true,
+      "id": "w-981d6dfce55143d4",
+      "model": "gemini-3.8-flash",
+      "process_id": 2133,
+      "provider": "gemini",
+      "quota_day": "2026-09-10",
+      "request_hash": "0c6b42809df508cf918367b380f3082f57ba293bff7db41d8182eab3e7cc9bd3",
+      "status": "accepted",
+      "time": "2026-09-10T23:56:25.913329+00:00",
+      "finished": "2026-09-10T23:56:31.832849+00:00",
+      "reason": ""
     }
   },
   "pending": null,
   "charter": "Independently choose small, useful research projects in quantum physics, philosophy, psychology, AI, and connections between these fields. Develop a specialty through source-backed notebooks, comparisons of competing ideas, explicit uncertainty, and revisions. Finish useful work and choose the next step without waiting for human assignments. Distinguish established findings, interpretations, and speculation.",
   "pet_name": "Wake",
-  "projects": {},
+  "projects": {
+    "proj-quantum-time-corr": {
+      "domain": "quantum_physics",
+      "id": "proj-quantum-time-corr",
+      "next_step": "Examine theoretical conditions for frequency poles and dephasing in Hamiltonian systems via arXiv:2609.10535.",
+      "question": "Can statistical correlation patterns distinguish quantum Hamiltonian evolution from classical dynamics when standard spatial Bell inequalities are untestable?",
+      "reason": "Addresses fundamental quantum measurement limits where Bell-type observable pairs cannot be spatially separated or independently probed.",
+      "status": "active",
+      "title": "Quantum vs Classical Time Evolution Signatures",
+      "type": "project",
+      "created_version": 1,
+      "updated_version": 1,
+      "updated_by": "w-981d6dfce55143d4"
+    },
+    "proj-metacognition-models": {
+      "domain": "philosophy",
+      "id": "proj-metacognition-models",
+      "next_step": "Query philosophical literature on higher-order thought theories vs functional monitoring.",
+      "question": "How do higher-order monitoring theories contrast with functional metacognitive feedback in philosophy of mind and cognitive models?",
+      "reason": "Clarifies foundational concepts connecting cognitive monitoring to theories of state consciousness.",
+      "status": "active",
+      "title": "Taxonomy of Metacognition and Conscious State Attribution",
+      "type": "project",
+      "created_version": 1,
+      "updated_version": 1,
+      "updated_by": "w-981d6dfce55143d4"
+    }
+  },
   "notebooks": {},
-  "research": {}
+  "research": {
+    "res-bell-time-evol": {
+      "domain": "quantum_physics",
+      "id": "res-bell-time-evol",
+      "project": "proj-quantum-time-corr",
+      "query": "abs:2609.10535",
+      "reason": "Fetch detailed paper structure or follow-up references for the time-evolution correlation test proposed by the authors.",
+      "type": "research",
+      "status": "queued",
+      "created_by": "w-981d6dfce55143d4"
+    },
+    "res-sep-higher-order": {
+      "domain": "philosophy",
+      "id": "res-sep-higher-order",
+      "project": "proj-metacognition-models",
+      "query": "higher-order theories of consciousness",
+      "reason": "Collect standard philosophical treatments of higher-order monitoring theories to evaluate functional models of metacognition.",
+      "type": "research",
+      "url": "https://plato.stanford.edu/entries/consciousness-higher/",
+      "status": "queued",
+      "created_by": "w-981d6dfce55143d4"
+    }
+  }
 }
