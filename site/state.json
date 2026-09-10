@@ -208,6 +208,23 @@
       "source": "runtime:continuity",
       "version": 0,
       "time": "2026-09-10T23:23:13.003142+00:00"
+    },
+    "source-78d6e66c18404aeb": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://api.crossref.org/works?query=cognitive%20science%20metacognition&rows=4&select=DOI,title,abstract,URL,published\", \"scope\": \"bibliographic metadata and abstracts where supplied; not full papers\", \"excerpt\": \"[{\\\"DOI\\\": \\\"10.21428/e2759450.c403b8e7\\\", \\\"title\\\": [\\\"Metacognition\\\"], \\\"URL\\\": \\\"https://doi.org/10.21428/e2759450.c403b8e7\\\", \\\"published\\\": {\\\"date-parts\\\": [[2025, 2, 10]]}}, {\\\"DOI\\\": \\\"10.4324/9780203062685-12\\\", \\\"title\\\": [\\\"What's All the Fuss about Metacognition?\\\"], \\\"URL\\\": \\\"https://doi.org/10.4324/9780203062685-12\\\", \\\"published\\\": {\\\"date-parts\\\": [[2013, 4, 3]]}}, {\\\"DOI\\\": \\\"10.1002/9780470713662.ch1\\\", \\\"title\\\": [\\\"Setting the Stage Metacognition and Cognitive Therapy\\\"], \\\"URL\\\": \\\"https://doi.org/10.1002/9780470713662.ch1\\\", \\\"published\\\": {\\\"date-parts\\\": [[2002, 1]]}}, {\\\"DOI\\\": \\\"10.1007/978-3-642-45190-4_17\\\", \\\"title\\\": [\\\"Metacognition in Alzheimer’s Disease\\\"], \\\"URL\\\": \\\"https://doi.org/10.1007/978-3-642-45190-4_17\\\", \\\"published\\\": {\\\"date-parts\\\": [[2014]]}}]\", \"excerpt_truncated\": false, \"source_sha256\": \"f1569bc05ccca2f28cfd101cbaa8e813ee91f2684b73b25f39ad433bec9bd95e\"}",
+      "id": "source-78d6e66c18404aeb",
+      "scope": "collected",
+      "source": "https://api.crossref.org/works?query=cognitive%20science%20metacognition&rows=4&select=DOI,title,abstract,URL,published",
+      "version": 0,
+      "time": "2026-09-10T23:46:19.300874+00:00"
+    },
+    "r-be704d3b5f344629": {
+      "actor": "runtime",
+      "content": "{\"base_version\":0,\"inherited_commitments\":[],\"invocation\":\"w-be704d3b5f344629\",\"previous_head\":\"ca51f0ccef49896f729d38e9c9a5a60d5c1d186f33d62d9a20033187890691e1\",\"process_id\":2190,\"scope\":\"Receipt proves state delivery to the provider boundary, not model comprehension.\"}",
+      "id": "r-be704d3b5f344629",
+      "source": "runtime:continuity",
+      "version": 0,
+      "time": "2026-09-10T23:46:19.334756+00:00"
     }
   },
   "journal": [],
@@ -379,6 +396,20 @@
       "time": "2026-09-10T23:23:13.012317+00:00",
       "finished": "2026-09-10T23:23:16.571465+00:00",
       "reason": "Gemini HTTP 503; attempt counted, no automatic retry"
+    },
+    "w-be704d3b5f344629": {
+      "base_version": 0,
+      "charged": true,
+      "id": "w-be704d3b5f344629",
+      "model": "gemini-3.7-flash",
+      "process_id": 2190,
+      "provider": "gemini",
+      "quota_day": "2026-09-10",
+      "request_hash": "35830c13f73d9c08a7f1809431c602c3eff9ed02f787c990d9c4a3401d75944d",
+      "status": "failed",
+      "time": "2026-09-10T23:46:19.344878+00:00",
+      "finished": "2026-09-10T23:46:22.118695+00:00",
+      "reason": "Gemini HTTP 400; attempt counted, no automatic retry"
     }
   },
   "pending": null,
