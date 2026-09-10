@@ -39,7 +39,8 @@ jobs:
         run: python scripts/github_wake.py
       - name: Confirm report is ready
         id: report
-        if: always() && steps.cycle.outcome == 'success'
+        # A handled provider failure still produces a valid public report.
+        if: always()
         run: |
           test -f site/index.html
           echo 'ready=true' >> "$GITHUB_OUTPUT"
@@ -67,6 +68,9 @@ jobs:
     needs: wake
     if: always() && needs.wake.outputs.report_ready == 'true' && !cancelled()
     runs-on: ubuntu-latest
+    concurrency:
+      group: pages
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

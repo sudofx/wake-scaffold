@@ -70,22 +70,34 @@ Use an existing project/notebook ID to update it. All previous versions remain i
 """
 
 
-SCHEMA = {"type": "object", "properties": {
-    "base_version": {"type": "integer"}, "title": {"type": "string"},
-    "summary": {"type": "string"}, "actions": {"type": "array", "items": {
-        "type": "object", "properties": {
-            "type": {"type": "string", "enum": ["belief", "commit", "resolve"]},
-            "id": {"type": "string"}, "statement": {"type": "string"},
-            "confidence": {"type": "number"}, "status": {"type": "string"},
-            "evidence": {"type": "array", "items": {"type": "string"}},
-            "reason": {"type": "string"}, "task": {"type": "string"}, "due_cycle": {"type": "integer"}},
-        "required": ["type", "id", "reason"]}}},
-    "required": ["base_version", "title", "summary", "actions"]}
+def action_schema(kind, fields, enums=None, optional=()):
+    """Keep each action's shape distinct, matching mechanical governance exactly."""
+    required = ["type", *fields.split()]
+    properties = {key: {"type": "string"} for key in [*required, *optional]}
+    properties["type"] = {"type": "string", "enum": [kind]}
+    for key, values in (enums or {}).items():
+        properties[key] = {"type": "string", "enum": values}
+    if "confidence" in properties:
+        properties["confidence"] = {"type": "number", "minimum": 0, "maximum": 1}
+    if "due_cycle" in properties:
+        properties["due_cycle"] = {"type": "integer"}
+    if "evidence" in properties:
+        properties["evidence"] = {"type": "array", "items": {"type": "string"}, "minItems": 1, "maxItems": 12}
+    return {"type": "object", "properties": properties, "required": required, "additionalProperties": False}
 
-SCHEMA["properties"]["actions"]["items"]["properties"]["type"]["enum"] += ["project", "research", "notebook"]
-SCHEMA["properties"]["actions"]["items"]["properties"].update({
-    key: {"type": "string"} for key in ("title", "question", "domain", "next_step", "project", "query", "url",
-                                        "summary", "findings", "limitations", "next_questions")})
+
+_DOMAINS = ["quantum_physics", "philosophy", "psychology", "ai", "intersections"]
+SCHEMA = {"type": "object", "additionalProperties": False, "properties": {
+    "base_version": {"type": "integer"}, "title": {"type": "string"}, "summary": {"type": "string"},
+    "actions": {"type": "array", "maxItems": 12, "items": {"anyOf": [
+        action_schema("belief", "id statement confidence status evidence reason", {"status": ["active", "retracted"]}),
+        action_schema("commit", "id task due_cycle reason"),
+        action_schema("resolve", "id status evidence reason", {"status": ["fulfilled"]}),
+        action_schema("project", "id title question domain status next_step reason",
+                      {"domain": _DOMAINS, "status": ["active", "parked", "completed"]}),
+        action_schema("research", "id project query domain reason", {"domain": _DOMAINS}, optional=("url",)),
+        action_schema("notebook", "id project title summary findings limitations next_questions evidence reason"),
+    ]}}}, "required": ["base_version", "title", "summary", "actions"]}
 
 
 def load_env(path=Path(".env")):
