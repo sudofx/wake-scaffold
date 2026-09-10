@@ -1,5 +1,5 @@
 {
   "status": "rejected",
-  "id": "w-4a7b46207fcc4c2b",
-  "reason": "Belief fields must be exactly: type id statement confidence status evidence reason"
+  "id": "w-c7bb80707f6846a2",
+  "reason": "Project fields must be exactly: type id title question domain status next_step reason"
 }
