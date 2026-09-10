@@ -39,7 +39,7 @@ jobs:
         run: python scripts/github_wake.py
       - name: Confirm report is ready
         id: report
-        if: always()
+        if: always() && steps.cycle.outcome == 'success'
         run: |
           test -f site/index.html
           echo 'ready=true' >> "$GITHUB_OUTPUT"
