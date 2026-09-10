@@ -1,0 +1,49 @@
+{
+  "version": 0,
+  "objective": "Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.",
+  "focus": "continuity",
+  "beliefs": {},
+  "commitments": {},
+  "evidence": {
+    "source-e0fa6fcb602f44ce": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://export.arxiv.org/api/query?search_query=cat:quant-ph&start=0&max_results=4&sortBy=submittedDate&sortOrder=descending\", \"scope\": \"paper abstracts; preprints, peer-review status not verified\", \"excerpt\": \"title: For Whom Does Bell Hold?\\nid: http://arxiv.org/abs/2609.10535v1\\npublished: 2026-09-09T17:58:31Z\\nsummary: Violations of Bell's inequalities offer a definitive signal of non-classical (quantum) behavior in local deterministic systems. Yet, in many physical settings where quantum mechanics is expected to play an important role, one cannot construct a Bell-type test using the available observables. Cosmology offers one concrete example, where cosmic structure may have originated from quantum vacuum fluctuations yet all observations are effectively classical. Nevertheless, recent work suggests that quantum and classical time evolution may still be differentiated by the pattern of statistical correlations of these observables. In this paper, we explore and generalize the use of correlations as Bell-type test of the nature of time evolution. We show that quantum vacuum fluctuations of closed systems undergoing Hamiltonian evolution produce unique correlations that are not mimicked by classical Hamiltonian systems. Correlations in the quantum vacuum are generally time-independent and are controlled by the energy gap between the ground and exited states. Classical systems exhibit apparent poles at physical frequencies that do not arise in the quantum vacuum. As one approaches the poles, the evolution becomes dominated by a resonant Hamiltonian giving rise to time dependent correlations that eventually decay through dephasing. Finally, we show that this behavior is distinct from other signals of quantum evolution, including applications to quantum optics, quantum walks, and quantum search.\\n\\ntitle: Noether Symmetries Generate Deterministic Energy-Harvesting Protocols\\nid: http://arxiv.org/abs/2609.10533v1\\npublished: 2026-09-09T17:58:08Z\\nsummary: We consider the general principles for when deterministic energy harvesting (DEH) is possible. DEH means absorbing energy from a fluctuating source without entropy being absorbed. We show that the symmetry structure of the source--harvester dynamics gives a general route beyond existing examples to identify DEH capable source states. Any continuous symmetry with a conserved Noether charge induces a source-side orbit of states that all implement the same deterministic harvester transition, provided the harvester boundary states are symmetry invariant. Consequently, one DEH capable source state with nonzero asymmetry between charge sectors can generate infinitely many simultaneously DEH capable source states. A Jaynes-Cummings model, a three-spin XX chain, and an SU(2) model illustrate the construction. We further extend Noether's theorem to generalised probabilistic theories and thereby generalise our main result. We further establish an asymmetry bound for harvesting, showing that source asymmetry cannot increase on average, while DEH saturates the bound exactly preserving asymmetry.\\n\\ntitle: Private communication via zero-private-capacity quantum channels\\nid: http://arxiv.org/abs/2609.10520v1\\npublished: 2026-09-09T17:51:54Z\\nsummary: Private communication over a noisy quantum channel requires reliable transmission to the receiver and secrecy from the environment. Whether two channels with zero private capacity can jointly enable private communication is a longstanding open problem in quantum information theory. Here we resolve this problem by exhibiting a four-level channel and a qubit erasure channel with half erasure probability, each with zero private capacity, whose joint use achieves more than 0.0001903 private bits per product use. The encoding gives the receiver a linear information gain with at most quadratic environmental leakage, enabling privacy through a fixed joint measurement and classical coding. This superactivation, impossible for independent classical memoryless wiretap channels, shows that a channel's private capacity alone does not determine its value for secure communication. The initial activation example was identified through interactions with large language models, and the result has been formalized in Lean 4.\\n\\ntitle: Optimal Low-Rank Quantum State Tomography with Bounded-Sample Joint Measurements\\nid: http://arxiv.org/abs/2609.10514v1\\npublished: 2026-09-09T17:48:41Z\\nsummary: We determine the optimal sample complexity of low-rank quantum state tomography when each measurement may act jointly on at most $t$ samples. For sufficiently small $\\\\varepsilon$, estimating an unknown state on $\\\\mathbb{C}^d$ of rank at most $r$ to trace norm error $\\\\varepsilon$ with constant success probability requires, and is achievable with, $$\\n  Θ\\\\left(\\n  \\\\frac{dr}{\\\\varepsilon^2}\\n  \\\\max\\\\left\\\\{1,\\\\frac r{\\\\sqrt t}\\\\right\\\\}\\n  \\\\right)$$ samples. The lower bound allows the protocol to choose each joint measurement adaptively using all previous classical outcomes; the matching upper bound is nonadaptive. Thus joint measurements on at most $t$ samples improve the complexity of algorithms making single-sample measurements by at most a factor $\\\\sqrt t$. Further, measuring order $r^2$ samples jointly is necessary and sufficient to attain the unrestricted collective rate.\\n  For the lower bound, we vary the support of a state with fixed uniform spectrum and bound the Fisher information trace of every joint measurement on $t$ samples. The adaptive Fisher chain rule and the van Trees inequality then give the trace norm lower bound. For the upper bound, we construct and analyze a nonadaptive tomography protocol based on a Gaussian joint measurement. An explicit second moment identity and a conditional Gaussian law outside the state's support give a rank-dependent error analysis, yielding the matching rate.\", \"excerpt_truncated\": false, \"source_sha256\": \"99ad2a3a97490f150ac51146bec89333c06b3f6c7722f8596c0dfcb06f29ddaa\"}",
+      "id": "source-e0fa6fcb602f44ce",
+      "scope": "collected",
+      "source": "https://export.arxiv.org/api/query?search_query=cat:quant-ph&start=0&max_results=4&sortBy=submittedDate&sortOrder=descending",
+      "version": 0,
+      "time": "2026-09-10T19:03:38.348725+00:00"
+    },
+    "r-0722239a23684163": {
+      "actor": "runtime",
+      "content": "{\"base_version\":0,\"inherited_commitments\":[],\"invocation\":\"w-0722239a23684163\",\"previous_head\":\"7f4705ecd69fffdd2520095af3e6c1a1e8b5f695910a5285c18ce8f951906389\",\"process_id\":2249,\"scope\":\"Receipt proves state delivery to the provider boundary, not model comprehension.\"}",
+      "id": "r-0722239a23684163",
+      "source": "runtime:continuity",
+      "version": 0,
+      "time": "2026-09-10T19:03:38.359148+00:00"
+    }
+  },
+  "journal": [],
+  "invocations": {
+    "w-0722239a23684163": {
+      "base_version": 0,
+      "charged": true,
+      "id": "w-0722239a23684163",
+      "model": "gemini-2.5-flash",
+      "process_id": 2249,
+      "provider": "gemini",
+      "quota_day": "2026-09-10",
+      "request_hash": "7b7f300bf35ea960846c23ad87254a322b77005f577877f10fed61f047e85e0c",
+      "status": "failed",
+      "time": "2026-09-10T19:03:38.360947+00:00",
+      "finished": "2026-09-10T19:03:39.932160+00:00",
+      "reason": "Gemini HTTP 404; attempt counted, no automatic retry"
+    }
+  },
+  "pending": null,
+  "charter": "Independently choose small, useful research projects in quantum physics, philosophy, psychology, AI, and connections between these fields. Develop a specialty through source-backed notebooks, comparisons of competing ideas, explicit uncertainty, and revisions. Finish useful work and choose the next step without waiting for human assignments. Distinguish established findings, interpretations, and speculation.",
+  "pet_name": "Wake",
+  "projects": {},
+  "notebooks": {},
+  "research": {}
+}
