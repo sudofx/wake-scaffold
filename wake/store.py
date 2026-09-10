@@ -37,6 +37,12 @@ def reduce_event(state, event):
     if kind == "initialized":
         require(not state["objective"], "Duplicate initialization")
         state["objective"] = p["objective"]
+    elif kind == "charter_adopted":
+        require(not state.get("charter"), "Charter is already established")
+        state.update(charter=p["mission"], pet_name=p["pet_name"], projects={}, notebooks={}, research={})
+    elif kind == "research_collected":
+        if p["id"] in state.get("research", {}):
+            state["research"][p["id"]].update(status=p["status"], evidence=p["evidence"])
     elif kind == "observation":
         require(p["id"] not in state["evidence"], "Duplicate evidence ID")
         state["evidence"][p["id"]] = {**p, "version": state["version"], "time": event["time"]}
@@ -56,7 +62,8 @@ def reduce_event(state, event):
         require(state["pending"] == p["id"], "Invocation is not pending")
         if kind == "accepted":
             state = transition(state, p["proposal"], p["id"])
-            require(digest({k: state[k] for k in ("version", "beliefs", "commitments", "journal")}) == p["result_hash"],
+            fields = p.get("hash_fields", ["version", "beliefs", "commitments", "journal"])
+            require(digest({k: state[k] for k in fields}) == p["result_hash"],
                     "Transition result hash mismatch")
         state["invocations"][p["id"]].update(status=kind, finished=event["time"], reason=p.get("reason", ""))
         state["pending"] = None

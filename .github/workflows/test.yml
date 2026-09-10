@@ -1,6 +1,7 @@
 name: Verify the record
 on:
   push:
+    branches-ignore: [wake-state, journal-pages]
   pull_request:
   workflow_dispatch:
 permissions:

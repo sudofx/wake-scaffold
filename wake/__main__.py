@@ -92,7 +92,8 @@ def execute(args):
             require(not args.crash_at or name == "fixture", "Crash injection is only allowed with fixture providers")
             require(name in ("fixture", "gemini"), "Unsupported provider; use prepare/complete for desktop models")
             provider = Fixture(args.model or "fixture-a") if name == "fixture" else Gemini(settings, args.model)
-            return engine.run(provider, args.crash_at)
+            from .research import collect
+            return engine.run(provider, args.crash_at, collector=collect if name == "gemini" and settings.get("mission") else None)
         if args.command == "export":
             return export(engine.store, args.output)
         with engine.store.lock():

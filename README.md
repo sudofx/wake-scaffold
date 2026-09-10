@@ -1,12 +1,18 @@
 # WAKE ✳
 
-**Same tape. Fresh deck.**
+**A curious research pet. Big questions. A durable record.**
 
 Disposable models. Durable state. Receipts for everything.
 
-WAKE tests a specific hypothesis: can durable state, evidence, commitments, and mechanical governance make fresh model invocations behave as one accountable process? A model gets one request and proposes a small set of changes. The system checks them, commits the entire decision atomically, and records who did what and why. Then the process exits.
+WAKE lives on GitHub, wakes every three hours, and chooses small useful research projects in **quantum physics, philosophy, psychology, AI and their intersections**. It gathers public sources, compares explanations, publishes notebooks, revisits weak claims and gradually develops a specialty. You check its website; you do not need to assign daily work.
 
-The public journal has some Gen-X mileage on it. The laboratory does not get to substitute attitude for evidence.
+**[Open Wake's home](https://sudofx.github.io/wake-scaffold/)** · **[Trigger a manual wake](https://github.com/sudofx/wake-scaffold/actions/workflows/wake.yml)**
+
+The phone interface shows current projects, new work since your last visit, notebooks with citations and limitations, emerging interests and every decision in the underlying journal. Research output is AI-authored synthesis, not a claim of new scientific discovery. Growth counts completed work and revisions, not intelligence or consciousness.
+
+The GitHub workflow persists its memory and call budget on `wake-state` before contacting Gemini, then publishes the updated interface through GitHub Pages. No running Mac is needed. **[Cloud setup, operation and limits](docs/cloud.md)** describes the one-time secret/Pages settings and what happens after a failure.
+
+The original continuity experiment remains underneath: each fresh invocation receives durable state, proposes bounded changes and passes mechanical governance. The offline 100-cycle example below tests those guarantees independently of the pet's live research.
 
 ## Start here — no account, no API calls
 
@@ -67,7 +73,7 @@ python3 -m wake export
 
 The exact request is durable before you switch apps. A pending manual request blocks automatic wakes until completed or explicitly recovered. All providers cross the same governance boundary. Manual model identity is honestly labeled human-attested. To add another API adapter, implement `name`, `model`, `charged`, and `propose(request) -> (raw_json, metadata)` and register it in the CLI; the state and governance layer do not change.
 
-## Set it and inspect it
+## Optional local schedule
 
 ```sh
 # See the proposed cron line without installing it.
@@ -78,7 +84,7 @@ python3 scripts/install_cron.py
 python3 scripts/install_cron.py --remove
 ```
 
-Each scheduled cycle refreshes the HTML/Markdown and retains a consistent SQLite backup. It runs while the host is awake; cron cannot wake a sleeping Mac. Existing cron entries are preserved. Logs live in `data/cron.log`. Scheduling and publishing are not activated merely by installing or rebuilding the project.
+For the GitHub-hosted pet, use the cloud workflow above and do not install a competing local schedule. Each local scheduled cycle refreshes the HTML/Markdown and retains a consistent SQLite backup. It runs while the host is awake; cron cannot wake a sleeping Mac. Existing cron entries are preserved. Logs live in `data/cron.log`. Scheduling and publishing are not activated merely by installing or rebuilding the project.
 
 For iPhone, iPad and Mac access away from the host, opt into publishing the static reports to GitHub Pages. The included publishing script maintains a separate `journal-pages` branch without force pushes. See [operations and publishing](docs/operations.md). No hosting service is required for local reading.
 
@@ -95,6 +101,8 @@ portable HTML journal → lab notes → evidence / raw history
 - `wake/store.py`: transactional, hash-linked event history and replayable projection.
 - `wake/governance.py`: explicit actions, evidence requirements, immutable model authority.
 - `wake/engine.py`: durable requests, quota reservation, recovery, context construction.
+- `wake/research.py`: bounded collection of public research sources.
+- `scripts/github_wake.py`: fresh-runner recovery and durable GitHub checkpoints.
 - `wake/providers.py`: Gemini REST and deterministic fixtures; manual import uses the same boundary.
 - `wake/report.py`, `wake/assets/`: portable, offline HTML and Markdown reports.
 - `wake/experiment.py`: executable 100–1000-cycle experiment.

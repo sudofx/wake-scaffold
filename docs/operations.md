@@ -1,5 +1,7 @@
 # Operating the record
 
+**The GitHub-hosted pet uses [cloud operations](cloud.md).** The commands below operate an independent local record. Do not run a second live schedule against the cloud pet’s API allowance.
+
 ## Everyday commands
 
 Global options precede the command: `python3 -m wake --data data/another-record status`.
@@ -43,7 +45,7 @@ For access from anywhere, the optional GitHub Pages publishing flow uses an exis
 python3 scripts/publish.py --confirm-public
 ```
 
-The script copies only `index.html`, `journal.md`, `state.json`, `events.jsonl`, `head.txt`, and optional `experiment.json` into an isolated temporary checkout. It pushes a new commit to `journal-pages`, without changing your source checkout or force-pushing. In repository Settings → Pages, select **Deploy from a branch**, **journal-pages**, **/ (root)**. Your repository must be eligible for free Pages hosting; the usual zero-dollar route is a public repository. See [GitHub's Pages documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site).
+The script copies only `index.html`, `journal.md`, `state.json`, `events.jsonl`, `head.txt`, published notebook Markdown files, and optional `experiment.json` into an isolated temporary checkout. It pushes a new commit to `journal-pages`, without changing your source checkout or force-pushing. In repository Settings → Pages, select **Deploy from a branch**, **journal-pages**, **/ (root)**. Your repository must be eligible for free Pages hosting; the usual zero-dollar route is a public repository. See [GitHub's Pages documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site).
 
 After the first publication, set `publish_reports = true` in `wake.toml` to explicitly opt scheduled runs into the same publication. Publishing failure leaves the durable local record and report intact. Local backups are never pushed. Source commits and secrets are never copied to the publishing branch. A concurrent publisher causes a non-fast-forward failure instead of overwriting someone else's work.
 

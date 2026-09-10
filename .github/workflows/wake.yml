@@ -1,0 +1,76 @@
+name: Wake — research & journal
+
+on:
+  push:
+    branches: [master]
+    paths: ['wake/**', 'scripts/github_wake.py', 'wake.toml', '.github/workflows/wake.yml']
+  schedule:
+    - cron: '42 */3 * * *'
+  workflow_dispatch: {}
+
+concurrency:
+  group: wake-durable-state
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  wake:
+    if: github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      report_ready: ${{ steps.report.outputs.ready }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Continue independent research
+        id: cycle
+        continue-on-error: true
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/github_wake.py
+      - name: Confirm report is ready
+        id: report
+        if: always()
+        run: |
+          test -f site/index.html
+          echo 'ready=true' >> "$GITHUB_OUTPUT"
+      - name: Configure Pages
+        if: always() && steps.report.outcome == 'success'
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - name: Save the phone journal
+        if: always() && steps.report.outcome == 'success'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - name: Record run summary
+        if: always()
+        run: |
+          if test -f site/operation.json; then
+            cat site/operation.json >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Flag a wake requiring attention
+        if: steps.cycle.outcome == 'failure'
+        run: exit 1
+
+  publish:
+    needs: wake
+    if: always() && needs.wake.outputs.report_ready == 'true' && !cancelled()
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish the latest journal
+        id: deployment
+        uses: actions/deploy-pages@v4

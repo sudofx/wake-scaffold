@@ -49,6 +49,9 @@ def transition(state, proposal, invocation):
             "At most 12 actions per invocation")
     result = {**state, "beliefs": deepcopy(state["beliefs"]),
               "commitments": deepcopy(state["commitments"]), "journal": list(state["journal"])}
+    if state.get("charter"):
+        for collection in ("projects", "notebooks", "research"):
+            result[collection] = deepcopy(state.get(collection, {}))
     for action in proposal["actions"]:
         require(isinstance(action, dict), "Each action must be an object")
         kind = action.get("type")
@@ -106,6 +109,63 @@ def transition(state, proposal, invocation):
                 "resolution_reason": action["reason"], "resolved_by": invocation,
                 "resolved_version": state["version"] + 1,
             }
+        elif kind == "project":
+            from .research import DOMAINS
+            require(bool(state.get("charter")), "Research charter is not enabled")
+            keys(action, "type id title question domain status next_step reason", "Project")
+            identifier(action["id"])
+            for key in ("title", "question", "next_step", "reason"):
+                text(action[key], key, 1000)
+            require(action["domain"] in DOMAINS, "Choose a charter research domain")
+            require(action["status"] in ("active", "parked", "completed"), "Invalid project status")
+            old = result["projects"].get(action["id"])
+            if not old:
+                require(action["status"] == "active", "A new project starts active")
+            if action["status"] == "active":
+                require(sum(p["status"] == "active" and p["id"] != action["id"] for p in result["projects"].values()) < 3,
+                        "Finish or park work before starting a fourth active project")
+            if action["status"] == "completed":
+                require(any(n["project"] == action["id"] for n in result["notebooks"].values()),
+                        "Completed projects need a published research notebook")
+            result["projects"][action["id"]] = {**action, "created_version": (old or {}).get("created_version", state["version"] + 1),
+                "updated_version": state["version"] + 1, "updated_by": invocation}
+        elif kind == "research":
+            from .research import DOMAINS
+            require(bool(state.get("charter")), "Research charter is not enabled")
+            keys(action, "type id project query domain reason" + (" url" if "url" in action else ""), "Research request")
+            identifier(action["id"])
+            text(action["query"], "Query", 200)
+            text(action["reason"], "Reason", 1000)
+            if "url" in action:
+                from .research import allowed_url
+                allowed_url(action["url"])
+            require(action["domain"] in DOMAINS, "Invalid research domain")
+            require(action["project"] in result["projects"], "Research needs an existing project")
+            require(action["id"] not in result["research"], "Research request ID already exists")
+            require(sum(r["status"] == "queued" for r in result["research"].values()) < 4, "At most four queued source searches")
+            result["research"][action["id"]] = {**action, "status": "queued", "created_by": invocation}
+        elif kind == "notebook":
+            require(bool(state.get("charter")), "Research charter is not enabled")
+            keys(action, "type id project title summary findings limitations next_questions evidence reason", "Notebook")
+            identifier(action["id"])
+            require(action["project"] in result["projects"], "Notebook needs an existing project")
+            for key, limit in (("title", 120), ("summary", 800), ("findings", 10000),
+                               ("limitations", 2400), ("next_questions", 1600), ("reason", 1000)):
+                text(action[key], key, limit)
+            references(action["evidence"], result)
+            cited = [result["evidence"][e] for e in action["evidence"]]
+            require(all(e.get("actor") == "collector" and e.get("scope") == "collected" for e in cited),
+                    "Research notebooks must cite successfully retrieved external sources")
+            require(len({e["source"] for e in cited}) >= 2, "Research notebooks need at least two distinct retrieved source URLs")
+            old = result["notebooks"].get(action["id"])
+            if old:
+                require(old["project"] == action["project"], "A notebook cannot change projects")
+                require(action["findings"] != old["findings"] and any(e not in old["evidence"] for e in action["evidence"]),
+                        "A revision needs changed findings and newly retrieved evidence")
+            result["notebooks"][action["id"]] = {**action, "revision": (old or {}).get("revision", 0) + 1,
+                "created_version": (old or {}).get("created_version", state["version"] + 1),
+                "updated_version": state["version"] + 1, "updated_by": invocation,
+                "domain": result["projects"][action["project"]]["domain"]}
         else:
             raise Rejected(f"Action is not allowed: {kind!r}")
     result["version"] += 1
