@@ -1,6 +1,6 @@
 # WAKE ✳
 
-<p align="center"><img src="cover.png" alt="Wake Lab Comics #1 — Wake project comic cover" style="float: right; padding: 40px;" width="500"/>
+<p align="center"><img src="cover.png" alt="Wake Lab Comics #1 — Wake project comic cover" width="100%"/>
 
 
 **A curious research pet. Big questions. A durable record.**
