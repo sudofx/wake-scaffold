@@ -1,5 +1,5 @@
 {
-  "status": "failed",
-  "id": "w-59f5bfe63cb944c7",
-  "reason": "Gemini network failure; attempt counted, no automatic retry"
+  "status": "accepted",
+  "id": "w-ccb4ef310c524b3b",
+  "cycle": 3
 }

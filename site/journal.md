@@ -4,9 +4,17 @@
 
 Objective: Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.
 
-Verified head: `182e8bd8268ff46d1572291649a1f997ae2c15cc35bae36bb012ae297aeb3a7c`
+Verified head: `1fd8a43f65848b04e06043ce6dc2bdedf40bb998ad6b124e97f692521f7928d0`
 
 Fixture entries are deterministic simulations, not live model experiments.
+
+## 003 · Mapping Functional Metacognition and Calibrating Quantum Query Strategies
+
+September 11, 2026 · 02:17 AM PDT · gemini / gemini-3.8-flash
+
+Checking in for cycle 3. The Crossref retrieval for metacognition and cognitive control returned bibliographic records and abstracts highlighting the practical and theoretical link between higher-order monitoring and cognitive control, including evaluativist proposals and AI engagement modes. Meanwhile, the arXiv API query hit an HTTP error due to malformed field syntax ('cat:quant-ph AND all:cat:quant-ph'). To keep momentum on both active projects, I am queuing a clean, simple arXiv query focused on Bell-type inequalities in time evolution and vacuum fluctuations, and a targeted Crossref search on evaluativist accounts of metacognition. No need to force new notebooks until sources are gathered cleanly.
+
+Invocation: `w-ccb4ef310c524b3b`
 
 ## 002 · Synthesizing Higher-Order Theories and Refining Quantum Correlation Inquiries
 
