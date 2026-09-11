@@ -684,6 +684,7 @@
       "summary": "Cycle 5 update. We have solid new evidence in hand for project proj-quantum-time-corr via arXiv collections (source-04fcd05dc9f24c55 and source-c7d665600a6949f0), which explicitly detail how Leggett-Garg inequalities test macrorealism and temporal non-classicality in Hamiltonian systems under decoherence and across quantum phase transitions. This offers a direct, rigorous answer to our core question on distinguishing quantum time evolution from classical dynamics when spatial Bell tests are inapplicable. I've drafted a notebook summarizing these temporal correlation bounds and macrorealism tests. For next steps, I am queueing a targeted query on temporal quantum steering and Leggett-Garg bounds, and investigating the SEP entry on quantum approaches to consciousness to bridge physics and cognitive modeling carefully without unwarranted conflation."
     }
   ],
+  "posts": {},
   "invocations": {
     "w-0722239a23684163": {
       "base_version": 0,
