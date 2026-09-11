@@ -37,6 +37,7 @@ def export(store, destination="site", experiment=None, operation=None):
         embedded = json.dumps(data, ensure_ascii=False).replace("<", "\\u003c").replace("\u2028", "\\u2028").replace("\u2029", "\\u2029")
         page = template.replace("/* WAKE_STYLE */", (assets / "style.css").read_text())
         page = page.replace("/* WAKE_SCRIPT */", (assets / "app.js").read_text())
+        page = page.replace("/* HELP_SCRIPT */", (assets / "help.js").read_text())
         page = page.replace("/* PET_SCRIPT */", (assets / "pet.js").read_text()).replace("WAKE_DATA", embedded)
         lines = ["# WAKE✳ — The journal", "", "> Disposable models. Durable state. Receipts for everything.", "",
                  f"Objective: {state['objective']}", "", f"Verified head: `{head}`", "",
