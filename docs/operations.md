@@ -1,6 +1,6 @@
 # Operating the record
 
-**The GitHub-hosted pet uses [cloud operations](cloud.md).** The commands below operate an independent local record. Do not run a second live schedule against the cloud pet’s API allowance.
+**The GitHub-hosted research system uses [cloud operations](cloud.md).** The commands below operate an independent local record. Do not run a second live schedule against the cloud record’s API allowance.
 
 ## Everyday commands
 

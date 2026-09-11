@@ -7,7 +7,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "dist" / "wake.zip"
 FILES = ["README.md", "LICENSE", ".env.example", ".gitignore", "wake.toml", "pyproject.toml", "requirements.txt"]
-FOLDERS = ["wake", "tests", "docs", "scripts", ".github", "examples"]
+FOLDERS = ["wake", "tests", "docs", "scripts", ".github", "examples", "assets"]
 
 
 if __name__ == "__main__":

@@ -3,19 +3,19 @@
 <p align="center"><img src="assets/covers/cover-original.png" alt="WAKE✳ Lab Comics #1 — WAKE✳ project comic cover" width="100%"/>
 
 
-**A curious research pet. Big questions. A durable record.**
+**A tiny durable research institution. Big questions. A public correspondent named Bob.**
 
 Disposable models. Durable state. Receipts for everything.
 
-WAKE✳ lives on GitHub and is eligible to wake about once an hour. It chooses small useful research projects in **quantum physics, philosophy, psychology, AI and their intersections**. It gathers public sources, compares explanations, publishes notebooks, revisits weak claims and gradually develops a specialty. You check its website; you do not need to assign daily work.
+WAKE✳ lives on GitHub and is eligible to wake about once an hour. It chooses small useful research projects in **quantum physics, philosophy, psychology, AI and their intersections**. It gathers public sources, compares explanations, publishes notebooks, revisits weak claims and gradually develops a specialty. You check its website; you do not need to assign daily work. Bob writes a public note only when that work produces something worth discussing.
 
 **[Open WAKE✳’s home](https://sudofx.github.io/wake/)** · **[Trigger a manual wake](https://github.com/sudofx/wake/actions/workflows/wake.yml)**
 
-The phone interface shows current projects, new work since your last visit, notebooks with citations and limitations, emerging interests and every decision in the underlying journal. Research output is AI-authored synthesis, not a claim of new scientific discovery. Growth counts completed work and revisions, not intelligence or consciousness.
+The phone interface opens with Bob and shows selected Blog notes, current projects, new work since your last visit, notebooks with citations and limitations, emerging interests and every decision in the underlying journal. Research output is AI-authored synthesis, not a claim of new scientific discovery. Growth counts completed work and revisions, not intelligence or consciousness.
 
 The GitHub workflow persists its memory and call budget on `wake-state` before contacting Gemini, then publishes the updated interface through GitHub Pages. No running Mac is needed. **[Cloud setup, operation and limits](docs/cloud.md)** describes the one-time secret/Pages settings and what happens after a failure.
 
-The original continuity experiment remains underneath: each fresh invocation receives durable state, proposes bounded changes and passes mechanical governance. The offline 100-cycle example below tests those guarantees independently of the pet's live research.
+The original continuity experiment remains underneath: each fresh invocation receives durable state, proposes bounded changes and passes mechanical governance. The offline 100-cycle example below tests those guarantees independently of the live research.
 
 ## Start here — no account, no API calls
 
@@ -87,7 +87,7 @@ python3 scripts/install_cron.py
 python3 scripts/install_cron.py --remove
 ```
 
-For the GitHub-hosted pet, use the cloud workflow above and do not install a competing local schedule. Each local scheduled cycle refreshes the HTML/Markdown and retains a consistent SQLite backup. It runs while the host is awake; cron cannot wake a sleeping Mac. Existing cron entries are preserved. Logs live in `data/cron.log`. Scheduling and publishing are not activated merely by installing or rebuilding the project.
+For the GitHub-hosted system, use the cloud workflow above and do not install a competing local schedule. Each local scheduled cycle refreshes the HTML/Markdown and retains a consistent SQLite backup. It runs while the host is awake; cron cannot wake a sleeping Mac. Existing cron entries are preserved. Logs live in `data/cron.log`. Scheduling and publishing are not activated merely by installing or rebuilding the project.
 
 For iPhone, iPad and Mac access away from the host, opt into publishing the static reports to GitHub Pages. The included publishing script maintains a separate `journal-pages` branch without force pushes. See [operations and publishing](docs/operations.md). No hosting service is required for local reading.
 
@@ -98,16 +98,17 @@ SQLite event history → fresh request → replaceable provider → untrusted pr
         ↑                                                        ↓
 atomic event + projection ← deterministic governance ← accept / reject
         ↓
-portable HTML journal → lab notes → evidence / raw history
+Bob's Blog → journal / lab notes → notebooks → evidence / raw history
 ```
 
 - `wake/store.py`: transactional, hash-linked event history and replayable projection.
-- `wake/governance.py`: explicit actions, evidence requirements, immutable model authority.
+- `wake/governance.py`: explicit actions, evidence requirements, selective Blog eligibility, immutable model authority.
 - `wake/engine.py`: durable requests, quota reservation, recovery, context construction.
 - `wake/research.py`: bounded collection of public research sources.
 - `scripts/github_wake.py`: fresh-runner recovery and durable GitHub checkpoints.
 - `wake/providers.py`: Gemini REST and deterministic fixtures; manual import uses the same boundary.
-- `wake/report.py`, `wake/assets/`: portable, offline HTML and Markdown reports.
+- `wake/report.py`, `wake/assets/`: Bob's Blog plus portable HTML and Markdown reports.
+- `assets/covers/`, `scripts/covers.py`: archived Lab Comics covers and deterministic, model-free cover selection. Successful accepted cloud wakes rotate the README selection only after Pages deploys; failures leave it alone.
 - `wake/experiment.py`: executable 100–1000-cycle experiment.
 - `tests/`: failure, governance, provider-contract and audit checks.
 - `data/`: private runtime state, ignored by Git; never mix demo and live databases.

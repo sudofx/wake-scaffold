@@ -108,6 +108,15 @@ class CloudWorkflowTests(unittest.TestCase):
             with self.assertRaises(OSError): self.run_cloud(NeverCall())
         self.assertFalse((self.project/"site/index.html").exists())
 
+    def test_accepted_wake_requests_cover_rotation_but_publish_only_does_not(self):
+        with patch.object(github_wake, "set_step_output") as output:
+            self.assertEqual(self.run_cloud(Fixture()), 0)
+            output.assert_any_call("rotate_cover", "true")
+            output.assert_any_call("accepted_cycle", 1)
+        with patch.object(github_wake, "set_step_output") as output:
+            self.assertEqual(self.run_cloud(Fixture(), publish_only=True), 0)
+            self.assertFalse(any(call.args[0] == "rotate_cover" for call in output.call_args_list))
+
     def test_workflow_publishes_generated_reports_even_after_provider_failure(self):
         root = Path(__file__).resolve().parents[1]
         workflow = (root/".github/workflows/wake.yml").read_text()
@@ -122,6 +131,13 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertIn("cron: '12,27,42,57 * * * *'", workflow)
         self.assertIn("python scripts/github_wake.py --scheduled", workflow)
         self.assertIn("artifact_name: ${{ needs.wake.outputs.artifact_name }}", workflow)
+        self.assertIn("needs: [wake, publish]", workflow)
+        self.assertIn("needs.publish.result == 'success'", workflow)
+        self.assertIn("needs.wake.outputs.rotate_cover == 'true'", workflow)
+        self.assertIn("python scripts/covers.py --cycle ${{ needs.wake.outputs.accepted_cycle }}", workflow)
+        self.assertIn("git add README.md", workflow)
+        self.assertIn("[skip ci] Rotate WAKE Lab Comics cover", workflow)
+        self.assertNotIn("git push --force", workflow)
         self.assertFalse((root/".github/workflows/static.yml").exists())
         self.assertFalse((root/".github/workflows/jekyll-gh-pages.yml").exists())
 

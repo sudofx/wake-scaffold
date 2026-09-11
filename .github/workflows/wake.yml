@@ -3,7 +3,7 @@ name: WAKE✳ — research & journal
 on:
   push:
     branches: [master]
-    paths: ['wake/**', 'scripts/github_wake.py', 'wake.toml', '.github/workflows/wake.yml']
+    paths: ['wake/**', 'scripts/github_wake.py', 'scripts/covers.py', 'assets/covers/**', 'wake.toml', '.github/workflows/wake.yml']
   schedule:
     # GitHub documents scheduled Actions as best effort: they can start late or
     # be dropped when the service is busy. :42 remains the Hitchhiker's Guide
@@ -35,6 +35,8 @@ jobs:
     outputs:
       report_ready: ${{ steps.report.outputs.ready }}
       artifact_name: ${{ steps.report.outputs.artifact_name }}
+      rotate_cover: ${{ steps.cycle.outputs.rotate_cover }}
+      accepted_cycle: ${{ steps.cycle.outputs.accepted_cycle }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -102,3 +104,31 @@ jobs:
         uses: actions/deploy-pages@v4
         with:
           artifact_name: ${{ needs.wake.outputs.artifact_name }}
+
+  rotate-cover:
+    needs: [wake, publish]
+    if: always() && needs.publish.result == 'success' && needs.wake.outputs.rotate_cover == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out the public source branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+      - name: Select the next Lab Comics cover
+        # Cover rotation is presentation only. It happens after an accepted wake
+        # and successful Pages deploy, makes no provider call, and cannot alter
+        # the durable research state on wake-state.
+        run: python scripts/covers.py --cycle ${{ needs.wake.outputs.accepted_cycle }}
+      - name: Record the selected cover
+        run: |
+          if git diff --quiet -- README.md; then
+            exit 0
+          fi
+          git config user.name wake-bot
+          git config user.email wake-bot@users.noreply.github.com
+          git add README.md
+          git commit -m '[skip ci] Rotate WAKE Lab Comics cover'
+          git push origin HEAD:${{ github.event.repository.default_branch }}

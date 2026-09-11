@@ -29,7 +29,8 @@ def now():
 
 def empty():
     return {"version": 0, "objective": "", "focus": "continuity", "beliefs": {},
-            "commitments": {}, "evidence": {}, "journal": [], "invocations": {}, "pending": None}
+            "commitments": {}, "evidence": {}, "journal": [], "posts": {},
+            "invocations": {}, "pending": None}
 
 
 def reduce_event(state, event):
@@ -41,7 +42,7 @@ def reduce_event(state, event):
         require(not state.get("charter"), "Charter is already established")
         state.update(charter=p["mission"], pet_name=p["pet_name"], projects={}, notebooks={}, research={})
     elif kind == "pet_renamed":
-        require(state.get("charter"), "A research pet must exist before it can be renamed")
+        require(state.get("charter"), "WAKE must exist before it can be renamed")
         require(p["pet_name"] != state.get("pet_name"), "Pet already has this name")
         state["pet_name"] = p["pet_name"]
     elif kind == "research_collected":

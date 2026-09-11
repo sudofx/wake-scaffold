@@ -92,6 +92,10 @@ class Engine:
             context["working_notebook"] = ({**working[-1], "findings": working[-1]["findings"][:3000],
                                            "context_excerpt": True} if working else None)
             context["research"] = list(state["research"].values())[-8:]
+            context["recent_blog"] = [
+                {key: post.get(key) for key in ("id", "project", "title", "lede", "lens", "created_version")}
+                for post in list(state.get("posts", {}).values())[-4:]
+            ]
             # Research excerpts are bounded. Full snapshots remain available in the lab.
             sources = [v for v in state["evidence"].values() if v.get("actor") == "collector"][-6:]
             context["evidence"] = [{**e, "content": e["content"][:3000], "context_excerpt": len(e["content"]) > 3000}
@@ -154,7 +158,7 @@ class Engine:
             return {"status": "rejected", "id": invocation, "reason": reason}
         fields = ["version", "beliefs", "commitments", "journal"]
         if state.get("charter"):
-            fields += ["projects", "notebooks", "research"]
+            fields += ["projects", "notebooks", "research", "posts"]
         result_hash = digest({k: result[k] for k in fields})
         self.store.append("accepted", {"id": invocation, "proposal": proposal, "raw_response": raw,
                                        "metadata": metadata or {}, "result_hash": result_hash, "hash_fields": fields}, crash=crash)

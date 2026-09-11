@@ -1,6 +1,7 @@
 """Pure, deterministic transition rules. No model gets to edit the rulebook."""
 
 from copy import deepcopy
+import json
 import math
 import re
 
@@ -38,6 +39,38 @@ def references(value, state):
     require(len(set(value)) == len(value), "Duplicate evidence reference")
 
 
+def _limited_sources(evidence):
+    limited = ("abstract", "preprint", "metadata", "incomplete", "truncated")
+    scopes = []
+    for item in evidence:
+        try:
+            scopes.append(str(json.loads(item["content"]).get("scope", "")).lower())
+        except (ValueError, TypeError):
+            scopes.append("")
+    return bool(scopes) and all(any(word in scope for word in limited) for scope in scopes)
+
+
+def _blog_language(action, evidence):
+    prose = " ".join(str(action.get(key, "")) for key in ("title", "lede", "body", "lens", "reason"))
+    lower = prose.lower()
+    # Explicitly stating the scientific boundary is responsible writing, not a
+    # prohibited bridge. Remove those statements before looking for causal ones.
+    lower = re.sub(r"quantum.{0,40}(does not|doesn't|cannot|can't|is not).{0,50}"
+                   r"(prove|explain|cause|validate).{0,70}"
+                   r"(consciousness|psychology|empathy|relationships?|communication|personal growth)", "", lower)
+    bridge = re.search(r"quantum.{0,100}(proves?|explains?|causes?|validates?).{0,100}"
+                       r"(consciousness|psychology|empathy|relationships?|communication|personal growth)", lower)
+    reverse = re.search(r"(consciousness|psychology|empathy|relationships?|communication|personal growth)"
+                        r".{0,100}(is|are).{0,40}quantum", lower)
+    require(not bridge and not reverse,
+            "Quantum-Carnegie connections must remain philosophical metaphor, not scientific causation")
+    if _limited_sources(evidence):
+        calibrated = re.sub(r"\b(not|isn't|is not|has not been|cannot be)\s+"
+                            r"(rigorous|confirmed|settled|proven|definitive|conclusive)\b", "", lower)
+        inflated = re.search(r"\b(rigorous|confirmed|settled|proven|definitive|conclusive)\b", calibrated)
+        require(not inflated, "Limited or abstract-only sources cannot support certainty language")
+
+
 def transition(state, proposal, invocation):
     """Return a new projection or reject the entire proposal, never a partial write."""
     keys(proposal, "base_version title summary actions", "Proposal")
@@ -48,7 +81,8 @@ def transition(state, proposal, invocation):
     require(isinstance(proposal["actions"], list) and len(proposal["actions"]) <= 12,
             "At most 12 actions per invocation")
     result = {**state, "beliefs": deepcopy(state["beliefs"]),
-              "commitments": deepcopy(state["commitments"]), "journal": list(state["journal"])}
+              "commitments": deepcopy(state["commitments"]), "journal": list(state["journal"]),
+              "posts": deepcopy(state.get("posts", {}))}
     if state.get("charter"):
         for collection in ("projects", "notebooks", "research"):
             result[collection] = deepcopy(state.get(collection, {}))
@@ -166,6 +200,52 @@ def transition(state, proposal, invocation):
                 "created_version": (old or {}).get("created_version", state["version"] + 1),
                 "updated_version": state["version"] + 1, "updated_by": invocation,
                 "domain": result["projects"][action["project"]]["domain"]}
+        elif kind == "blog":
+            require(bool(state.get("charter")), "Research charter is not enabled")
+            require(action is proposal["actions"][-1], "A blog action must be last so its research is already validated")
+            expected = "type id project title lede body notebooks evidence reason" + (" lens" if "lens" in action else "") + (" supersedes" if "supersedes" in action else "")
+            keys(action, expected, "Blog post")
+            identifier(action["id"])
+            require(action["id"] not in result["posts"], "Blog post ID already exists")
+            require(action["project"] in result["projects"], "Blog post needs an existing project")
+            for key, limit in (("title", 120), ("lede", 500), ("body", 6000), ("reason", 1000)):
+                text(action[key], key, limit)
+            require(len(action["body"].strip()) >= 300, "Blog posts must contain at least 300 characters")
+            if "lens" in action:
+                text(action["lens"], "Bob's Lens", 320)
+            require(isinstance(action["notebooks"], list) and 1 <= len(action["notebooks"]) <= 3
+                    and len(set(action["notebooks"])) == len(action["notebooks"]),
+                    "Blog posts must reference 1–3 distinct notebooks")
+            notebooks = [result["notebooks"].get(item) for item in action["notebooks"]]
+            require(all(notebook and notebook["project"] == action["project"] for notebook in notebooks),
+                    "Blog notebooks must exist and belong to the related project")
+            references(action["evidence"], result)
+            cited = [result["evidence"][item] for item in action["evidence"]]
+            require(all(item.get("actor") == "collector" and item.get("scope") == "collected" for item in cited),
+                    "Blog research support must use collected external evidence")
+            require(len({item["source"] for item in cited}) >= 2,
+                    "Blog posts need evidence from at least two distinct source URLs")
+            notebook_evidence = {item for notebook in notebooks for item in notebook["evidence"]}
+            require(set(action["evidence"]) <= notebook_evidence,
+                    "Blog evidence must be traceable through its referenced notebooks")
+            qualifying_notebooks = {item["id"] for item in proposal["actions"]
+                                    if item.get("type") == "notebook" and item.get("project") == action["project"]}
+            completed = any(item.get("type") == "project" and item.get("id") == action["project"]
+                            and item.get("status") == "completed" for item in proposal["actions"])
+            require(bool(qualifying_notebooks & set(action["notebooks"])) or completed,
+                    "A blog post requires a new/revised notebook or meaningful project completion in this wake")
+            supersedes = action.get("supersedes")
+            if supersedes:
+                require(supersedes in result["posts"], "A correction must reference an existing blog post")
+                require(not result["posts"][supersedes].get("superseded_by"),
+                        "The earlier blog post is already superseded")
+            _blog_language(action, cited)
+            post = {**action, "created_by": invocation, "created_version": state["version"] + 1,
+                    "status": "current"}
+            result["posts"][action["id"]] = post
+            if supersedes:
+                result["posts"][supersedes] = {**result["posts"][supersedes],
+                                               "status": "superseded", "superseded_by": action["id"]}
         else:
             raise Rejected(f"Action is not allowed: {kind!r}")
     result["version"] += 1

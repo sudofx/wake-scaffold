@@ -59,6 +59,23 @@ def export(store, destination="site", experiment=None, operation=None):
                         f"## Next questions\n\n{notebook['next_questions']}\n\n## Collected sources\n\n{sources}\n\n"
                         f"Revision {notebook['revision']} · AI-authored research synthesis; see source scopes in the journal.\n")
             atomic_write(target / "notebooks" / (notebook["id"] + ".md"), markdown)
+        for post in state.get("posts", {}).values():
+            newline = chr(10)
+            notebook_links = newline.join(
+                f"- [{state['notebooks'][item]['title']}](../index.html#projects/notebook:{item})"
+                for item in post["notebooks"])
+            source_links = newline.join(
+                f"- [{item}]({state['evidence'][item]['source']})" for item in post["evidence"])
+            parts = [f"# {post['title']}", "", post["lede"], "", post["body"]]
+            if post.get("lens"):
+                parts += ["", "> **Bob's Lens — philosophical reflection**", "", f"> {post['lens']}"]
+            if post.get("superseded_by"):
+                parts += ["", f"This post was superseded by [{post['superseded_by']}](../index.html#blog/{post['superseded_by']})."]
+            parts += ["", "## Follow the receipts", "", "### Research notebooks", "", notebook_links, "",
+                      "### Collected sources", "", source_links, "",
+                      f"[Exact wake and decision](../index.html#history/{post['created_by']})", "",
+                      "AI-authored from WAKE✳'s durable research record. Research claims link to evidence; philosophical reflections are reflections.", ""]
+            atomic_write(target / "blog" / (post["id"] + ".md"), newline.join(parts))
         if experiment:
             atomic_write(target / "experiment.json", json.dumps(experiment, indent=2))
         else:
