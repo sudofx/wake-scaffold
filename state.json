@@ -436,6 +436,32 @@
       "source": "runtime:continuity",
       "version": 2,
       "time": "2026-09-11T09:17:27.566108+00:00"
+    },
+    "source-ed1263fe88a444ae": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://api.crossref.org/works?query=evaluativist+cognitive+control+metacognition+Joelle+Proust&rows=4&select=DOI%2Ctitle%2Cabstract%2CURL%2Cpublished\", \"scope\": \"bibliographic metadata and abstracts where supplied; not full papers\", \"excerpt\": \"[{\\\"DOI\\\": \\\"10.1093/acprof:oso/9780199602162.003.0002\\\", \\\"title\\\": [\\\"An Evaluativist Proposal: Cognitive Control and Metacognition\\\"], \\\"URL\\\": \\\"https://doi.org/10.1093/acprof:oso/9780199602162.003.0002\\\", \\\"published\\\": {\\\"date-parts\\\": [[2013, 11, 28]]}}, {\\\"DOI\\\": \\\"10.21428/e2759450.c403b8e7\\\", \\\"title\\\": [\\\"Metacognition\\\"], \\\"URL\\\": \\\"https://doi.org/10.21428/e2759450.c403b8e7\\\", \\\"published\\\": {\\\"date-parts\\\": [[2025, 2, 10]]}}, {\\\"DOI\\\": \\\"10.1093/analys/anu159\\\", \\\"title\\\": [\\\"The Philosophy of Metacognition: Mental Agency and Self-Awareness By JOELLE PROUST\\\"], \\\"URL\\\": \\\"https://doi.org/10.1093/analys/anu159\\\", \\\"published\\\": {\\\"date-parts\\\": [[2015, 1, 19]]}}, {\\\"DOI\\\": \\\"10.3389/fpsyg.2013.00145\\\", \\\"title\\\": [\\\"Examining implicit metacognition in 3.5-year-old children: an eye-tracking and pupillometric study\\\"], \\\"URL\\\": \\\"https://doi.org/10.3389/fpsyg.2013.00145\\\", \\\"published\\\": {\\\"date-parts\\\": [[2013]]}}]\", \"excerpt_truncated\": false, \"source_sha256\": \"95446a6396e86df31f69eef47256468309f3e2fa1784e9cb3c5ede1f27b74d94\"}",
+      "id": "source-ed1263fe88a444ae",
+      "scope": "collected",
+      "source": "https://api.crossref.org/works?query=evaluativist+cognitive+control+metacognition+Joelle+Proust&rows=4&select=DOI%2Ctitle%2Cabstract%2CURL%2Cpublished",
+      "version": 3,
+      "time": "2026-09-11T10:13:49.289963+00:00"
+    },
+    "source-c7d665600a6949f0": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3ABell+inequalities+time+correlations+Hamiltonian+vacuum&start=0&max_results=4\", \"scope\": \"paper abstracts; preprints, peer-review status not verified\", \"excerpt\": \"title: Exponentially decreasing critical detection efficiency for any Bell inequality\\nid: http://arxiv.org/abs/2204.11726v4\\npublished: 2022-04-25T15:32:53Z\\nsummary: We address the problem of closing the detection efficiency loophole in Bell experiments, which is crucial for real-world applications. Every Bell inequality has a critical detection efficiency $η$ that must be surpassed to avoid the detection loophole. Here, we propose a general method for reducing the critical detection efficiency of any Bell inequality to arbitrary low values. This is accomplished by entangling two particles in $N$ orthogonal subspaces (e.g., $N$ degrees of freedom) and conducting $N$ Bell tests in parallel. Furthermore, the proposed method is based on the introduction of penalized $N$-product (PNP) Bell inequalities, for which the so-called simultaneous measurement loophole is closed, and the maximum value for local hidden-variable theories is simply the $N$th power of the one of the Bell inequality initially considered. We show that, for the PNP Bell inequalities, the critical detection efficiency decays exponentially with $N$. The strength of our method is illustrated with a detailed study of the PNP Bell inequalities resulting from the Clauser-Horne-Shimony-Holt inequality.\\n\\ntitle: Bipartite non-locality beyond Bell inequalities by means of multivariable correlations\\nid: http://arxiv.org/abs/2004.12968v2\\npublished: 2020-04-27T17:21:48Z\\nsummary: We give a set of necessary conditions for locality in bipartite systems, which include and generalize known Bell's inequalities. Each condition corresponds to a specific order of the expansion of random variables defined on graphs, in terms of genuinely n-variable correlation functions. The first non-trivial order leads to known Bell inequalities, while higher orders produce additional, non-equivalent conditions. In particular, in CHSH settings, we obtain at least two additional tight conditions which do not reduce to the CHSH inequality. This shows that tight Bell inequalities are sufficient but not necessary conditions for the non-locality of bipartite quantum correlations.\\n\\ntitle: Upper bounds on violation of Bell-type inequalities by a multipartite quantum state\\nid: http://arxiv.org/abs/1108.0263v1\\npublished: 2011-08-01T08:57:55Z\\nsummary: We present the new exact upper bounds on the maximal Bell violation for the generalized N-qubit GHZ state, the N-qudit GHZ state and, in general, for an arbitrary N-partite quantum state, possibly infinite-dimensional. Our results indicate that, for an N-partite quantum state of any Hilbert space dimension, violation of any Bell-type inequality (either on correlation functions or on joint probabilities) with S settings and any number of outcomes at each site cannot exceed (2S-1)^{N-1}.\\n\\ntitle: Correlations, Bell Inequality Violation & Quantum Entanglement\\nid: http://arxiv.org/abs/0810.5400v1\\npublished: 2008-10-30T01:55:25Z\\nsummary: It is one of the most remarkable features of quantum physics that measurements on spatially separated systems cannot always be described by a locally causal theory. In such a theory, the outcomes of local measurements are determined in advance solely by some unknown (or hidden) variables and the choice of local measurements. Correlations that are allowed within the framework of a locally causal theory are termed classical. Typically, the fact that quantum mechanics does not always result in classical correlations is revealed by the violation of Bell inequalities, which are constraints that have to be satisfied by any classical correlations. It has been known for a long time that entanglement is necessary to demonstrate nonclassical correlations, and hence a Bell inequality violation. However, since some entangled quantum states are known to admit explicit locally causal models, the exact role of entanglement in Bell inequality violation has remained obscure. This thesis provides both a comprehensive review on these issues as well as a report on new discoveries made to clarify the relationship between entanglement and Bell inequality violation.\", \"excerpt_truncated\": false, \"source_sha256\": \"ee0dedf69845a9162f7827c85a39adfba1471ae35a52dcd87a4f43f91b82bce5\"}",
+      "id": "source-c7d665600a6949f0",
+      "scope": "collected",
+      "source": "https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3ABell+inequalities+time+correlations+Hamiltonian+vacuum&start=0&max_results=4",
+      "version": 3,
+      "time": "2026-09-11T10:13:50.009127+00:00"
+    },
+    "r-7e2a568393064757": {
+      "actor": "runtime",
+      "content": "{\"base_version\":3,\"inherited_commitments\":[],\"invocation\":\"w-7e2a568393064757\",\"previous_head\":\"171b340df15a28fce79f58790bc5cafe25d8f7fadf3d8016f1b02d7eb26263e1\",\"process_id\":2033,\"scope\":\"Receipt proves state delivery to the provider boundary, not model comprehension.\"}",
+      "id": "r-7e2a568393064757",
+      "source": "runtime:continuity",
+      "version": 3,
+      "time": "2026-09-11T10:13:50.040914+00:00"
     }
   },
   "journal": [
@@ -766,6 +792,20 @@
       "time": "2026-09-11T09:17:27.585298+00:00",
       "finished": "2026-09-11T09:17:57.750640+00:00",
       "reason": ""
+    },
+    "w-7e2a568393064757": {
+      "base_version": 3,
+      "charged": true,
+      "id": "w-7e2a568393064757",
+      "model": "gemini-3.8-flash",
+      "process_id": 2033,
+      "provider": "gemini",
+      "quota_day": "2026-09-11",
+      "request_hash": "ab51a9cadaa28178f6daac1140163c4f36b59880e948c3a4f1bcf975bf233259",
+      "status": "failed",
+      "time": "2026-09-11T10:13:50.052280+00:00",
+      "finished": "2026-09-11T10:14:14.453562+00:00",
+      "reason": "Gemini HTTP 503; attempt counted, no automatic retry"
     }
   },
   "pending": null,
@@ -874,8 +914,9 @@
       "query": "evaluativist cognitive control metacognition Joelle Proust",
       "reason": "Follow up on the evaluativist proposal identified in Crossref (source-efc0f0b94d0d4107) connecting mental action, metacognition, and cognitive control.",
       "type": "research",
-      "status": "queued",
-      "created_by": "w-ccb4ef310c524b3b"
+      "status": "collected",
+      "created_by": "w-ccb4ef310c524b3b",
+      "evidence": "source-ed1263fe88a444ae"
     },
     "res-quantum-bell-time": {
       "domain": "quantum_physics",
@@ -884,8 +925,9 @@
       "query": "Bell inequalities time correlations Hamiltonian vacuum",
       "reason": "Search arXiv with standard term tokens to locate papers discussing temporal Bell inequalities and Hamiltonian vacuum correlation tests without malformed Boolean field syntax.",
       "type": "research",
-      "status": "queued",
-      "created_by": "w-ccb4ef310c524b3b"
+      "status": "collected",
+      "created_by": "w-ccb4ef310c524b3b",
+      "evidence": "source-c7d665600a6949f0"
     }
   }
 }
