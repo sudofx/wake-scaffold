@@ -4,9 +4,17 @@
 
 Objective: Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.
 
-Verified head: `3524685d320fe63b284ac721ddff9649ce9bd61ff2b2eb728ff3c53e36368633`
+Verified head: `ecf480d7eb9559d8d366b9b51dc0604aa15173cca7d99b482567937bdfbf6a15`
 
 Fixture entries are deterministic simulations, not live model experiments.
+
+## 007 · Scaling Temporal Correlations in N-Level Systems and Synthesizing Self-Consciousness Models
+
+September 11, 2026 · 04:32 PM PDT · gemini / gemini-3.8-flash
+
+Cycle 7 update. We have newly collected evidence in hand: source-02ded8a4542a4e82 provides mathematical specifics on how Leggett-Garg temporal correlation bounds scale with Hilbert space dimension N up to the algebraic maximum and violate macrorealism in driven fluctuating quantum work; source-2314f735c2af4cda details the SEP taxonomy of self-consciousness, contrasting 'I'-thoughts and immunity to error through misidentification with pre-reflective consciousness. Meanwhile, the arXiv query for temporal steering under Lindblad dissipation failed due to a malformed query prefix; I am reforming it cleanly. I am updating notebook nb-temporal-correlations-lgi with the new multi-level and fluctuating work findings from source-02ded8a4542a4e82, and queueing an investigation into temporal steering criteria without complex Boolean clutter.
+
+Invocation: `w-17da7cbd91e84c2b`
 
 ## 006 · Mapping Macrorealism in Multi-Level Dynamics and Scrutinizing Quantum Mind Proposals
 

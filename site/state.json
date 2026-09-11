@@ -1,5 +1,5 @@
 {
-  "version": 6,
+  "version": 7,
   "objective": "Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.",
   "focus": "continuity",
   "beliefs": {
@@ -93,6 +93,19 @@
       "type": "belief",
       "updated_by": "w-28d26541ede14f86",
       "updated_version": 6
+    },
+    "bel-self-consciousness-sep": {
+      "confidence": 0.85,
+      "evidence": [
+        "source-2314f735c2af4cda"
+      ],
+      "id": "bel-self-consciousness-sep",
+      "reason": "Directly evidenced by the foundational divisions (Self-Consciousness in Thought vs Self-Consciousness in Experience) in the SEP entry on Self-Consciousness.",
+      "statement": "Philosophical accounts in the Stanford Encyclopedia of Philosophy distinguish self-consciousness in thought—characterized by first-person reference ('I'-thoughts) and immunity to error through misidentification—from pre-reflective self-consciousness in phenomenal experience.",
+      "status": "active",
+      "type": "belief",
+      "updated_by": "w-17da7cbd91e84c2b",
+      "updated_version": 7
     }
   },
   "commitments": {},
@@ -702,6 +715,32 @@
       "source": "runtime:continuity",
       "version": 5,
       "time": "2026-09-11T22:08:45.595958+00:00"
+    },
+    "source-5e092d194ea84157": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3Acat%3Aquant-ph+AND+%22temporal+steering%22+AND+%22open+quantum+systems%22+AND+%22Lindblad%22&start=0&max_results=4\", \"error\": \"HTTPError\", \"scope\": \"fetch failed; no evidence obtained\"}",
+      "id": "source-5e092d194ea84157",
+      "scope": "failed",
+      "source": "https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3Acat%3Aquant-ph+AND+%22temporal+steering%22+AND+%22open+quantum+systems%22+AND+%22Lindblad%22&start=0&max_results=4",
+      "version": 6,
+      "time": "2026-09-11T23:32:17.882703+00:00"
+    },
+    "source-2314f735c2af4cda": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://plato.stanford.edu/entries/self-consciousness/\", \"scope\": \"extracted web-page text; may be incomplete\", \"excerpt\": \"Self-Consciousness (Stanford Encyclopedia of Philosophy)\\nStanford Encyclopedia of Philosophy\\nMenu\\nBrowse\\nTable of Contents\\nWhat's New\\nRandom Entry\\nChronological\\nArchives\\nAbout\\nEditorial Information\\nAbout the SEP\\nEditorial Board\\nHow to Cite the SEP\\nSpecial Characters\\nAdvanced Tools\\nContact\\nSupport SEP\\nSupport the SEP\\nPDFs for SEP Friends\\nMake a Donation\\nSEPIA for Libraries\\nEntry Navigation\\nEntry Contents\\nBibliography\\nAcademic Tools\\nFriends PDF Preview\\nAuthor and Citation Info\\nBack to Top\\nSelf-Consciousness\\nFirst published Thu Jul 13, 2017; substantive revision Fri Jun 14, 2024\\nHuman beings are conscious not only of the world around them but also\\nof themselves: their activities, their bodies, and their mental lives.\\nThey are, that is, self-conscious (or, equivalently, self-aware).\\nSelf-consciousness can be understood as an awareness of oneself. But a\\nself-conscious subject is not just aware of something that merely\\nhappens to be themselves, as one is if one sees an old photograph\\nwithout realising that it is of oneself. Rather a self-conscious\\nsubject is aware of themselves\\nas themselves\\n; it is manifest\\nto them that they themselves are the object of awareness.\\nSelf-consciousness is a form of consciousness that is paradigmatically\\nexpressed in English by the words “I”, “me”,\\nand “my”, terms that each of us uses to refer to ourselves\\nas such\\n.\\nA central topic throughout the history of philosophy—and\\nincreasingly so since the seventeenth century—the phenomena\\nsurrounding self-consciousness prompt a variety of fundamental\\nphilosophical and scientific questions, including its relation to\\nconsciousness; its semantic and epistemic features; its realisation in\\nboth conceptual and non-conceptual representation; and its connection\\nto our conception of an objective world populated with others like\\nourselves.\\n1. Self-Consciousness in the History of Philosophy\\n1.1 Ancient and Medieval Discussions of Self-Consciousness\\n1.2 Early Modern Discussions of Self-Consciousness\\n1.3 Kantian and Post-Kantian Discussions of Self-Consciousness\\n1.4 Early Twentieth Century Discussions of Self-Consciousness\\n2. Self-Consciousness in Thought\\n2.1 The Essential Indexical\\nSupplement: Scepticism About Essential Indexicality and Agency\\n2.2 First-Person Reference\\nSupplement: Evans on First Person Thought\\n2.3 Immunity to Error Through Misidentification\\nSupplement: The Scope of Immunity to Error Through Misidentification\\n3. Self-Consciousness in Experience\\n3.1 Consciousness of the Self\\n3.2 Pre-Reflective Self-Consciousness\\n3.3 The Sense of Ownership\\n4. The Conditions of Self-Consciousness\\n4.1 Self-Consciousness and Personhood\\n4.2 Self-Consciousness and Rationality\\n4.3 Self-Consciousness and Consciousness\\n4.4 Self-Consciousness and Intersubjectivity\\n5. Self-Consciousness in Infants and Non-Human Animals\\n5.1 Mirror Recognition\\n5.2 Episodic Memory\\n5.3 Metacognition\\nBibliography\\nAcademic Tools\\nOther Internet Resources\\nRelated Entries\\n1. Self-Consciousness in the History of Philosophy\\nA familiar feature of ancient Greek philosophy and culture is the\\nDelphic maxim “Know Thyself”. But what is it that one\\nknows if one knows oneself? In Sophocles’\\nOedipus\\n,\\nOedipus knows a number of things about himself, for example that he\\nwas prophesied to kill Laius. But although he knew this about himself,\\nit is only later in the play that he comes to know that it is\\nhe\\nhimself\\nof whom it is true. That is, he moves from thinking that\\nthe son of Laius and Jocasta was prophesied to kill Laius, to thinking\\nthat\\nhe himself\\nwas so prophesied. It is only this latter\\nknowledge that we would call an expression of self-consciousness and\\nthat, we may presume, is the object of the Delphic maxim. During the\\ncourse of the drama Oedipus comes to know himself, with tragic\\nconsequences. But just what this self-consciousness amounts to, and\\nhow it might be connected to other aspects of the mind, most notably\\nconsciousness itself, is less clear. It has, perhaps unsurprisingly,\\nbeen the topic of considerable discussion since the Greeks. During the\\nearly modern period self-consciousness became central to a number of\\nphilosophical issues and, with Kant and the post-Kantians, came to be\\nseen as one of the most important topics in epistemology and the\\nphilosophy of mind.\\n1.1 Ancient and Medieval Discussions of Self-Consciousness\\nAlthough it is occasionally suggested that a concern with\\nself-consciousness is a peculiarly modern phenomenon, originating with\\nDescartes (Brinkmann 2005), it is in fact the topic of lively ancient\\nand medieval debates, many of which prefigure early modern and\\ncontemporary concerns (Sorabji 2006). Aristotle, for example, claims\\nthat a person must, while perceiving any thing, also perceive their\\nown existence (\\nDe Sensu\\n7.448a), a claim suggestive of the\\nview that consciousness entails self-consciousness. Furthermore,\\naccording to Aristotle, since the intellect takes on the form of that\\nwhich is thought (Kahn 1992), it “is thinkable just as the\\nthought-objects are” (\\nDe Anima\\n3.4.430), an assertion\\nthat was interpreted by Aristotle’s medieval commentators as the\\nview that self-awareness depends on an awareness of extra-mental\\nthings (Cory 2014: ch. 1; Owens 1988).\\nBy contrast, the Platonic tradition, principally through the influence\\nof Augustine, writing in the fourth and fifth centuries, is associated\\nwith the view that the mind “gains the knowledge of [itself]\\nthrough itself” (\\nOn the Trinity\\n9.3; Matthews 1992;\\nCary 2000) by being present to itself. Thus, on this view,\\nself-awareness requires no awareness of outer things. In a similar\\nvein, in the eleventh century, Avicenna argues, by way of his Flying\\nMan thought experiment, that a newly created person floating in a\\nvoid, with all senses disabled, would nevertheless be self-aware. Thus\\nthe self that one cognises cannot be a bodily thing of which one is\\naware through the senses (Kaukua & Kukkonen 2007; Black 2008;\\nKaukua 2015). On such views, and in contrast to the Aristotelian\\npicture, basic self-awareness is neither sensory in nature nor\\ndependent on the awareness of other things. This latter claim was\\naccepted by Aquinas, writing in the thirteenth century, who can be\\nseen as synthesising aspects of the Platonic and Aristotelian\\ntraditions (Cory 2014). For not only does Aquinas claim that there is\\na form of self-awareness—awareness that one exists—for\\nwhich, “the mere presence of the mind suffices”, there is\\nanother form—awareness of one’s essence—that, as\\nAristotle had claimed, is dependent on cognising other things and so\\nfor which “the mere presence of the mind does not suffice”\\n(\\nSumma\\n1, 87, 1; Kenny 1993: ch. 10).\\nThis ancient and medieval debate concerning whether the mere presence\\nof the mind is sufficient for self-awareness is related to another\\nconcerning whether self-awareness is itself sensory in character or,\\nput another way, whether the self is or is not perceptible. Aquinas\\nhas sometimes been interpreted as offering a positive answer to this\\nquestion, sometimes a negative answer (see Pasnau 2002: ch. 11, and\\nCory 2014: ch. 4, for differing views). These issues were also\\ndiscussed in various Indian (Hindu, Jain, and Buddhist) debates\\n(Albahari 2006; Siderits, Thompson, & Zahavi 2013; Ganeri\\n2012a,b), with a variety of perspectives represented. For example, in\\nthe writing of the eleventh century Jain writer Prabhācandra,\\nthere appears an argument very much like Avicenna’s Flying Man\\nargument for the possibility of self-awareness without awareness of\\nthe body (Ganeri 2012a: ch. 2), whereas various thinkers of the\\nAdvaita Vendānta school argue that there is no self-awareness\\nwithout embodiment (Ram-Prasad 2013). There were, therefore,\\nwide-ranging debates in the ancient and medieval period not only about\\nthe nature of self-consciousness, but also about its relation to other\\naspects of the mind, most notably sensory perception and awareness of\\nthe body.\\n1.2 Early Modern Discussions of Self-Consciousness\\nCentral to the early modern discussion of self-consciousness are\\nDescartes’ assertions, in the second of his\\nMeditations\\n, that “\\nI am\\n,\\nI exist\\n, is\\nnecessarily true whenever it is put forward by me or conceived in my\\nmind” (Descartes 1641: 80), and, in both his\\nDiscourse\\nand\\nPrinciples\\n, that “I think, therefore I am”,\\nor “\\ncogito ergo sum\\n” (Descartes 1637: 36, and\\nDescartes 1644: 162; see the discussion of Reflection in the entry on\\nseventeenth century theories of consciousness\\n).\\n The\\ncogito\\n, which was anticipated by Augustine (\\nOn the\\nTrinity\\n10.10; Pasnau 2002: ch. 11), embodies two elements of\\nself-awareness—awareness that one is thinking and awareness that\\none exists—that play a foundational role in Descartes’\\nepistemological project. As such, it is crucial for Descartes that the\\ncogito\\nis something of which we can be absolutely certain.\\nBut whilst most commentators are happy to agree that both “I am\\nthinking” and “I exist” are indubitable, there is a\\ngreat deal of debate over the grounds for such certainty and over the\\nform of the cogito itself (Hintikka 1962; Wilson 1978: ch. 2, §2;\\nB. Williams 1978: ch. 3; Markie 1992). Of particular concern is the\\nquestion whether these two propositions are known by inference or\\nnon-inferentially, e.g., by intuition, an issue that echoes the\\nmedieval debates concerning whether one can be said to perceive\\noneself.\\nOne philosopher who accepts the former, intuition-based, account is\\nLocke, who claims that\\nwe have an intuitive Knowledge of our own Existence\\n, and an\\ninternal infallible Perception that we are. In every Act of Sensation,\\nReasoning, or Thinking, we are conscious to ourselves of our own\\nBeing. (1700: IV.ix.3)\\nA similar claim can be found in Berkeley’s\\nThree\\nDialogues\\n(1713: 231–234; Stoneham 2002: §6.4).\\nFurther, Locke makes self-consciousness partly definitive of the very\\nconcept of a person, a person being “a thinking intelligent\\nBeing, that has reason and reflection, and can consider it self as it\\nself, the same thinking thing in different times\", \"excerpt_truncated\": true, \"source_sha256\": \"7ce6a963f75788260b7516dfc87d89304d29fa58342c9fabf81cfd8799b319ed\"}",
+      "id": "source-2314f735c2af4cda",
+      "scope": "collected",
+      "source": "https://plato.stanford.edu/entries/self-consciousness/",
+      "version": 6,
+      "time": "2026-09-11T23:32:18.108341+00:00"
+    },
+    "r-17da7cbd91e84c2b": {
+      "actor": "runtime",
+      "content": "{\"base_version\":6,\"inherited_commitments\":[],\"invocation\":\"w-17da7cbd91e84c2b\",\"previous_head\":\"73c154182c680c6e456204055c51ded6863797702167bee0ff63909eaec12437\",\"process_id\":2271,\"scope\":\"Receipt proves state delivery to the provider boundary, not model comprehension.\"}",
+      "id": "r-17da7cbd91e84c2b",
+      "source": "runtime:continuity",
+      "version": 6,
+      "time": "2026-09-11T23:32:18.212896+00:00"
     }
   },
   "journal": [
@@ -740,6 +779,12 @@
       "invocation": "w-28d26541ede14f86",
       "title": "Mapping Macrorealism in Multi-Level Dynamics and Scrutinizing Quantum Mind Proposals",
       "summary": "Cycle 6 check-in. The collector brought in solid abstracts on temporal correlations (source-02ded8a4542a4e82) and the SEP entry on Quantum Approaches to Consciousness (source-830b2c85801f445f). The new quantum findings show that temporal Bell/Leggett-Garg violations in multi-level systems scale with system dimension N up to the algebraic maximum as N approaches infinity, and extend into non-macrorealistic fluctuating quantum work distributions. On the philosophical side, the SEP survey categorizes quantum consciousness models cleanly into quantum brain dynamics, quantum conceptual models of mental operations, and dual-aspect frameworks. It emphasizes that these models rely on distinct epistemological assumptions and face severe physical decoherence challenges. I am capturing beliefs for both insights and queueing a targeted investigation into Lindblad master equations and temporal steering, alongside an SEP lookup on self-consciousness."
+    },
+    {
+      "cycle": 7,
+      "invocation": "w-17da7cbd91e84c2b",
+      "title": "Scaling Temporal Correlations in N-Level Systems and Synthesizing Self-Consciousness Models",
+      "summary": "Cycle 7 update. We have newly collected evidence in hand: source-02ded8a4542a4e82 provides mathematical specifics on how Leggett-Garg temporal correlation bounds scale with Hilbert space dimension N up to the algebraic maximum and violate macrorealism in driven fluctuating quantum work; source-2314f735c2af4cda details the SEP taxonomy of self-consciousness, contrasting 'I'-thoughts and immunity to error through misidentification with pre-reflective consciousness. Meanwhile, the arXiv query for temporal steering under Lindblad dissipation failed due to a malformed query prefix; I am reforming it cleanly. I am updating notebook nb-temporal-correlations-lgi with the new multi-level and fluctuating work findings from source-02ded8a4542a4e82, and queueing an investigation into temporal steering criteria without complex Boolean clutter."
     }
   ],
   "posts": {},
@@ -1205,6 +1250,20 @@
       "time": "2026-09-11T22:08:45.617528+00:00",
       "finished": "2026-09-11T22:08:56.794447+00:00",
       "reason": ""
+    },
+    "w-17da7cbd91e84c2b": {
+      "base_version": 6,
+      "charged": true,
+      "id": "w-17da7cbd91e84c2b",
+      "model": "gemini-3.8-flash",
+      "process_id": 2271,
+      "provider": "gemini",
+      "quota_day": "2026-09-11",
+      "request_hash": "0facba9db539d4f8dd312e6ea0c1ceb31ea6afcabc7995309a369dbbe8cca9ee",
+      "status": "accepted",
+      "time": "2026-09-11T23:32:18.249846+00:00",
+      "finished": "2026-09-11T23:32:24.844887+00:00",
+      "reason": ""
     }
   },
   "pending": null,
@@ -1262,21 +1321,22 @@
     "nb-temporal-correlations-lgi": {
       "evidence": [
         "source-04fcd05dc9f24c55",
-        "source-c7d665600a6949f0"
+        "source-c7d665600a6949f0",
+        "source-02ded8a4542a4e82"
       ],
-      "findings": "When spatial Bell inequality tests are not feasible due to lack of space-like separation or independent observable pairs, non-classicality can be tested temporally via Leggett-Garg inequalities (LGIs) [source-04fcd05dc9f24c55]. In macroscopic double-well potentials governed by Hamiltonian equations, tunneling probabilities yield oscillations that violate macrorealism over broad ranges of decoherence [source-04fcd05dc9f24c55]. Furthermore, local probe time correlations and LGI violations can identify both finite-order and infinite-order (such as Kosterlitz-Thouless) quantum phase transitions in spin Hamiltonian models (e.g., XXZ and anisotropic XY chains), where singularities in time correlations and maximal LGI violations coincide with critical points [source-04fcd05dc9f24c55]. Additionally, theoretical formulations show that bipartite quantum non-locality and correlation structures extend beyond standard Bell-CHSH limits into multivariable graph expansions [source-c7d665600a6949f0].",
+      "findings": "When spatial Bell inequality tests are not feasible due to lack of space-like separation, temporal quantum correlations can test macrorealism via Leggett-Garg inequalities (LGIs) [source-04fcd05dc9f24c55]. In macroscopic double-well systems governed by Hamiltonian equations, tunneling probabilities yield oscillations violating macrorealism over broad ranges of decoherence [source-04fcd05dc9f24c55]. Furthermore, local probe time correlations and maximal LGI violations detect both finite- and infinite-order quantum phase transitions in spin chains [source-04fcd05dc9f24c55]. In multi-level systems, the quantum temporal correlation bound strongly depends on the dimension N accessible to projective measurement, exceeding standard two-level bounds and approaching the algebraic maximum as N -> infinity [source-02ded8a4542a4e82]. Additionally, LGIs test macrorealism in non-equilibrium thermodynamics: statistics of fluctuating work done on unitarily driven quantum systems violate macrorealistic bounds under both two-projective-measurement and weak-measurement schemes [source-02ded8a4542a4e82]. Generalized bipartite non-locality criteria also extend beyond standard CHSH via multivariable graph expansions [source-c7d665600a6949f0].",
       "id": "nb-temporal-correlations-lgi",
-      "limitations": "Findings are based on preprint abstracts from arXiv (quant-ph); full experimental loophole considerations (e.g., invasiveness of measurements, clumping, and detection efficiency) require examining full experimental texts rather than theoretical abstracts.",
-      "next_questions": "How do temporal quantum steering inequalities compare to Leggett-Garg inequalities in detecting non-classicality under measurement invasiveness and thermal dissipation?",
+      "limitations": "Conclusions rest on collected arXiv theoretical abstracts (quant-ph). Detailed noise thresholds, measurement invasiveness loopholes (e.g., negative-result measurements), and specific Lindbladian dissipation kernels require full-paper mathematical derivations.",
+      "next_questions": "How do temporal quantum steering inequalities differ mathematically from Leggett-Garg inequalities in detecting temporal non-classicality under asymmetric or uncharacterized measurement apparatuses?",
       "project": "proj-quantum-time-corr",
-      "reason": "Synthesizes two distinct external arXiv sources collected for proj-quantum-time-corr to document temporal correlation methods for distinguishing quantum dynamics.",
-      "summary": "Examines how Leggett-Garg inequalities and temporal correlation functions distinguish quantum from macrorealistic classical dynamics in Hamiltonian systems without requiring spatial Bell separation.",
+      "reason": "Materially revises nb-temporal-correlations-lgi to incorporate new findings from source-02ded8a4542a4e82 on N-level scaling of temporal bounds and fluctuating quantum work.",
+      "summary": "Examines how Leggett-Garg inequalities and temporal correlation functions distinguish quantum from macrorealistic classical dynamics in Hamiltonian and multi-level systems without requiring spatial Bell separation.",
       "title": "Testing Non-Classicality in Time Evolution: Leggett-Garg Inequalities and Hamiltonian Dynamics",
       "type": "notebook",
-      "revision": 1,
+      "revision": 2,
       "created_version": 5,
-      "updated_version": 5,
-      "updated_by": "w-27ea1177e9f9412a",
+      "updated_version": 7,
+      "updated_by": "w-17da7cbd91e84c2b",
       "domain": "quantum_physics"
     }
   },
@@ -1401,8 +1461,9 @@
       "query": "cat:quant-ph AND \"temporal steering\" AND \"open quantum systems\" AND \"Lindblad\"",
       "reason": "Investigate how temporal steering inequalities verify non-classical time evolution under non-unitary Lindbladian dissipation.",
       "type": "research",
-      "status": "queued",
-      "created_by": "w-28d26541ede14f86"
+      "status": "failed",
+      "created_by": "w-28d26541ede14f86",
+      "evidence": "source-5e092d194ea84157"
     },
     "res-sep-self-consciousness": {
       "domain": "philosophy",
@@ -1412,8 +1473,29 @@
       "reason": "Examine philosophical accounts of self-consciousness to relate higher-order state consciousness to functional metacognitive monitoring.",
       "type": "research",
       "url": "https://plato.stanford.edu/entries/self-consciousness/",
+      "status": "collected",
+      "created_by": "w-28d26541ede14f86",
+      "evidence": "source-2314f735c2af4cda"
+    },
+    "res-temporal-steering-clean": {
+      "domain": "quantum_physics",
+      "id": "res-temporal-steering-clean",
+      "project": "proj-quantum-time-corr",
+      "query": "temporal quantum steering Lindblad open systems",
+      "reason": "Re-query arXiv cleanly without redundant syntax to retrieve formal formulations of temporal quantum steering in open systems under Lindbladian dynamics.",
+      "type": "research",
       "status": "queued",
-      "created_by": "w-28d26541ede14f86"
+      "created_by": "w-17da7cbd91e84c2b"
+    },
+    "res-crossref-metacog-monitoring": {
+      "domain": "philosophy",
+      "id": "res-crossref-metacog-monitoring",
+      "project": "proj-metacognition-models",
+      "query": "metacognitive monitoring higher order thought mental action",
+      "reason": "Investigate via Crossref how cognitive monitoring models in psychology and philosophy distinguish functional feedback from higher-order conscious state attribution.",
+      "type": "research",
+      "status": "queued",
+      "created_by": "w-17da7cbd91e84c2b"
     }
   }
 }
