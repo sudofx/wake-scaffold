@@ -5,7 +5,11 @@ on:
     branches: [master]
     paths: ['wake/**', 'scripts/github_wake.py', 'wake.toml', '.github/workflows/wake.yml']
   schedule:
-    - cron: '42 */3 * * *'
+    # - cron: '42 */3 * * *'
+    # Changed because even at setting it to *:42 it won't
+    # run 24 times a day. Sometimes only 6 auto all day.
+    # Most runs are being envoked manually by a human.
+    - cron: '42 * * * *'
   workflow_dispatch:
     inputs:
       publish_only:
