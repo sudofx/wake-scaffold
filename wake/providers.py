@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import re
+import time
 import urllib.error
 import urllib.request
 
@@ -111,6 +112,7 @@ def load_env(path=Path(".env")):
 class Gemini:
     name = "gemini"
     charged = True
+    retry_503_delay_seconds = 30
 
     def __init__(self, config, model=None):
         load_env()
@@ -136,14 +138,22 @@ class Gemini:
             f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent",
             data=json.dumps(body).encode(), headers={"Content-Type": "application/json",
                                                    "x-goog-api-key": os.environ["GEMINI_API_KEY"]})
-        try:
-            with urllib.request.urlopen(req, timeout=self.config["timeout_seconds"]) as response:
-                data = json.loads(response.read(1_000_001))
-        except urllib.error.HTTPError as exc:
-            # Neither request headers nor provider error bodies belong in the public journal.
-            raise Rejected(f"Gemini HTTP {exc.code}; attempt counted, no automatic retry") from None
-        except (urllib.error.URLError, TimeoutError):
-            raise Rejected("Gemini network failure; attempt counted, no automatic retry") from None
+        for transport_attempt in range(2):
+            try:
+                with urllib.request.urlopen(req, timeout=self.config["timeout_seconds"]) as response:
+                    data = json.loads(response.read(1_000_001))
+                break
+            except urllib.error.HTTPError as exc:
+                # A 503 means Gemini is temporarily busy. Wait once and resend the
+                # same durable request; all other HTTP failures remain final.
+                if exc.code == 503 and transport_attempt == 0:
+                    time.sleep(self.retry_503_delay_seconds)
+                    continue
+                # Neither request headers nor provider error bodies belong in the public journal.
+                suffix = " after one delayed retry" if exc.code == 503 else ""
+                raise Rejected(f"Gemini HTTP {exc.code}{suffix}; wake attempt counted") from None
+            except (urllib.error.URLError, TimeoutError):
+                raise Rejected("Gemini network failure; wake attempt counted") from None
         candidates = data.get("candidates", [])
         require(candidates and candidates[0].get("finishReason") == "STOP", "Gemini did not return a complete answer")
         raw = "".join(part.get("text", "") for part in candidates[0].get("content", {}).get("parts", [])

@@ -22,8 +22,8 @@ The record includes the objective, focus, all observations, belief revisions, co
 4. Record a runtime receipt stating the prior valid head, state version and inherited obligations.
 5. Build a request from durable state. Reject before inference if it exceeds the context ceiling.
 6. Persist `invocation_started`, its exact request, provider identity and quota reservation.
-7. Make one provider request, or leave a durable manual request for the operator.
-8. Validate the reply. Commit all proposed actions atomically or record the entire rejected reply. Provider failures create a failure event. No automatic retry.
+7. Make a provider request, or leave a durable manual request for the operator. Gemini HTTP 503 may make one delayed repeat of the identical request.
+8. Validate the reply. Commit all proposed actions atomically or record the entire rejected reply. Provider failures create a failure event. A Gemini HTTP 503 gets one retry after a 30-second wait; other provider failures are not retried.
 9. The scheduled wrapper generates reports and a consistent backup.
 
 A runtime receipt attests delivery of durable state to the provider boundary. It does **not** attest that the remote model understood it. Prose in a journal is the provider's narrative; accepted means governance checks passed, not that every sentence is true.
@@ -53,7 +53,7 @@ Every request includes the objective, current focus, all beliefs, every open com
 
 Gemini requests use JSON output mode and an output-token cap. The durable request contains an exact JSON Schema with distinct action shapes; the adapter includes that contract in the system prompt. The deployed model rejected the nested action union in its constrained-decoding setting, so schema enforcement remains in the unchanged deterministic governance layer rather than relying on the provider to enforce it. Invalid replies remain rejected, without retries or silently repaired fields. The adapter uses the documented [generateContent interface](https://ai.google.dev/api/generate-content). No vendor SDK is required.
 
-The hard local ceiling is at most 20 charged attempts per Pacific day. Reservations are durable before sending, so an interrupted or failed call still consumes a slot. A lost response can waste a slot but cannot cause an automatic retry. Manual imports and fixtures do not use API slots. This ledger is local to one state directory; other applications and other state directories can consume the same provider quota. Never run multiple live databases on the same 20-call allowance. A key with billing enabled can incur charges: `free_tier_confirmed` is an operator attestation, not a billing API check.
+The hard local ceiling is at most 20 charged attempts per Pacific day. Reservations are durable before sending, so an interrupted or failed call still consumes a slot. A 503 retry belongs to the same durable wake reservation, though Google may count both transport requests toward its quota. A lost response is not retried. Manual imports and fixtures do not use API slots. This ledger is local to one state directory; other applications and other state directories can consume the same provider quota. Never run multiple live databases on the same 20-call allowance. A key with billing enabled can incur charges: `free_tier_confirmed` is an operator attestation, not a billing API check.
 
 ## Recovery and audit limits
 

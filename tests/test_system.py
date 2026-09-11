@@ -1,6 +1,7 @@
 """Behavioral checks for the boundaries the experiment actually relies on."""
 
 from datetime import datetime
+from email.message import Message
 import json
 from pathlib import Path
 import subprocess
@@ -8,6 +9,7 @@ import sys
 import tempfile
 import unittest
 from unittest.mock import patch
+import urllib.error
 from zoneinfo import ZoneInfo
 
 from wake.audit import verify_history
@@ -231,6 +233,46 @@ class SystemTests(unittest.TestCase):
             request = network.call_args.args[0]
             self.assertNotIn("test-key", request.full_url)
             self.assertEqual(json.loads(request.data)["generationConfig"]["responseMimeType"], "application/json")
+
+
+    def test_gemini_waits_once_and_retries_a_503(self):
+        class Response:
+            def __enter__(self): return self
+            def __exit__(self, *args): pass
+            def read(self, maximum):
+                return json.dumps({"candidates":[{"finishReason":"STOP", "content":{"parts":[{"text":"{}"}]}}]}).encode()
+
+        busy = urllib.error.HTTPError("https://example.invalid", 503, "busy", Message(), None)
+        with patch.dict("os.environ", {"GEMINI_API_KEY":"test-key"}), \
+             patch("urllib.request.urlopen", side_effect=[busy, Response()]) as network, \
+             patch("wake.providers.time.sleep") as wait:
+            raw, _ = Gemini({**DEFAULTS, "free_tier_confirmed":True}).propose({"system":"rules", "context":{}})
+        self.assertEqual(raw, "{}")
+        self.assertEqual(network.call_count, 2)
+        wait.assert_called_once_with(30)
+        busy.close()
+
+    def test_gemini_stops_after_one_503_retry(self):
+        busy = urllib.error.HTTPError("https://example.invalid", 503, "busy", Message(), None)
+        with patch.dict("os.environ", {"GEMINI_API_KEY":"test-key"}), \
+             patch("urllib.request.urlopen", side_effect=[busy, busy]) as network, \
+             patch("wake.providers.time.sleep") as wait:
+            with self.assertRaisesRegex(Rejected, "503 after one delayed retry"):
+                Gemini({**DEFAULTS, "free_tier_confirmed":True}).propose({"system":"rules", "context":{}})
+        self.assertEqual(network.call_count, 2)
+        wait.assert_called_once_with(30)
+        busy.close()
+
+    def test_gemini_does_not_retry_a_nontransient_http_error(self):
+        denied = urllib.error.HTTPError("https://example.invalid", 403, "denied", Message(), None)
+        with patch.dict("os.environ", {"GEMINI_API_KEY":"test-key"}), \
+             patch("urllib.request.urlopen", side_effect=denied) as network, \
+             patch("wake.providers.time.sleep") as wait:
+            with self.assertRaisesRegex(Rejected, "Gemini HTTP 403"):
+                Gemini({**DEFAULTS, "free_tier_confirmed":True}).propose({"system":"rules", "context":{}})
+        self.assertEqual(network.call_count, 1)
+        wait.assert_not_called()
+        denied.close()
 
 
 if __name__ == "__main__":
