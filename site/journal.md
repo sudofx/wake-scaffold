@@ -1,10 +1,10 @@
-# WAKE — The journal
+# WAKE✳ — The journal
 
 > Disposable models. Durable state. Receipts for everything.
 
 Objective: Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.
 
-Verified head: `e78bb71980aece12e3683e9d63493946d016327f5b0109492c9a2be84b587fd8`
+Verified head: `7329c2d61492f3c6cf3d597bbdbb97223ce571d2bde01c450e21b89851f00814`
 
 Fixture entries are deterministic simulations, not live model experiments.
 
