@@ -569,6 +569,23 @@
       "source": "runtime:continuity",
       "version": 4,
       "time": "2026-09-11T16:08:53.705423+00:00"
+    },
+    "source-3fe207d2446d4a6a": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://export.arxiv.org/api/query?search_query=cat:cs.AI&start=0&max_results=4&sortBy=submittedDate&sortOrder=descending\", \"scope\": \"paper abstracts; preprints, peer-review status not verified\", \"excerpt\": \"title: GPU-CFR: 80x Faster Counterfactual Regret Minimization by Compiling the Game to Static Dataflow and CUDA Graph Replay\\nid: http://arxiv.org/abs/2609.11923v1\\npublished: 2026-09-10T17:58:14Z\\nsummary: Counterfactual regret minimization (CFR) is one of the few large numerical workloads that still runs faster on CPUs than on GPUs. Each iteration sweeps a game tree with up to billions of states in millions of small, interdependent gather and scatter steps issued through a generic tree interface. On a GPU every kernel finishes in microseconds, so kernel launches and framework dispatch dominate the run time, and prior GPU implementations have lost to optimized CPU code. We observe that for a fixed game, everything about a CFR iteration except the numerical values is known before the first iteration runs. We propose GPU-CFR, a compiler and runtime built on this observation. It compiles any game once into static dataflow: flat edge and information-set arrays, precomputed indices, and depth-level batched passes fix the entire operation sequence, and only solver state changes between iterations. Static chance folding, depth-level execution blocks, and a dual-lane reach buffer cut the number of framework operations by up to 18.1x. Because shapes, indices, and buffer addresses never change, CUDA Graph Replay records the iteration once and replays it with a single graph launch. On one A100, across an eight-game suite that spans card games, dice games, and board games, GPU-CFR runs 29.8--80.4x faster than the fastest prior GPU CFR on the same accelerator, and 14--258x faster than LiteEFG, one of the fastest open-source CPU implementations, on the four largest games. The compiled representation carries most of that margin: on eight CPU threads with no accelerator it is already 2.2--51.1x faster than the GPU baseline. On the CPU the optimized path reproduces the reference iterates bitwise, and tree construction and graph capture pay for themselves within the first solve. GPU-CFR beats every CPU and GPU baseline on the mid-to-large games of the suite without changing the update rule.\\n\\ntitle: General Quantification of Covariate and Concept Shifts\\nid: http://arxiv.org/abs/2609.11918v1\\npublished: 2026-09-10T17:57:52Z\\nsummary: Generalization under distribution shift remains a core challenge in modern machine learning, yet existing learning bound theory is limited to narrow, idealized settings and is non-estimable from samples. In this paper, we bridge the gap between theory and practical applications. We first show that existing definition of concept shift breaks when the source and target supports mismatch. Leveraging entropic optimal transport, we propose a key notion: $γ^{*}\\\\!$-concept shifts, and derive a general error bound unifying covariate and $γ^{*}\\\\!$-concept shifts, which applies to broad loss functions, label spaces, and stochastic labeling. We further develop estimators for these shifts with concentration guarantees, and the DataShifts algorithm, which can quantify distribution shifts and estimate the error bound in most applications - a rigorous and general tool for analyzing learning error under distribution shift.\\n\\ntitle: Can Edge-Deployable Vision-Language Models Identify Species?\\nid: http://arxiv.org/abs/2609.11916v1\\npublished: 2026-09-10T17:57:32Z\\nsummary: Camera traps often run in the field on edge hardware with limited or no connectivity, making small, locally-deployable vision-language models (VLMs) -- not frontier-scale ones -- the practically relevant class to evaluate for species identification. We test whether models in this deployment-relevant 2--8B range carry genuine taxonomic knowledge, evaluating four such VLMs (Qwen3-VL 2B/4B/8B, Gemma3 4B) against the domain-specific specialist BioCLIP (300M parameters) on a 96-species task, comparing clean iNaturalist photographs against camera-trap imagery from 6 LILA.science collections, on two independently-sampled evaluation sets. All models identify species far above chance, but every model -- general-purpose or specialist -- degrades sharply on field imagery (domain gaps of 9.6--26.6 percentage points, consistent across taxonomic levels and both evaluation sets), indicating the degradation reflects general image legibility rather than fine-grained discrimination failure. BioCLIP substantially outperforms every VLM tested (by 33.2--59.2 percentage points across an expanded 200-image sample for every model) despite its far smaller size, suggesting the gap reflects specialized training data rather than model scale; yet BioCLIP's own domain gap (18.0 points) is statistically indistinguishable from the best VLM's (22.3 points), suggesting the clean-to-field degradation itself is a property of the image-quality shift rather than a general-purpose-model weakness. Under open-set prompting, 5.9--9.6% of responses are syntactically valid but taxonomically nonexistent species names; the relative fabrication-rate ranking across models replicates exactly across both evaluation sets, a more robust finding than any single point estimate.\\n\\ntitle: Generative Marketing Mix Modeling: A Causal Inference Framework Linking GEO and GEM to Business Impact\\nid: http://arxiv.org/abs/2609.11915v1\\npublished: 2026-09-10T17:57:28Z\\nsummary: Generative artificial intelligence changes how firms reach customers, but standard marketing data do not record how often users see and notice a firm's name in generated answers. We develop Generative Marketing Mix Modeling (GMMM) to estimate the causal effects of Generative Engine Optimization (GEO) and Generative Engine Marketing (GEM). For GEO, GMMM combines repeated generated answers with question counts, shares of use across generative systems, and notice probabilities. For GEM, it combines records of sponsored placements with notice probabilities. GMMM compares expected business responses under alternative treatment sequences and establishes sufficient conditions for identifying the resulting effects. We investigate the empirical performance of the proposed method using simulated answers to product recommendation in English and Japanese.\", \"excerpt_truncated\": false, \"source_sha256\": \"b6eb2a764f465170b4da7b5d399fdfe55a16ea1f14f9a6dd366546dc065aa30b\"}",
+      "id": "source-3fe207d2446d4a6a",
+      "scope": "collected",
+      "source": "https://export.arxiv.org/api/query?search_query=cat:cs.AI&start=0&max_results=4&sortBy=submittedDate&sortOrder=descending",
+      "version": 4,
+      "time": "2026-09-11T16:37:11.325314+00:00"
+    },
+    "r-f8db4b400ce446a3": {
+      "actor": "runtime",
+      "content": "{\"base_version\":4,\"inherited_commitments\":[],\"invocation\":\"w-f8db4b400ce446a3\",\"previous_head\":\"6a7504f81e44e2662eee642cbc15191992d256337dec378461fd48f8c67b3cec\",\"process_id\":58277,\"scope\":\"Receipt proves state delivery to the provider boundary, not model comprehension.\"}",
+      "id": "r-f8db4b400ce446a3",
+      "source": "runtime:continuity",
+      "version": 4,
+      "time": "2026-09-11T16:37:11.392335+00:00"
     }
   },
   "journal": [
@@ -989,6 +1006,20 @@
       "time": "2026-09-11T16:08:53.730300+00:00",
       "finished": "2026-09-11T16:09:04.881790+00:00",
       "reason": "Gemini HTTP 503; attempt counted, no automatic retry"
+    },
+    "w-f8db4b400ce446a3": {
+      "base_version": 4,
+      "charged": true,
+      "id": "w-f8db4b400ce446a3",
+      "model": "gemini-3.8-flash",
+      "process_id": 58277,
+      "provider": "gemini",
+      "quota_day": "2026-09-11",
+      "request_hash": "b8ffade72c1618b5b5095f492abafecb531e55ab5ba6625690198a0930d486ef",
+      "status": "failed",
+      "time": "2026-09-11T16:37:11.409987+00:00",
+      "finished": "2026-09-11T16:38:09.601157+00:00",
+      "reason": "Gemini HTTP 503 after one delayed retry; wake attempt counted"
     }
   },
   "pending": null,
