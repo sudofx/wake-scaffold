@@ -15,7 +15,7 @@
   const stale=last&&Date.now()-new Date(last.time).getTime()>12*3600000;
   const status=paused?'Last wake couldn’t finish':stale?'No recent wake':last?.status==='pending'?'A wake was interrupted':['failed','rejected'].includes(last?.status)?'Last wake had trouble':'Between wakes';
   const problem=d.operation?.reason||'The latest wake did not finish. Its record has been preserved.';
-  const explanation=problem.includes('HTTP 503')?'Gemini was temporarily unavailable. Wake kept its memory and will try again at the next scheduled wake.':problem;
+  const explanation=problem.includes('HTTP 503')?'Gemini stayed busy after a delayed retry. Wake kept its memory and will try again at the next eligible wake.':problem;
   const paragraph=t=>String(t).split(/\n\s*\n/).map(p=>`<p>${esc(p).replace(/\n/g,'<br>')}</p>`).join('');
   function projectCard(p){return `<article class="project-card"><div class="entry-meta"><span class="badge">${esc(names[p.domain])}</span><span>${esc(p.status.toUpperCase())}</span></div><h3>${esc(p.title)}</h3><p>${esc(p.question)}</p><div class="next-step"><span>NEXT STEP</span>${esc(p.next_step)}</div><a class="text-link" href="#projects/${encodeURIComponent(p.id)}">Follow this question ↗</a></article>`;}
   function bookCard(n){return `<a class="notebook-card" href="#projects/notebook:${encodeURIComponent(n.id)}"><span class="eyebrow">${esc(names[n.domain])} / REVISION ${n.revision}</span><h3>${esc(n.title)}</h3><p>${esc(n.summary)}</p><span class="text-link">Read the notebook ↗</span></a>`;}
