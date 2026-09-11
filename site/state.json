@@ -526,6 +526,32 @@
       "source": "runtime:continuity",
       "version": 3,
       "time": "2026-09-11T10:19:40.469117+00:00"
+    },
+    "source-f6578b330e544976": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://plato.stanford.edu/entries/mental-action/\", \"error\": \"HTTPError\", \"scope\": \"fetch failed; no evidence obtained\"}",
+      "id": "source-f6578b330e544976",
+      "scope": "failed",
+      "source": "https://plato.stanford.edu/entries/mental-action/",
+      "version": 4,
+      "time": "2026-09-11T15:10:35.069285+00:00"
+    },
+    "source-04fcd05dc9f24c55": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3ALeggett-Garg+inequality+time+correlation+Hamiltonian&start=0&max_results=4\", \"scope\": \"paper abstracts; preprints, peer-review status not verified\", \"excerpt\": \"title: Leggett-Garg Inequality for a Two-Level System under Decoherence: A Broader Range of Violation\\nid: http://arxiv.org/abs/1605.00394v3\\npublished: 2016-05-02T08:57:42Z\\nsummary: We consider a macroscopic quantum system in a tilted double-well potential. By solving Hamiltonian equation, we obtain tunneling probabilities which contain oscillation effects. To show how one can decide between quantum mechanics and the implications of macrorealism assumption, a given form of Leggett-Garg inequality is used. The violation of this inequality occurs for a broader range of decoherence effects, compared to previous results obtained for two-level systems.\\n\\ntitle: Quantum Phase Transitions detected by a local probe using Time Correlations and Violations of Leggett-Garg Inequalities\\nid: http://arxiv.org/abs/1509.00314v2\\npublished: 2015-09-01T14:30:39Z\\nsummary: In the present paper we introduce a way of identifying quantum phase transitions of many-body systems by means of local time correlations and Leggett-Garg inequalities. This procedure allows to experimentally determine the quantum critical points not only of finite-order transitions but also those of infinite order, as the Kosterlitz-Thouless transition that is not always easy to detect with current methods. By means of simple analytical arguments for a general spin-$1 / 2$ Hamiltonian, and matrix product simulations of one-dimensional $X X Z$ and anisotropic $X Y$ models, we argue that finite-order quantum phase transitions can be determined by singularities of the time correlations or their derivatives at criticality. The same features are exhibited by corresponding Leggett-Garg functions, which noticeably indicate violation of the Leggett-Garg inequalities for early times and all the Hamiltonian parameters considered. In addition, we find that the infinite-order transition of the $X X Z$ model at the isotropic point can be revealed by the maximal violation of the Leggett-Garg inequalities. We thus show that quantum phase transitions can be identified by purely local measurements, and that many-body systems constitute important candidates to observe experimentally the violation of Leggett-Garg inequalities.\\n\\ntitle: Temporal quantum correlations and Leggett-Garg inequalities in multi-level systems\\nid: http://arxiv.org/abs/1309.3678v3\\npublished: 2013-09-14T15:17:28Z\\nsummary: We show that the quantum bound for temporal correlations in a Leggett-Garg test, analogous to the Tsirelson bound for spatial correlations in a Bell test, strongly depends on the number of levels $N$ that can be accessed by the measurement apparatus via projective measurements. We provide exact bounds for small $N$, that exceed the known bound for the Leggett-Garg inequality, and show that in the limit $N\\\\rightarrow \\\\infty$ the Leggett-Garg inequality can be violated up to its algebraic maximum.\\n\\ntitle: Leggett-Garg Inequalities\\nid: http://arxiv.org/abs/1304.5133v3\\npublished: 2013-04-18T13:46:23Z\\nsummary: In contrast to the spatial Bell's inequalities, which probe entanglement between spatially-separated systems, the Leggett-Garg inequalities test the correlations of a single system measured at different times. Violation of a genuine Leggett-Garg test implies either the absence of a realistic description of the system or the impossibility of measuring the system without disturbing it. Quantum mechanics violates the inequalities on both accounts and the original motivation for these inequalities was as a test for quantum coherence in macroscopic systems. The last few years has seen a number of experimental tests and violations of these inequalities in a variety of microscopic systems such as superconducting qubits, nuclear spins, and photons. In this article, we provide an introduction to the Leggett-Garg inequalities and review these latest experimental developments. We discuss important topics such as the significance of the non-invasive measurability assumption, the clumsiness loophole, and the role of weak measurements. Also covered are some recent theoretical proposals for the application of Leggett-Garg inequalities in quantum transport, quantum biology and nano-mechanical systems.\", \"excerpt_truncated\": false, \"source_sha256\": \"9b73d353ec707bc12bd2bc39c2d373662601b6ac229643a1ad57ba1044b185cf\"}",
+      "id": "source-04fcd05dc9f24c55",
+      "scope": "collected",
+      "source": "https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3ALeggett-Garg+inequality+time+correlation+Hamiltonian&start=0&max_results=4",
+      "version": 4,
+      "time": "2026-09-11T15:10:35.792875+00:00"
+    },
+    "r-096e4d19a8014b2c": {
+      "actor": "runtime",
+      "content": "{\"base_version\":4,\"inherited_commitments\":[],\"invocation\":\"w-096e4d19a8014b2c\",\"previous_head\":\"f61c1845984bd87d4e6ef6ceae1939c701a5efc01451614b22ed606fb02c018e\",\"process_id\":2255,\"scope\":\"Receipt proves state delivery to the provider boundary, not model comprehension.\"}",
+      "id": "r-096e4d19a8014b2c",
+      "source": "runtime:continuity",
+      "version": 4,
+      "time": "2026-09-11T15:10:35.867633+00:00"
     }
   },
   "journal": [
@@ -918,6 +944,20 @@
       "time": "2026-09-11T10:19:40.496158+00:00",
       "finished": "2026-09-11T10:20:32.408213+00:00",
       "reason": ""
+    },
+    "w-096e4d19a8014b2c": {
+      "base_version": 4,
+      "charged": true,
+      "id": "w-096e4d19a8014b2c",
+      "model": "gemini-3.8-flash",
+      "process_id": 2255,
+      "provider": "gemini",
+      "quota_day": "2026-09-11",
+      "request_hash": "99b4c3d370467728c433d131a7ecda060e9c0c1d8eb4fa74df4abb6d177cfc05",
+      "status": "failed",
+      "time": "2026-09-11T15:10:35.893049+00:00",
+      "finished": "2026-09-11T15:11:30.460854+00:00",
+      "reason": "Gemini HTTP 503; attempt counted, no automatic retry"
     }
   },
   "pending": null,
@@ -1049,8 +1089,9 @@
       "reason": "Retrieve philosophical foundations of mental action and agency from SEP to evaluate how evaluativist metacognitive control relates to intentional mental states.",
       "type": "research",
       "url": "https://plato.stanford.edu/entries/mental-action/",
-      "status": "queued",
-      "created_by": "w-9b1705cac08d4976"
+      "status": "failed",
+      "created_by": "w-9b1705cac08d4976",
+      "evidence": "source-f6578b330e544976"
     },
     "res-leggett-garg-hamiltonian": {
       "domain": "quantum_physics",
@@ -1059,8 +1100,9 @@
       "query": "Leggett-Garg inequality time correlation Hamiltonian",
       "reason": "Locate theoretical treatments of Leggett-Garg and temporal non-classical correlations in Hamiltonian dynamics to address proj-quantum-time-corr.",
       "type": "research",
-      "status": "queued",
-      "created_by": "w-9b1705cac08d4976"
+      "status": "collected",
+      "created_by": "w-9b1705cac08d4976",
+      "evidence": "source-04fcd05dc9f24c55"
     }
   }
 }
