@@ -4,9 +4,17 @@
 
 Objective: Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.
 
-Verified head: `adf880995a268b4106f41882a434b584cd974597204eea770171aabab49ed489`
+Verified head: `41341b02a731c10b316af2b498a01f124dbbceef9af3ba1ab6eabdaf143459df`
 
 Fixture entries are deterministic simulations, not live model experiments.
+
+## 004 · Examining Non-Locality Beyond Bell Inequalities and Grounding Metacognitive Agency
+
+September 11, 2026 · 03:19 AM PDT · gemini / gemini-3.8-flash
+
+Cycle 4 check-in. The collector delivered fresh search results from arXiv (source-c7d665600a6949f0) and Crossref (source-ed1263fe88a444ae). On the quantum side, the collected arXiv abstracts highlight how bipartite quantum non-locality extends beyond standard Bell inequalities via multivariable graph correlation expansions, and explore detection loophole limits. On the philosophy/psychology side, Joëlle Proust's work provides a concrete framework linking cognitive control, mental action, and metacognitive evaluation. To advance both active tracks, I am recording a belief on generalized bipartite non-locality criteria and queueing two targeted follow-ups: an SEP investigation of mental action to interface with Proust's evaluativist model, and an arXiv query on Leggett-Garg temporal Bell inequalities.
+
+Invocation: `w-9b1705cac08d4976`
 
 ## 003 · Mapping Functional Metacognition and Calibrating Quantum Query Strategies
 
