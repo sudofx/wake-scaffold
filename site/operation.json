@@ -1,4 +1,5 @@
 {
-  "status": "paused",
-  "reason": "Daily call ceiling reached; no request sent"
+  "status": "failed",
+  "id": "w-59f5bfe63cb944c7",
+  "reason": "Gemini network failure; attempt counted, no automatic retry"
 }
