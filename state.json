@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "objective": "Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.",
   "focus": "continuity",
   "beliefs": {
@@ -28,6 +28,19 @@
       "type": "belief",
       "updated_by": "w-981d6dfce55143d4",
       "updated_version": 1
+    },
+    "bel-hot-mental-state": {
+      "confidence": 0.85,
+      "evidence": [
+        "source-f8aa0227079a4ffa"
+      ],
+      "id": "bel-hot-mental-state",
+      "reason": "Directly articulated in the SEP entry on Higher-Order Theories of Consciousness, distinguishing mental-state consciousness from creature consciousness.",
+      "statement": "Higher-order theories of consciousness account for mental-state consciousness by positing that a mental state becomes conscious via an appropriate higher-order representation (perception or thought) directed at it.",
+      "status": "active",
+      "type": "belief",
+      "updated_by": "w-3445168b85ab47c5",
+      "updated_version": 2
     }
   },
   "commitments": {},
@@ -319,6 +332,32 @@
       "source": "runtime:continuity",
       "version": 0,
       "time": "2026-09-10T23:56:25.902179+00:00"
+    },
+    "source-3a9ea06fab2b4bf9": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3Aabs%3A2609.10535&start=0&max_results=4\", \"error\": \"HTTPError\", \"scope\": \"fetch failed; no evidence obtained\"}",
+      "id": "source-3a9ea06fab2b4bf9",
+      "scope": "failed",
+      "source": "https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3Aabs%3A2609.10535&start=0&max_results=4",
+      "version": 1,
+      "time": "2026-09-11T00:31:14.616183+00:00"
+    },
+    "source-f8aa0227079a4ffa": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://plato.stanford.edu/entries/consciousness-higher/\", \"scope\": \"extracted web-page text; may be incomplete\", \"excerpt\": \"Higher-Order Theories of Consciousness (Stanford Encyclopedia of Philosophy)\\nStanford Encyclopedia of Philosophy\\nMenu\\nBrowse\\nTable of Contents\\nWhat's New\\nRandom Entry\\nChronological\\nArchives\\nAbout\\nEditorial Information\\nAbout the SEP\\nEditorial Board\\nHow to Cite the SEP\\nSpecial Characters\\nAdvanced Tools\\nContact\\nSupport SEP\\nSupport the SEP\\nPDFs for SEP Friends\\nMake a Donation\\nSEPIA for Libraries\\nEntry Navigation\\nEntry Contents\\nBibliography\\nAcademic Tools\\nFriends PDF Preview\\nAuthor and Citation Info\\nBack to Top\\nHigher-Order Theories of Consciousness\\nFirst published Tue Apr 3, 2001; substantive revision Fri Jan 9, 2026\\nHigher-order theories of consciousness try to explain the difference\\nbetween unconscious and conscious mental states in terms of a relation\\nobtaining between the conscious state in question and a higher-order\\nrepresentation of some sort (either a higher-order perception of that\\nstate, or a higher-order thought about it). What is it that makes an\\notherwise unconscious mental state a conscious state? According to\\nhigher-order theories, what makes a mental state (M) conscious is a\\nhigher-order representation directed at M. The most challenging\\nproperties to explain are those involved in\\nphenomenal\\nconsciousness—the sort of state that has a\\nsubjective\\ndimension, that has “feel”, or that it is\\nlike\\nsomething\\nto undergo. These properties will form the focus of\\nthis article.\\n1. Kinds of Consciousness\\n2. The Motivation for a Higher-Order Approach\\n3. Higher-Order Perception Theory\\n4. Higher-Order Thought Theory (1): Actualist\\n5. Higher-Order Thought Theory (2): Dispositionalist\\n6. Self-Representational and Hybrid Higher-Order Theories\\n7. Further Objections and Replies to the Higher-Order Approach\\n7.1 Targetless HOTs\\n7.2 The Problem of the Rock\\n7.3 Animals and Infants\\n7.4 Explaining Phenomenal Consciousness\\n8. HOT Theory and the Prefrontal Cortex (PFC)\\nBibliography\\nAcademic Tools\\nOther Internet Resources\\nRelated Entries\\n1. Kinds of Consciousness\\nOne of the advances made in the last few decades has been to\\ndistinguish between different questions concerning consciousness (see\\nparticularly: Rosenthal 1986; Dretske 1993; Block 1995; Lycan 1996).\\nNot everyone agrees on quite\\nwhich\\ndistinctions need to be\\ndrawn. But all are agreed that we should distinguish\\ncreature\\nconsciousness from\\nmental-state\\nconsciousness. It is one\\nthing to say\\nof an individual person or organism\\nthat it is\\nconscious (either in general or of something in particular); and it is\\nquite another thing to say\\nof one of the mental states\\nof a\\ncreature that it is conscious. Higher-order theories tend to focus\\nmainly on mental-state consciousness.\\nIt is also agreed that within creature-consciousness itself we should\\ndistinguish between\\nintransitive\\nand\\ntransitive\\nvariants. To say of an organism that it is conscious\\nsimpliciter\\n(intransitive) is to say just that it is awake,\\nas opposed to asleep or comatose. There don’t appear to be any\\ndeep philosophical difficulties lurking here (or at least, they\\naren’t difficulties specific to the topic of consciousness, as\\nopposed to mentality in general). But to say of an organism that it is\\nconscious\\nof such-and-such\\n(transitive) is normally to say at\\nleast that it is\\nperceiving\\nsuch-and-such, or\\naware\\nof\\nsuch-and-such. So we say of the mouse that it is conscious of\\nthe cat outside its hole, in explaining why it doesn’t come out;\\nmeaning that it\\nperceives\\nthe cat’s presence. To\\nprovide an account of transitive creature-consciousness would thus be\\nto attempt a theory of perception.\\nThere is a choice to be made concerning transitive\\ncreature-consciousness, failure to notice which may be a potential\\nsource of confusion. For we have to decide whether the perceptual\\nstate in virtue of which an organism may be said to be\\ntransitively-conscious of something must itself be a conscious one\\n(state-conscious—see below). If we say “Yes” then we\\nshall need to know more about the mouse than merely that it perceives\\nthe cat if we are to be assured that it is conscious of the\\ncat—we shall need to establish that its percept of the cat is\\nitself conscious. If we say “No”, on the other hand, then\\nthe mouse’s perception of the cat will be sufficient for the\\nmouse to count as conscious of the cat; but we may have to say that\\nalthough it is conscious of the cat, the mental state in virtue of\\nwhich it is so conscious is not itself a conscious one! It may be best\\nto by-pass any danger of confusion here by avoiding the language of\\ntransitive-creature-consciousness altogether. Nothing of importance\\nwould be lost to us by doing this.\\nTurning now to the notion of\\nmental-state consciousness\\n, the\\nmajor distinction here is between\\nphenomenal consciousness\\n,\\non the one hand—which is a property of states that it is\\nlike something\\nto be in, that have a distinctive\\n“feel” (Nagel 1974)—and various\\nfunctionally-definable forms of\\naccess consciousness\\n, on the\\nother (Block 1995). Most theorists believe that there are mental\\nstates—such as occurrent thoughts or judgments—that are\\naccess-conscious (in whatever is the correct functionally-definable\\nsense), but that are not phenomenally conscious. In contrast, there is\\nconsiderable dispute as to whether mental states can be\\nphenomenally-conscious without also being conscious in the\\nfunctionally-definable sense—and even more dispute about whether\\nphenomenal consciousness can be\\nreductively explained\\nin\\nfunctional and/or representational terms.\\nThere is nothing deeply problematic about functionally-definable\\nnotions of mental-state consciousness, from a naturalistic\\nperspective. For mental functions and mental representations are the\\nstaple fare of naturalistic accounts of the mind. But this leaves\\nplenty of room for dispute about the form that the correct functional\\naccount should take. Some claim that for a state to be conscious in\\nthe relevant sense is for it to be poised to have an impact on the\\norganism’s decision-making processes (Kirk 1994; Dretske 1995;\\nTye 1995, 2000), perhaps also with the additional requirement that\\nthose processes should be distinctively\\nrational\\nones (Block\\n1995). Others think that the relevant requirement for\\naccess-consciousness is that the state should be suitably related to\\nhigher-order representations—experiences and/or\\nthoughts—of that very state (Armstrong 1968, 1984; Rosenthal\\n1986, 1993, 2005; Dennett 1978a, 1991; Carruthers 1996, 2000, 2005;\\nLycan 1987, 1996; Gennaro 2012).\\nWhat\\nis\\noften thought to be naturalistically problematic, in\\ncontrast, is phenomenal consciousness (Nagel 1974, 1986; Jackson 1982,\\n1986; McGinn 1991; Block 1995; Chalmers 1996). And what is really and\\ndeeply controversial is whether phenomenal consciousness can be\\nexplained\\nin terms of some or other functionally-definable\\nnotion.\\nCognitive\\n(or\\nrepresentational\\n) theories\\nmaintain that it can.\\nHigher-order\\ncognitive theories\\nmaintain that phenomenal consciousness can be reductively explained in\\nterms of representations (either experiences or thoughts) that are\\nhigher-order. It is such theories that concern us here.\\n2. The Motivation for a Higher-Order Approach\\nHigher-order theories, like cognitive/representational theories in\\ngeneral, assume that the right\\nlevel\\nat which to seek an\\nexplanation of phenomenal consciousness is a cognitive one, providing\\nan explanation in terms of some combination of\\ncausal role\\nand\\nintentional content\\n. All such theories claim that\\nphenomenal consciousness consists in a certain kind of intentional or\\nrepresentational content (\\nanalog\\nor\\n“fine-grained” in comparison with any concepts we possess)\\nfiguring in a certain distinctive position in the causal architecture\\nof the mind. They must therefore maintain that these latter sorts of\\nmental property don’t already implicate or presuppose phenomenal\\nconsciousness. In fact, all cognitive accounts are united in rejecting\\nthe thesis that the very properties of\\nmind\\nor\\nmentality\\nalready presuppose phenomenal consciousness, as\\nproposed by Searle (1992, 1995 [1997]) for example. The higher-order\\napproach does not attempt to reduce consciousness directly to\\nneurophysiology but rather its reduction is in mentalistic terms, that\\nis, by using such notions as thoughts and awareness. A\\n“second-step” reduction to neurophysiology is often\\nfavored by higher-order theorists as well (see\\nsection 8\\nbelow as well).\\nThe major divide amongst representational theories of phenomenal\\nconsciousness in general, is between accounts that are provided in\\npurely first-order terms and those that implicate higher-order\\nrepresentations of one sort or another (see below). These higher-order\\ntheorists will allow that first-order accounts—of the sort\\ndefended by Dretske (1995) and Tye (1995), for example—can\\nalready make some progress with the problem of consciousness.\\nAccording to first-order views, phenomenal consciousness consists in\\nanalog or fine-grained contents that are available to the first-order\\nprocesses that guide thought and action. So a phenomenally-conscious\\npercept of red, for example, consists in a state with the analog\\ncontent\\nred\\nwhich is tokened in such a way as to feed into\\nthoughts about red, or into actions that are in one way or another\\nguided by redness. Now, the point to note in favor of such an account\\nis that it can explain the natural temptation to think that phenomenal\\nconsciousness is in some sense\\nineffable\\n, or\\nindescribable\\n. This will be because such states have\\nfine-grained contents that can slip through the mesh of any conceptual\\nnet. We can always distinguish many more shades of red than we have\\nconcepts for, or could describe in language (other than\\nindexically—e.g., “\\nThat\\nshade”).\\nThe main motivation behind higher-order theories of consciousness, in\\ncontrast, derives from the belief that all (or at least most)\\nmental-state types admit of both conscious and unconscious varieties.\\nAlmost everyone now accepts, for example, (post-Freud) that beliefs\\nand desires can be activated unconsciously. (Think, here, of the way\\ni\", \"excerpt_truncated\": true, \"source_sha256\": \"6e6d29dec11fc2f12d4ea31faa4a492697bf3955f0763292dd4524b943e7fd8f\"}",
+      "id": "source-f8aa0227079a4ffa",
+      "scope": "collected",
+      "source": "https://plato.stanford.edu/entries/consciousness-higher/",
+      "version": 1,
+      "time": "2026-09-11T00:31:14.892139+00:00"
+    },
+    "r-3445168b85ab47c5": {
+      "actor": "runtime",
+      "content": "{\"base_version\":1,\"inherited_commitments\":[],\"invocation\":\"w-3445168b85ab47c5\",\"previous_head\":\"3b553e51e6157f509176d206be28390189adbdb759ad13a75a1f914c2e60ffba\",\"process_id\":2316,\"scope\":\"Receipt proves state delivery to the provider boundary, not model comprehension.\"}",
+      "id": "r-3445168b85ab47c5",
+      "source": "runtime:continuity",
+      "version": 1,
+      "time": "2026-09-11T00:31:14.934607+00:00"
     }
   },
   "journal": [
@@ -327,6 +366,12 @@
       "invocation": "w-981d6dfce55143d4",
       "title": "Bootstrapping research on non-classical correlation signatures and philosophical frameworks",
       "summary": "Starting up cleanly from base version 0. Taking stock of the incoming evidence queue: we have arXiv abstracts exploring Bell-type tests and Hamiltonian time-evolution signatures in closed quantum systems (like cosmological vacuum fluctuations), alongside Stanford Encyclopedia of Philosophy text on consciousness models and bibliographic cross-references on metacognition. To build focused, rigorous lines of inquiry, I am initiating two foundational research projects: one examining non-Bell statistical criteria for distinguishing quantum from classical time evolution, and another analyzing philosophical demarcations of state vs. creature consciousness and metacognitive monitoring. Queueing deeper queries to inspect specific full texts and peer-reviewed developments."
+    },
+    {
+      "cycle": 2,
+      "invocation": "w-3445168b85ab47c5",
+      "title": "Synthesizing Higher-Order Theories and Refining Quantum Correlation Inquiries",
+      "summary": "Cycle 2 check-in. The retrieval for higher-order theories of consciousness succeeded with a solid overview from the Stanford Encyclopedia of Philosophy, clarifying the distinct targets of mental-state consciousness versus creature consciousness. However, our targeted query for arXiv:2609.10535 hit an HTTPError on the arXiv API side. Rather than getting stuck, I am drafting our first rigorous notebook comparing general consciousness taxonomy with higher-order representation models based on the two distinct SEP entries in hand. I am also formulating a belief on the core claim of higher-order theories and queuing an adjusted search for quantum non-classicality tests in cosmological and temporal settings."
     }
   ],
   "invocations": {
@@ -581,6 +626,20 @@
       "time": "2026-09-10T23:56:25.913329+00:00",
       "finished": "2026-09-10T23:56:31.832849+00:00",
       "reason": ""
+    },
+    "w-3445168b85ab47c5": {
+      "base_version": 1,
+      "charged": true,
+      "id": "w-3445168b85ab47c5",
+      "model": "gemini-3.8-flash",
+      "process_id": 2316,
+      "provider": "gemini",
+      "quota_day": "2026-09-10",
+      "request_hash": "7a22ccac327e20b9df846df30c2ca7f955b4b4b8440a0f5cc8ea4226370a4eb7",
+      "status": "accepted",
+      "time": "2026-09-11T00:31:14.950308+00:00",
+      "finished": "2026-09-11T00:31:21.310677+00:00",
+      "reason": ""
     }
   },
   "pending": null,
@@ -614,7 +673,28 @@
       "updated_by": "w-981d6dfce55143d4"
     }
   },
-  "notebooks": {},
+  "notebooks": {
+    "nb-higher-order-taxonomy": {
+      "evidence": [
+        "source-02cd5476f8c84812",
+        "source-f8aa0227079a4ffa"
+      ],
+      "findings": "A fundamental division in contemporary philosophy of mind distinguishes creature consciousness (whether an entity as a whole is awake, sentient, or aware) from mental-state consciousness (whether an individual mental state within that entity is conscious) [source-02cd5476f8c84812, source-f8aa0227079a4ffa]. Higher-order theories (HOTs and HOPs) specifically target mental-state consciousness, arguing that what transforms an otherwise unconscious mental state into a conscious one is a higher-order representation directed at it [source-f8aa0227079a4ffa]. Within this framework, theorists divide over whether this representation takes the form of an actualist higher-order thought, a dispositional state, or higher-order perception, while confronting classic theoretical challenges such as targetless higher-order thoughts and the problem of explaining phenomenal qualitative character [source-f8aa0227079a4ffa].",
+      "id": "nb-higher-order-taxonomy",
+      "limitations": "Analysis is based on encyclopedia overview texts rather than primary monographs; it does not evaluate empirical neuroscience or artificial agent architectures directly, nor does it resolve competing first-order representationalist rebuttals.",
+      "next_questions": "How do empirical models of metacognitive error detection and functional monitoring in psychology map onto the higher-order representational split between actualist thought and dispositional perception?",
+      "project": "proj-metacognition-models",
+      "reason": "Provides a clear conceptual baseline for project proj-metacognition-models, citing two distinct valid external SEP sources.",
+      "summary": "Examines the distinction between creature consciousness and mental-state consciousness, detailing how higher-order representation accounts attempt to explain conscious mental states.",
+      "title": "Demarcating Mental-State Consciousness in Higher-Order Theories",
+      "type": "notebook",
+      "revision": 1,
+      "created_version": 2,
+      "updated_version": 2,
+      "updated_by": "w-3445168b85ab47c5",
+      "domain": "philosophy"
+    }
+  },
   "research": {
     "res-bell-time-evol": {
       "domain": "quantum_physics",
@@ -623,8 +703,9 @@
       "query": "abs:2609.10535",
       "reason": "Fetch detailed paper structure or follow-up references for the time-evolution correlation test proposed by the authors.",
       "type": "research",
-      "status": "queued",
-      "created_by": "w-981d6dfce55143d4"
+      "status": "failed",
+      "created_by": "w-981d6dfce55143d4",
+      "evidence": "source-3a9ea06fab2b4bf9"
     },
     "res-sep-higher-order": {
       "domain": "philosophy",
@@ -634,8 +715,29 @@
       "reason": "Collect standard philosophical treatments of higher-order monitoring theories to evaluate functional models of metacognition.",
       "type": "research",
       "url": "https://plato.stanford.edu/entries/consciousness-higher/",
+      "status": "collected",
+      "created_by": "w-981d6dfce55143d4",
+      "evidence": "source-f8aa0227079a4ffa"
+    },
+    "res-quantum-correlations-alt": {
+      "domain": "quantum_physics",
+      "id": "res-quantum-correlations-alt",
+      "project": "proj-quantum-time-corr",
+      "query": "cat:quant-ph AND \"Bell\" AND \"vacuum fluctuations\"",
+      "reason": "Retry quantum correlation search with a broader query avoiding the specific failed abs query format to find theoretical treatments of vacuum fluctuation correlations.",
+      "type": "research",
       "status": "queued",
-      "created_by": "w-981d6dfce55143d4"
+      "created_by": "w-3445168b85ab47c5"
+    },
+    "res-metacognition-review": {
+      "domain": "philosophy",
+      "id": "res-metacognition-review",
+      "project": "proj-metacognition-models",
+      "query": "metacognition \"higher-order\" cognitive control",
+      "reason": "Identify works linking philosophical higher-order theories to functional metacognitive control in psychology and cognitive science.",
+      "type": "research",
+      "status": "queued",
+      "created_by": "w-3445168b85ab47c5"
     }
   }
 }
