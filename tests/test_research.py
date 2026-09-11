@@ -49,6 +49,23 @@ class ResearchTests(unittest.TestCase):
             self.engine.store.append("observation", dict(id=identifier, source=url or "https://plato.stanford.edu/entries/"+identifier,
                 content=json.dumps({"scope":"synthetic test fixture", "excerpt":"Only a fixture"}), actor="collector", scope=status))
 
+    def test_existing_pet_name_is_migrated_through_an_audited_event(self):
+        legacy = Engine(self.root/"legacy", {**DEFAULTS, "mission":"Explore big ideas.", "pet_name":"Wake"})
+        try:
+            with legacy.store.lock():
+                legacy.initialize()
+            legacy.config["pet_name"] = "WAKE✳"
+            with legacy.store.lock():
+                state = legacy.initialize()
+            self.assertEqual(state["pet_name"], "WAKE✳")
+            event = legacy.store.events()[-1]
+            self.assertEqual(event["kind"], "pet_renamed")
+            self.assertEqual(event["payload"], {"pet_name": "WAKE✳", "actor": "operator"})
+            reconstructed, _ = legacy.store.replay()
+            self.assertEqual(reconstructed, state)
+        finally:
+            legacy.store.close()
+
     def test_new_projects_are_bounded_and_rejection_is_atomic(self):
         result = self.propose([project(str(i)) for i in range(4)])
         self.assertEqual(result["status"], "rejected")

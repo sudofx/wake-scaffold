@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Explicitly install/remove WAKE's cron entry, preserving other scheduled jobs."""
+"""Explicitly install/remove WAKE✳’s cron entry, preserving other scheduled jobs."""
 
 import argparse
 from pathlib import Path
@@ -28,4 +28,4 @@ if __name__ == "__main__":
     if not args.remove:
         lines.append(entry)
     subprocess.run(["crontab", "-"], input="\n".join(lines)+"\n", text=True, check=True)
-    print("WAKE schedule removed." if args.remove else "WAKE scheduled every three hours while this computer is awake.")
+    print("WAKE✳ schedule removed." if args.remove else "WAKE✳ scheduled every three hours while this computer is awake.")

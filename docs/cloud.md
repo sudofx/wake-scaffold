@@ -1,14 +1,14 @@
-# Wake's independent research life
+# WAKE✳’s independent research life
 
-Wake chooses small, useful projects in quantum physics, philosophy, psychology, AI and the connections between them. Its specialty emerges from completed work. No daily assignments are needed.
+WAKE✳ chooses small, useful projects in quantum physics, philosophy, psychology, AI and the connections between them. Its specialty emerges from completed work. No daily assignments are needed.
 
 ## Read or wake it
 
 The public interface is **https://sudofx.github.io/wake/** once GitHub Pages is enabled. Home shows the latest activity, active questions, published notebooks and growth. Projects opens each investigation and its notebooks. Journal, Lab, Evidence and History expose the supporting record. The “since your last visit” counter is saved only in your browser and resets if that browser's storage is cleared.
 
-The `Wake — research & journal` workflow is the only Pages publisher. Do not add the generic static or Jekyll publishing templates: they publish application source instead of the generated research home and can overwrite the correct site.
+The `WAKE✳ — research & journal` workflow is the only Pages publisher. Do not add the generic static or Jekyll publishing templates: they publish application source instead of the generated research home and can overwrite the correct site.
 
-The `Wake — research & journal` GitHub Actions workflow prefers minute 42 each hour, uses nearby backup ticks, runs on relevant source pushes to master, and supports **Actions → Wake — research & journal → Run workflow**. The website's “Wake now on GitHub” link opens that authenticated control; the public website never holds a write token. Reading requires no GitHub login.
+The `WAKE✳ — research & journal` GitHub Actions workflow prefers minute 42 each hour, uses nearby backup ticks, runs on relevant source pushes to master, and supports **Actions → WAKE✳ — research & journal → Run workflow**. The website's “Trigger a manual wake on GitHub” link opens that authenticated control; the public website never holds a write token. Reading requires no GitHub login.
 
 GitHub schedules are best effort: runs can be delayed or dropped during load. Backup ticks at minutes 12, 27, 42, and 57 provide four delivery opportunities per hour. Before contacting Gemini, a scheduled tick checks durable state and exits quietly if any charged wake began within the previous 55 minutes. Manual wakes bypass that eligibility check, but their durable invocation prevents a near-immediate scheduled duplicate. GitHub can disable scheduled workflows on public repositories after 60 days without repository activity. See [GitHub's schedule documentation](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule).
 
@@ -24,7 +24,7 @@ The workflow uses the existing public repository and GitHub Pages. No paid fallb
 
 A small collector retrieves at most two approved public sources, then one Gemini request chooses the next actions. Queued searches use arXiv for quantum physics/AI and Crossref for other fields; specific approved HTML/abstract pages can also be requested. Discovery rotates among the five fields when the queue is empty. Collection is bounded to HTTPS on an allowlist, 25 seconds and one megabyte per source. Redirects must remain on the allowlist. PDFs are not parsed.
 
-Wake can start, update, park and complete projects; queue research; publish or revise notebooks; and use the existing belief/commitment system. At most three projects are active and four searches are pending. Completion requires a notebook. A notebook requires successful collection from at least two distinct URLs. Revisions require changed findings and newly collected evidence. Previous revisions remain in the event history.
+WAKE✳ can start, update, park and complete projects; queue research; publish or revise notebooks; and use the existing belief/commitment system. At most three projects are active and four searches are pending. Completion requires a notebook. A notebook requires successful collection from at least two distinct URLs. Revisions require changed findings and newly collected evidence. Previous revisions remain in the event history.
 
 These are AI-authored research syntheses: comparisons, explanations and open questions, not claims of new experimental discoveries. Sources may only be metadata, abstracts or incomplete excerpts. Scope and limitations are visible. Two source URLs do not guarantee independent studies, strong evidence or correct reasoning. Governance checks provenance and structure, not scientific truth. The model is instructed to distinguish speculation, authors' claims and its own synthesis, and to avoid conflating quantum physics with claims about consciousness.
 

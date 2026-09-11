@@ -1,15 +1,15 @@
-# WAKE ✳
+# WAKE✳
 
-<p align="center"><img src="cover.png" alt="Wake Lab Comics #1 — Wake project comic cover" width="100%"/>
+<p align="center"><img src="cover.png" alt="WAKE✳ Lab Comics #1 — WAKE✳ project comic cover" width="100%"/>
 
 
 **A curious research pet. Big questions. A durable record.**
 
 Disposable models. Durable state. Receipts for everything.
 
-WAKE lives on GitHub, wakes every three hours, and chooses small useful research projects in **quantum physics, philosophy, psychology, AI and their intersections**. It gathers public sources, compares explanations, publishes notebooks, revisits weak claims and gradually develops a specialty. You check its website; you do not need to assign daily work.
+WAKE✳ lives on GitHub and is eligible to wake about once an hour. It chooses small useful research projects in **quantum physics, philosophy, psychology, AI and their intersections**. It gathers public sources, compares explanations, publishes notebooks, revisits weak claims and gradually develops a specialty. You check its website; you do not need to assign daily work.
 
-**[Open Wake's home](https://sudofx.github.io/wake/)** · **[Trigger a manual wake](https://github.com/sudofx/wake/actions/workflows/wake.yml)**
+**[Open WAKE✳’s home](https://sudofx.github.io/wake/)** · **[Trigger a manual wake](https://github.com/sudofx/wake/actions/workflows/wake.yml)**
 
 The phone interface shows current projects, new work since your last visit, notebooks with citations and limitations, emerging interests and every decision in the underlying journal. Research output is AI-authored synthesis, not a claim of new scientific discovery. Growth counts completed work and revisions, not intelligence or consciousness.
 
@@ -58,7 +58,7 @@ python3 -m wake export
 python3 -m wake serve
 ```
 
-One wake normally makes one Gemini request. If Gemini reports HTTP 503 because it is temporarily unavailable, WAKE waits 30 seconds and retries that same durable request once. The local ceiling is 20 wake attempts per Pacific calendar day, including failed and interrupted wakes; a 503 retry may also count toward Google's provider quota. There is no paid fallback or hidden second model task. Token and context ceilings bound each request. A provider's actual free quota can be lower, and the program cannot inspect your billing settings. See [Google's rate-limit documentation](https://ai.google.dev/gemini-api/docs/rate-limits) and [API pricing](https://ai.google.dev/gemini-api/docs/pricing).
+One wake normally makes one Gemini request. If Gemini reports HTTP 503 because it is temporarily unavailable, WAKE✳ waits 30 seconds and retries that same durable request once. The local ceiling is 20 wake attempts per Pacific calendar day, including failed and interrupted wakes; a 503 retry may also count toward Google's provider quota. There is no paid fallback or hidden second model task. Token and context ceilings bound each request. A provider's actual free quota can be lower, and the program cannot inspect your billing settings. See [Google's rate-limit documentation](https://ai.google.dev/gemini-api/docs/rate-limits) and [API pricing](https://ai.google.dev/gemini-api/docs/pricing).
 
 The rebuild preserves an existing `.env`; it is never included in the ZIP or report. No live calls are necessary to run the tests or demo.
 
@@ -83,7 +83,7 @@ The exact request is durable before you switch apps. A pending manual request bl
 python3 scripts/install_cron.py --print
 # Explicitly install an every-three-hours schedule (about 8 attempts/day).
 python3 scripts/install_cron.py
-# Remove only WAKE's schedule.
+# Remove only WAKE✳’s schedule.
 python3 scripts/install_cron.py --remove
 ```
 

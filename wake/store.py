@@ -40,6 +40,10 @@ def reduce_event(state, event):
     elif kind == "charter_adopted":
         require(not state.get("charter"), "Charter is already established")
         state.update(charter=p["mission"], pet_name=p["pet_name"], projects={}, notebooks={}, research={})
+    elif kind == "pet_renamed":
+        require(state.get("charter"), "A research pet must exist before it can be renamed")
+        require(p["pet_name"] != state.get("pet_name"), "Pet already has this name")
+        state["pet_name"] = p["pet_name"]
     elif kind == "research_collected":
         if p["id"] in state.get("research", {}):
             state["research"][p["id"]].update(status=p["status"], evidence=p["evidence"])

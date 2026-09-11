@@ -38,7 +38,7 @@ def export(store, destination="site", experiment=None, operation=None):
         page = template.replace("/* WAKE_STYLE */", (assets / "style.css").read_text())
         page = page.replace("/* WAKE_SCRIPT */", (assets / "app.js").read_text())
         page = page.replace("/* PET_SCRIPT */", (assets / "pet.js").read_text()).replace("WAKE_DATA", embedded)
-        lines = ["# WAKE — The journal", "", "> Disposable models. Durable state. Receipts for everything.", "",
+        lines = ["# WAKE✳ — The journal", "", "> Disposable models. Durable state. Receipts for everything.", "",
                  f"Objective: {state['objective']}", "", f"Verified head: `{head}`", "",
                  "Fixture entries are deterministic simulations, not live model experiments.", ""]
         for item in reversed(state["journal"]):

@@ -79,7 +79,7 @@ def main(publish_only=False, scheduled=False):
     if os.environ.get("GITHUB_ACTIONS") != "true":
         raise SystemExit("This entry point runs in GitHub Actions. Use python -m wake for local work.")
     settings = config(ROOT / "wake.toml")
-    result = {"status": "failed", "reason": "Wake did not complete"}
+    result = {"status": "failed", "reason": "WAKE✳ did not complete"}
     with tempfile.TemporaryDirectory(prefix="wake-cloud-") as folder:
         branch = StateBranch(ROOT, Path(folder)/"state")
         branch.open()

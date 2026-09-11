@@ -29,7 +29,7 @@ def config(path="wake.toml"):
     text(result["objective"], "Objective", 2000)
     if result.get("mission"):
         text(result["mission"], "Research mission", 3000)
-        text(result.get("pet_name", "Wake"), "Pet name", 80)
+        text(result.get("pet_name", "WAKE✳"), "Pet name", 80)
     return result
 
 
@@ -44,7 +44,12 @@ class Engine:
             state = self.store.append("initialized", {"objective": self.config["objective"], "governance": 1})
         if self.config.get("mission") and not state.get("charter"):
             state = self.store.append("charter_adopted", {"mission": self.config["mission"],
-                                     "pet_name": self.config.get("pet_name", "Wake"), "actor": "operator"})
+                                     "pet_name": self.config.get("pet_name", "WAKE✳"), "actor": "operator"})
+        # A branding change is part of the durable identity. Record it as an
+        # auditable event instead of rewriting the original charter or history.
+        desired_name = self.config.get("pet_name", "WAKE✳")
+        if state.get("charter") and state.get("pet_name") != desired_name:
+            self.store.append("pet_renamed", {"pet_name": desired_name, "actor": "operator"})
         return self.store.load(repair=True)
 
     def recover(self, explicit=False):
