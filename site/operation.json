@@ -1,5 +1,7 @@
 {
   "status": "accepted",
   "id": "w-17da7cbd91e84c2b",
-  "cycle": 7
+  "reason": "",
+  "cycle": 7,
+  "publication_only": true
 }
