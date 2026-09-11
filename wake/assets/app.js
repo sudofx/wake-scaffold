@@ -3,6 +3,17 @@
   const data = JSON.parse(document.getElementById('wake-data').textContent);
   const s = data.state;
   const $ = id => document.getElementById(id);
+  const themeToggle = $('theme-toggle');
+  function setTheme(theme, remember=false) {
+    const dark=theme==='dark';
+    if(dark) document.documentElement.dataset.theme='dark';else delete document.documentElement.dataset.theme;
+    themeToggle.setAttribute('aria-pressed',String(dark));
+    themeToggle.setAttribute('aria-label',dark?'Use light theme':'Use dark theme');
+    themeToggle.innerHTML='<span aria-hidden="true">◐</span> '+(dark?'LIGHT':'DARK');
+    if(remember)try{localStorage.setItem('wake-theme',dark?'dark':'light')}catch{}
+  }
+  setTheme(document.documentElement.dataset.theme==='dark'?'dark':'light');
+  themeToggle.addEventListener('click',()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark',true));
   const help = key => window.WakeHelp.button(key);
   const esc = value => String(value ?? '').replace(/[&<>"']/g, x => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
   const fmt = time => new Date(time).toLocaleString('en-US', {timeZone:data.timezone,month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'});
