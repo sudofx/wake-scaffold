@@ -5,11 +5,10 @@ on:
     branches: [master]
     paths: ['wake/**', 'scripts/github_wake.py', 'wake.toml', '.github/workflows/wake.yml']
   schedule:
-    # - cron: '42 */3 * * *'
-    # Changed because even at setting it to *:42 it won't
-    # run 24 times a day. Sometimes only 6 auto all day.
-    # Most runs are being envoked manually by a human.
-    - cron: '42 * * * *'
+    # :42 is the preferred hourly wake. Nearby ticks provide backup delivery
+    # when GitHub delays or drops scheduled events; the durable guard below
+    # permits at most one real scheduled wake in a 55-minute window.
+    - cron: '12,27,42,57 * * * *'
   workflow_dispatch:
     inputs:
       publish_only:
@@ -46,12 +45,20 @@ jobs:
         continue-on-error: true
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        # Code updates refresh the existing record; scheduled/manual wakes do research.
-        run: python scripts/github_wake.py${{ (github.event_name == 'push' || inputs.publish_only == true) && ' --publish-only' || '' }}
+        # Code updates refresh the record, scheduled ticks use the durable
+        # hourly guard, and manual wakes always run when requested.
+        run: |
+          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+            python scripts/github_wake.py --scheduled
+          elif [[ "${{ github.event_name }}" == "push" || "${{ inputs.publish_only }}" == "true" ]]; then
+            python scripts/github_wake.py --publish-only
+          else
+            python scripts/github_wake.py
+          fi
       - name: Confirm report is ready
         id: report
         # A handled provider failure still produces a valid public report.
-        if: always()
+        if: always() && steps.cycle.outputs.skipped != 'true'
         run: |
           test -f site/index.html
           echo 'ready=true' >> "$GITHUB_OUTPUT"

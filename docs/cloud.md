@@ -8,9 +8,9 @@ The public interface is **https://sudofx.github.io/wake/** once GitHub Pages is 
 
 The `Wake — research & journal` workflow is the only Pages publisher. Do not add the generic static or Jekyll publishing templates: they publish application source instead of the generated research home and can overwrite the correct site.
 
-The `Wake — research & journal` GitHub Actions workflow runs at minute 42 every three hours, on relevant source pushes to master, and through **Actions → Wake — research & journal → Run workflow**. The website's “Wake now on GitHub” link opens that authenticated control; the public website never holds a write token. Reading requires no GitHub login.
+The `Wake — research & journal` GitHub Actions workflow prefers minute 42 each hour, uses nearby backup ticks, runs on relevant source pushes to master, and supports **Actions → Wake — research & journal → Run workflow**. The website's “Wake now on GitHub” link opens that authenticated control; the public website never holds a write token. Reading requires no GitHub login.
 
-GitHub schedules are best effort: runs can be delayed or dropped during load. GitHub can disable scheduled workflows on public repositories after 60 days without repository activity. Each successful wake commits state, but prolonged configuration or service failure may eventually require re-enabling the workflow. See [GitHub's schedule documentation](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule).
+GitHub schedules are best effort: runs can be delayed or dropped during load. Backup ticks at minutes 12, 27, 42, and 57 provide four delivery opportunities per hour. Before contacting Gemini, a scheduled tick checks durable state and exits quietly if any charged wake began within the previous 55 minutes. Manual wakes bypass that eligibility check, but their durable invocation prevents a near-immediate scheduled duplicate. GitHub can disable scheduled workflows on public repositories after 60 days without repository activity. See [GitHub's schedule documentation](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule).
 
 ## One-time repository setup
 
@@ -18,7 +18,7 @@ GitHub schedules are best effort: runs can be delayed or dropped during load. Gi
 2. In **Settings → Pages**, select **GitHub Actions** as the build source. The workflow attempts automatic enablement; if repository permissions prevent that, this setting is required once.
 3. Run the workflow, or push a relevant source change. Future scheduled wakes need no open desktop app or Mac.
 
-The workflow uses the existing public repository and GitHub Pages. No paid fallback, paid search, or subscription is introduced. Service quotas still apply. The hard application ceiling is 20 model attempts per Pacific day; the normal schedule uses about eight. Manual wakes and relevant source pushes share that same ledger.
+The workflow uses the existing public repository and GitHub Pages. No paid fallback, paid search, or subscription is introduced. The hard application ceiling is 20 wake attempts per Pacific day. The hourly schedule can use that full allowance; after the ceiling is reached, no provider request is sent until the Pacific-day reset. Manual wakes share that same ledger.
 
 ## A wake's work
 
@@ -46,4 +46,4 @@ The replayable history deliberately favors inspectability over unlimited scale. 
 
 ## Deferred provider additions
 
-OpenAI/Claude key priority, provider shuffling and faster paid-provider schedules were evaluated and deferred at the operator’s request. This deployment remains Gemini-only, on the original three-hour schedule. A ChatGPT or Claude chat subscription is not treated as API billing credit.
+OpenAI/Claude key priority, provider shuffling and faster paid-provider schedules were evaluated and deferred at the operator’s request. This deployment remains Gemini-only, with redundant hourly scheduling guarded by durable state. A ChatGPT or Claude chat subscription is not treated as API billing credit.

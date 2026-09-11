@@ -2,6 +2,7 @@
 """One cloud wake. Persist the call reservation remotely before sending to Gemini."""
 
 import argparse
+from datetime import datetime, timedelta, timezone
 import json
 import os
 from pathlib import Path
@@ -16,6 +17,27 @@ from wake.governance import Rejected
 from wake.providers import Gemini
 from wake.research import collect
 from wake.report import export, atomic_write
+
+
+SCHEDULED_WAKE_INTERVAL = timedelta(minutes=55)
+
+
+def scheduled_wake_due(state, now=None):
+    """Use durable invocation times to collapse delayed and duplicate cron events."""
+    now = now or datetime.now(timezone.utc)
+    charged = [datetime.fromisoformat(item["time"]) for item in state["invocations"].values()
+               if item.get("charged")]
+    if not charged:
+        return True, None
+    next_eligible = max(charged) + SCHEDULED_WAKE_INTERVAL
+    return now >= next_eligible, next_eligible
+
+
+def set_step_output(name, value):
+    output = os.environ.get("GITHUB_OUTPUT")
+    if output:
+        with Path(output).open("a") as stream:
+            stream.write(f"{name}={value}\n")
 
 
 class StateBranch:
@@ -47,7 +69,7 @@ class StateBranch:
         self.git("push", "origin", f"HEAD:refs/heads/{self.branch}", cwd=self.checkout)
 
 
-def main(publish_only=False):
+def main(publish_only=False, scheduled=False):
     if os.environ.get("GITHUB_ACTIONS") != "true":
         raise SystemExit("This entry point runs in GitHub Actions. Use python -m wake for local work.")
     settings = config(ROOT / "wake.toml")
@@ -62,6 +84,14 @@ def main(publish_only=False):
                 engine.initialize()
                 engine.recover(explicit=True)
                 branch.checkpoint()
+            if scheduled:
+                due, next_eligible = scheduled_wake_due(engine.store.load())
+                if not due:
+                    result = {"status": "waiting", "reason": "A recent wake already covered this hour.",
+                              "next_eligible": next_eligible.isoformat()}
+                    set_step_output("skipped", "true")
+                    print(json.dumps(result))
+                    return 0
             try:
                 if publish_only:
                     state = engine.store.load()
@@ -96,8 +126,9 @@ def main(publish_only=False):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--publish-only", action="store_true", help="Publish the existing record without a model call")
+    parser.add_argument("--scheduled", action="store_true", help="Skip duplicate cron events covered by a recent wake")
     args = parser.parse_args()
     try:
-        sys.exit(main(publish_only=args.publish_only))
+        sys.exit(main(publish_only=args.publish_only, scheduled=args.scheduled))
     except subprocess.CalledProcessError:
         raise SystemExit("Git state persistence failed. No force push or automatic model retry was attempted.") from None
