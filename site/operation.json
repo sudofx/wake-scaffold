@@ -1,6 +1,4 @@
 {
-  "status": "failed",
-  "id": "w-ee707a0a79464ea5",
-  "reason": "Gemini HTTP 503; attempt counted, no automatic retry",
-  "publication_only": true
+  "status": "paused",
+  "reason": "GEMINI_API_KEY is missing"
 }
