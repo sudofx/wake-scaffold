@@ -5,7 +5,7 @@ from pathlib import Path
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT = ROOT / "dist" / "wake-scaffold.zip"
+OUTPUT = ROOT / "dist" / "wake.zip"
 FILES = ["README.md", "LICENSE", ".env.example", ".gitignore", "wake.toml", "pyproject.toml", "requirements.txt"]
 FOLDERS = ["wake", "tests", "docs", "scripts", ".github", "examples"]
 

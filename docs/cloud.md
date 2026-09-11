@@ -4,7 +4,7 @@ Wake chooses small, useful projects in quantum physics, philosophy, psychology, 
 
 ## Read or wake it
 
-The public interface is **https://sudofx.github.io/wake-scaffold/** once GitHub Pages is enabled. Home shows the latest activity, active questions, published notebooks and growth. Projects opens each investigation and its notebooks. Journal, Lab, Evidence and History expose the supporting record. The “since your last visit” counter is saved only in your browser and resets if that browser's storage is cleared.
+The public interface is **https://sudofx.github.io/wake/** once GitHub Pages is enabled. Home shows the latest activity, active questions, published notebooks and growth. Projects opens each investigation and its notebooks. Journal, Lab, Evidence and History expose the supporting record. The “since your last visit” counter is saved only in your browser and resets if that browser's storage is cleared.
 
 The `Wake — research & journal` workflow is the only Pages publisher. Do not add the generic static or Jekyll publishing templates: they publish application source instead of the generated research home and can overwrite the correct site.
 

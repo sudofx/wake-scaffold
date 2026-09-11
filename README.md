@@ -9,7 +9,7 @@ Disposable models. Durable state. Receipts for everything.
 
 WAKE lives on GitHub, wakes every three hours, and chooses small useful research projects in **quantum physics, philosophy, psychology, AI and their intersections**. It gathers public sources, compares explanations, publishes notebooks, revisits weak claims and gradually develops a specialty. You check its website; you do not need to assign daily work.
 
-**[Open Wake's home](https://sudofx.github.io/wake-scaffold/)** · **[Trigger a manual wake](https://github.com/sudofx/wake-scaffold/actions/workflows/wake.yml)**
+**[Open Wake's home](https://sudofx.github.io/wake/)** · **[Trigger a manual wake](https://github.com/sudofx/wake/actions/workflows/wake.yml)**
 
 The phone interface shows current projects, new work since your last visit, notebooks with citations and limitations, emerging interests and every decision in the underlying journal. Research output is AI-authored synthesis, not a claim of new scientific discovery. Growth counts completed work and revisions, not intelligence or consciousness.
 
@@ -122,6 +122,6 @@ python3 -m unittest discover -s tests -v
 python3 scripts/package.py
 ```
 
-The replacement ZIP is `dist/wake-scaffold.zip`. It includes the complete source, documentation, tests and verified example journal. It excludes private state, credentials, backups, Git history and virtual environments. Extract into an empty project directory, preserving `.git` if replacing a checkout.
+The replacement ZIP is `dist/wake.zip`. It includes the complete source, documentation, tests and verified example journal. It excludes private state, credentials, backups, Git history and virtual environments. Extract into an empty project directory, preserving `.git` if replacing a checkout.
 
 No model is immortal here. The record just has a better filing system.

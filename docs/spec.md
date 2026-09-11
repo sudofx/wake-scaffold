@@ -1,4 +1,4 @@
-[Repository](https://github.com/sudofx/wake-scaffold/tree/master) | [Blog](https://htmlpreview.github.io/?https://raw.githubusercontent.com/sudofx/wake-scaffold/refs/heads/master/memory/core_persona/blog/html/index.html)
+[Repository](https://github.com/sudofx/wake/tree/master) | [Blog](https://htmlpreview.github.io/?https://raw.githubusercontent.com/sudofx/wake/refs/heads/master/memory/core_persona/blog/html/index.html)
 
 ## Mission
 
@@ -94,7 +94,7 @@ Do not let personality compromise experimental integrity.
 
 Produce the **complete working project** as:
 
-`wake-scaffold.zip` or if connected to the project folder with write access, modify the files directly.
+`wake.zip` or if connected to the project folder with write access, modify the files directly.
 
 I will delete everything in the existing project directory except `.git` history, then extract the ZIP contents into it.
 
