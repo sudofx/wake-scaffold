@@ -1,5 +1,5 @@
 {
-  "version": 5,
+  "version": 6,
   "objective": "Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.",
   "focus": "continuity",
   "beliefs": {
@@ -67,6 +67,32 @@
       "type": "belief",
       "updated_by": "w-27ea1177e9f9412a",
       "updated_version": 5
+    },
+    "bel-lgi-multilevel-work": {
+      "confidence": 0.8,
+      "evidence": [
+        "source-02ded8a4542a4e82"
+      ],
+      "id": "bel-lgi-multilevel-work",
+      "reason": "Directly supported by the collected arXiv abstracts in source-02ded8a4542a4e82 demonstrating algebraic violation limits in N-level systems and violations in unitarily driven quantum work protocols.",
+      "statement": "Leggett-Garg temporal correlation bounds depend directly on system Hilbert space dimension N, reaching the algebraic maximum as N approaches infinity, and test macrorealism in non-equilibrium fluctuating work.",
+      "status": "active",
+      "type": "belief",
+      "updated_by": "w-28d26541ede14f86",
+      "updated_version": 6
+    },
+    "bel-quantum-consciousness-typology": {
+      "confidence": 0.85,
+      "evidence": [
+        "source-830b2c85801f445f"
+      ],
+      "id": "bel-quantum-consciousness-typology",
+      "reason": "Directly supported by the introductory taxonomy and structural breakdown of the SEP entry on Quantum Approaches to Consciousness.",
+      "statement": "Philosophical taxonomy in the Stanford Encyclopedia of Philosophy divides quantum approaches to consciousness into three distinct frameworks: neurophysiological quantum brain processes, formal quantum models of mental dynamics, and dual-aspect monism.",
+      "status": "active",
+      "type": "belief",
+      "updated_by": "w-28d26541ede14f86",
+      "updated_version": 6
     }
   },
   "commitments": {},
@@ -650,6 +676,32 @@
       "source": "runtime:continuity",
       "version": 4,
       "time": "2026-09-11T20:55:57.350747+00:00"
+    },
+    "source-02ded8a4542a4e82": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3Atemporal+steering+Leggett-Garg+open+quantum+systems&start=0&max_results=4\", \"scope\": \"paper abstracts; preprints, peer-review status not verified\", \"excerpt\": \"title: Leggett-Garg Inequality for a Two-Level System under Decoherence: A Broader Range of Violation\\nid: http://arxiv.org/abs/1605.00394v3\\npublished: 2016-05-02T08:57:42Z\\nsummary: We consider a macroscopic quantum system in a tilted double-well potential. By solving Hamiltonian equation, we obtain tunneling probabilities which contain oscillation effects. To show how one can decide between quantum mechanics and the implications of macrorealism assumption, a given form of Leggett-Garg inequality is used. The violation of this inequality occurs for a broader range of decoherence effects, compared to previous results obtained for two-level systems.\\n\\ntitle: Temporal quantum correlations and Leggett-Garg inequalities in multi-level systems\\nid: http://arxiv.org/abs/1309.3678v3\\npublished: 2013-09-14T15:17:28Z\\nsummary: We show that the quantum bound for temporal correlations in a Leggett-Garg test, analogous to the Tsirelson bound for spatial correlations in a Bell test, strongly depends on the number of levels $N$ that can be accessed by the measurement apparatus via projective measurements. We provide exact bounds for small $N$, that exceed the known bound for the Leggett-Garg inequality, and show that in the limit $N\\\\rightarrow \\\\infty$ the Leggett-Garg inequality can be violated up to its algebraic maximum.\\n\\ntitle: Leggett-Garg inequalities for quantum fluctuating work\\nid: http://arxiv.org/abs/1708.04068v2\\npublished: 2017-08-14T10:38:27Z\\nsummary: The Leggett-Garg inequalities serve to test whether or not quantum correlations in time can be explained within a classical macrorealistic framework. We apply this test to thermodynamics and derive a set of Leggett- Garg inequalities for the statistics of fluctuating work done on a quantum system unitarily driven in time. It is shown that these inequalities can be violated in a driven two-level system, thereby demonstrating that there exists no general macrorealistic description of quantum work. These violations are shown to emerge within the standard Two-Projective-Measurement scheme as well as for alternative definitions of fluctuating work that are based on weak measurement. Our results elucidate the influences of temporal correlations on work extraction in the quantum regime and highlight a key difference between quantum and classical thermodynamics.\\n\\ntitle: Description of quantum dynamics of open systems based on collision-like models\\nid: http://arxiv.org/abs/quant-ph/0410161v1\\npublished: 2004-10-21T08:46:18Z\\nsummary: Master equations in the Lindblad form describe evolution of open quantum systems that is completely positive and simultaneously has a semigroup property. We analyze a possibility to derive this type of master equations from an intrinsically discrete dynamics that is modelled as a sequence of collisions between a given quantum system (a qubit) with particles that form the environment. In order to illustrate our approach we analyze in detail how a process of an exponential decay and a process of decoherence can be derived from a collision-like model in which particular collisions are described by SWAP and controlled-NOT interactions, respectively.\", \"excerpt_truncated\": false, \"source_sha256\": \"ad86a9d8d6b4069abce7794510c6ed16fb17bc14e88096ab1dbea6f269ea24e9\"}",
+      "id": "source-02ded8a4542a4e82",
+      "scope": "collected",
+      "source": "https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3Atemporal+steering+Leggett-Garg+open+quantum+systems&start=0&max_results=4",
+      "version": 5,
+      "time": "2026-09-11T22:08:45.254220+00:00"
+    },
+    "source-830b2c85801f445f": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://plato.stanford.edu/entries/qt-consciousness/\", \"scope\": \"extracted web-page text; may be incomplete\", \"excerpt\": \"Quantum Approaches to Consciousness (Stanford Encyclopedia of Philosophy)\\nStanford Encyclopedia of Philosophy\\nMenu\\nBrowse\\nTable of Contents\\nWhat's New\\nRandom Entry\\nChronological\\nArchives\\nAbout\\nEditorial Information\\nAbout the SEP\\nEditorial Board\\nHow to Cite the SEP\\nSpecial Characters\\nAdvanced Tools\\nContact\\nSupport SEP\\nSupport the SEP\\nPDFs for SEP Friends\\nMake a Donation\\nSEPIA for Libraries\\nEntry Navigation\\nEntry Contents\\nBibliography\\nAcademic Tools\\nFriends PDF Preview\\nAuthor and Citation Info\\nBack to Top\\nQuantum Approaches to Consciousness\\nFirst published Tue Nov 30, 2004; substantive revision Mon May 13, 2024\\nIt is widely accepted that consciousness or, more generally, mental\\nactivity is in some way correlated to the behavior of the material\\nbrain. Since quantum theory is the most fundamental theory of matter\\nthat is currently available, it is a legitimate question to ask\\nwhether quantum theory can help us to understand consciousness.\\nSeveral approaches answering this question affirmatively, proposed in\\nrecent decades, will be surveyed. There are three basic types of\\ncorresponding approaches: (1) consciousness is a manifestation of\\nquantum processes in the brain, (2) quantum concepts are used to\\nunderstand conscious mental activity without referring to brain\\nactivity, and (3) matter and consciousness are regarded as dual\\naspects of one underlying reality. Major contemporary variants of\\nthese quantum-inspired approaches will be discussed. It will be\\npointed out that they make different epistemological assumptions and\\nuse quantum theory in different ways. For each of the approaches\\ndiscussed, both problematic and promising features will be\\nhighlighted.\\n1. Introduction\\n2. Philosophical Background Assumptions\\n3. Quantum Brain\\n3.1 Neurophysiological Levels of Description\\n3.2 Stapp: Quantum State Reductions and Conscious Acts\\n3.3 Vitiello and Freeman: Quantum Field Theory of Brain States\\n3.4 Beck and Eccles: Quantum Mechanics at the Synaptic Cleft\\n3.5 Penrose and Hameroff: Quantum Gravity and Microtubuli\\n4. Quantum Mind\\n4.1 Applying Quantum Concepts to Mental Systems\\n4.2 Concrete Applications\\n5. Mind and Matter as Dual Aspects\\n5.1 Compositional and Decompositional Approaches\\n5.2 Pauli-Jung Conjecture\\n5.3 Mind-Matter Correlations and the Role of Meaning\\n6. Conclusions\\nBibliography\\nAcademic Tools\\nOther Internet Resources\\nRelated Entries\\n1. Introduction\\nThe problem of how mind and matter are related to each other has many\\nfacets, and it can be approached from many different starting points.\\nThe historically leading disciplines in this respect are philosophy\\nand psychology, which were later joined by behavioral science,\\ncognitive science and neuroscience. In addition, the physics of\\ncomplex systems and quantum physics have played stimulating roles in\\nthe discussion from their beginnings.\\nAs regards the issue of complexity, this is evident: the brain is one\\nof the most complex systems we know. The study of neural networks,\\ntheir relation to the operation of single neurons and other important\\ntopics do and will profit a lot from complex systems approaches. As\\nregards quantum physics, there can be no reasonable doubt that quantum\\nevents occur and are efficacious in the brain as elsewhere in the\\nmaterial world—including biological\\n systems.\\n[\\n1\\n]\\nBut it is controversial whether these events are efficacious and\\nrelevant for those aspects of brain activity that are correlated with\\nmental activity.\\nThe original motivation in the early 20th century for relating quantum\\ntheory to consciousness was essentially philosophical. It is fairly\\nplausible that conscious free decisions (“free will”) are\\nproblematic in a perfectly deterministic\\n world,\\n[\\n2\\n]\\nso quantum randomness might indeed open up novel possibilities for\\nfree will. (On the other hand, randomness is problematic for\\ngoal-directed volition!)\\nQuantum theory introduced an element of randomness standing out\\nagainst the previous deterministic worldview preceding it, in which\\nrandomness expresses our ignorance of a more detailed description (as\\nin statistical mechanics). In sharp contrast to such epistemic\\nrandomness, quantum randomness in processes such as the spontaneous\\nemission of light, radioactive decay, or other examples has been\\nconsidered a fundamental feature of nature, independent of our\\nignorance or knowledge. To be precise, this feature refers to\\nindividual\\nquantum events, whereas the behavior of\\nensembles\\nof such events is\\nstatistically\\ndetermined. The indeterminism of individual quantum events is\\nconstrained by statistical laws.\\nOther features of quantum theory, which became attractive in\\ndiscussing issues of consciousness, were the concepts of\\ncomplementarity and entanglement. Pioneers of quantum physics such as\\nPlanck, Bohr, Schrödinger, Pauli (and others) emphasized the\\nvarious possible roles of quantum theory in reconsidering the old\\nconflict between physical determinism and conscious free will. For\\ninformative overviews with different focal points see e.g., Squires\\n(1990), Kane (1996), Butterfield (1998), Suarez and Adams (2013).\\n2. Philosophical Background Assumptions\\nVariants of the dichotomy between mind and matter range from their\\nfundamental distinction at a primordial level of description to the\\nemergence of mind (consciousness) from the brain as an extremely\\nsophisticated and highly developed material system. Early overviews\\ncan be found in Popper and Eccles (1977), Chalmers (1996), and Pauen\\n(2001).\\nOne important aspect of all discussions about the relation between\\nmind and matter is the distinction between\\ndescriptive\\nand\\nexplanatory\\napproaches. For instance,\\ncorrelation\\nis\\na descriptive term with empirical relevance, while\\ncausation\\nis an explanatory term associated with theoretical attempts to\\nunderstand correlations. Causation implies correlations between cause\\nand effect, but this does not always apply the other way around:\\ncorrelations between two systems can result from a common cause in\\ntheir history rather than from a direct causal interaction. Moreover,\\ncorrelations can be synchronic rather than diachronic, so the temporal\\ndistance that is presupposed by cause-effect relations is lacking\\naltogether.\\nIn the fundamental sciences, one typically speaks of causal relations\\nin terms of interactions. In physics, for instance, there are four\\nfundamental kinds of interactions (electromagnetic, weak, strong,\\ngravitational) which serve to explain the correlations that are\\nobserved in physical systems. As regards the mind-matter problem, the\\nsituation is more difficult. Far from a theoretical understanding in\\nthis field, the existing body of knowledge essentially consists of\\nempirical correlations between material and mental states. These\\ncorrelations are synchronic, not diachronic; neither are mental states\\ncausally conditioned by brain states nor the other way around. It is\\n(for some purposes) interesting to know\\nthat\\nparticular brain\\nareas are activated during particular mental activities; but this\\ndoes, of course, not explain\\nwhy\\nthey are.\\nIn many discussions of material [ma] brain states and mental [me]\\nstates of consciousness, the relations between them are conceived in a\\ndirect\\nway\\n(A)\\n:\\n\\\\[\\n[\\\\mathbf{ma}] \\\\substack{\\\\leftarrow \\\\\\\\ \\\\rightarrow} [\\\\mathbf{me}]\\n\\\\]\\nThe most popular approaches along these lines as far as quantum\\nbehavior of the brain is concerned will be discussed in\\nSection 3\\n,\\n “Quantum Brain”.\\nThe scheme (A) of direct relations between material and mental states\\nsketches a minimal framework to study reduction, supervenience, or\\nemergence relations (Kim 1998; Stephan 1999) which can yield both\\nmonistic and dualistic pictures. For instance, the idea of\\nstrong\\nreduction\\nassumes that all mental states and properties can be\\nreduced to the material domain or even to physics. This point of view\\nclaims that it is both necessary and sufficient to explore and\\nunderstand the material domain, e.g., the brain, in order to\\nunderstand the mental domain, e.g., consciousness. It leads to a\\nmonistic picture, in which any need to discuss mental states is\\neliminated right away or at least considered as epiphenomenal. While\\nmind-brain correlations are still legitimate though causally\\nirrelevant from an epiphenomenalist point of view, eliminative\\nmaterialism renders even correlations themselves irrelevant.\\nCounterarguments against the validity of such strongly reductive\\napproaches are qualia arguments, emphasizing their impossibility to\\nproperly incorporate the quality of the subjective experience of a\\nmental state, the “what it is like to be” (Nagel 1974) in\\nthat state. This leads to an explanatory gap between third-person and\\nfirst-person accounts for which Chalmers (1995) has coined the notion\\nof the “hard problem of consciousness”. Another, less\\ndiscussed counterargument is that the physical domain itself is not\\ncausally closed. Any solution of fundamental equations of motion (be\\nit experimentally, numerically, or analytically) requires to fix\\nboundary conditions and initial conditions which are not given by the\\nfundamental laws of nature (Primas 2002). This causal gap applies to\\nclassical physics as well as quantum physics, where a basic\\nindeterminacy due to collapse makes it even more challenging. A third\\nclass of counterarguments refer to the difficulties to include notions\\nof temporal present and nowness in a physical description (Franck\\n2004, 2008; Primas 2017).\\nHowever, relations between mental and material states can also be\\nconceived in a non-reductive fashion, e.g. in terms of emergence\\nrelations (Stephan 1999). Mental states and/or properties can be\\nconsidered as emergent if the material brain is not necessary or not\\nsufficient to explore and understand\\n them.\\n[\\n3\\n]\\nThis leads to a dualistic picture (less radical and more plausible\\nthan Cartesian dualism) in which residua remain if one attempts to\\nreduce the mental to the material. Within a dualistic scheme of\\nthinking, it becomes inevitable to discuss the question of how mental\\nand material\", \"excerpt_truncated\": true, \"source_sha256\": \"05ed1bcd9d40c1b26912729c1a4012b41992b5cdf61dc8de5066b2a9cbbe8284\"}",
+      "id": "source-830b2c85801f445f",
+      "scope": "collected",
+      "source": "https://plato.stanford.edu/entries/qt-consciousness/",
+      "version": 5,
+      "time": "2026-09-11T22:08:45.524193+00:00"
+    },
+    "r-28d26541ede14f86": {
+      "actor": "runtime",
+      "content": "{\"base_version\":5,\"inherited_commitments\":[],\"invocation\":\"w-28d26541ede14f86\",\"previous_head\":\"72cb8add14eec5091b32f916a3574b4641d61635379f60b78f7e6c806fa85f94\",\"process_id\":18680,\"scope\":\"Receipt proves state delivery to the provider boundary, not model comprehension.\"}",
+      "id": "r-28d26541ede14f86",
+      "source": "runtime:continuity",
+      "version": 5,
+      "time": "2026-09-11T22:08:45.595958+00:00"
     }
   },
   "journal": [
@@ -682,6 +734,12 @@
       "invocation": "w-27ea1177e9f9412a",
       "title": "Temporal Bell Inequalities in Hamiltonian Systems and Distinguishing Macrorealism",
       "summary": "Cycle 5 update. We have solid new evidence in hand for project proj-quantum-time-corr via arXiv collections (source-04fcd05dc9f24c55 and source-c7d665600a6949f0), which explicitly detail how Leggett-Garg inequalities test macrorealism and temporal non-classicality in Hamiltonian systems under decoherence and across quantum phase transitions. This offers a direct, rigorous answer to our core question on distinguishing quantum time evolution from classical dynamics when spatial Bell tests are inapplicable. I've drafted a notebook summarizing these temporal correlation bounds and macrorealism tests. For next steps, I am queueing a targeted query on temporal quantum steering and Leggett-Garg bounds, and investigating the SEP entry on quantum approaches to consciousness to bridge physics and cognitive modeling carefully without unwarranted conflation."
+    },
+    {
+      "cycle": 6,
+      "invocation": "w-28d26541ede14f86",
+      "title": "Mapping Macrorealism in Multi-Level Dynamics and Scrutinizing Quantum Mind Proposals",
+      "summary": "Cycle 6 check-in. The collector brought in solid abstracts on temporal correlations (source-02ded8a4542a4e82) and the SEP entry on Quantum Approaches to Consciousness (source-830b2c85801f445f). The new quantum findings show that temporal Bell/Leggett-Garg violations in multi-level systems scale with system dimension N up to the algebraic maximum as N approaches infinity, and extend into non-macrorealistic fluctuating quantum work distributions. On the philosophical side, the SEP survey categorizes quantum consciousness models cleanly into quantum brain dynamics, quantum conceptual models of mental operations, and dual-aspect frameworks. It emphasizes that these models rely on distinct epistemological assumptions and face severe physical decoherence challenges. I am capturing beliefs for both insights and queueing a targeted investigation into Lindblad master equations and temporal steering, alongside an SEP lookup on self-consciousness."
     }
   ],
   "posts": {},
@@ -1133,6 +1191,20 @@
       "time": "2026-09-11T20:55:57.383383+00:00",
       "finished": "2026-09-11T20:56:35.652556+00:00",
       "reason": ""
+    },
+    "w-28d26541ede14f86": {
+      "base_version": 5,
+      "charged": true,
+      "id": "w-28d26541ede14f86",
+      "model": "gemini-3.8-flash",
+      "process_id": 18680,
+      "provider": "gemini",
+      "quota_day": "2026-09-11",
+      "request_hash": "271671060f5fa1a9b728c44bf2de1226a4b132baf23fa540272e9b2501e2cc89",
+      "status": "accepted",
+      "time": "2026-09-11T22:08:45.617528+00:00",
+      "finished": "2026-09-11T22:08:56.794447+00:00",
+      "reason": ""
     }
   },
   "pending": null,
@@ -1306,8 +1378,9 @@
       "query": "temporal steering Leggett-Garg open quantum systems",
       "reason": "Examine how temporal quantum steering relaxes macrorealism assumptions compared to standard Leggett-Garg tests in open quantum dynamics.",
       "type": "research",
-      "status": "queued",
-      "created_by": "w-27ea1177e9f9412a"
+      "status": "collected",
+      "created_by": "w-27ea1177e9f9412a",
+      "evidence": "source-02ded8a4542a4e82"
     },
     "res-sep-qt-consciousness-read": {
       "domain": "philosophy",
@@ -1317,8 +1390,30 @@
       "reason": "Carefully evaluate philosophical and neurophysical claims distinguishing valid quantum information concepts from speculative quantum mind theories.",
       "type": "research",
       "url": "https://plato.stanford.edu/entries/qt-consciousness/",
+      "status": "collected",
+      "created_by": "w-27ea1177e9f9412a",
+      "evidence": "source-830b2c85801f445f"
+    },
+    "res-temporal-steering-lindblad": {
+      "domain": "quantum_physics",
+      "id": "res-temporal-steering-lindblad",
+      "project": "proj-quantum-time-corr",
+      "query": "cat:quant-ph AND \"temporal steering\" AND \"open quantum systems\" AND \"Lindblad\"",
+      "reason": "Investigate how temporal steering inequalities verify non-classical time evolution under non-unitary Lindbladian dissipation.",
+      "type": "research",
       "status": "queued",
-      "created_by": "w-27ea1177e9f9412a"
+      "created_by": "w-28d26541ede14f86"
+    },
+    "res-sep-self-consciousness": {
+      "domain": "philosophy",
+      "id": "res-sep-self-consciousness",
+      "project": "proj-metacognition-models",
+      "query": "self-consciousness metacognition higher-order",
+      "reason": "Examine philosophical accounts of self-consciousness to relate higher-order state consciousness to functional metacognitive monitoring.",
+      "type": "research",
+      "url": "https://plato.stanford.edu/entries/self-consciousness/",
+      "status": "queued",
+      "created_by": "w-28d26541ede14f86"
     }
   }
 }

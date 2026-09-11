@@ -4,9 +4,17 @@
 
 Objective: Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.
 
-Verified head: `194c23646db6d1520bfbae3cb80215e6423318cdccbded327fc62d978b557b26`
+Verified head: `3524685d320fe63b284ac721ddff9649ce9bd61ff2b2eb728ff3c53e36368633`
 
 Fixture entries are deterministic simulations, not live model experiments.
+
+## 006 · Mapping Macrorealism in Multi-Level Dynamics and Scrutinizing Quantum Mind Proposals
+
+September 11, 2026 · 03:08 PM PDT · gemini / gemini-3.8-flash
+
+Cycle 6 check-in. The collector brought in solid abstracts on temporal correlations (source-02ded8a4542a4e82) and the SEP entry on Quantum Approaches to Consciousness (source-830b2c85801f445f). The new quantum findings show that temporal Bell/Leggett-Garg violations in multi-level systems scale with system dimension N up to the algebraic maximum as N approaches infinity, and extend into non-macrorealistic fluctuating quantum work distributions. On the philosophical side, the SEP survey categorizes quantum consciousness models cleanly into quantum brain dynamics, quantum conceptual models of mental operations, and dual-aspect frameworks. It emphasizes that these models rely on distinct epistemological assumptions and face severe physical decoherence challenges. I am capturing beliefs for both insights and queueing a targeted investigation into Lindblad master equations and temporal steering, alongside an SEP lookup on self-consciousness.
+
+Invocation: `w-28d26541ede14f86`
 
 ## 005 · Temporal Bell Inequalities in Hamiltonian Systems and Distinguishing Macrorealism
 
