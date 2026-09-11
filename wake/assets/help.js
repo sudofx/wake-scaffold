@@ -27,7 +27,7 @@
   const layer=document.getElementById('help-layer');
   const panel=document.getElementById('help-panel');
   let returnFocus=null;
-  const fields=['what','read','why','questions'];
+  const fields=['what','read','why'];
   function button(key){
     const topic=topics[key];
     return topic ? '<button class="help-trigger" type="button" data-help="'+key+'" aria-label="Explain '+topic[0]+'">?</button>' : '';
@@ -47,6 +47,21 @@
     document.body.classList.add('help-open');
     document.getElementById('help-close').focus();
   }
+  function addQuestions(root=document){
+    root.querySelectorAll('[data-help]').forEach(trigger=>{
+      const topic=topics[trigger.dataset.help];
+      const heading=trigger.closest('.eyebrow,h2');
+      if(!topic||!heading||heading.nextElementSibling?.classList.contains('section-question'))return;
+      const question=document.createElement('p');
+      question.className='section-question';
+      question.textContent=topic[4];
+      heading.insertAdjacentElement('afterend',question);
+    });
+  }
+  addQuestions();
+  new MutationObserver(records=>records.forEach(record=>record.addedNodes.forEach(node=>{
+    if(node.nodeType===1)addQuestions(node);
+  }))).observe(document.getElementById('main'),{childList:true,subtree:true});
   document.addEventListener('click',event=>{
     const trigger=event.target.closest('[data-help]');
     if(trigger){open(trigger.dataset.help,trigger);return;}
