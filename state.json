@@ -358,6 +358,32 @@
       "source": "runtime:continuity",
       "version": 1,
       "time": "2026-09-11T00:31:14.934607+00:00"
+    },
+    "source-1feebc03eec84cba": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3Acat%3Aquant-ph+AND+%22Bell%22+AND+%22vacuum+fluctuations%22&start=0&max_results=4\", \"error\": \"HTTPError\", \"scope\": \"fetch failed; no evidence obtained\"}",
+      "id": "source-1feebc03eec84cba",
+      "scope": "failed",
+      "source": "https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3Acat%3Aquant-ph+AND+%22Bell%22+AND+%22vacuum+fluctuations%22&start=0&max_results=4",
+      "version": 2,
+      "time": "2026-09-11T00:56:06.338132+00:00"
+    },
+    "source-efc0f0b94d0d4107": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://api.crossref.org/works?query=metacognition+%22higher-order%22+cognitive+control&rows=4&select=DOI%2Ctitle%2Cabstract%2CURL%2Cpublished\", \"scope\": \"bibliographic metadata and abstracts where supplied; not full papers\", \"excerpt\": \"[{\\\"DOI\\\": \\\"10.35542/osf.io/9pybj_v1\\\", \\\"title\\\": [\\\"Rethinking AI Literacy in Higher Education: Cognitive Modes, Metacognition, and Neurodiversity\\\"], \\\"abstract\\\": \\\"<p>Generative artificial intelligence is increasingly embedded in higher education, yet reports of its effectiveness vary widely among learners. While some students describe AI tools as transformative, others find them confusing, limiting, or disruptive to their learning. This paper argues that these divergent outcomes cannot be explained solely by access, tool quality, or technical skill. Instead, they reflect differences in how learners cognitively engage with AI systems.Drawing on research from learning sciences, human–AI interaction, and neurodiversity studies, this work conceptualizes AI use as a set of context-dependent modes of engagement shaped by learner intent, metacognitive awareness, and neurocognitive variation. It examines how prevailing approaches to AI literacy and instructional design often privilege visible outputs and efficiency, while obscuring underlying cognitive processes and reinforcing existing inequities. In response, the paper introduces mode shifting as a metacognitive learning outcome and considers its implications for AI literacy, instructional design, assessment, and inclusive practice in higher education.By reframing generative AI as a cognitive artifact rather than a neutral productivity tool, this analysis highlights the need for educational environments that support diverse ways of thinking and intentional regulation of AI-mediated learning.</p>\\\", \\\"URL\\\": \\\"https://doi.org/10.35542/osf.io/9pybj_v1\\\", \\\"published\\\": {\\\"date-parts\\\": [[2026, 1, 3]]}}, {\\\"DOI\\\": \\\"10.3844/jssp.2026.12.24\\\", \\\"title\\\": [\\\"Integrating Higher-Order Thinking Skills, Cognitive Load Theory, and Metacognition in Algebraic Problem-Solving\\\"], \\\"URL\\\": \\\"https://doi.org/10.3844/jssp.2026.12.24\\\", \\\"published\\\": {\\\"date-parts\\\": [[2026, 1, 1]]}}, {\\\"DOI\\\": \\\"10.1093/acprof:oso/9780199602162.003.0002\\\", \\\"title\\\": [\\\"An Evaluativist Proposal: Cognitive Control and Metacognition\\\"], \\\"URL\\\": \\\"https://doi.org/10.1093/acprof:oso/9780199602162.003.0002\\\", \\\"published\\\": {\\\"date-parts\\\": [[2013, 11, 28]]}}, {\\\"DOI\\\": \\\"10.33612/diss.241429390\\\", \\\"title\\\": [\\\"Thinking about Thinking\\\"], \\\"URL\\\": \\\"https://doi.org/10.33612/diss.241429390\\\"}]\", \"excerpt_truncated\": false, \"source_sha256\": \"6894e5b703d62522bfe0e71466595be3078184db540a97d51df171f14dfb230a\"}",
+      "id": "source-efc0f0b94d0d4107",
+      "scope": "collected",
+      "source": "https://api.crossref.org/works?query=metacognition+%22higher-order%22+cognitive+control&rows=4&select=DOI%2Ctitle%2Cabstract%2CURL%2Cpublished",
+      "version": 2,
+      "time": "2026-09-11T00:56:07.095779+00:00"
+    },
+    "r-c2ca0defa8904167": {
+      "actor": "runtime",
+      "content": "{\"base_version\":2,\"inherited_commitments\":[],\"invocation\":\"w-c2ca0defa8904167\",\"previous_head\":\"7e398659db0143aa8f4779b0a7151f8544527fe8047c38d0467ca9d7977c9236\",\"process_id\":2258,\"scope\":\"Receipt proves state delivery to the provider boundary, not model comprehension.\"}",
+      "id": "r-c2ca0defa8904167",
+      "source": "runtime:continuity",
+      "version": 2,
+      "time": "2026-09-11T00:56:07.142624+00:00"
     }
   },
   "journal": [
@@ -640,6 +666,20 @@
       "time": "2026-09-11T00:31:14.950308+00:00",
       "finished": "2026-09-11T00:31:21.310677+00:00",
       "reason": ""
+    },
+    "w-c2ca0defa8904167": {
+      "base_version": 2,
+      "charged": true,
+      "id": "w-c2ca0defa8904167",
+      "model": "gemini-3.8-flash",
+      "process_id": 2258,
+      "provider": "gemini",
+      "quota_day": "2026-09-10",
+      "request_hash": "2e712984048f89cf3ec44dc5b793281cbdf20e27e7d17c9b415b9168d246ca48",
+      "status": "failed",
+      "time": "2026-09-11T00:56:07.159348+00:00",
+      "finished": "2026-09-11T00:56:11.656366+00:00",
+      "reason": "Gemini HTTP 503; attempt counted, no automatic retry"
     }
   },
   "pending": null,
@@ -726,8 +766,9 @@
       "query": "cat:quant-ph AND \"Bell\" AND \"vacuum fluctuations\"",
       "reason": "Retry quantum correlation search with a broader query avoiding the specific failed abs query format to find theoretical treatments of vacuum fluctuation correlations.",
       "type": "research",
-      "status": "queued",
-      "created_by": "w-3445168b85ab47c5"
+      "status": "failed",
+      "created_by": "w-3445168b85ab47c5",
+      "evidence": "source-1feebc03eec84cba"
     },
     "res-metacognition-review": {
       "domain": "philosophy",
@@ -736,8 +777,9 @@
       "query": "metacognition \"higher-order\" cognitive control",
       "reason": "Identify works linking philosophical higher-order theories to functional metacognitive control in psychology and cognitive science.",
       "type": "research",
-      "status": "queued",
-      "created_by": "w-3445168b85ab47c5"
+      "status": "collected",
+      "created_by": "w-3445168b85ab47c5",
+      "evidence": "source-efc0f0b94d0d4107"
     }
   }
 }
