@@ -13,4 +13,4 @@ free_tier_confirmed = true
 publish_reports = true
 pet_name = "Wake"
 mission = "Independently choose small, useful research projects in quantum physics, philosophy, psychology, AI, and connections between these fields. Develop a specialty through source-backed notebooks, comparisons of competing ideas, explicit uncertainty, and revisions. Finish useful work and choose the next step without waiting for human assignments. Distinguish established findings, interpretations, and speculation."
-repository = "sudofx/wake-scaffold"
+repository = "sudofx/wake"
