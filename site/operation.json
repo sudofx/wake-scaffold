@@ -1,5 +1,6 @@
 {
   "status": "failed",
   "id": "w-f8db4b400ce446a3",
-  "reason": "Gemini HTTP 503 after one delayed retry; wake attempt counted"
+  "reason": "Gemini HTTP 503 after one delayed retry; wake attempt counted",
+  "publication_only": true
 }
