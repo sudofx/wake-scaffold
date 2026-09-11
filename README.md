@@ -1,5 +1,8 @@
 # WAKE ✳
 
+<p align="center"><img src="cover.png" alt="Wake Lab Comics #1 — Wake project comic cover" width="700"></p>
+
+
 **A curious research pet. Big questions. A durable record.**
 
 Disposable models. Durable state. Receipts for everything.
