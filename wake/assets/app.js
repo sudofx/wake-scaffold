@@ -40,7 +40,7 @@
       `${j.title} ${j.summary} ${j.invocation} ${j.cycle}`.toLowerCase().includes(query));
     $('entries').innerHTML=entries.slice(0,journalLimit).map(j => {
       const i=s.invocations[j.invocation], event=decisions[j.invocation], actions=event.payload.proposal.actions;
-      return `<article class="entry" id="cycle-${j.cycle}"><div class="entry-meta"><span class="cycle">WAKE✳ ${String(j.cycle).padStart(3,'0')}</span><span>/</span><time datetime="${esc(i.time)}">${esc(fmt(i.time))}</time>${badge(i.provider==='fixture'?'simulated':'accepted',i.provider==='fixture'?'SIMULATED':'ACCEPTED')}</div><h3>${esc(j.title)}</h3><p>${esc(j.summary)}</p><div class="entry-bottom"><span>${esc(i.provider)} / ${esc(i.model)}</span><span>${actions.length} recorded change${actions.length===1?'':'s'}</span></div><details><summary>Open the lab notes ↗</summary>${actions.map(a=>`<div class="decision"><strong>${esc(a.type)} / ${esc(a.id)}</strong><p>${esc(a.statement||a.task||a.status)}</p><p>${esc(a.reason)}</p>${refs(a.evidence)}</div>`).join('') || '<p>No state changes proposed.</p>'}<a class="subtle" href="#history/${encodeURIComponent(j.invocation)}">Full invocation & decision →</a></details></article>`;
+      return `<article class="entry" id="cycle-${j.cycle}"><div class="entry-meta"><span class="cycle">WAKE✳︎ ${String(j.cycle).padStart(3,'0')}</span><span>/</span><time datetime="${esc(i.time)}">${esc(fmt(i.time))}</time>${badge(i.provider==='fixture'?'simulated':'accepted',i.provider==='fixture'?'SIMULATED':'ACCEPTED')}</div><h3>${esc(j.title)}</h3><p>${esc(j.summary)}</p><div class="entry-bottom"><span>${esc(i.provider)} / ${esc(i.model)}</span><span>${actions.length} recorded change${actions.length===1?'':'s'}</span></div><details><summary>Open the lab notes ↗</summary>${actions.map(a=>`<div class="decision"><strong>${esc(a.type)} / ${esc(a.id)}</strong><p>${esc(a.statement||a.task||a.status)}</p><p>${esc(a.reason)}</p>${refs(a.evidence)}</div>`).join('') || '<p>No state changes proposed.</p>'}<a class="subtle" href="#history/${encodeURIComponent(j.invocation)}">Full invocation & decision →</a></details></article>`;
     }).join('') || '<p class="empty">No matching entries. The tape is blank here.</p>';
     $('more').hidden=entries.length<=journalLimit;
   }
@@ -76,7 +76,7 @@
     if(page==='evidence')evidence(selected);
     if(page==='history')history(selected);
     if(page==='home'||page==='projects')window.WakePet.render(page,selected);
-    document.title=`WAKE✳ / ${page==='journal'?'Same tape. Fresh deck.':page[0].toUpperCase()+page.slice(1)}`;
+    document.title=`WAKE✳︎ / ${page==='journal'?'Same tape. Fresh deck.':page[0].toUpperCase()+page.slice(1)}`;
   }
   $('evidence-search').addEventListener('input',route);
   $('history-search').addEventListener('input',()=>{historyLimit=35;route();});
