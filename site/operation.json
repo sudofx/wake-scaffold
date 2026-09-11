@@ -1,5 +1,4 @@
 {
-  "status": "failed",
-  "id": "w-c2ca0defa8904167",
-  "reason": "Gemini HTTP 503; attempt counted, no automatic retry"
+  "status": "paused",
+  "reason": "Daily call ceiling reached; no request sent"
 }
