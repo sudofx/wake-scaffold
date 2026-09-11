@@ -23,7 +23,13 @@ SCHEDULED_WAKE_INTERVAL = timedelta(minutes=55)
 
 
 def scheduled_wake_due(state, now=None):
-    """Use durable invocation times to collapse delayed and duplicate cron events."""
+    """Collapse redundant GitHub cron deliveries into roughly one hourly wake.
+
+    GitHub's scheduler can delay or drop events, so the workflow asks at several
+    off-minute times. The last charged invocation is the cross-run authority:
+    a backup may replace a missing wake, but it cannot duplicate a recent
+    scheduled or manual Gemini call.
+    """
     now = now or datetime.now(timezone.utc)
     charged = [datetime.fromisoformat(item["time"]) for item in state["invocations"].values()
                if item.get("charged")]

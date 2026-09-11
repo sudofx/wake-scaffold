@@ -5,9 +5,11 @@ on:
     branches: [master]
     paths: ['wake/**', 'scripts/github_wake.py', 'wake.toml', '.github/workflows/wake.yml']
   schedule:
-    # :42 is the preferred hourly wake. Nearby ticks provide backup delivery
-    # when GitHub delays or drops scheduled events; the durable guard below
-    # permits at most one real scheduled wake in a 55-minute window.
+    # GitHub documents scheduled Actions as best effort: they can start late or
+    # be dropped when the service is busy. :42 remains the Hitchhiker's Guide
+    # reference and preferred hourly wake, away from top-of-hour congestion.
+    # The other off-minute ticks are delivery backups. scripts/github_wake.py
+    # checks durable state before Gemini, so these never multiply model calls.
     - cron: '12,27,42,57 * * * *'
   workflow_dispatch:
     inputs:
