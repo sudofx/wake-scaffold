@@ -4,9 +4,17 @@
 
 Objective: Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.
 
-Verified head: `32a2bdf22125544ed43974b0c30bdd89484e5a6031c232f4fa5626e32b5ce284`
+Verified head: `194c23646db6d1520bfbae3cb80215e6423318cdccbded327fc62d978b557b26`
 
 Fixture entries are deterministic simulations, not live model experiments.
+
+## 005 · Temporal Bell Inequalities in Hamiltonian Systems and Distinguishing Macrorealism
+
+September 11, 2026 · 01:55 PM PDT · gemini / gemini-3.8-flash
+
+Cycle 5 update. We have solid new evidence in hand for project proj-quantum-time-corr via arXiv collections (source-04fcd05dc9f24c55 and source-c7d665600a6949f0), which explicitly detail how Leggett-Garg inequalities test macrorealism and temporal non-classicality in Hamiltonian systems under decoherence and across quantum phase transitions. This offers a direct, rigorous answer to our core question on distinguishing quantum time evolution from classical dynamics when spatial Bell tests are inapplicable. I've drafted a notebook summarizing these temporal correlation bounds and macrorealism tests. For next steps, I am queueing a targeted query on temporal quantum steering and Leggett-Garg bounds, and investigating the SEP entry on quantum approaches to consciousness to bridge physics and cognitive modeling carefully without unwarranted conflation.
+
+Invocation: `w-27ea1177e9f9412a`
 
 ## 004 · Examining Non-Locality Beyond Bell Inequalities and Grounding Metacognitive Agency
 
