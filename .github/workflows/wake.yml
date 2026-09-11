@@ -6,7 +6,12 @@ on:
     paths: ['wake/**', 'scripts/github_wake.py', 'wake.toml', '.github/workflows/wake.yml']
   schedule:
     - cron: '42 */3 * * *'
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      publish_only:
+        description: Refresh the website without calling Gemini
+        type: boolean
+        default: false
 
 concurrency:
   group: wake-durable-state
@@ -24,6 +29,7 @@ jobs:
     timeout-minutes: 10
     outputs:
       report_ready: ${{ steps.report.outputs.ready }}
+      artifact_name: ${{ steps.report.outputs.artifact_name }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -36,7 +42,8 @@ jobs:
         continue-on-error: true
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python scripts/github_wake.py
+        # Code updates refresh the existing record; scheduled/manual wakes do research.
+        run: python scripts/github_wake.py${{ (github.event_name == 'push' || inputs.publish_only == true) && ' --publish-only' || '' }}
       - name: Confirm report is ready
         id: report
         # A handled provider failure still produces a valid public report.
@@ -44,6 +51,7 @@ jobs:
         run: |
           test -f site/index.html
           echo 'ready=true' >> "$GITHUB_OUTPUT"
+          echo 'artifact_name=github-pages-${{ github.run_id }}-${{ github.run_attempt }}' >> "$GITHUB_OUTPUT"
       - name: Configure Pages
         if: always() && steps.report.outcome == 'success'
         uses: actions/configure-pages@v5
@@ -54,6 +62,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: site
+          name: ${{ steps.report.outputs.artifact_name }}
       - name: Record run summary
         if: always()
         run: |
@@ -78,3 +87,5 @@ jobs:
       - name: Publish the latest journal
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: ${{ needs.wake.outputs.artifact_name }}

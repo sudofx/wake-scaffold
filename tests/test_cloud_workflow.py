@@ -32,13 +32,13 @@ class CloudWorkflowTests(unittest.TestCase):
     def git(self, *args):
         return subprocess.run(["git", *map(str,args)], check=True, capture_output=True, text=True)
 
-    def run_cloud(self, provider):
+    def run_cloud(self, provider, publish_only=False):
         with patch.object(github_wake, "ROOT", self.project), \
              patch.object(github_wake, "config", return_value=dict(DEFAULTS)), \
              patch.object(github_wake, "Gemini", return_value=provider), \
              patch.object(github_wake, "collect", lambda engine: None), \
              patch.dict("os.environ", {"GITHUB_ACTIONS": "true"}):
-            return github_wake.main()
+            return github_wake.main(publish_only=publish_only)
 
     def test_failure_is_counted_once_exported_pushed_and_followed_by_recovery(self):
         class Failure(Fixture):
@@ -63,6 +63,21 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertEqual(public["version"], 1)
         self.assertEqual([i["status"] for i in public["invocations"].values()], ["failed", "accepted"])
 
+    def test_republishing_preserves_the_accepted_wake_without_calling_gemini(self):
+        self.assertEqual(self.run_cloud(Fixture()), 0)
+        before = json.loads((self.project/"site/state.json").read_text())
+        with patch.object(github_wake, "Gemini", side_effect=AssertionError("No model initialization")), \
+             patch.object(github_wake, "ROOT", self.project), \
+             patch.object(github_wake, "config", return_value=dict(DEFAULTS)), \
+             patch.object(github_wake, "collect", side_effect=AssertionError("No collection")), \
+             patch.dict("os.environ", {"GITHUB_ACTIONS":"true"}):
+            self.assertEqual(github_wake.main(publish_only=True), 0)
+        after = json.loads((self.project/"site/state.json").read_text())
+        self.assertEqual(before, after)
+        result = json.loads((self.project/"site/operation.json").read_text())
+        self.assertEqual(result["status"], "accepted")
+        self.assertTrue(result["publication_only"])
+
     def test_failed_checkpoint_never_exports_or_calls_provider(self):
         class NeverCall(Fixture):
             def propose(self, request): raise AssertionError("Provider must not be called")
@@ -80,6 +95,8 @@ class CloudWorkflowTests(unittest.TestCase):
         self.assertIn("needs.wake.outputs.report_ready == 'true'", workflow)
         self.assertIn("if: always() && steps.cycle.outcome == 'failure'", workflow)
         self.assertIn("path: site", workflow)
+        self.assertIn("github-pages-${{ github.run_id }}-${{ github.run_attempt }}", workflow)
+        self.assertIn("artifact_name: ${{ needs.wake.outputs.artifact_name }}", workflow)
         self.assertFalse((root/".github/workflows/static.yml").exists())
         self.assertFalse((root/".github/workflows/jekyll-gh-pages.yml").exists())
 
