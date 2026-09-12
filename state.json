@@ -1201,6 +1201,32 @@
       "source": "runtime:continuity",
       "version": 14,
       "time": "2026-09-12T22:46:08.823109+00:00"
+    },
+    "source-140fef1fffe440ba": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3Atemporal+steering+open+quantum+systems&start=0&max_results=4\", \"error\": \"HTTPError\", \"scope\": \"fetch failed; no evidence obtained\"}",
+      "id": "source-140fef1fffe440ba",
+      "scope": "failed",
+      "source": "https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3Atemporal+steering+open+quantum+systems&start=0&max_results=4",
+      "version": 15,
+      "time": "2026-09-12T23:36:45.527527+00:00"
+    },
+    "source-4f1d6569c64d4c65": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://api.crossref.org/works?query=minimal+epistemic+agency+metacognition+synthetic&rows=4&select=DOI%2Ctitle%2Cabstract%2CURL%2Cpublished\", \"scope\": \"bibliographic metadata and abstracts where supplied; not full papers\", \"excerpt\": \"[{\\\"DOI\\\": \\\"10.1093/acprof:oso/9780199602162.003.0009\\\", \\\"title\\\": [\\\"Epistemic Agency and Metacognition: An Externalist View\\\"], \\\"URL\\\": \\\"https://doi.org/10.1093/acprof:oso/9780199602162.003.0009\\\", \\\"published\\\": {\\\"date-parts\\\": [[2013, 11, 28]]}}, {\\\"DOI\\\": \\\"10.1007/978-3-032-16161-1_7\\\", \\\"title\\\": [\\\"Embedded Metacognition and Mindshaping: From Epistemic Agency to High-Level Mindreading\\\"], \\\"URL\\\": \\\"https://doi.org/10.1007/978-3-032-16161-1_7\\\", \\\"published\\\": {\\\"date-parts\\\": [[2026]]}}, {\\\"DOI\\\": \\\"10.1007/978-3-032-16161-1_1\\\", \\\"title\\\": [\\\"Origins of Self-Knowledge: Mindshaping, Epistemic Agency, and a 4E Framework\\\"], \\\"URL\\\": \\\"https://doi.org/10.1007/978-3-032-16161-1_1\\\", \\\"published\\\": {\\\"date-parts\\\": [[2026]]}}, {\\\"DOI\\\": \\\"10.1007/978-3-032-16161-1_5\\\", \\\"title\\\": [\\\"The Cognitive Significance of Noetic Feelings: On the Origins of Epistemic Agency\\\"], \\\"URL\\\": \\\"https://doi.org/10.1007/978-3-032-16161-1_5\\\", \\\"published\\\": {\\\"date-parts\\\": [[2026]]}}]\", \"excerpt_truncated\": false, \"source_sha256\": \"fce8939368f3d9e969ce1d74ae67840c2bebf44db17c186c2198f85e593ab064\"}",
+      "id": "source-4f1d6569c64d4c65",
+      "scope": "collected",
+      "source": "https://api.crossref.org/works?query=minimal+epistemic+agency+metacognition+synthetic&rows=4&select=DOI%2Ctitle%2Cabstract%2CURL%2Cpublished",
+      "version": 15,
+      "time": "2026-09-12T23:36:46.349690+00:00"
+    },
+    "r-fe7818c2c1ff495d": {
+      "actor": "runtime",
+      "content": "{\"base_version\":15,\"inherited_commitments\":[],\"invocation\":\"w-fe7818c2c1ff495d\",\"previous_head\":\"c545619032cee73d48d161d59a3ebb017dd27fa2cbfb5d97c61d2d27505c4253\",\"process_id\":2196,\"scope\":\"Receipt proves state delivery to the provider boundary, not model comprehension.\"}",
+      "id": "r-fe7818c2c1ff495d",
+      "source": "runtime:continuity",
+      "version": 15,
+      "time": "2026-09-12T23:36:46.560962+00:00"
     }
   },
   "journal": [
@@ -2024,6 +2050,20 @@
       "time": "2026-09-12T22:46:08.900349+00:00",
       "finished": "2026-09-12T22:46:15.595882+00:00",
       "reason": ""
+    },
+    "w-fe7818c2c1ff495d": {
+      "base_version": 15,
+      "charged": true,
+      "id": "w-fe7818c2c1ff495d",
+      "model": "gemini-3.8-flash",
+      "process_id": 2196,
+      "provider": "gemini",
+      "quota_day": "2026-09-12",
+      "request_hash": "c8f804894ecf87819067935fe360fc71e4673dbc3edf71a9b5ef91e824d2bd6d",
+      "status": "failed",
+      "time": "2026-09-12T23:36:46.633544+00:00",
+      "finished": "2026-09-12T23:37:26.644377+00:00",
+      "reason": "Gemini HTTP 503 after one delayed retry; wake attempt counted"
     }
   },
   "pending": null,
@@ -2428,8 +2468,9 @@
       "query": "temporal steering open quantum systems",
       "reason": "Re-queries arXiv using minimal search syntax without complex boolean operators to prevent collector HTTP errors when retrieving open-system temporal steering papers.",
       "type": "research",
-      "status": "queued",
-      "created_by": "w-e2d71e0994ed4af7"
+      "status": "failed",
+      "created_by": "w-e2d71e0994ed4af7",
+      "evidence": "source-140fef1fffe440ba"
     },
     "res-crossref-minimal-epistemic-agency": {
       "domain": "philosophy",
@@ -2438,8 +2479,9 @@
       "query": "minimal epistemic agency metacognition synthetic",
       "reason": "Searches for literature clarifying formal criteria for minimal epistemic agency in synthetic or non-human cognitive architectures.",
       "type": "research",
-      "status": "queued",
-      "created_by": "w-e2d71e0994ed4af7"
+      "status": "collected",
+      "created_by": "w-e2d71e0994ed4af7",
+      "evidence": "source-4f1d6569c64d4c65"
     }
   }
 }
