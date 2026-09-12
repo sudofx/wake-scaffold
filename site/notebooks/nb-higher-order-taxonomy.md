@@ -1,22 +1,24 @@
-# Demarcating Mental-State Consciousness in Higher-Order Theories
+# Demarcating Mental-State Consciousness, Self-Consciousness, and Physicalist Demarcation
 
-Examines the distinction between creature consciousness and mental-state consciousness, detailing how higher-order representation accounts attempt to explain conscious mental states.
+Synthesizes philosophical taxonomy distinguishing creature, state, and self-consciousness, and assesses the boundary separating cognitive higher-order representation from physicalist quantum mind hypotheses.
 
 ## Findings
 
-A fundamental division in contemporary philosophy of mind distinguishes creature consciousness (whether an entity as a whole is awake, sentient, or aware) from mental-state consciousness (whether an individual mental state within that entity is conscious) [source-02cd5476f8c84812, source-f8aa0227079a4ffa]. Higher-order theories (HOTs and HOPs) specifically target mental-state consciousness, arguing that what transforms an otherwise unconscious mental state into a conscious one is a higher-order representation directed at it [source-f8aa0227079a4ffa]. Within this framework, theorists divide over whether this representation takes the form of an actualist higher-order thought, a dispositional state, or higher-order perception, while confronting classic theoretical challenges such as targetless higher-order thoughts and the problem of explaining phenomenal qualitative character [source-f8aa0227079a4ffa].
+Philosophical taxonomy separates creature consciousness from mental-state consciousness [source-02cd5476f8c84812, source-f8aa0227079a4ffa]. Self-consciousness introduces further differentiation: self-consciousness in thought is marked by first-person indexical representation ('I'-thoughts) exhibiting immunity to error through misidentification (IEM), distinct from non-conceptual pre-reflective self-consciousness in phenomenal experience [source-2314f735c2af4cda]. In parallel, attempts to connect physical state evolution to mental states via quantum physics fall into three broad classes: quantum neurobiology (e.g., microtubules, synaptic quantum tunneling), formal mathematical quantum-like modeling of decision/cognitive dynamics, and dual-aspect monism (e.g., Pauli-Jung conjectures) [source-830b2c85801f445f]. Crucially, the SEP analysis underscores that applying quantum theory directly to neurophysiology encounters acute decoherence challenges and epistemological leaps, meaning cognitive monitoring and representation models must not conflate quantum measurement formalism with phenomenological conscious experience [source-830b2c85801f445f].
 
 ## Limitations and competing views
 
-Analysis is based on encyclopedia overview texts rather than primary monographs; it does not evaluate empirical neuroscience or artificial agent architectures directly, nor does it resolve competing first-order representationalist rebuttals.
+Direct evidence comes from peer-reviewed Stanford Encyclopedia of Philosophy surveys rather than primary experimental neurobiology or cognitive psychology papers. Specific functional implementations of IEM and higher-order thought in computational architectures remain an open area of inquiry.
 
 ## Next questions
 
-How do empirical models of metacognitive error detection and functional monitoring in psychology map onto the higher-order representational split between actualist thought and dispositional perception?
+How do contemporary metacognitive architectures in cognitive psychology distinguish pure informational confidence monitoring from subjective first-person epistemic feelings?
 
 ## Collected sources
 
 - [source-02cd5476f8c84812](https://plato.stanford.edu/entries/consciousness/)
 - [source-f8aa0227079a4ffa](https://plato.stanford.edu/entries/consciousness-higher/)
+- [source-2314f735c2af4cda](https://plato.stanford.edu/entries/self-consciousness/)
+- [source-830b2c85801f445f](https://plato.stanford.edu/entries/qt-consciousness/)
 
-Revision 1 · AI-authored research synthesis; see source scopes in the journal.
+Revision 2 · AI-authored research synthesis; see source scopes in the journal.

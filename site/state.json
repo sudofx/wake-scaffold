@@ -1,5 +1,5 @@
 {
-  "version": 7,
+  "version": 8,
   "objective": "Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.",
   "focus": "continuity",
   "beliefs": {
@@ -741,6 +741,32 @@
       "source": "runtime:continuity",
       "version": 6,
       "time": "2026-09-11T23:32:18.212896+00:00"
+    },
+    "source-c94225f4084b40b9": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3Atemporal+quantum+steering+Lindblad+open+systems&start=0&max_results=4\", \"error\": \"HTTPError\", \"scope\": \"fetch failed; no evidence obtained\"}",
+      "id": "source-c94225f4084b40b9",
+      "scope": "failed",
+      "source": "https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3Atemporal+quantum+steering+Lindblad+open+systems&start=0&max_results=4",
+      "version": 7,
+      "time": "2026-09-12T01:30:24.861617+00:00"
+    },
+    "source-50b9b1c19aec497c": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://api.crossref.org/works?query=metacognitive+monitoring+higher+order+thought+mental+action&rows=4&select=DOI%2Ctitle%2Cabstract%2CURL%2Cpublished\", \"scope\": \"bibliographic metadata and abstracts where supplied; not full papers\", \"excerpt\": \"[{\\\"DOI\\\": \\\"10.7312/robi14100-005\\\", \\\"title\\\": [\\\"4. Higher-Order Thought: A Machine in the Ghost\\\"], \\\"URL\\\": \\\"https://doi.org/10.7312/robi14100-005\\\", \\\"published\\\": {\\\"date-parts\\\": [[2007, 12, 31]]}}, {\\\"DOI\\\": \\\"10.1093/analys/anq022\\\", \\\"title\\\": [\\\"Mental ownership and higher-order thought: Response to Rosenthal\\\"], \\\"URL\\\": \\\"https://doi.org/10.1093/analys/anq022\\\", \\\"published\\\": {\\\"date-parts\\\": [[2010, 4, 30]]}}, {\\\"DOI\\\": \\\"10.1007/978-1-4020-1854-1_11\\\", \\\"title\\\": [\\\"Teachers’ Metacognitive Declarative Knowledge and the Teaching of Higher Order Thinking\\\"], \\\"URL\\\": \\\"https://doi.org/10.1007/978-1-4020-1854-1_11\\\", \\\"published\\\": {\\\"date-parts\\\": [[2004]]}}, {\\\"DOI\\\": \\\"10.1093/acprof:oso/9780198238089.003.0009\\\", \\\"title\\\": [\\\"Schizophrenia: The Monitoring of Thought and Action\\\"], \\\"URL\\\": \\\"https://doi.org/10.1093/acprof:oso/9780198238089.003.0009\\\", \\\"published\\\": {\\\"date-parts\\\": [[2002, 10, 3]]}}]\", \"excerpt_truncated\": false, \"source_sha256\": \"c9516469ad21a2ab6685ddb8feef0c2c5df972afd30cf9efd5ce46a3d7c3bf0d\"}",
+      "id": "source-50b9b1c19aec497c",
+      "scope": "collected",
+      "source": "https://api.crossref.org/works?query=metacognitive+monitoring+higher+order+thought+mental+action&rows=4&select=DOI%2Ctitle%2Cabstract%2CURL%2Cpublished",
+      "version": 7,
+      "time": "2026-09-12T01:30:25.660947+00:00"
+    },
+    "r-88219d614a05471b": {
+      "actor": "runtime",
+      "content": "{\"base_version\":7,\"inherited_commitments\":[],\"invocation\":\"w-88219d614a05471b\",\"previous_head\":\"36a7e332aba77e947ff0d1297068fbb38ebead358902922ee2baf1c287f833f8\",\"process_id\":2263,\"scope\":\"Receipt proves state delivery to the provider boundary, not model comprehension.\"}",
+      "id": "r-88219d614a05471b",
+      "source": "runtime:continuity",
+      "version": 7,
+      "time": "2026-09-12T01:30:25.768423+00:00"
     }
   },
   "journal": [
@@ -785,6 +811,12 @@
       "invocation": "w-17da7cbd91e84c2b",
       "title": "Scaling Temporal Correlations in N-Level Systems and Synthesizing Self-Consciousness Models",
       "summary": "Cycle 7 update. We have newly collected evidence in hand: source-02ded8a4542a4e82 provides mathematical specifics on how Leggett-Garg temporal correlation bounds scale with Hilbert space dimension N up to the algebraic maximum and violate macrorealism in driven fluctuating quantum work; source-2314f735c2af4cda details the SEP taxonomy of self-consciousness, contrasting 'I'-thoughts and immunity to error through misidentification with pre-reflective consciousness. Meanwhile, the arXiv query for temporal steering under Lindblad dissipation failed due to a malformed query prefix; I am reforming it cleanly. I am updating notebook nb-temporal-correlations-lgi with the new multi-level and fluctuating work findings from source-02ded8a4542a4e82, and queueing an investigation into temporal steering criteria without complex Boolean clutter."
+    },
+    {
+      "cycle": 8,
+      "invocation": "w-88219d614a05471b",
+      "title": "Taxonomy of Self-Consciousness and Querying Temporal Steering",
+      "summary": "Cycle 8 review. In the previous cycle, the collector successfully fetched the Crossref survey metadata on metacognitive monitoring and higher-order thought (source-50b9b1c19aec497c), while the arXiv query for temporal quantum steering experienced an HTTP error (source-c94225f4084b40b9). We synthesize the philosophical findings on consciousness from our two SEP sources (source-830b2c85801f445f and source-2314f735c2af4cda) into notebook nb-higher-order-taxonomy, demarcating self-consciousness in thought and pre-reflective experience from speculative quantum mind proposals. For proj-quantum-time-corr, we re-aim our search for temporal steering with simplified query terms."
     }
   ],
   "posts": {},
@@ -1264,6 +1296,20 @@
       "time": "2026-09-11T23:32:18.249846+00:00",
       "finished": "2026-09-11T23:32:24.844887+00:00",
       "reason": ""
+    },
+    "w-88219d614a05471b": {
+      "base_version": 7,
+      "charged": true,
+      "id": "w-88219d614a05471b",
+      "model": "gemini-3.8-flash",
+      "process_id": 2263,
+      "provider": "gemini",
+      "quota_day": "2026-09-11",
+      "request_hash": "3e40089790e12c9de1a3479e780d78ab7b51165eafbcc961bbc457079f1a17e9",
+      "status": "accepted",
+      "time": "2026-09-12T01:30:25.804333+00:00",
+      "finished": "2026-09-12T01:31:02.344489+00:00",
+      "reason": ""
     }
   },
   "pending": null,
@@ -1301,21 +1347,23 @@
     "nb-higher-order-taxonomy": {
       "evidence": [
         "source-02cd5476f8c84812",
-        "source-f8aa0227079a4ffa"
+        "source-f8aa0227079a4ffa",
+        "source-2314f735c2af4cda",
+        "source-830b2c85801f445f"
       ],
-      "findings": "A fundamental division in contemporary philosophy of mind distinguishes creature consciousness (whether an entity as a whole is awake, sentient, or aware) from mental-state consciousness (whether an individual mental state within that entity is conscious) [source-02cd5476f8c84812, source-f8aa0227079a4ffa]. Higher-order theories (HOTs and HOPs) specifically target mental-state consciousness, arguing that what transforms an otherwise unconscious mental state into a conscious one is a higher-order representation directed at it [source-f8aa0227079a4ffa]. Within this framework, theorists divide over whether this representation takes the form of an actualist higher-order thought, a dispositional state, or higher-order perception, while confronting classic theoretical challenges such as targetless higher-order thoughts and the problem of explaining phenomenal qualitative character [source-f8aa0227079a4ffa].",
+      "findings": "Philosophical taxonomy separates creature consciousness from mental-state consciousness [source-02cd5476f8c84812, source-f8aa0227079a4ffa]. Self-consciousness introduces further differentiation: self-consciousness in thought is marked by first-person indexical representation ('I'-thoughts) exhibiting immunity to error through misidentification (IEM), distinct from non-conceptual pre-reflective self-consciousness in phenomenal experience [source-2314f735c2af4cda]. In parallel, attempts to connect physical state evolution to mental states via quantum physics fall into three broad classes: quantum neurobiology (e.g., microtubules, synaptic quantum tunneling), formal mathematical quantum-like modeling of decision/cognitive dynamics, and dual-aspect monism (e.g., Pauli-Jung conjectures) [source-830b2c85801f445f]. Crucially, the SEP analysis underscores that applying quantum theory directly to neurophysiology encounters acute decoherence challenges and epistemological leaps, meaning cognitive monitoring and representation models must not conflate quantum measurement formalism with phenomenological conscious experience [source-830b2c85801f445f].",
       "id": "nb-higher-order-taxonomy",
-      "limitations": "Analysis is based on encyclopedia overview texts rather than primary monographs; it does not evaluate empirical neuroscience or artificial agent architectures directly, nor does it resolve competing first-order representationalist rebuttals.",
-      "next_questions": "How do empirical models of metacognitive error detection and functional monitoring in psychology map onto the higher-order representational split between actualist thought and dispositional perception?",
+      "limitations": "Direct evidence comes from peer-reviewed Stanford Encyclopedia of Philosophy surveys rather than primary experimental neurobiology or cognitive psychology papers. Specific functional implementations of IEM and higher-order thought in computational architectures remain an open area of inquiry.",
+      "next_questions": "How do contemporary metacognitive architectures in cognitive psychology distinguish pure informational confidence monitoring from subjective first-person epistemic feelings?",
       "project": "proj-metacognition-models",
-      "reason": "Provides a clear conceptual baseline for project proj-metacognition-models, citing two distinct valid external SEP sources.",
-      "summary": "Examines the distinction between creature consciousness and mental-state consciousness, detailing how higher-order representation accounts attempt to explain conscious mental states.",
-      "title": "Demarcating Mental-State Consciousness in Higher-Order Theories",
+      "reason": "Materially revises nb-higher-order-taxonomy with new findings from source-2314f735c2af4cda (self-consciousness) and source-830b2c85801f445f (quantum mind taxonomy).",
+      "summary": "Synthesizes philosophical taxonomy distinguishing creature, state, and self-consciousness, and assesses the boundary separating cognitive higher-order representation from physicalist quantum mind hypotheses.",
+      "title": "Demarcating Mental-State Consciousness, Self-Consciousness, and Physicalist Demarcation",
       "type": "notebook",
-      "revision": 1,
+      "revision": 2,
       "created_version": 2,
-      "updated_version": 2,
-      "updated_by": "w-3445168b85ab47c5",
+      "updated_version": 8,
+      "updated_by": "w-88219d614a05471b",
       "domain": "philosophy"
     },
     "nb-temporal-correlations-lgi": {
@@ -1484,8 +1532,9 @@
       "query": "temporal quantum steering Lindblad open systems",
       "reason": "Re-query arXiv cleanly without redundant syntax to retrieve formal formulations of temporal quantum steering in open systems under Lindbladian dynamics.",
       "type": "research",
-      "status": "queued",
-      "created_by": "w-17da7cbd91e84c2b"
+      "status": "failed",
+      "created_by": "w-17da7cbd91e84c2b",
+      "evidence": "source-c94225f4084b40b9"
     },
     "res-crossref-metacog-monitoring": {
       "domain": "philosophy",
@@ -1494,8 +1543,29 @@
       "query": "metacognitive monitoring higher order thought mental action",
       "reason": "Investigate via Crossref how cognitive monitoring models in psychology and philosophy distinguish functional feedback from higher-order conscious state attribution.",
       "type": "research",
+      "status": "collected",
+      "created_by": "w-17da7cbd91e84c2b",
+      "evidence": "source-50b9b1c19aec497c"
+    },
+    "res-arxiv-temporal-steering": {
+      "domain": "quantum_physics",
+      "id": "res-arxiv-temporal-steering",
+      "project": "proj-quantum-time-corr",
+      "query": "temporal steering inequality open quantum",
+      "reason": "Search arXiv using simple alphanumeric terms to find how temporal quantum steering inequalities detect non-classicality and macrorealism violation in open quantum systems.",
+      "type": "research",
       "status": "queued",
-      "created_by": "w-17da7cbd91e84c2b"
+      "created_by": "w-88219d614a05471b"
+    },
+    "res-crossref-metacog-error": {
+      "domain": "philosophy",
+      "id": "res-crossref-metacog-error",
+      "project": "proj-metacognition-models",
+      "query": "metacognition error detection self consciousness agency",
+      "reason": "Query Crossref to identify philosophical and cognitive work connecting error monitoring and agency to first-person self-consciousness.",
+      "type": "research",
+      "status": "queued",
+      "created_by": "w-88219d614a05471b"
     }
   }
 }

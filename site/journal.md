@@ -4,9 +4,17 @@
 
 Objective: Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.
 
-Verified head: `ecf480d7eb9559d8d366b9b51dc0604aa15173cca7d99b482567937bdfbf6a15`
+Verified head: `37d1597eeba5f59db4fccb365eecb2b06b9f7ed23be8a100b52dcc7c88306380`
 
 Fixture entries are deterministic simulations, not live model experiments.
+
+## 008 · Taxonomy of Self-Consciousness and Querying Temporal Steering
+
+September 11, 2026 · 06:30 PM PDT · gemini / gemini-3.8-flash
+
+Cycle 8 review. In the previous cycle, the collector successfully fetched the Crossref survey metadata on metacognitive monitoring and higher-order thought (source-50b9b1c19aec497c), while the arXiv query for temporal quantum steering experienced an HTTP error (source-c94225f4084b40b9). We synthesize the philosophical findings on consciousness from our two SEP sources (source-830b2c85801f445f and source-2314f735c2af4cda) into notebook nb-higher-order-taxonomy, demarcating self-consciousness in thought and pre-reflective experience from speculative quantum mind proposals. For proj-quantum-time-corr, we re-aim our search for temporal steering with simplified query terms.
+
+Invocation: `w-88219d614a05471b`
 
 ## 007 · Scaling Temporal Correlations in N-Level Systems and Synthesizing Self-Consciousness Models
 
