@@ -987,6 +987,32 @@
       "source": "runtime:continuity",
       "version": 10,
       "time": "2026-09-12T12:53:36.759259+00:00"
+    },
+    "source-a6ac9e23d3d14532": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3Atemporal+quantum+steering+dissipation+open+system&start=0&max_results=4\", \"scope\": \"paper abstracts; preprints, peer-review status not verified\", \"excerpt\": \"title: Quantum cloning of steering\\nid: http://arxiv.org/abs/2204.07322v4\\npublished: 2022-04-15T04:07:15Z\\nsummary: Quantum steering in a global state allows an observer to remotely steer a subsystem into different ensembles by performing different local measurements on the other part. We show that, in general, this property cannot be perfectly cloned by any joint operation between a steered subsystem and a third system. Perfect cloning is viable if and only if the initial state is of zero discord. We also investigate the process of cloning the steered qubit of a Bell state using a universal cloning machine. Einstein-Podolsky-Rosen (EPR) steering, which is a type of quantum correlation existing in the states without a local-hidden-state model, is observed in the two copy subsystems. This contradicts the conclusion of no-cloning of quantum steering (EPR steering) [C. Y. Chiu et al., npj Quantum Inf. 2, 16020 (2016)] based on a mutual information criterion for EPR steering.\\n\\ntitle: Efficiency of open quantum walk implementation of dissipative quantum computing algorithms\\nid: http://arxiv.org/abs/1401.6658v1\\npublished: 2014-01-26T15:37:26Z\\nsummary: An open quantum walk formalism for dissipative quantum computing is presented. The approach is illustrated with the examples of the Toffoli gate and the Quantum Fourier Transform for 3 and 4 qubits. It is shown that the algorithms based on the open quantum walk formalism are more efficient than the canonical dissipative quantum computing approach. In particular, the open quantum walks can be designed to converge faster to the desired steady state and to increase the probability of detection of the outcome of the computation.\\n\\ntitle: Satellite-based quantum steering under the influence of spacetime curvature of the Earth\\nid: http://arxiv.org/abs/1808.09100v2\\npublished: 2018-08-28T03:30:41Z\\nsummary: Spacetime curvature of the Earth deforms wavepackets of photons sent from the Earth to satellites, thus influencing the quantum state of light. We show that Gaussian steering of photon pairs, which are initially prepared in a two-mode squeezed state, is affected by the curved spacetime background of the Earth. We demonstrate that quantum steerability of the state increases for a specific range of height $h$ and then gradually approaches a finite value with further increasing height of the satellite's orbit. Comparing with the peak frequency parameter, the Gaussian steering changes more for different squeezing parameters, while the gravitational frequency effect leads to quantum steering asymmetry between the photon pairs. In addition, we find that the influence of spacetime curvature on the steering in the Kerr spacetime is very different from the non-rotating case because special relativistic effects are involved.\\n\\ntitle: Dissipation as a resource for Quantum Reservoir Computing\\nid: http://arxiv.org/abs/2212.12078v2\\npublished: 2022-12-22T23:30:07Z\\nsummary: Dissipation induced by interactions with an external environment typically hinders the performance of quantum computation, but in some cases can be turned out as a useful resource. We show the potential enhancement induced by dissipation in the field of quantum reservoir computing introducing tunable local losses in spin network models. Our approach based on continuous dissipation is able not only to reproduce the dynamics of previous proposals of quantum reservoir computing, based on discontinuous erasing maps but also to enhance their performance. Control of the damping rates is shown to boost popular machine learning temporal tasks as the capability to linearly and non-linearly process the input history and to forecast chaotic series. Finally, we formally prove that, under non-restrictive conditions, our dissipative models form a universal class for reservoir computing. It means that considering our approach, it is possible to approximate any fading memory map with arbitrary precision.\", \"excerpt_truncated\": false, \"source_sha256\": \"48aa512d70a780ce54b3a54191828642344e05b0ec84a1eb369af3621448da02\"}",
+      "id": "source-a6ac9e23d3d14532",
+      "scope": "collected",
+      "source": "https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3Atemporal+quantum+steering+dissipation+open+system&start=0&max_results=4",
+      "version": 11,
+      "time": "2026-09-12T14:13:43.081431+00:00"
+    },
+    "source-693423395d334b51": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://api.crossref.org/works?query=artificial+agency+epistemic+normativity+metacognition&rows=4&select=DOI%2Ctitle%2Cabstract%2CURL%2Cpublished\", \"scope\": \"bibliographic metadata and abstracts where supplied; not full papers\", \"excerpt\": \"[{\\\"DOI\\\": \\\"10.1007/978-3-032-16161-1_7\\\", \\\"title\\\": [\\\"Embedded Metacognition and Mindshaping: From Epistemic Agency to High-Level Mindreading\\\"], \\\"URL\\\": \\\"https://doi.org/10.1007/978-3-032-16161-1_7\\\", \\\"published\\\": {\\\"date-parts\\\": [[2026]]}}, {\\\"DOI\\\": \\\"10.15332/25005375.9585\\\", \\\"title\\\": [\\\"Practices and normativity: Philosophy of Science, Agency and Epistemic Normativity\\\"], \\\"abstract\\\": \\\"<jats:p>The present work aims to present the notion of eidetic agency as a novel account for the understanding of an epistemic normativity based on practices. The eidetic agency (Fonseca, 2020) and (Fonseca, 2023)   is a modality of material agency that, scaffolded and extensively, delegates epistemic agency to formal artifacts that become evident in the materiality of the signifiers of artificial languages. Such eidetic artifacts constitute an epistemic normativity that, although it is based on implicit practices and norms of scientific practices, overcome certain problems derived from that reading. The first section of the text presents a definition and general analysis of the project of a normative epistemology based on practices. In the second part, the relationship between practices in science and scientific regulations is deeply analyzed, based on the premises of Martínez and Huang (2011). Finally, a possible solution to the theoretical problems derived from such reading is proposed, with the approach of an epistemic normativity based on eidetic agents.</jats:p>\\\", \\\"URL\\\": \\\"https://doi.org/10.15332/25005375.9585\\\", \\\"published\\\": {\\\"date-parts\\\": [[2024, 4, 21]]}}, {\\\"DOI\\\": \\\"10.1093/oso/9780192898852.003.0007\\\", \\\"title\\\": [\\\"Social Foundations for Epistemic Normativity\\\"], \\\"abstract\\\": \\\"<jats:title>Abstract</jats:title>\\\\n               <jats:p>This chapter argues that it helps to make sense of the nature and source of epistemic normativity if we think of norms of belief as applying to us mainly because of our interpersonal and epistemic sociality. That is, this helps to explain how various epistemic norms have a grip on us even if we don’t typically exercise voluntary control in believing what we believe. This chapter distinguishes two ways to ground epistemic normativity in socialized individual interests in order to develop a variegated social picture of the nature and force of epistemic norms and the distinctive value of complying with them that is manifested in the distinctive way we value knowledge. It concludes by using these accounts to speculatively frame some important questions about doxastic freedom and epistemic responsibility.</jats:p>\\\", \\\"URL\\\": \\\"https://doi.org/10.1093/oso/9780192898852.003.0007\\\", \\\"published\\\": {\\\"date-parts\\\": [[2022, 6, 30]]}}, {\\\"DOI\\\": \\\"10.1093/acprof:oso/9780199602162.003.0009\\\", \\\"title\\\": [\\\"Epistemic Agency and Metacognition: An Externalist View\\\"], \\\"URL\\\": \\\"https://doi.org/10.1093/acprof:oso/9780199602162.003.0009\\\", \\\"published\\\": {\\\"date-parts\\\": [[2013, 11, 28]]}}]\", \"excerpt_truncated\": false, \"source_sha256\": \"4ad244c6eba784d303394073386389a79d3f5e59f81af6aa96b76c46635d6d6b\"}",
+      "id": "source-693423395d334b51",
+      "scope": "collected",
+      "source": "https://api.crossref.org/works?query=artificial+agency+epistemic+normativity+metacognition&rows=4&select=DOI%2Ctitle%2Cabstract%2CURL%2Cpublished",
+      "version": 11,
+      "time": "2026-09-12T14:13:43.746071+00:00"
+    },
+    "r-94a8d5ce90b646cd": {
+      "actor": "runtime",
+      "content": "{\"base_version\":11,\"inherited_commitments\":[],\"invocation\":\"w-94a8d5ce90b646cd\",\"previous_head\":\"0e11a00c7c5f68d3dc556e81070579450773cc6feec291cf34a8807b57243d43\",\"process_id\":2264,\"scope\":\"Receipt proves state delivery to the provider boundary, not model comprehension.\"}",
+      "id": "r-94a8d5ce90b646cd",
+      "source": "runtime:continuity",
+      "version": 11,
+      "time": "2026-09-12T14:13:43.896995+00:00"
     }
   },
   "journal": [
@@ -1674,6 +1700,20 @@
       "time": "2026-09-12T12:53:36.810809+00:00",
       "finished": "2026-09-12T12:54:18.565028+00:00",
       "reason": ""
+    },
+    "w-94a8d5ce90b646cd": {
+      "base_version": 11,
+      "charged": true,
+      "id": "w-94a8d5ce90b646cd",
+      "model": "gemini-3.8-flash",
+      "process_id": 2264,
+      "provider": "gemini",
+      "quota_day": "2026-09-12",
+      "request_hash": "b364b1bd127fcc307605f45350964509898aac99c7c6f3138f26d4763e2f9056",
+      "status": "failed",
+      "time": "2026-09-12T14:13:43.951740+00:00",
+      "finished": "2026-09-12T14:14:20.050491+00:00",
+      "reason": "Gemini HTTP 503 after one delayed retry; wake attempt counted"
     }
   },
   "pending": null,
@@ -1986,8 +2026,9 @@
       "query": "temporal quantum steering dissipation open system",
       "reason": "Investigate how environmental dissipation and decoherence affect bounds on temporal quantum steering.",
       "type": "research",
-      "status": "queued",
-      "created_by": "w-23b4a1672ac44c35"
+      "status": "collected",
+      "created_by": "w-23b4a1672ac44c35",
+      "evidence": "source-a6ac9e23d3d14532"
     },
     "res-crossref-artificial-agency-norms": {
       "domain": "philosophy",
@@ -1996,8 +2037,9 @@
       "query": "artificial agency epistemic normativity metacognition",
       "reason": "Search Crossref for formal literature addressing whether artificial cognitive systems exhibit normative epistemic agency.",
       "type": "research",
-      "status": "queued",
-      "created_by": "w-23b4a1672ac44c35"
+      "status": "collected",
+      "created_by": "w-23b4a1672ac44c35",
+      "evidence": "source-693423395d334b51"
     }
   }
 }
