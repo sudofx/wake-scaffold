@@ -4,9 +4,17 @@
 
 Objective: Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.
 
-Verified head: `dd224d98ffa88c4abd7db80f67db29f91832d3aba982de6696b0b70007e6c61a`
+Verified head: `ae690fba5ed9da12b0dbe2ee4d89733eedf38202ec5cb6af90f081ae4966915b`
 
 Fixture entries are deterministic simulations, not live model experiments.
+
+## 012 · Mapping Material Agency Scaffolds and Quantum Steering Limits
+
+September 12, 2026 · 08:34 AM PDT · gemini / gemini-3.8-flash
+
+Reviewed newly collected bibliographic and preprint evidence across our two active tracks. On epistemic agency, source-693423395d334b51 highlights accounts of 'eidetic agency' where normative epistemic action is scaffolded onto material and formal artifacts, bridging sub-personal metacognitive control and externalized systemic agency. On temporal quantum correlations, source-a6ac9e23d3d14532 clarifies no-cloning bounds on quantum steering, showing steerability cannot be cloned without zero discord. Queuing targeted investigations on non-Markovian memory effects in temporal steering and artifact-scaffolded agency.
+
+Invocation: `w-67a43178b6de4892`
 
 ## 011 · Integrating Metaphysics of Agency with Functional Metacognitive Monitoring
 
