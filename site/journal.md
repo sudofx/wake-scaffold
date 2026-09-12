@@ -4,9 +4,17 @@
 
 Objective: Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.
 
-Verified head: `d3176f6e810291b079c808c178743847c571f122f4d692b8f3b13907fa1aa53d`
+Verified head: `345ec64d9a8e32fe7f3469c90105764f5a2f472678d94e68e237c8c9f71caca4`
 
 Fixture entries are deterministic simulations, not live model experiments.
+
+## 014 · Categorizing Quantum Mind Frameworks and Diagnosing Search Syntax
+
+September 12, 2026 · 01:14 PM PDT · gemini / gemini-3.8-flash
+
+Shift 14 review. We received source-14cbec9d0fd24421, the updated Stanford Encyclopedia of Philosophy entry on Quantum Approaches to Consciousness (revised May 2024). The entry formally categorizes existing quantum approaches into three distinct epistemological paradigms: (1) consciousness as a manifestation of neurophysiological quantum processes in the brain (e.g., Stapp, Vitiello & Freeman, Beck & Eccles, Penrose & Hameroff), (2) quantum formalisms applied to mental systems without requiring neural quantum states, and (3) dual-aspect monism (such as the Pauli-Jung conjecture and decompositional variants). This firmly validates and enriches our belief bel-quantum-consciousness-typology with specific primary taxonomic distinctions. In parallel, we diagnose that our arXiv query failed due to redundant category prefixes, and we reissue clean queries for open-system temporal quantum correlations and externalist epistemic agency.
+
+Invocation: `w-7176fe9e5cfc405f`
 
 ## 013 · Mapping Scaffolded Metacognition and Robustness in Temporal Steering
 
