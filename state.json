@@ -863,6 +863,32 @@
       "source": "runtime:continuity",
       "version": 9,
       "time": "2026-09-12T08:06:58.057024+00:00"
+    },
+    "source-cc63fc0358664c57": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3Atemporal+quantum+steering+non-Markovian+memory+decoherence&start=0&max_results=4\", \"error\": \"TimeoutError\", \"scope\": \"fetch failed; no evidence obtained\"}",
+      "id": "source-cc63fc0358664c57",
+      "scope": "failed",
+      "source": "https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3Atemporal+quantum+steering+non-Markovian+memory+decoherence&start=0&max_results=4",
+      "version": 10,
+      "time": "2026-09-12T11:13:34.629903+00:00"
+    },
+    "source-42dca65212d14ad4": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://plato.stanford.edu/entries/agency/\", \"scope\": \"extracted web-page text; may be incomplete\", \"excerpt\": \"Agency (Stanford Encyclopedia of Philosophy)\\nStanford Encyclopedia of Philosophy\\nMenu\\nBrowse\\nTable of Contents\\nWhat's New\\nRandom Entry\\nChronological\\nArchives\\nAbout\\nEditorial Information\\nAbout the SEP\\nEditorial Board\\nHow to Cite the SEP\\nSpecial Characters\\nAdvanced Tools\\nContact\\nSupport SEP\\nSupport the SEP\\nPDFs for SEP Friends\\nMake a Donation\\nSEPIA for Libraries\\nEntry Navigation\\nEntry Contents\\nBibliography\\nAcademic Tools\\nFriends PDF Preview\\nAuthor and Citation Info\\nBack to Top\\nAgency\\nFirst published Mon Aug 10, 2015; substantive revision Mon Oct 28, 2019\\nIn very general terms, an agent is a being with the capacity to\\nact, and ‘agency’ denotes the exercise or manifestation of\\nthis capacity. The philosophy of action provides us with a standard\\nconception and a standard theory of action. The former construes\\naction in terms of intentionality, the latter explains the\\nintentionality of action in terms of causation by the agent’s\\nmental states and events. From this, we obtain a standard conception\\nand a standard theory of agency. There are alternative conceptions of\\nagency, and it has been argued that the standard theory fails to\\ncapture agency (or distinctively human agency). Further, it seems that\\ngenuine agency can be exhibited by beings that are not capable of\\nintentional action, and it has been argued that agency can and should\\nbe explained without reference to causally efficacious mental states\\nand events.\\nDebates about the nature of agency have flourished over the past\\nfew decades in philosophy and in other areas of research (including\\npsychology, cognitive neuroscience, social science, and\\nanthropology). In philosophy, the nature of agency is an important\\nissue in the philosophy of mind, the philosophy of psychology, the\\ndebates on free will and moral responsibility, in ethics, meta-ethics,\\nand in the debates on the nature of reasons and practical\\nrationality. For the most part, this entry focuses on conceptual and\\nmetaphysical questions concerning the nature of agency. In the final\\nsections, it provides an overview of empirically informed accounts of\\nthe sense of agency and of various empirical challenges to the\\ncommonsense assumption that our reasons and our conscious intentions\\nmake a real difference to how we act.\\n1. Introduction\\n2. Conceptions, theories, and kinds of agency\\n2.1 Agency as intentional action\\n2.2 Agency as initiation by the agent\\n2.3 Agency and distinctively human action\\n2.4 Agency without mental representations\\n2.5 Other kinds of agency: mental, epistemic, shared, collective, relational, artificial\\n3. The metaphysics of agency\\n3.1 Three metaphysical frameworks\\n3.2 Deviant causal chains\\n3.3 Disappearing agents, naturalism, and dual standpoint theory\\n3.4 Actions, events, processes, and omissions\\n4. Empirical challenges and the role of consciousness\\n4.1 Reasons and causes\\n4.2 Situationism\\n4.3 The Libet experiment and Wegner’s challenge\\n4.4 Automaticity and dual-system theory\\n4.5 The sense of agency\\n4.6 Perception and attention\\nBibliography\\nAcademic Tools\\nOther Internet Resources\\nRelated Entries\\n1. Introduction\\nIn a very broad sense, agency is virtually everywhere. Whenever\\nentities enter into causal relationships, they can be said to act on\\neach other and interact with each other, bringing about changes in\\neach other. In this very broad sense, it is possible to identify\\nagents and agency, and patients and patiency, virtually \\neverywhere.\\n[\\n1\\n]\\nUsually, though, the term ‘agency’ is used in a much narrower sense to denote the performance of intentional actions. This\\nway of thinking about agency has a long history in philosophy and it\\ncan be traced back to Hume and Aristotle, among other historical\\nfigures. In contemporary analytic philosophy, it is most commonly\\nassociated with the influential work of Anscombe (1957) and Davidson\\n(1963). Anscombe’s and Davidson’s views differ\\nsignificantly in many respects, but they share the central doctrine\\nthat action is to be explained in terms of the intentionality of intentional action. In the debates that followed, the philosophy of\\naction revolved largely around the notion of intentional action. For\\nsome time, the term ‘agency’ was rarely used, and if it was, it was usually taken to refer to the exercise of the capacity to perform intentional actions.\\n[\\n2\\n]\\nThis has changed in the more recent\\ndebate, where talk about agency has become more and more common in\\nmany areas of philosophy (and in other areas of\\nresearch).\\n[\\n3\\n]\\nTo\\nsome extent, this focus on the notion of agency has been fuelled by a\\nresistance to the assimilation of agency to intentional action. As we\\nwill see in the following section, this resistance amounts in some\\ncases to the rejection of the standard\\nconception\\nof action,\\nin some cases it amounts to the rejection of the\\nstandard\\ntheory\\nof action, and in some it amounts to the\\nmore modest claim that there are different\\nkinds\\nof\\nagency.\\n2. Conceptions, theories, and kinds of agency\\nThe contributions of Anscombe and Davidson have established a\\nstandard conception of action, and Davidson’s work has provided\\nthe groundwork for a standard theory of action. At the core of the\\nstandard conception are the following two claims. First, the notion of\\nintentional action is more fundamental than the notion of action. In\\nparticular, action is to be explained in terms of the intentionality\\nof intentional action. Second, there is a close connection between\\nintentional action and acting for a reason.\\nThere are two ways of spelling out the first claim (which\\ncorrespond to two different views on the individuation of actions; see\\nsection 3.4\\n). According to the first, one\\nand the same event can be more than one action\\nunder different\\ndescriptions\\n, and an event is an action just in case it is an\\nintentional action under\\nsome\\ndescription. An action, that\\nis, may be intentional under some description and unintentional under\\nothers (Anscombe 1957; Davidson 1963). Suppose that you alert the\\nburglar by turning on the light, and suppose that this is one event\\nthat is intentional under the description ‘turning on the\\nlight’, but not under ‘alerting the burglar’. On this view, alerting the burglar is nevertheless something that you do,\\ngiven that the event is an intentional action under some description.\\nAccording to a second way of spelling out the first claim, something\\nis an action either if it is identical with or “generated\\nby” an intentional action (Goldman 1970; see also Ginet\\n1990).\\n[\\n4\\n]\\nOn this view, alerting the burglar is an action of yours either if it\\nis an intentional action or if it is generated by an intentional\\naction (your turning on the light, in this case). If it is merely\\ngenerated by an intentional action, it is an unintentional action of\\nyours. On both views, intentional action is more fundamental than\\naction itself: action derives from and is dependent on intentional\\naction.\\n[\\n5\\n]\\nAccording to the second claim of the standard conception, there is\\na close connection between acting intentionally and acting for a\\nreason. According to Anscombe and Davidson’s early view, this\\nclose connection is identity. Following Aristotle, they both held the\\nview that to act intentionally is to act for a reason, and that to\\nact for a reason is to act in a way that can be rationalized by the\\npremises of a sound practical syllogism, which consists, typically,\\nof a major premise that corresponds to the agent’s goal and a\\nminor premise that corresponds to the agent’s take on how to\\nattain the goal. Furthermore, Davidson held the view that having an\\nintention consists in having a desire and a belief that correspond to\\nthe major and the minor premise of the relevant syllogism (Davidson\\n1963, 1970; see also Goldman 1970; Audi\\n1986).\\n[\\n6\\n]\\nOne can still find a fairly widespread commitment to this\\ndesire-belief version of the standard conception (in the philosophy of\\nmind, the philosophy of psychology, ethics, meta-ethics, and in other\\nareas of research). In the philosophy of action, however, it is now\\nwidely thought that intentions cannot be reduced to desires and\\nbeliefs (and combinations thereof). On this view, intentions play a\\ncrucial and irreducible role in practical reasoning, long-term\\nplanning, and in the initiation and guidance of action (see,\\nespecially, Bratman 1987; see also Harman 1976; Brand 1984; Bishop\\n1989; Mele 1992, 2003; Enç 2003). It is nevertheless still\\nwidely accepted that there is a close connection between intentional\\naction and acting for reasons and that intentional actions are\\ntypically performed for reasons (Mele and Moser 1994; Mele 2003;\\nEnç 2003; Clarke 2010b, for instance).\\nThe standard\\nconception\\nis not committed to a particular\\naccount of what it is to act intentionally and for reasons, and it is\\nnot committed to a particular account of the nature of reason\\nexplanations. It is important to distinguish the standard conception\\nfrom the standard\\ntheory\\n, which provides a causal account of\\nintentional action and reason explanation. This theory says, very\\nroughly, that something is an intentional action and done for reasons\\njust in case it is caused by the right mental states and events in the\\nright way. The right mental states and events are states and events\\nthat rationalize the action from the agent’s point of view (such\\nas desires, beliefs, and intentions). The right way of causation is\\nnon-deviant causation (see\\nsection 3.2\\n). On this view, a reason explanation is an explanation in terms of\\nmental states and events that cause the action and that rationalize it\\nfrom the agent’s point of view (typically by providing a\\nmeans-end rationale). This theory is often called “the causal\\ntheory of action”. Strictly speaking, it is an event-causal\\ntheory and it consists of an event-causal theory of reason explanation\\nand an event-causal theory of intentional action. In conjunction with\\nthe standard conception, this causal theory provides us with a theory\\nof action, which has been the standard theory in the contemporary\\nphilosophy of mind and ac\", \"excerpt_truncated\": true, \"source_sha256\": \"f0700b7d0d04dff589a90e959e62aa7bc244c20922ef46c28fb5e2d68fc3c875\"}",
+      "id": "source-42dca65212d14ad4",
+      "scope": "collected",
+      "source": "https://plato.stanford.edu/entries/agency/",
+      "version": 10,
+      "time": "2026-09-12T11:13:35.063237+00:00"
+    },
+    "r-c6c402a32488489a": {
+      "actor": "runtime",
+      "content": "{\"base_version\":10,\"inherited_commitments\":[],\"invocation\":\"w-c6c402a32488489a\",\"previous_head\":\"85bc3c4451f247f9adfdee97b8aa57087ea5285caaca74a90eaf40c3c74a75c9\",\"process_id\":2253,\"scope\":\"Receipt proves state delivery to the provider boundary, not model comprehension.\"}",
+      "id": "r-c6c402a32488489a",
+      "source": "runtime:continuity",
+      "version": 10,
+      "time": "2026-09-12T11:13:35.196392+00:00"
     }
   },
   "journal": [
@@ -1460,6 +1486,20 @@
       "time": "2026-09-12T08:06:58.090284+00:00",
       "finished": "2026-09-12T08:07:12.287875+00:00",
       "reason": ""
+    },
+    "w-c6c402a32488489a": {
+      "base_version": 10,
+      "charged": true,
+      "id": "w-c6c402a32488489a",
+      "model": "gemini-3.8-flash",
+      "process_id": 2253,
+      "provider": "gemini",
+      "quota_day": "2026-09-12",
+      "request_hash": "471e66772a95da8bc05b3d8fb126fbe910d7c82652c586f03a46f7fcec7bc4ad",
+      "status": "failed",
+      "time": "2026-09-12T11:13:35.242219+00:00",
+      "finished": "2026-09-12T11:14:08.602837+00:00",
+      "reason": "Gemini HTTP 503 after one delayed retry; wake attempt counted"
     }
   },
   "pending": null,
@@ -1749,8 +1789,9 @@
       "query": "temporal quantum steering non-Markovian memory decoherence",
       "reason": "Investigate how non-Markovian memory kernels affect temporal steering inequality violations compared to memoryless Lindbladian evolution.",
       "type": "research",
-      "status": "queued",
-      "created_by": "w-8c0a93ea88674b91"
+      "status": "failed",
+      "created_by": "w-8c0a93ea88674b91",
+      "evidence": "source-cc63fc0358664c57"
     },
     "res-sep-agency": {
       "domain": "philosophy",
@@ -1760,8 +1801,9 @@
       "reason": "Examine the SEP entry on Agency to formalize the criteria separating standard intentional action from sub-personal metacognitive regulation.",
       "type": "research",
       "url": "https://plato.stanford.edu/entries/agency/",
-      "status": "queued",
-      "created_by": "w-8c0a93ea88674b91"
+      "status": "collected",
+      "created_by": "w-8c0a93ea88674b91",
+      "evidence": "source-42dca65212d14ad4"
     }
   }
 }
