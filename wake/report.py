@@ -27,7 +27,6 @@ def _pretty(value):
 
 def _md_code(value, language="json"):
     text = value if isinstance(value, str) else _pretty(value)
-    text = text.replace("WAKE✳︎", "WAKE✳").replace("WAKE✳", "WAKE✳︎")
     fence = "```"
     while fence in text:
         fence += "`"
@@ -36,15 +35,12 @@ def _md_code(value, language="json"):
 
 def _html_pre(value):
     text = value if isinstance(value, str) else _pretty(value)
-    # Presentation-only normalization: keep canonical JSON untouched while forcing
-    # the text-style asterisk in readable exports, including historical prompts.
-    text = text.replace("WAKE✳︎", "WAKE✳").replace("WAKE✳", "WAKE✳︎")
     return f"<pre>{html.escape(text)}</pre>"
 
 
 def _human_events_markdown(events, head):
     lines = [
-        "# WAKE✳︎ — Human-readable event history",
+        "# WAKE✳ — Human-readable event history",
         "",
         "> A presentation layer over `events.jsonl`. The JSONL file remains the canonical audit export.",
         "",
@@ -114,7 +110,7 @@ def _human_events_markdown(events, head):
 
 def _human_state_markdown(state, head):
     lines = [
-        "# WAKE✳︎ — Human-readable durable state",
+        "# WAKE✳ — Human-readable durable state",
         "",
         "> A presentation layer over `state.json`. The JSON file remains the canonical state export.",
         "",
@@ -156,17 +152,15 @@ def _human_state_markdown(state, head):
 
 
 def _human_page(title, subtitle, body, head, raw_href, markdown_href):
-    favicon = "data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2712%27 fill=%27%23f7f3ea%27/%3E%3Cpath d=%27M32 9v46M9 32h46M15.7 15.7l32.6 32.6M48.3 15.7L15.7 48.3%27 stroke=%27%23286d72%27 stroke-width=%276%27 stroke-linecap=%27round%27/%3E%3C/svg%3E"
     return f"""<!doctype html>
 <html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">
-<meta name=\"theme-color\" media=\"(prefers-color-scheme: light)\" content=\"#f7f3ea\"><meta name=\"theme-color\" media=\"(prefers-color-scheme: dark)\" content=\"#24283b\">
-<link rel=\"icon\" href=\"{favicon}\"><title>{html.escape(title)} · WAKE✳︎</title>
-<script>try{{const saved=localStorage.getItem('wake-theme');const dark=saved?saved==='dark':matchMedia('(prefers-color-scheme:dark)').matches;if(dark)document.documentElement.dataset.theme='dark'}}catch{{}}</script>
+<title>{html.escape(title)}</title>
 <style>
-:root{{--paper:#f7f3ea;--ink:#242335;--muted:#615f6f;--line:#d8d0c5;--accent:#7b3fc6;--green:#286d72;--pale:#ece6f0;--surface:#fffaf2;--mono:ui-monospace,SFMono-Regular,Consolas,monospace;--sans:Arial,Helvetica,sans-serif;--serif:Georgia,'Times New Roman',serif}}
-:root[data-theme=dark]{{--paper:#24283b;--ink:#c0caf5;--muted:#a9b1d6;--line:#414868;--accent:#c69cff;--green:#7dcfff;--pale:#292e42;--surface:#1f2335}}
-*{{box-sizing:border-box}}html{{scroll-behavior:smooth}}body{{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 var(--sans)}}a{{color:inherit;text-decoration:none}}a:hover{{text-decoration:underline;text-underline-offset:5px}}button,summary{{font:inherit;color:inherit}}button{{cursor:pointer}}main{{max-width:1120px;margin:auto;padding:32px 28px 90px}}header{{border-bottom:1px solid var(--ink);padding-bottom:24px;margin-bottom:30px}}.topline{{display:flex;align-items:center;justify-content:space-between;gap:18px}}.wordmark{{font-size:30px;font-weight:900;letter-spacing:-1.7px}}.wordmark b{{color:var(--green)}}.theme-toggle{{border:1px solid var(--line);background:var(--surface);padding:8px 10px;font:10px var(--mono);letter-spacing:.08em}}.eyebrow{{font:10px var(--mono);letter-spacing:1.5px;color:var(--green);margin:26px 0 10px}}h1{{font:400 clamp(2.4rem,6vw,4.8rem)/1.03 var(--serif);letter-spacing:-.035em;margin:.1em 0 .3em}}h2{{font:400 1.7rem/1.2 var(--serif);margin:38px 0 14px}}h3{{font-size:14px;margin:24px 0 10px}}nav{{display:flex;gap:20px;flex-wrap:wrap;margin-top:18px;font:10px var(--mono);color:var(--muted)}}.meta{{color:var(--muted);font:11px/1.6 var(--mono)}}details{{background:var(--surface);border:1px solid var(--line);margin:12px 0;padding:0 16px}}summary{{cursor:pointer;padding:15px 0;font:11px var(--mono);color:var(--green)}}.inside{{border-top:1px solid var(--line);padding:14px 0 18px}}pre{{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--pale);padding:16px;font:11px/1.7 var(--mono);max-height:560px;overflow:auto}}code{{font-family:var(--mono);overflow-wrap:anywhere}}.tag{{display:inline-block;border:1px solid var(--line);padding:2px 8px;font-size:.78rem;margin-right:8px;color:var(--accent)}}.event-links{{font-size:.9rem;color:var(--muted)}}hr{{border:0;border-top:1px solid var(--line);margin:28px 0}}@media(max-width:680px){{main{{padding:24px 18px 70px}}h1{{font-size:2.7rem}}.topline{{align-items:flex-start}}}}
-</style></head><body><main><header><div class=\"topline\"><a class=\"wordmark\" href=\"index.html\">WAKE<b>✳︎</b></a><button id=\"theme-toggle\" class=\"theme-toggle\" type=\"button\">DARK</button></div><div class=\"eyebrow\">READABLE EXPORT</div><h1>{html.escape(title)}</h1><p>{html.escape(subtitle)}</p><p class=\"meta\">Verified head: <code>{html.escape(head)}</code></p><nav><a href=\"index.html\">Main journal</a><a href=\"{html.escape(markdown_href)}\">Markdown source</a><a href=\"{html.escape(raw_href)}\">Raw data</a></nav></header>{body}</main><script>(()=>{{const b=document.getElementById('theme-toggle');const sync=()=>{{const d=document.documentElement.dataset.theme==='dark';b.textContent=d?'LIGHT':'DARK';b.setAttribute('aria-label',d?'Use light theme':'Use dark theme')}};sync();b.addEventListener('click',()=>{{const d=document.documentElement.dataset.theme==='dark';if(d)delete document.documentElement.dataset.theme;else document.documentElement.dataset.theme='dark';try{{localStorage.setItem('wake-theme',d?'light':'dark')}}catch{{}}sync()}})}})();</script></body></html>"""
+:root{{color-scheme:light dark;--bg:#f3f0e8;--fg:#181818;--muted:#666;--card:#fff;--line:#d7d1c5;--accent:#b64a2c}}
+@media(prefers-color-scheme:dark){{:root{{--bg:#171715;--fg:#eee;--muted:#aaa;--card:#22221f;--line:#3a3933;--accent:#e47b58}}}}
+*{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif}}main{{max-width:1100px;margin:auto;padding:28px 18px 80px}}header{{border-bottom:1px solid var(--line);padding-bottom:22px;margin-bottom:24px}}h1{{font-size:clamp(2rem,5vw,4rem);line-height:1;margin:.15em 0}}h2{{margin-top:0}}a{{color:var(--accent)}}nav{{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px}}.meta{{color:var(--muted)}}details{{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:12px 0;padding:0 14px}}summary{{cursor:pointer;padding:14px 0;font-weight:700}}.inside{{border-top:1px solid var(--line);padding:12px 0 18px}}pre{{white-space:pre-wrap;overflow-wrap:anywhere;background:rgba(127,127,127,.08);padding:14px;border-radius:8px;font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace}}code{{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}}.tag{{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:1px 8px;font-size:.78rem;margin-right:8px}}.event-links{{font-size:.9rem}}hr{{border:0;border-top:1px solid var(--line);margin:24px 0}}
+</style></head><body><main><header><div class=\"meta\">WAKE✳ / READABLE EXPORT</div><h1>{html.escape(title)}</h1><p>{html.escape(subtitle)}</p><p class=\"meta\">Verified head: <code>{html.escape(head)}</code></p><nav><a href=\"index.html\">Main journal</a><a href=\"{html.escape(markdown_href)}\">Markdown</a><a href=\"{html.escape(raw_href)}\">Raw data</a></nav></header>{body}</main></body></html>"""
+
 
 def _human_events_html(events, head):
     cards = []
@@ -236,16 +230,15 @@ def _human_state_html(state, head):
 
 def _reading_page(title, eyebrow, body, source_href, back_href="../index.html"):
     """Standalone browser reading page; Markdown remains a secondary flat artifact."""
-    favicon = "data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2712%27 fill=%27%23f7f3ea%27/%3E%3Cpath d=%27M32 9v46M9 32h46M15.7 15.7l32.6 32.6M48.3 15.7L15.7 48.3%27 stroke=%27%23286d72%27 stroke-width=%276%27 stroke-linecap=%27round%27/%3E%3C/svg%3E"
     return f"""<!doctype html>
 <html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">
-<meta name=\"theme-color\" media=\"(prefers-color-scheme: light)\" content=\"#f7f3ea\"><meta name=\"theme-color\" media=\"(prefers-color-scheme: dark)\" content=\"#24283b\"><link rel=\"icon\" href=\"{favicon}\"><title>{html.escape(title)} · WAKE✳︎</title>
-<script>try{{const saved=localStorage.getItem('wake-theme');const dark=saved?saved==='dark':matchMedia('(prefers-color-scheme:dark)').matches;if(dark)document.documentElement.dataset.theme='dark'}}catch{{}}</script>
+<title>{html.escape(title)} · WAKE✳</title>
 <style>
-:root{{--paper:#f7f3ea;--ink:#242335;--muted:#615f6f;--line:#d8d0c5;--accent:#7b3fc6;--green:#286d72;--pale:#ece6f0;--surface:#fffaf2;--mono:ui-monospace,SFMono-Regular,Consolas,monospace;--sans:Arial,Helvetica,sans-serif;--serif:Georgia,'Times New Roman',serif}}
-:root[data-theme=dark]{{--paper:#24283b;--ink:#c0caf5;--muted:#a9b1d6;--line:#414868;--accent:#c69cff;--green:#7dcfff;--pale:#292e42;--surface:#1f2335}}
-*{{box-sizing:border-box}}body{{margin:0;background:var(--paper);color:var(--ink);font:17px/1.72 var(--serif)}}main{{max-width:840px;margin:auto;padding:34px 22px 90px}}header{{border-bottom:1px solid var(--ink);padding-bottom:24px;margin-bottom:34px}}.topline{{display:flex;align-items:center;justify-content:space-between;gap:18px}}.wordmark{{font:900 29px/1 var(--sans);letter-spacing:-1.7px;color:inherit;text-decoration:none}}.wordmark b{{color:var(--green)}}.theme-toggle{{border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 10px;font:10px var(--mono);letter-spacing:.08em;cursor:pointer}}h1{{font:400 clamp(2.4rem,7vw,4.8rem)/1.02 var(--serif);letter-spacing:-.035em;margin:.18em 0 .3em}}h2{{font:400 1.8rem/1.2 var(--serif);margin-top:2.2em}}h3{{font:700 14px var(--sans);margin-top:2em}}a{{color:var(--green)}}nav{{display:flex;gap:18px;flex-wrap:wrap;margin-top:17px;font:10px var(--mono)}}.eyebrow,.meta{{font:10px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.1em}}.eyebrow{{color:var(--green);margin-top:24px}}.lede{{font-size:1.25rem;line-height:1.55}}.note{{border-left:3px solid var(--accent);padding:2px 0 2px 18px;margin:28px 0}}.sources{{font-family:var(--sans);font-size:.95rem}}code{{font-family:var(--mono)}}hr{{border:0;border-top:1px solid var(--line);margin:34px 0}}small{{color:var(--muted)}}@media(max-width:680px){{main{{padding:24px 18px 70px}}h1{{font-size:2.7rem}}}}
-</style></head><body><main><header><div class=\"topline\"><a class=\"wordmark\" href=\"{html.escape(back_href)}\">WAKE<b>✳︎</b></a><button id=\"theme-toggle\" class=\"theme-toggle\" type=\"button\">DARK</button></div><div class=\"eyebrow\">{html.escape(eyebrow)}</div><h1>{html.escape(title)}</h1><nav><a href=\"{html.escape(back_href)}\">WAKE site</a><a href=\"{html.escape(source_href)}\">Markdown source</a></nav></header>{body}</main><script>(()=>{{const b=document.getElementById('theme-toggle');const sync=()=>{{const d=document.documentElement.dataset.theme==='dark';b.textContent=d?'LIGHT':'DARK';b.setAttribute('aria-label',d?'Use light theme':'Use dark theme')}};sync();b.addEventListener('click',()=>{{const d=document.documentElement.dataset.theme==='dark';if(d)delete document.documentElement.dataset.theme;else document.documentElement.dataset.theme='dark';try{{localStorage.setItem('wake-theme',d?'light':'dark')}}catch{{}}sync()}})}})();</script></body></html>"""
+:root{{color-scheme:light dark;--bg:#f3f0e8;--fg:#181818;--muted:#666;--card:#fff;--line:#d7d1c5;--accent:#b64a2c}}
+@media(prefers-color-scheme:dark){{:root{{--bg:#171715;--fg:#eee;--muted:#aaa;--card:#22221f;--line:#3a3933;--accent:#e47b58}}}}
+*{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--fg);font:17px/1.68 ui-serif,Georgia,Cambria,\"Times New Roman\",serif}}main{{max-width:820px;margin:auto;padding:34px 20px 90px}}header{{border-bottom:1px solid var(--line);padding-bottom:22px;margin-bottom:30px}}h1{{font:700 clamp(2.2rem,7vw,4.6rem)/.98 ui-sans-serif,system-ui,-apple-system,sans-serif;letter-spacing:-.035em;margin:.16em 0 .3em}}h2{{font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;margin-top:2.2em}}h3{{font-family:ui-sans-serif,system-ui,-apple-system,sans-serif}}a{{color:var(--accent)}}nav{{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;font-size:.92rem}}.eyebrow,.meta{{font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-size:.78rem}}.lede{{font-size:1.25rem;line-height:1.5}}.note{{border-left:3px solid var(--accent);padding-left:18px;margin:28px 0}}.sources{{font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;font-size:.95rem}}code{{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}}hr{{border:0;border-top:1px solid var(--line);margin:34px 0}}
+</style></head><body><main><header><div class=\"eyebrow\">{html.escape(eyebrow)}</div><h1>{html.escape(title)}</h1><nav><a href=\"{html.escape(back_href)}\">WAKE site</a><a href=\"{html.escape(source_href)}\">Markdown source</a></nav></header>{body}</main></body></html>"""
+
 
 def _notebook_html(notebook, state):
     source_items = []
@@ -260,7 +253,7 @@ def _notebook_html(notebook, state):
         f'<h2>Collected sources</h2><ul class="sources">{"".join(source_items)}</ul>'
         f'<hr><p class="meta">Revision {notebook["revision"]} · AI-authored research synthesis; see source scopes in the journal.</p>'
     )
-    return _reading_page(notebook["title"], "WAKE✳︎ / RESEARCH NOTEBOOK", body, notebook["id"] + ".md")
+    return _reading_page(notebook["title"], "WAKE✳ / RESEARCH NOTEBOOK", body, notebook["id"] + ".md")
 
 
 def _blog_html(post, state):
@@ -280,9 +273,9 @@ def _blog_html(post, state):
         f'<h2>Follow the receipts</h2><h3>Research notebooks</h3><ul class="sources">{notebooks}</ul>'
         f'<h3>Collected sources</h3><ul class="sources">{sources}</ul>'
         f'<p><a href="../index.html#history/{html.escape(post["created_by"])}">Exact wake and decision →</a></p>'
-        '<hr><p class="meta">AI-authored from WAKE✳︎’s durable research record. Research claims link to evidence; philosophical reflections are reflections.</p>'
+        '<hr><p class="meta">AI-authored from WAKE✳’s durable research record. Research claims link to evidence; philosophical reflections are reflections.</p>'
     )
-    return _reading_page(post["title"], "BOB / WAKE✳︎ BLOG", body, post["id"] + ".md")
+    return _reading_page(post["title"], "BOB / WAKE✳ BLOG", body, post["id"] + ".md")
 
 
 def export(store, destination="site", experiment=None, operation=None):
@@ -311,7 +304,7 @@ def export(store, destination="site", experiment=None, operation=None):
         page = page.replace('<a href="state.json">State →</a><a href="events.jsonl">History →</a><a href="journal.md">Markdown →</a>',
                             '<a href="state.html">State →</a><a href="events.html">History →</a><a href="journal.md">Journal source ↓</a>')
         page = page.replace("'.md'>Markdown ↓</a>", "'.html'>Standalone HTML →</a> · <a class=\"subtle\" href=\"blog/'+encodeURIComponent(post.id)+'.md\">Markdown source ↓</a>")
-        lines = ["# WAKE✳︎ — The journal", "", "> Disposable models. Durable state. Receipts for everything.", "",
+        lines = ["# WAKE✳ — The journal", "", "> Disposable models. Durable state. Receipts for everything.", "",
                  f"Objective: {state['objective']}", "", f"Verified head: `{head}`", "",
                  "Fixture entries are deterministic simulations, not live model experiments.", ""]
         for item in reversed(state["journal"]):
@@ -351,7 +344,7 @@ def export(store, destination="site", experiment=None, operation=None):
             parts += ["", "## Follow the receipts", "", "### Research notebooks", "", notebook_links, "",
                       "### Collected sources", "", source_links, "",
                       f"[Exact wake and decision](../index.html#history/{post['created_by']})", "",
-                      "AI-authored from WAKE✳︎'s durable research record. Research claims link to evidence; philosophical reflections are reflections.", ""]
+                      "AI-authored from WAKE✳'s durable research record. Research claims link to evidence; philosophical reflections are reflections.", ""]
             atomic_write(target / "blog" / (post["id"] + ".md"), newline.join(parts))
             atomic_write(target / "blog" / (post["id"] + ".html"), _blog_html(post, state))
         if experiment:

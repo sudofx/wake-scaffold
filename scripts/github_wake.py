@@ -79,7 +79,7 @@ def main(publish_only=False, scheduled=False):
     if os.environ.get("GITHUB_ACTIONS") != "true":
         raise SystemExit("This entry point runs in GitHub Actions. Use python -m wake for local work.")
     settings = config(ROOT / "wake.toml")
-    result = {"status": "failed", "reason": "WAKE✳︎ did not complete"}
+    result = {"status": "failed", "reason": "WAKE✳ did not complete"}
     with tempfile.TemporaryDirectory(prefix="wake-cloud-") as folder:
         branch = StateBranch(ROOT, Path(folder)/"state")
         branch.open()
@@ -123,6 +123,9 @@ def main(publish_only=False, scheduled=False):
             shutil.copytree(ROOT/"site", branch.checkout/"site", dirs_exist_ok=True)
             branch.git("add", "events.jsonl", "state.json", "head.txt", "site", cwd=branch.checkout)
             branch.checkpoint()
+            if not publish_only and result.get("status") == "accepted":
+                set_step_output("rotate_cover", "true")
+                set_step_output("accepted_cycle", result["cycle"])
         finally:
             engine.store.close()
     print(json.dumps(result))
