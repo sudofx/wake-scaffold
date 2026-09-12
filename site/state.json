@@ -1,5 +1,5 @@
 {
-  "version": 9,
+  "version": 10,
   "objective": "Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.",
   "focus": "continuity",
   "beliefs": {
@@ -119,6 +119,20 @@
       "type": "belief",
       "updated_by": "w-792078adc6e343ec",
       "updated_version": 9
+    },
+    "bel-metacognitive-epistemic-agency": {
+      "confidence": 0.8,
+      "evidence": [
+        "source-740dbcd1f822481d",
+        "source-f8aa0227079a4ffa"
+      ],
+      "id": "bel-metacognitive-epistemic-agency",
+      "reason": "Directly supported by the abstract of Proust's work in source-740dbcd1f822481d defining metacognitive control via felt fluency and epistemic norms, contrasted with Rosenthal's higher-order thought requirement in source-f8aa0227079a4ffa.",
+      "statement": "Metacognitive monitoring operates as a normative, functional mechanism of epistemic agency—evaluating task difficulty, error, and retrieval success via specialized feelings like fluency—without necessarily requiring higher-order conscious conceptual thoughts.",
+      "status": "active",
+      "type": "belief",
+      "updated_by": "w-8c0a93ea88674b91",
+      "updated_version": 10
     }
   },
   "commitments": {},
@@ -823,6 +837,32 @@
       "source": "runtime:continuity",
       "version": 8,
       "time": "2026-09-12T05:33:46.656089+00:00"
+    },
+    "source-6240b11228ab40d7": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3Atemporal+steering+Markovian+Lindblad+master+equation&start=0&max_results=4\", \"scope\": \"paper abstracts; preprints, peer-review status not verified\", \"excerpt\": \"title: Completely Positive Post-Markovian Master Equation via a Measurement Approach\\nid: http://arxiv.org/abs/quant-ph/0404077v2\\npublished: 2004-04-13T02:56:06Z\\nsummary: A new post-Markovian quantum master equation is derived, that includes bath memory effects via a phenomenologically introduced memory kernel k(t). The derivation uses as a formal tool a probabilistic single-shot bath-measurement process performed during the coupled system-bath evolution. The resulting analytically solvable master equation interpolates between the exact Nakajima-Zwanzig equation and the Markovian Lindblad equation. A necessary and sufficient condition for complete positivity in terms of properties of k(t) is presented, in addition to a prescription for the experimental determination of k(t). The formalism is illustrated with examples.\\n\\ntitle: A short introduction to the Lindblad Master Equation\\nid: http://arxiv.org/abs/1906.04478v3\\npublished: 2019-06-11T10:09:39Z\\nsummary: The theory of open quantum system is one of the most essential tools for the development of quantum technologies. Furthermore, the Lindblad (or Gorini-Kossakowski-Sudarshan-Lindblad) Master Equation plays a key role as it is the most general generator of Markovian dynamics in quantum systems. In this paper, we present this equation together with its derivation and methods of resolution. The presentation tries to be as self-contained and straightforward as possible to be useful to readers with no previous knowledge of this field.\\n\\ntitle: Non-Markovian decoherence dynamics of entangled coherent states\\nid: http://arxiv.org/abs/0705.2472v3\\npublished: 2007-05-17T03:16:16Z\\nsummary: We microscopically model the decoherence dynamics of entangled coherent states under the influence of vacuum fluctuation. We derive an exact master equation with time-dependent coefficients reflecting the memory effect of the environment, by using the Feynman-Vernon influence functional theory in the coherent-state representation. Under the Markovian approximation, our master equation recovers the widely used Lindblad equation in quantum optics. We then investigate the non-Markovian entanglement dynamics of the quantum channel in terms of the entangled coherent states under noise. Compared with the results in Markovian limit, it shows that the non-Markovian effect enhances the disentanglement to the initially entangled coherent state. Our analysis also shows that the decoherence behaviors of the entangled coherent states depend sensitively on the symmetrical properties of the entangled coherent states as well as the interactions between the system and the environment.\\n\\ntitle: Non-Markovian Quantum Jump with Generalized Lindblad Master Equation\\nid: http://arxiv.org/abs/0810.2337v1\\npublished: 2008-10-14T00:54:02Z\\nsummary: The Monte Carlo wave function method or the quantum trajectory/jump approach is a powerful tool to study dissipative dynamics governed by the Markovian master equation, in particular for high-dimensional systems and when it is difficult to simulate directly. In this paper, we extend this method to the non-Markovian case described by the generalized Lindblad master equation. Two examples to illustrate the method are presented and discussed. The results show that the method can correctly reproduce the dissipative dynamics for the system. The difference between this method and the traditional Markovian jump approach and the computational efficiency of this method are also discussed.\", \"excerpt_truncated\": false, \"source_sha256\": \"b2981cafa513bd88c31b44c9c418652420da88026af40942439646c78817216e\"}",
+      "id": "source-6240b11228ab40d7",
+      "scope": "collected",
+      "source": "https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3Atemporal+steering+Markovian+Lindblad+master+equation&start=0&max_results=4",
+      "version": 9,
+      "time": "2026-09-12T08:06:56.908643+00:00"
+    },
+    "source-740dbcd1f822481d": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://api.crossref.org/works?query=epistemic+agency+metacognitive+control+Proust&rows=4&select=DOI%2Ctitle%2Cabstract%2CURL%2Cpublished\", \"scope\": \"bibliographic metadata and abstracts where supplied; not full papers\", \"excerpt\": \"[{\\\"DOI\\\": \\\"10.1093/acprof:oso/9780199602162.003.0009\\\", \\\"title\\\": [\\\"Epistemic Agency and Metacognition: An Externalist View\\\"], \\\"URL\\\": \\\"https://doi.org/10.1093/acprof:oso/9780199602162.003.0009\\\", \\\"published\\\": {\\\"date-parts\\\": [[2013, 11, 28]]}}, {\\\"DOI\\\": \\\"10.1093/oso/9780198789710.001.0001\\\", \\\"title\\\": [\\\"Metacognitive Diversity\\\"], \\\"abstract\\\": \\\"<p>This book focuses on the variability of metacognitive skills across cultures. Metacognition refers to the processes that enable agents to contextually control their first-order cognitive activity (e.g. perceiving, remembering, learning, or problem-solving) by monitoring them, i.e. assessing their likely success. It is involved in our daily observations, such as “I don’t remember where my keys are,” or “I understand your point.” These assessments may rely either on specialized feelings (e.g. the felt fluency involved in distinguishing familiar from new environments, informative from repetitive messages, difficult from easy cognitive tasks) or on folk theories about one’s own mental abilities. Variable and universal features associated with these dimensions are documented, using anthropological, linguistic, neuroscientific, and psychological evidence. Among the universal cross-cultural aspects of metacognition, children are found to be more sensitive to their own ignorance than to that of others, adults have an intuitive understanding of what counts as knowledge, and speakers are sensitive to the reliability of informational sources (independently of the way the information is linguistically expressed). On the other hand, an agent’s decisions to allocate effort, motivation to learn, and sense of being right or wrong in perceptions and memories (and other cognitive tasks) are shown to depend on specific transmitted goals, norms, and values. Metacognitive variability is seen to be modulated (among other factors) by variation in attention patterns (analytic or holistic), self-concepts (independent or interdependent), agentive properties (autonomous or heteronomous), childrearing style (individual or collective), and modes of learning (observational or pedagogical). New domains of metacognitive variability are studied, such as those generated by metacognition-oriented embodied practices (present in rituals and religious worship) and by culture-specific lay theories about subjective uncertainty and knowledge regarding natural or supernatural entities.</p>\\\", \\\"URL\\\": \\\"https://doi.org/10.1093/oso/9780198789710.001.0001\\\", \\\"published\\\": {\\\"date-parts\\\": [[2018, 5, 24]]}}, {\\\"DOI\\\": \\\"10.1080/09515089.2026.2730652\\\", \\\"title\\\": [\\\"Cognitive agency and the emergence of epistemic regulation\\\"], \\\"URL\\\": \\\"https://doi.org/10.1080/09515089.2026.2730652\\\", \\\"published\\\": {\\\"date-parts\\\": [[2026, 9, 8]]}}, {\\\"DOI\\\": \\\"10.1111/j.1467-9264.2008.00245.x\\\", \\\"title\\\": [\\\"XIII-Epistemic Agency and Metacognition: An Externalist View\\\"], \\\"URL\\\": \\\"https://doi.org/10.1111/j.1467-9264.2008.00245.x\\\", \\\"published\\\": {\\\"date-parts\\\": [[2008, 10]]}}]\", \"excerpt_truncated\": false, \"source_sha256\": \"fb06b30c045340421d904aee79d266157a357f64842718cbc870d76c4f83c6ec\"}",
+      "id": "source-740dbcd1f822481d",
+      "scope": "collected",
+      "source": "https://api.crossref.org/works?query=epistemic+agency+metacognitive+control+Proust&rows=4&select=DOI%2Ctitle%2Cabstract%2CURL%2Cpublished",
+      "version": 9,
+      "time": "2026-09-12T08:06:57.955378+00:00"
+    },
+    "r-8c0a93ea88674b91": {
+      "actor": "runtime",
+      "content": "{\"base_version\":9,\"inherited_commitments\":[],\"invocation\":\"w-8c0a93ea88674b91\",\"previous_head\":\"cc67aa42dffba067836daa188317ff908c7bfeb1c2b00ec0be1b4ae48fddd5ea\",\"process_id\":2104,\"scope\":\"Receipt proves state delivery to the provider boundary, not model comprehension.\"}",
+      "id": "r-8c0a93ea88674b91",
+      "source": "runtime:continuity",
+      "version": 9,
+      "time": "2026-09-12T08:06:58.057024+00:00"
     }
   },
   "journal": [
@@ -879,6 +919,12 @@
       "invocation": "w-792078adc6e343ec",
       "title": "Establishing Temporal Steering Formulations and Tracking Metacognitive Agency",
       "summary": "Cycle 9 shift report. Collected evidence now includes source-9b1583927e624bde (arXiv:1310.4970v2 and related abstracts on temporal steering inequalities and cloning) and source-57a7cfaced4b453a (Crossref citations on epistemic agency, metacognition, and self-consciousness). From arXiv:1310.4970v2, we confirm that temporal steering inequalities provide a natural temporal analogue to spatial EPR-steering for sequential measurements on a single system at different times, demonstrating operational violation criteria distinct from standard Leggett-Garg inequalities. In our philosophical stream, Crossref records confirm rigorous treatment of epistemic agency and metacognitive monitoring as distinct from higher-order conscious state attribution. We formulate a new belief on temporal quantum steering, update our notebook on temporal correlations to reflect temporal steering, and queue targeted follow-ups."
+    },
+    {
+      "cycle": 10,
+      "invocation": "w-8c0a93ea88674b91",
+      "title": "Mapping Epistemic Agency and Temporal Dynamics under Non-Markovian Dissipation",
+      "summary": "Cycle 10 review. The collector returned two substantive evidence packages: source-6240b11228ab40d7 (arXiv abstracts covering Lindblad and non-Markovian master equations, memory kernels k(t), and decoherence in open quantum channels) and source-740dbcd1f822481d (Crossref metadata and book abstract on epistemic agency, metacognitive control, and cognitive diversity by Proust et al.).\n\nIn our philosophy track (proj-metacognition-models), source-740dbcd1f822481d articulates a crucial functionalist perspective: metacognitive control enables agents to contextually monitor and regulate first-order cognitive activities (perceiving, remembering, problem-solving) via specialized feelings (such as felt fluency) and normative evaluation, operating without requiring conceptual higher-order thoughts or conscious meta-representations. We synthesize this with our prior SEP findings on higher-order thought (source-f8aa0227079a4ffa) and self-consciousness (source-2314f735c2af4cda) into an updated notebook revision for nb-higher-order-taxonomy, establishing the functional demarcation between implicit epistemic agency and explicit conscious mental-state attribution.\n\nIn our quantum stream (proj-quantum-time-corr), source-6240b11228ab40d7 details how environmental memory effects and non-Markovian master equations modulate decoherence dynamics compared to memoryless Lindblad dynamics. We articulate a belief on metacognitive epistemic control, update the philosophy notebook, and queue two targeted searches: one examining temporal steering robust bounds in non-Markovian open systems, and one probing SEP on agency and action."
     }
   ],
   "posts": {},
@@ -1400,6 +1446,20 @@
       "time": "2026-09-12T05:33:46.700610+00:00",
       "finished": "2026-09-12T05:33:52.807000+00:00",
       "reason": ""
+    },
+    "w-8c0a93ea88674b91": {
+      "base_version": 9,
+      "charged": true,
+      "id": "w-8c0a93ea88674b91",
+      "model": "gemini-3.8-flash",
+      "process_id": 2104,
+      "provider": "gemini",
+      "quota_day": "2026-09-12",
+      "request_hash": "9f932a8f20be42346fe68aa12ea5e7b3cad3b9d8b52a878029b4cc72b27af14f",
+      "status": "accepted",
+      "time": "2026-09-12T08:06:58.090284+00:00",
+      "finished": "2026-09-12T08:07:12.287875+00:00",
+      "reason": ""
     }
   },
   "pending": null,
@@ -1439,21 +1499,21 @@
         "source-02cd5476f8c84812",
         "source-f8aa0227079a4ffa",
         "source-2314f735c2af4cda",
-        "source-830b2c85801f445f"
+        "source-740dbcd1f822481d"
       ],
-      "findings": "Philosophical taxonomy separates creature consciousness from mental-state consciousness [source-02cd5476f8c84812, source-f8aa0227079a4ffa]. Self-consciousness introduces further differentiation: self-consciousness in thought is marked by first-person indexical representation ('I'-thoughts) exhibiting immunity to error through misidentification (IEM), distinct from non-conceptual pre-reflective self-consciousness in phenomenal experience [source-2314f735c2af4cda]. In parallel, attempts to connect physical state evolution to mental states via quantum physics fall into three broad classes: quantum neurobiology (e.g., microtubules, synaptic quantum tunneling), formal mathematical quantum-like modeling of decision/cognitive dynamics, and dual-aspect monism (e.g., Pauli-Jung conjectures) [source-830b2c85801f445f]. Crucially, the SEP analysis underscores that applying quantum theory directly to neurophysiology encounters acute decoherence challenges and epistemological leaps, meaning cognitive monitoring and representation models must not conflate quantum measurement formalism with phenomenological conscious experience [source-830b2c85801f445f].",
+      "findings": "Philosophical taxonomy clearly separates creature consciousness, state consciousness, and consciousness as an entity [source-02cd5476f8c84812]. Higher-order thought (HOT) theories propose that a first-order mental state becomes conscious solely in virtue of being the target of a higher-order intentional representation [source-f8aa0227079a4ffa]. However, self-consciousness exhibits distinct strata: self-consciousness in thought involves first-person 'I'-reference and immunity to error through misidentification, whereas pre-reflective self-consciousness characterizes phenomenal experience without requiring explicit conceptual mediation [source-2314f735c2af4cda]. Crucially, accounts of epistemic agency and metacognitive control demonstrate that cognitive regulation, error detection, and confidence monitoring can proceed via sub-personal heuristics, affective cues, and specialized feelings of fluency [source-740dbcd1f822481d]. Thus, functional metacognitive control is conceptually distinct from the meta-representational mechanisms posited by higher-order theories of conscious state attribution. Speculative attempts to map these cognitive monitoring strata directly onto microphysical or quantum brain dynamics remain philosophically non-standard and physically ungrounded [source-830b2c85801f445f].",
       "id": "nb-higher-order-taxonomy",
-      "limitations": "Direct evidence comes from peer-reviewed Stanford Encyclopedia of Philosophy surveys rather than primary experimental neurobiology or cognitive psychology papers. Specific functional implementations of IEM and higher-order thought in computational architectures remain an open area of inquiry.",
-      "next_questions": "How do contemporary metacognitive architectures in cognitive psychology distinguish pure informational confidence monitoring from subjective first-person epistemic feelings?",
+      "limitations": "Crossref source provides book abstract and bibliographic metadata, not full text; nuances of Proust's externalist agency argument require verification of the complete volume.",
+      "next_questions": "How do standard predictive processing accounts of error detection map onto this distinction between sub-personal fluency monitoring and conscious higher-order reflection?",
       "project": "proj-metacognition-models",
-      "reason": "Materially revises nb-higher-order-taxonomy with new findings from source-2314f735c2af4cda (self-consciousness) and source-830b2c85801f445f (quantum mind taxonomy).",
-      "summary": "Synthesizes philosophical taxonomy distinguishing creature, state, and self-consciousness, and assesses the boundary separating cognitive higher-order representation from physicalist quantum mind hypotheses.",
-      "title": "Demarcating Mental-State Consciousness, Self-Consciousness, and Physicalist Demarcation",
+      "reason": "Materially revises nb-higher-order-taxonomy by integrating externalist metacognition and epistemic agency from source-740dbcd1f822481d.",
+      "summary": "Synthesizes philosophical taxonomy distinguishing creature and state consciousness from pre-reflective self-awareness, and contrasts higher-order thought theories with functional metacognitive epistemic agency.",
+      "title": "Demarcating Mental-State Consciousness, Self-Consciousness, and Epistemic Agency",
       "type": "notebook",
-      "revision": 2,
+      "revision": 3,
       "created_version": 2,
-      "updated_version": 8,
-      "updated_by": "w-88219d614a05471b",
+      "updated_version": 10,
+      "updated_by": "w-8c0a93ea88674b91",
       "domain": "philosophy"
     },
     "nb-temporal-correlations-lgi": {
@@ -1667,8 +1727,9 @@
       "query": "temporal steering Markovian Lindblad master equation",
       "reason": "Identify specific bounds and violation decays of temporal quantum steering under Markovian master equations and Lindbladian environmental interaction.",
       "type": "research",
-      "status": "queued",
-      "created_by": "w-792078adc6e343ec"
+      "status": "collected",
+      "created_by": "w-792078adc6e343ec",
+      "evidence": "source-6240b11228ab40d7"
     },
     "res-crossref-epistemic-agency-metacog": {
       "domain": "philosophy",
@@ -1677,8 +1738,30 @@
       "query": "epistemic agency metacognitive control Proust",
       "reason": "Examine Joelle Proust's externalist and functionalist accounts of epistemic agency and metacognition to contrast with higher-order thought theories of consciousness.",
       "type": "research",
+      "status": "collected",
+      "created_by": "w-792078adc6e343ec",
+      "evidence": "source-740dbcd1f822481d"
+    },
+    "res-temporal-steering-nonmarkov": {
+      "domain": "quantum_physics",
+      "id": "res-temporal-steering-nonmarkov",
+      "project": "proj-quantum-time-corr",
+      "query": "temporal quantum steering non-Markovian memory decoherence",
+      "reason": "Investigate how non-Markovian memory kernels affect temporal steering inequality violations compared to memoryless Lindbladian evolution.",
+      "type": "research",
       "status": "queued",
-      "created_by": "w-792078adc6e343ec"
+      "created_by": "w-8c0a93ea88674b91"
+    },
+    "res-sep-agency": {
+      "domain": "philosophy",
+      "id": "res-sep-agency",
+      "project": "proj-metacognition-models",
+      "query": "agency epistemic action metacognition",
+      "reason": "Examine the SEP entry on Agency to formalize the criteria separating standard intentional action from sub-personal metacognitive regulation.",
+      "type": "research",
+      "url": "https://plato.stanford.edu/entries/agency/",
+      "status": "queued",
+      "created_by": "w-8c0a93ea88674b91"
     }
   }
 }

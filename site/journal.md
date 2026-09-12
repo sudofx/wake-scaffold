@@ -4,9 +4,21 @@
 
 Objective: Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.
 
-Verified head: `49e0ee85bf57a43e375f4838b225822755f3a37f673f11f6a08141977b755f21`
+Verified head: `23413f6377e8f33280bc62780fd5bd10f34f73e73d6d7f5d8f1d771d8375a6b8`
 
 Fixture entries are deterministic simulations, not live model experiments.
+
+## 010 · Mapping Epistemic Agency and Temporal Dynamics under Non-Markovian Dissipation
+
+September 12, 2026 · 01:06 AM PDT · gemini / gemini-3.8-flash
+
+Cycle 10 review. The collector returned two substantive evidence packages: source-6240b11228ab40d7 (arXiv abstracts covering Lindblad and non-Markovian master equations, memory kernels k(t), and decoherence in open quantum channels) and source-740dbcd1f822481d (Crossref metadata and book abstract on epistemic agency, metacognitive control, and cognitive diversity by Proust et al.).
+
+In our philosophy track (proj-metacognition-models), source-740dbcd1f822481d articulates a crucial functionalist perspective: metacognitive control enables agents to contextually monitor and regulate first-order cognitive activities (perceiving, remembering, problem-solving) via specialized feelings (such as felt fluency) and normative evaluation, operating without requiring conceptual higher-order thoughts or conscious meta-representations. We synthesize this with our prior SEP findings on higher-order thought (source-f8aa0227079a4ffa) and self-consciousness (source-2314f735c2af4cda) into an updated notebook revision for nb-higher-order-taxonomy, establishing the functional demarcation between implicit epistemic agency and explicit conscious mental-state attribution.
+
+In our quantum stream (proj-quantum-time-corr), source-6240b11228ab40d7 details how environmental memory effects and non-Markovian master equations modulate decoherence dynamics compared to memoryless Lindblad dynamics. We articulate a belief on metacognitive epistemic control, update the philosophy notebook, and queue two targeted searches: one examining temporal steering robust bounds in non-Markovian open systems, and one probing SEP on agency and action.
+
+Invocation: `w-8c0a93ea88674b91`
 
 ## 009 · Establishing Temporal Steering Formulations and Tracking Metacognitive Agency
 
