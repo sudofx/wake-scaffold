@@ -1,23 +1,24 @@
-# Testing Non-Classicality in Time Evolution: Leggett-Garg Inequalities and Hamiltonian Dynamics
+# Testing Non-Classicality in Time Evolution: Leggett-Garg and Temporal Steering Inequalities
 
-Examines how Leggett-Garg inequalities and temporal correlation functions distinguish quantum from macrorealistic classical dynamics in Hamiltonian and multi-level systems without requiring spatial Bell separation.
+Examines how Leggett-Garg inequalities and temporal quantum steering inequalities distinguish non-classical single-system dynamics and macrorealism violations across multi-level and open systems.
 
 ## Findings
 
-When spatial Bell inequality tests are not feasible due to lack of space-like separation, temporal quantum correlations can test macrorealism via Leggett-Garg inequalities (LGIs) [source-04fcd05dc9f24c55]. In macroscopic double-well systems governed by Hamiltonian equations, tunneling probabilities yield oscillations violating macrorealism over broad ranges of decoherence [source-04fcd05dc9f24c55]. Furthermore, local probe time correlations and maximal LGI violations detect both finite- and infinite-order quantum phase transitions in spin chains [source-04fcd05dc9f24c55]. In multi-level systems, the quantum temporal correlation bound strongly depends on the dimension N accessible to projective measurement, exceeding standard two-level bounds and approaching the algebraic maximum as N -> infinity [source-02ded8a4542a4e82]. Additionally, LGIs test macrorealism in non-equilibrium thermodynamics: statistics of fluctuating work done on unitarily driven quantum systems violate macrorealistic bounds under both two-projective-measurement and weak-measurement schemes [source-02ded8a4542a4e82]. Generalized bipartite non-locality criteria also extend beyond standard CHSH via multivariable graph expansions [source-c7d665600a6949f0].
+When spatial Bell tests are not possible due to lack of space-like separation, non-classicality can be tested dynamically through temporal correlation inequalities. Leggett-Garg inequalities (LGIs) probe macrorealism and non-invasive measurability in Hamiltonian systems such as macroscopic double wells and critical spin chains [source-04fcd05dc9f24c55]. Multi-level systems display temporal correlation bounds that scale directly with the accessible Hilbert space dimension N, reaching the algebraic limit as N -> infinity, while fluctuating quantum work done in driven systems similarly violates macrorealistic bounds [source-02ded8a4542a4e82]. Beyond LGIs, temporal steering inequalities define a temporal analogue of EPR-steering for sequential measurements on a single quantum object at different times, providing an operational criterion to verify temporal quantum correlations and directional non-classical signaling without spatial bipartite entanglement [source-9b1583927e624bde]. Multivariable correlation expansions on graphs further extend bipartite non-locality criteria beyond CHSH [source-c7d665600a6949f0].
 
 ## Limitations and competing views
 
-Conclusions rest on collected arXiv theoretical abstracts (quant-ph). Detailed noise thresholds, measurement invasiveness loopholes (e.g., negative-result measurements), and specific Lindbladian dissipation kernels require full-paper mathematical derivations.
+Findings are based on preprint and theoretical paper abstracts. Experimental implementations must address invasiveness loopholes, detection efficiency, and state tomography under non-unitary environmental decoherence.
 
 ## Next questions
 
-How do temporal quantum steering inequalities differ mathematically from Leggett-Garg inequalities in detecting temporal non-classicality under asymmetric or uncharacterized measurement apparatuses?
+How do temporal steering inequalities behave under open Markovian Lindbladian dissipation kernels compared to unitary Hamiltonian evolution?
 
 ## Collected sources
 
 - [source-04fcd05dc9f24c55](https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3ALeggett-Garg+inequality+time+correlation+Hamiltonian&start=0&max_results=4)
-- [source-c7d665600a6949f0](https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3ABell+inequalities+time+correlations+Hamiltonian+vacuum&start=0&max_results=4)
 - [source-02ded8a4542a4e82](https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3Atemporal+steering+Leggett-Garg+open+quantum+systems&start=0&max_results=4)
+- [source-9b1583927e624bde](https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3Atemporal+steering+inequality+open+quantum&start=0&max_results=4)
+- [source-c7d665600a6949f0](https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3ABell+inequalities+time+correlations+Hamiltonian+vacuum&start=0&max_results=4)
 
-Revision 2 · AI-authored research synthesis; see source scopes in the journal.
+Revision 3 · AI-authored research synthesis; see source scopes in the journal.

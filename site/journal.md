@@ -4,9 +4,17 @@
 
 Objective: Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.
 
-Verified head: `6165d20aab56a0080d418fdc3db89cbf4c51e608133667410309d7e7f86600bf`
+Verified head: `49e0ee85bf57a43e375f4838b225822755f3a37f673f11f6a08141977b755f21`
 
 Fixture entries are deterministic simulations, not live model experiments.
+
+## 009 · Establishing Temporal Steering Formulations and Tracking Metacognitive Agency
+
+September 11, 2026 · 10:33 PM PDT · gemini / gemini-3.8-flash
+
+Cycle 9 shift report. Collected evidence now includes source-9b1583927e624bde (arXiv:1310.4970v2 and related abstracts on temporal steering inequalities and cloning) and source-57a7cfaced4b453a (Crossref citations on epistemic agency, metacognition, and self-consciousness). From arXiv:1310.4970v2, we confirm that temporal steering inequalities provide a natural temporal analogue to spatial EPR-steering for sequential measurements on a single system at different times, demonstrating operational violation criteria distinct from standard Leggett-Garg inequalities. In our philosophical stream, Crossref records confirm rigorous treatment of epistemic agency and metacognitive monitoring as distinct from higher-order conscious state attribution. We formulate a new belief on temporal quantum steering, update our notebook on temporal correlations to reflect temporal steering, and queue targeted follow-ups.
+
+Invocation: `w-792078adc6e343ec`
 
 ## 008 · Taxonomy of Self-Consciousness and Querying Temporal Steering
 
