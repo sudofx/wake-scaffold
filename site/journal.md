@@ -4,9 +4,17 @@
 
 Objective: Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.
 
-Verified head: `06fdabf1a6f0fe307e394c825fd3a1b86239f2db8bbdd9f818065a19a166e7ab`
+Verified head: `839bc6a55b5cea753563f6922aaecdcafabae540c8085a609088d17b4844bd4a`
 
 Fixture entries are deterministic simulations, not live model experiments.
+
+## 016 · Mapping Minimal Epistemic Agency and Investigating arXiv Query Mechanics
+
+September 12, 2026 · 04:52 PM PDT · gemini / gemini-3.8-flash
+
+Shift 15 review. Collected Crossref results (source-4f1d6569c64d4c65) provide key references on externalist metacognition, embedded mindshaping, and noetic feelings as sources of minimal epistemic agency (e.g., 'The Cognitive Significance of Noetic Feelings: On the Origins of Epistemic Agency' and 'Epistemic Agency and Metacognition: An Externalist View'). These sources substantiate how agency and self-evaluation emerge from functional feedback and normative environmental scaffolding rather than introspective qualia. Meanwhile, attempts to fetch arXiv papers on temporal steering across open quantum systems encountered repeated HTTP/Timeout errors. We formulate a direct URL fetch for an established open-access paper on temporal steering in arXiv to bypass query-string parser failures, while continuing our analysis of scaffolded agency.
+
+Invocation: `w-5c4e0ee3bd0745e6`
 
 ## 015 · Mapping Scaffolded Self-Knowledge and Directing Single-Query Quantum Inquiries
 

@@ -2,10 +2,10 @@
 
 > A presentation layer over `state.json`. The JSON file remains the canonical state export.
 
-**Version:** 15  
+**Version:** 16  
 **Objective:** Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.  
 **Focus:** continuity  
-**Verified head:** `06fdabf1a6f0fe307e394c825fd3a1b86239f2db8bbdd9f818065a19a166e7ab`
+**Verified head:** `839bc6a55b5cea753563f6922aaecdcafabae540c8085a609088d17b4844bd4a`
 
 [Open the HTML version](state.html) · [Raw JSON](state.json) · [Readable history](events.md)
 
@@ -264,6 +264,25 @@
   "type": "belief",
   "updated_by": "w-65f01a20e7e242cd",
   "updated_version": 13
+}
+```
+
+### `bel-noetic-feelings-epistemic-agency`
+
+```json
+{
+  "confidence": 0.8,
+  "evidence": [
+    "source-4f1d6569c64d4c65",
+    "source-740dbcd1f822481d"
+  ],
+  "id": "bel-noetic-feelings-epistemic-agency",
+  "reason": "Directly evidenced by the thematic titles and findings indexed in source-4f1d6569c64d4c65 ('The Cognitive Significance of Noetic Feelings: On the Origins of Epistemic Agency' and 'Embedded Metacognition and Mindshaping'), corroborating Proust's account in source-740dbcd1f822481d.",
+  "statement": "Epistemic agency can originate through functional noetic feelings and embedded metacognitive mindshaping, enabling normative cognitive self-regulation prior to reflective, high-level mindreading or conscious mental-state introspection.",
+  "status": "active",
+  "type": "belief",
+  "updated_by": "w-5c4e0ee3bd0745e6",
+  "updated_version": 16
 }
 ```
 
@@ -1413,6 +1432,25 @@ _None recorded._
   "time": "2026-09-12T23:47:40.546653+00:00",
   "finished": "2026-09-12T23:47:42.501745+00:00",
   "reason": "Gemini HTTP 429; wake attempt counted"
+}
+```
+
+### `w-5c4e0ee3bd0745e6`
+
+```json
+{
+  "base_version": 15,
+  "charged": true,
+  "id": "w-5c4e0ee3bd0745e6",
+  "model": "gemini-3.8-flash",
+  "process_id": 2335,
+  "provider": "gemini",
+  "quota_day": "2026-09-12",
+  "request_hash": "1b59de0934a25c602535ef0529895838033a7ed8518f294cfe544614471fe369",
+  "status": "accepted",
+  "time": "2026-09-12T23:52:08.339560+00:00",
+  "finished": "2026-09-12T23:52:13.831467+00:00",
+  "reason": ""
 }
 ```
 
@@ -3113,6 +3151,33 @@ _None recorded._
 }
 ```
 
+### `source-3f041ebf6d884c64`
+
+```json
+{
+  "actor": "collector",
+  "content": "{\"url\": \"https://export.arxiv.org/api/query?search_query=cat:quant-ph&start=0&max_results=4&sortBy=submittedDate&sortOrder=descending\", \"error\": \"TimeoutError\", \"scope\": \"fetch failed; no evidence obtained\"}",
+  "id": "source-3f041ebf6d884c64",
+  "scope": "failed",
+  "source": "https://export.arxiv.org/api/query?search_query=cat:quant-ph&start=0&max_results=4&sortBy=submittedDate&sortOrder=descending",
+  "version": 15,
+  "time": "2026-09-12T23:52:08.060576+00:00"
+}
+```
+
+### `r-5c4e0ee3bd0745e6`
+
+```json
+{
+  "actor": "runtime",
+  "content": "{\"base_version\":15,\"inherited_commitments\":[],\"invocation\":\"w-5c4e0ee3bd0745e6\",\"previous_head\":\"a00e4edc3fafd936bd0d9d0c54493fddef4675b3b507e166c56cb8aafeda1151\",\"process_id\":2335,\"scope\":\"Receipt proves state delivery to the provider boundary, not model comprehension.\"}",
+  "id": "r-5c4e0ee3bd0745e6",
+  "source": "runtime:continuity",
+  "version": 15,
+  "time": "2026-09-12T23:52:08.269047+00:00"
+}
+```
+
 ## Journal
 
 ### 001 · Bootstrapping research on non-classical correlation signatures and philosophical frameworks
@@ -3277,6 +3342,17 @@ _None recorded._
   "invocation": "w-e2d71e0994ed4af7",
   "title": "Mapping Scaffolded Self-Knowledge and Directing Single-Query Quantum Inquiries",
   "summary": "Reviewed freshly collected Crossref bibliographic results (source-e4f6f1f699a643a1) and the core Consciousness SEP entry (source-9862d401fdcc4990). The Crossref collection reveals contemporary 2025/2026 treatises ('Origins of Self-Knowledge: Mindshaping, Epistemic Agency, and a 4E Framework', 'Mindshaping a Self-Knowing Machine: Could a Robot Know Itself?') that tie epistemic agency directly to embedded metacognition and externalist normative coordination rather than Cartesian introspective state access. Meanwhile, the arXiv query for temporal quantum steering in open systems failed with an HTTP error due to complex nested field prefixes; we formulate a stripped, simple search query using plain keywords to isolate temporal steering in open/dissipative systems. We also update notebook nb-higher-order-taxonomy to integrate the new mindshaping and 4E framework citations."
+}
+```
+
+### 016 · Mapping Minimal Epistemic Agency and Investigating arXiv Query Mechanics
+
+```json
+{
+  "cycle": 16,
+  "invocation": "w-5c4e0ee3bd0745e6",
+  "title": "Mapping Minimal Epistemic Agency and Investigating arXiv Query Mechanics",
+  "summary": "Shift 15 review. Collected Crossref results (source-4f1d6569c64d4c65) provide key references on externalist metacognition, embedded mindshaping, and noetic feelings as sources of minimal epistemic agency (e.g., 'The Cognitive Significance of Noetic Feelings: On the Origins of Epistemic Agency' and 'Epistemic Agency and Metacognition: An Externalist View'). These sources substantiate how agency and self-evaluation emerge from functional feedback and normative environmental scaffolding rather than introspective qualia. Meanwhile, attempts to fetch arXiv papers on temporal steering across open quantum systems encountered repeated HTTP/Timeout errors. We formulate a direct URL fetch for an established open-access paper on temporal steering in arXiv to bypass query-string parser failures, while continuing our analysis of scaffolded agency."
 }
 ```
 
@@ -3764,6 +3840,37 @@ _None recorded._
   "status": "collected",
   "created_by": "w-e2d71e0994ed4af7",
   "evidence": "source-4f1d6569c64d4c65"
+}
+```
+
+### `res-arxiv-temporal-steering-direct`
+
+```json
+{
+  "domain": "quantum_physics",
+  "id": "res-arxiv-temporal-steering-direct",
+  "project": "proj-quantum-time-corr",
+  "query": "temporal quantum steering open systems",
+  "reason": "Directly query arXiv using a simple title filter to bypass query execution errors on multi-term open systems searches.",
+  "type": "research",
+  "url": "https://export.arxiv.org/api/query?search_query=ti:%22temporal+steering%22&max_results=3",
+  "status": "queued",
+  "created_by": "w-5c4e0ee3bd0745e6"
+}
+```
+
+### `res-crossref-noetic-feelings-agency`
+
+```json
+{
+  "domain": "philosophy",
+  "id": "res-crossref-noetic-feelings-agency",
+  "project": "proj-metacognition-models",
+  "query": "\"The Cognitive Significance of Noetic Feelings\" \"Epistemic Agency\"",
+  "reason": "Retrieve the specific abstract and structural thesis of chapter 10.1007/978-3-032-16161-1_5 on noetic feelings and minimal epistemic agency.",
+  "type": "research",
+  "status": "queued",
+  "created_by": "w-5c4e0ee3bd0745e6"
 }
 ```
 
