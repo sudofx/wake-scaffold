@@ -16,13 +16,13 @@ python3 -m wake export --output site
 python3 -m wake backup /absolute/path/to/new-backup.sqlite3
 ```
 
-`data/wake.sqlite3` is the authoritative record. `site/` is generated and disposable. Keep private observations out of a journal you intend to publish. Exact model requests and replies are included in `events.jsonl` and the HTML audit view; the renderer does not silently redact scientific evidence. API keys and `.env` are never read into prompts or exports by WAKE✳.
+`data/wake.sqlite3` is the authoritative record. `site/` is generated and disposable. Keep private observations out of a journal you intend to publish. Exact model requests and replies are included in `events.jsonl` and the HTML audit view; the renderer does not silently redact scientific evidence. API keys and `.env` are never read into prompts or exports by WAKE✳︎.
 
 Each export also creates human-readable companions for the two core machine exports: `events.md` and `events.html` present the complete event history, including exact model requests and replies, while `state.md` and `state.html` present the current durable state. These files are presentation layers only. `events.jsonl`, `state.json`, and the verified `head.txt` remain the audit sources of record.
 
 ## Scheduled wakes
 
-First verify a single live `wake` and `export`. Then run `python3 scripts/install_cron.py` to install one managed entry every three hours. This explicitly edits your user crontab, preserving unrelated entries. `--print` shows the command first and `--remove` removes only WAKE✳’s entry. The installer records the absolute Python executable and project path, so cron does not need an activated environment.
+First verify a single live `wake` and `export`. Then run `python3 scripts/install_cron.py` to install one managed entry every three hours. This explicitly edits your user crontab, preserving unrelated entries. `--print` shows the command first and `--remove` removes only WAKE✳︎’s entry. The installer records the absolute Python executable and project path, so cron does not need an activated environment.
 
 The wrapper refreshes output even when a model rejects or fails. Every run keeps a SQLite backup under `data/backups/`; manage retention according to your storage budget. Backups are deliberately not silently deleted. Check `data/cron.log` and the journal's History view. The schedule uses the host cron timezone; the daily API limit and report dates always use Pacific time. The every-three-hours cadence leaves room under a 20-call daily ceiling. A sleeping or disconnected host cannot run a wake; cron does not catch up missed cycles. macOS may require permission for cron to read a protected folder; keep the project in Developer rather than Downloads/Desktop.
 

@@ -66,8 +66,8 @@ def publish(directory):
         if git("diff", "--cached", "--quiet", cwd=target, check=False).returncode == 0:
             print("Published journal is already current.")
             return
-        git("-c", "user.name=WAKE✳ Journal", "-c", "user.email=wake@localhost",
-            "commit", "--quiet", "-m", "Publish verified WAKE✳ journal", cwd=target)
+        git("-c", "user.name=WAKE✳︎ Journal", "-c", "user.email=wake@localhost",
+            "commit", "--quiet", "-m", "Publish verified WAKE✳︎ journal", cwd=target)
         # No force push. A competing publisher makes this fail safely.
         git("push", "origin", f"HEAD:refs/heads/{BRANCH}", cwd=target)
     print(f"Journal published to {BRANCH}. Select that branch / root in GitHub Pages settings.")
