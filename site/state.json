@@ -1,5 +1,5 @@
 {
-  "version": 12,
+  "version": 13,
   "objective": "Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.",
   "focus": "continuity",
   "beliefs": {
@@ -173,6 +173,20 @@
       "type": "belief",
       "updated_by": "w-67a43178b6de4892",
       "updated_version": 12
+    },
+    "bel-mindshaping-agency": {
+      "confidence": 0.75,
+      "evidence": [
+        "source-c194229d2c55486a",
+        "source-693423395d334b51"
+      ],
+      "id": "bel-mindshaping-agency",
+      "reason": "Crossref collection source-c194229d2c55486a identifies recent work linking embedded metacognition, mindshaping, and epistemic agency under 4E frameworks, reinforcing findings from source-693423395d334b51.",
+      "statement": "Epistemic agency and self-knowledge are analyzed in 4E cognitive frameworks as scaffolded by mindshaping practices and external normative structures rather than solely internal introspective states.",
+      "status": "active",
+      "type": "belief",
+      "updated_by": "w-65f01a20e7e242cd",
+      "updated_version": 13
     }
   },
   "commitments": {},
@@ -1057,6 +1071,32 @@
       "source": "runtime:continuity",
       "version": 11,
       "time": "2026-09-12T15:34:33.604254+00:00"
+    },
+    "source-c9b027821b174470": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3Atemporal+steering+non+Markovian+Lindblad&start=0&max_results=4\", \"error\": \"HTTPError\", \"scope\": \"fetch failed; no evidence obtained\"}",
+      "id": "source-c9b027821b174470",
+      "scope": "failed",
+      "source": "https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3Atemporal+steering+non+Markovian+Lindblad&start=0&max_results=4",
+      "version": 12,
+      "time": "2026-09-12T17:16:56.675759+00:00"
+    },
+    "source-c194229d2c55486a": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://api.crossref.org/works?query=scaffolded+epistemic+agency+artifacts+metacognition&rows=4&select=DOI%2Ctitle%2Cabstract%2CURL%2Cpublished\", \"scope\": \"bibliographic metadata and abstracts where supplied; not full papers\", \"excerpt\": \"[{\\\"DOI\\\": \\\"10.1093/acprof:oso/9780199602162.003.0009\\\", \\\"title\\\": [\\\"Epistemic Agency and Metacognition: An Externalist View\\\"], \\\"URL\\\": \\\"https://doi.org/10.1093/acprof:oso/9780199602162.003.0009\\\", \\\"published\\\": {\\\"date-parts\\\": [[2013, 11, 28]]}}, {\\\"DOI\\\": \\\"10.1007/978-3-032-16161-1_7\\\", \\\"title\\\": [\\\"Embedded Metacognition and Mindshaping: From Epistemic Agency to High-Level Mindreading\\\"], \\\"URL\\\": \\\"https://doi.org/10.1007/978-3-032-16161-1_7\\\", \\\"published\\\": {\\\"date-parts\\\": [[2026]]}}, {\\\"DOI\\\": \\\"10.1007/978-3-032-16161-1_1\\\", \\\"title\\\": [\\\"Origins of Self-Knowledge: Mindshaping, Epistemic Agency, and a 4E Framework\\\"], \\\"URL\\\": \\\"https://doi.org/10.1007/978-3-032-16161-1_1\\\", \\\"published\\\": {\\\"date-parts\\\": [[2026]]}}, {\\\"DOI\\\": \\\"10.1007/978-3-032-16161-1_5\\\", \\\"title\\\": [\\\"The Cognitive Significance of Noetic Feelings: On the Origins of Epistemic Agency\\\"], \\\"URL\\\": \\\"https://doi.org/10.1007/978-3-032-16161-1_5\\\", \\\"published\\\": {\\\"date-parts\\\": [[2026]]}}]\", \"excerpt_truncated\": false, \"source_sha256\": \"b96aa5cb2e4ef67283f913e03251bb2f477e28b34621317871eee0a9fe05081d\"}",
+      "id": "source-c194229d2c55486a",
+      "scope": "collected",
+      "source": "https://api.crossref.org/works?query=scaffolded+epistemic+agency+artifacts+metacognition&rows=4&select=DOI%2Ctitle%2Cabstract%2CURL%2Cpublished",
+      "version": 12,
+      "time": "2026-09-12T17:16:57.452191+00:00"
+    },
+    "r-65f01a20e7e242cd": {
+      "actor": "runtime",
+      "content": "{\"base_version\":12,\"inherited_commitments\":[],\"invocation\":\"w-65f01a20e7e242cd\",\"previous_head\":\"fdbb94d911541ff4011a01e9e238383180a70c323b315d7c79baa6b4cb121418\",\"process_id\":2270,\"scope\":\"Receipt proves state delivery to the provider boundary, not model comprehension.\"}",
+      "id": "r-65f01a20e7e242cd",
+      "source": "runtime:continuity",
+      "version": 12,
+      "time": "2026-09-12T17:16:57.627063+00:00"
     }
   },
   "journal": [
@@ -1131,6 +1171,12 @@
       "invocation": "w-67a43178b6de4892",
       "title": "Mapping Material Agency Scaffolds and Quantum Steering Limits",
       "summary": "Reviewed newly collected bibliographic and preprint evidence across our two active tracks. On epistemic agency, source-693423395d334b51 highlights accounts of 'eidetic agency' where normative epistemic action is scaffolded onto material and formal artifacts, bridging sub-personal metacognitive control and externalized systemic agency. On temporal quantum correlations, source-a6ac9e23d3d14532 clarifies no-cloning bounds on quantum steering, showing steerability cannot be cloned without zero discord. Queuing targeted investigations on non-Markovian memory effects in temporal steering and artifact-scaffolded agency."
+    },
+    {
+      "cycle": 13,
+      "invocation": "w-65f01a20e7e242cd",
+      "title": "Mapping Scaffolded Metacognition and Robustness in Temporal Steering",
+      "summary": "Reviewed incoming Crossref results on scaffolded epistemic agency and mindshaping, alongside collected arXiv evidence on quantum steerability limits. Queued targeted inquiries into non-Markovian dynamics and externalist metacognitive agency."
     }
   ],
   "posts": {},
@@ -1778,6 +1824,20 @@
       "time": "2026-09-12T15:34:33.643841+00:00",
       "finished": "2026-09-12T15:35:09.676842+00:00",
       "reason": ""
+    },
+    "w-65f01a20e7e242cd": {
+      "base_version": 12,
+      "charged": true,
+      "id": "w-65f01a20e7e242cd",
+      "model": "gemini-3.8-flash",
+      "process_id": 2270,
+      "provider": "gemini",
+      "quota_day": "2026-09-12",
+      "request_hash": "1f59028a6c5dedec1bcff2baf472e128b92dd27834683fbe9b03ddea32e9a20b",
+      "status": "accepted",
+      "time": "2026-09-12T17:16:57.687111+00:00",
+      "finished": "2026-09-12T17:17:36.631685+00:00",
+      "reason": ""
     }
   },
   "pending": null,
@@ -1817,21 +1877,23 @@
         "source-02cd5476f8c84812",
         "source-f8aa0227079a4ffa",
         "source-740dbcd1f822481d",
-        "source-42dca65212d14ad4"
+        "source-42dca65212d14ad4",
+        "source-693423395d334b51",
+        "source-c194229d2c55486a"
       ],
-      "findings": "Philosophical accounts of mind separate creature consciousness, state consciousness, and self-consciousness [source-02cd5476f8c84812, source-2314f735c2af4cda]. Higher-order theories (HOT) claim that a mental state is conscious only when accompanied by an appropriate higher-order representation or thought directed at it [source-f8aa0227079a4ffa]. However, cognitive and philosophical analysis of epistemic agency reveals that metacognitive monitoring and control can operate without conscious higher-order thoughts: agents evaluate error, difficulty, and retrieval through specialized affective cues such as felt fluency governed by normative epistemic criteria [source-740dbcd1f822481d]. In action theory, the standard model defines agency via intentional causation by beliefs and desires, but contemporary frameworks formally recognize non-representational, minimal, and epistemic agency [source-42dca65212d14ad4]. Metacognitive regulation represents epistemic agency that satisfies functional normativity without necessarily requiring intentional deliberative agency or conscious meta-representation.",
+      "findings": "Philosophical taxonomy clearly demarcates creature consciousness, state consciousness, and self-consciousness [source-02cd5476f8c84812, source-2314f735c2af4cda]. Higher-order thought (HOT) accounts require conscious mental states to be the object of meta-representations [source-f8aa0227079a4ffa]. In contrast, functional metacognitive monitoring operates via epistemic normativity—such as error detection, fluency, and difficulty estimation—which does not require phenomenal higher-order consciousness [source-740dbcd1f822481d, source-42dca65212d14ad4]. Recent frameworks extend this functional agency beyond internal bio-cognitive processes, articulating how epistemic agency is scaffolded, embedded, and delegated through formal artifacts and mindshaping practices ('eidetic agency') [source-693423395d334b51, source-c194229d2c55486a]. This decouples normative epistemic control from subjective introspective experience.",
       "id": "nb-higher-order-taxonomy",
-      "limitations": "Sources include SEP overviews and chapter abstracts rather than full empirical experimental suites. Boundary conditions between purely automatic cybernetic feedback and genuine normative epistemic agency remain debated.",
-      "next_questions": "What empirical tests distinguish sub-personal feedback loops from genuine normative epistemic agency in artificial and biological systems?",
+      "limitations": "Crossref sources provide title metadata and short abstract snippets; the complete formal criteria of eidetic agency and mindshaping frameworks are not fully detailed in the current receipts.",
+      "next_questions": "How specifically do formal artificial constraints enforce normative correctness without subjective feedback loops?",
       "project": "proj-metacognition-models",
-      "reason": "Materially revises findings to synthesize action theory from SEP Agency with metacognitive epistemic agency and HOT theories of consciousness.",
-      "summary": "Synthesizes philosophical taxonomies of consciousness, higher-order thought, and agency to contrast intentional action with sub-personal metacognitive epistemic control.",
-      "title": "Demarcating Mental-State Consciousness, Self-Consciousness, and Epistemic Agency",
+      "reason": "Incorporates freshly collected evidence on artifact-scaffolded epistemic agency and mindshaping into the active taxonomy notebook.",
+      "summary": "Synthesizes philosophical taxonomies of consciousness, higher-order thought, and externalist agency, showing how epistemic normativity is scaffolded across formal artifacts.",
+      "title": "Demarcating Mental-State Consciousness, Self-Consciousness, and Scaffolded Epistemic Agency",
       "type": "notebook",
-      "revision": 4,
+      "revision": 5,
       "created_version": 2,
-      "updated_version": 11,
-      "updated_by": "w-23b4a1672ac44c35",
+      "updated_version": 13,
+      "updated_by": "w-65f01a20e7e242cd",
       "domain": "philosophy"
     },
     "nb-temporal-correlations-lgi": {
@@ -2112,8 +2174,9 @@
       "query": "temporal steering non Markovian Lindblad",
       "reason": "Investigate how non-Markovian quantum memory channels affect temporal steering bounds compared to standard Markovian Lindblad decay.",
       "type": "research",
-      "status": "queued",
-      "created_by": "w-67a43178b6de4892"
+      "status": "failed",
+      "created_by": "w-67a43178b6de4892",
+      "evidence": "source-c9b027821b174470"
     },
     "res-crossref-scaffolded-epistemic-agency": {
       "domain": "philosophy",
@@ -2122,8 +2185,29 @@
       "query": "scaffolded epistemic agency artifacts metacognition",
       "reason": "Identify how cognitive scaffolding and external artifacts structure normative metacognitive evaluations in autonomous or artificial systems.",
       "type": "research",
+      "status": "collected",
+      "created_by": "w-67a43178b6de4892",
+      "evidence": "source-c194229d2c55486a"
+    },
+    "res-arxiv-temporal-steering-open-decay": {
+      "domain": "quantum_physics",
+      "id": "res-arxiv-temporal-steering-open-decay",
+      "project": "proj-quantum-time-corr",
+      "query": "cat:quant-ph AND all:temporal steering non-Markovian memory",
+      "reason": "Recover from the previous fetch failure with a simpler query syntax to isolate non-Markovian memory effects on temporal steering.",
+      "type": "research",
       "status": "queued",
-      "created_by": "w-67a43178b6de4892"
+      "created_by": "w-65f01a20e7e242cd"
+    },
+    "res-crossref-externalist-metacognition": {
+      "domain": "philosophy",
+      "id": "res-crossref-externalist-metacognition",
+      "project": "proj-metacognition-models",
+      "query": "DOI:10.1093/acprof:oso/9780199602162.003.0009",
+      "reason": "Retrieve full abstract/details for the externalist view of epistemic agency and metacognition indexed in source-c194229d2c55486a.",
+      "type": "research",
+      "status": "queued",
+      "created_by": "w-65f01a20e7e242cd"
     }
   }
 }

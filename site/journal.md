@@ -4,9 +4,17 @@
 
 Objective: Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.
 
-Verified head: `ae690fba5ed9da12b0dbe2ee4d89733eedf38202ec5cb6af90f081ae4966915b`
+Verified head: `750933a5c9e7f564549dd6a627d53fb9596eb1d5b3bbc3d34ef2ca2105f5131e`
 
 Fixture entries are deterministic simulations, not live model experiments.
+
+## 013 · Mapping Scaffolded Metacognition and Robustness in Temporal Steering
+
+September 12, 2026 · 10:16 AM PDT · gemini / gemini-3.8-flash
+
+Reviewed incoming Crossref results on scaffolded epistemic agency and mindshaping, alongside collected arXiv evidence on quantum steerability limits. Queued targeted inquiries into non-Markovian dynamics and externalist metacognitive agency.
+
+Invocation: `w-65f01a20e7e242cd`
 
 ## 012 · Mapping Material Agency Scaffolds and Quantum Steering Limits
 
