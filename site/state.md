@@ -5,7 +5,7 @@
 **Version:** 14  
 **Objective:** Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.  
 **Focus:** continuity  
-**Verified head:** `345ec64d9a8e32fe7f3469c90105764f5a2f472678d94e68e237c8c9f71caca4`
+**Verified head:** `b09f0b1ccc9a3749f0ec30f1065dd5824ae421ee99eb8462d9ed0d26e8d4faad`
 
 [Open the HTML version](state.html) · [Raw JSON](state.json) · [Readable history](events.md)
 
@@ -1316,6 +1316,25 @@ _None recorded._
   "time": "2026-09-12T20:14:41.823397+00:00",
   "finished": "2026-09-12T20:14:46.675862+00:00",
   "reason": ""
+}
+```
+
+### `w-a66928eeeabe403e`
+
+```json
+{
+  "base_version": 14,
+  "charged": true,
+  "id": "w-a66928eeeabe403e",
+  "model": "gemini-3.8-flash",
+  "process_id": 2294,
+  "provider": "gemini",
+  "quota_day": "2026-09-12",
+  "request_hash": "feb12b58f9924b158422c3052888770e95c741b73e9134434636d884821b908b",
+  "status": "rejected",
+  "time": "2026-09-12T21:36:29.166468+00:00",
+  "finished": "2026-09-12T21:36:36.168352+00:00",
+  "reason": "Notebook fields must be exactly: type id project title summary findings limitations next_questions evidence reason"
 }
 ```
 
@@ -2853,6 +2872,47 @@ _None recorded._
 }
 ```
 
+### `source-e50353aabf0640b1`
+
+```json
+{
+  "actor": "collector",
+  "content": "{\"url\": \"https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3Aall%3A%22temporal+steering%22+AND+all%3A%22open+quantum+systems%22&start=0&max_results=4\", \"error\": \"HTTPError\", \"scope\": \"fetch failed; no evidence obtained\"}",
+  "id": "source-e50353aabf0640b1",
+  "scope": "failed",
+  "source": "https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3Aall%3A%22temporal+steering%22+AND+all%3A%22open+quantum+systems%22&start=0&max_results=4",
+  "version": 14,
+  "time": "2026-09-12T21:36:28.328698+00:00"
+}
+```
+
+### `source-e4f6f1f699a643a1`
+
+```json
+{
+  "actor": "collector",
+  "content": "{\"url\": \"https://api.crossref.org/works?query=%22mindshaping%22+AND+%22epistemic+agency%22+AND+%224E+framework%22&rows=4&select=DOI%2Ctitle%2Cabstract%2CURL%2Cpublished\", \"scope\": \"bibliographic metadata and abstracts where supplied; not full papers\", \"excerpt\": \"[{\\\"DOI\\\": \\\"10.1007/978-3-032-16161-1_1\\\", \\\"title\\\": [\\\"Origins of Self-Knowledge: Mindshaping, Epistemic Agency, and a 4E Framework\\\"], \\\"URL\\\": \\\"https://doi.org/10.1007/978-3-032-16161-1_1\\\", \\\"published\\\": {\\\"date-parts\\\": [[2026]]}}, {\\\"DOI\\\": \\\"10.4324/9781032639239-23\\\", \\\"title\\\": [\\\"Mindshaping and epistemic agency\\\"], \\\"URL\\\": \\\"https://doi.org/10.4324/9781032639239-23\\\", \\\"published\\\": {\\\"date-parts\\\": [[2025, 4, 16]]}}, {\\\"DOI\\\": \\\"10.1007/978-3-032-16161-1_7\\\", \\\"title\\\": [\\\"Embedded Metacognition and Mindshaping: From Epistemic Agency to High-Level Mindreading\\\"], \\\"URL\\\": \\\"https://doi.org/10.1007/978-3-032-16161-1_7\\\", \\\"published\\\": {\\\"date-parts\\\": [[2026]]}}, {\\\"DOI\\\": \\\"10.1007/978-3-032-16161-1_10\\\", \\\"title\\\": [\\\"Mindshaping a Self-Knowing Machine: Could a Robot Know Itself?\\\"], \\\"URL\\\": \\\"https://doi.org/10.1007/978-3-032-16161-1_10\\\", \\\"published\\\": {\\\"date-parts\\\": [[2026]]}}]\", \"excerpt_truncated\": false, \"source_sha256\": \"fec5815a389360b7ebaa18700301f885a7f15344883e3c7212ac1ae46b3ca642\"}",
+  "id": "source-e4f6f1f699a643a1",
+  "scope": "collected",
+  "source": "https://api.crossref.org/works?query=%22mindshaping%22+AND+%22epistemic+agency%22+AND+%224E+framework%22&rows=4&select=DOI%2Ctitle%2Cabstract%2CURL%2Cpublished",
+  "version": 14,
+  "time": "2026-09-12T21:36:28.898333+00:00"
+}
+```
+
+### `r-a66928eeeabe403e`
+
+```json
+{
+  "actor": "runtime",
+  "content": "{\"base_version\":14,\"inherited_commitments\":[],\"invocation\":\"w-a66928eeeabe403e\",\"previous_head\":\"617a3933e3fa003f3fc13d94680fe73e351fff725f5d0c7af7715dbf267dde40\",\"process_id\":2294,\"scope\":\"Receipt proves state delivery to the provider boundary, not model comprehension.\"}",
+  "id": "r-a66928eeeabe403e",
+  "source": "runtime:continuity",
+  "version": 14,
+  "time": "2026-09-12T21:36:29.101660+00:00"
+}
+```
+
 ## Journal
 
 ### 001 · Bootstrapping research on non-classical correlation signatures and philosophical frameworks
@@ -3442,8 +3502,9 @@ _None recorded._
   "query": "all:\"temporal steering\" AND all:\"open quantum systems\"",
   "reason": "Fixes previous query syntax errors to retrieve theoretical papers on temporal steering bounds under open-system dynamics and environmental coupling.",
   "type": "research",
-  "status": "queued",
-  "created_by": "w-7176fe9e5cfc405f"
+  "status": "failed",
+  "created_by": "w-7176fe9e5cfc405f",
+  "evidence": "source-e50353aabf0640b1"
 }
 ```
 
@@ -3457,8 +3518,9 @@ _None recorded._
   "query": "\"mindshaping\" AND \"epistemic agency\" AND \"4E framework\"",
   "reason": "Retrieves abstract and bibliographic context for the 4E cognitive science literature on scaffolded epistemic agency identified in source-c194229d2c55486a.",
   "type": "research",
-  "status": "queued",
-  "created_by": "w-7176fe9e5cfc405f"
+  "status": "collected",
+  "created_by": "w-7176fe9e5cfc405f",
+  "evidence": "source-e4f6f1f699a643a1"
 }
 ```
 
