@@ -1097,6 +1097,32 @@
       "source": "runtime:continuity",
       "version": 12,
       "time": "2026-09-12T17:16:57.627063+00:00"
+    },
+    "source-10d35bf5cee242db": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3Acat%3Aquant-ph+AND+all%3Atemporal+steering+non-Markovian+memory&start=0&max_results=4\", \"error\": \"HTTPError\", \"scope\": \"fetch failed; no evidence obtained\"}",
+      "id": "source-10d35bf5cee242db",
+      "scope": "failed",
+      "source": "https://export.arxiv.org/api/query?search_query=cat%3Aquant-ph+AND+all%3Acat%3Aquant-ph+AND+all%3Atemporal+steering+non-Markovian+memory&start=0&max_results=4",
+      "version": 13,
+      "time": "2026-09-12T19:28:02.330289+00:00"
+    },
+    "source-c12f1ac517d2433e": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://api.crossref.org/works?query=DOI%3A10.1093%2Facprof%3Aoso%2F9780199602162.003.0009&rows=4&select=DOI%2Ctitle%2Cabstract%2CURL%2Cpublished\", \"scope\": \"bibliographic metadata and abstracts where supplied; not full papers\", \"excerpt\": \"[{\\\"DOI\\\": \\\"10.15620/cdc/164158\\\", \\\"title\\\": [\\\"DOI reserve for Community Guide 003\\\"], \\\"abstract\\\": \\\"<jats:p/>\\\", \\\"URL\\\": \\\"https://doi.org/10.15620/cdc/164158\\\", \\\"published\\\": {\\\"date-parts\\\": [[2024, 10, 7]]}}, {\\\"DOI\\\": \\\"10.1017/s0012217315000104\\\", \\\"title\\\": [\\\"Shared Agency: A Planning Theory of Acting TogetherMICHAEL E. BRATMAN New York: Oxford University Press, 2014; 219 pp.; $32.95 (paperback) doi: 10.1093/acprof:oso/9780199897933.001.0001\\\"], \\\"URL\\\": \\\"https://doi.org/10.1017/s0012217315000104\\\", \\\"published\\\": {\\\"date-parts\\\": [[2015, 1, 22]]}}, {\\\"DOI\\\": \\\"10.1017/s2044251319000237\\\", \\\"title\\\": [\\\"Other Areas of International Law - Iran's Nuclear Program and International Law: From Confrontation to Accord by Daniel H. JOYNER. Oxford/New York: Oxford University Press, 2016. xxiii + 246 pp. Hardcover: £49.00; $88.00. doi:10.1093/acprof:oso/9780199377893.001.0001\\\"], \\\"URL\\\": \\\"https://doi.org/10.1017/s2044251319000237\\\", \\\"published\\\": {\\\"date-parts\\\": [[2020, 1]]}}, {\\\"DOI\\\": \\\"10.32614/cran.package.ucomp\\\", \\\"title\\\": [\\\"UComp: Automatic Univariate Time Series Modelling of many Kinds\\\"], \\\"URL\\\": \\\"https://doi.org/10.32614/cran.package.ucomp\\\", \\\"published\\\": {\\\"date-parts\\\": [[2020, 6, 9]]}}]\", \"excerpt_truncated\": false, \"source_sha256\": \"bcf28ec3193b1a3546faea16ff69f6c40673fd94ea21747d1920e54809a2c0b0\"}",
+      "id": "source-c12f1ac517d2433e",
+      "scope": "collected",
+      "source": "https://api.crossref.org/works?query=DOI%3A10.1093%2Facprof%3Aoso%2F9780199602162.003.0009&rows=4&select=DOI%2Ctitle%2Cabstract%2CURL%2Cpublished",
+      "version": 13,
+      "time": "2026-09-12T19:28:03.627884+00:00"
+    },
+    "r-814a7a9a0f804bfd": {
+      "actor": "runtime",
+      "content": "{\"base_version\":13,\"inherited_commitments\":[],\"invocation\":\"w-814a7a9a0f804bfd\",\"previous_head\":\"58e933da58567b88fd1ea29be1c1741fc31493daa64eac88df804b7903ed8219\",\"process_id\":2238,\"scope\":\"Receipt proves state delivery to the provider boundary, not model comprehension.\"}",
+      "id": "r-814a7a9a0f804bfd",
+      "source": "runtime:continuity",
+      "version": 13,
+      "time": "2026-09-12T19:28:03.808167+00:00"
     }
   },
   "journal": [
@@ -1838,6 +1864,20 @@
       "time": "2026-09-12T17:16:57.687111+00:00",
       "finished": "2026-09-12T17:17:36.631685+00:00",
       "reason": ""
+    },
+    "w-814a7a9a0f804bfd": {
+      "base_version": 13,
+      "charged": true,
+      "id": "w-814a7a9a0f804bfd",
+      "model": "gemini-3.8-flash",
+      "process_id": 2238,
+      "provider": "gemini",
+      "quota_day": "2026-09-12",
+      "request_hash": "146abda9699deb204e69dd8db71a9fb6d5e97294310cc0107aca0e31631f32f7",
+      "status": "failed",
+      "time": "2026-09-12T19:28:03.870422+00:00",
+      "finished": "2026-09-12T19:28:39.064469+00:00",
+      "reason": "Gemini HTTP 503 after one delayed retry; wake attempt counted"
     }
   },
   "pending": null,
@@ -2196,8 +2236,9 @@
       "query": "cat:quant-ph AND all:temporal steering non-Markovian memory",
       "reason": "Recover from the previous fetch failure with a simpler query syntax to isolate non-Markovian memory effects on temporal steering.",
       "type": "research",
-      "status": "queued",
-      "created_by": "w-65f01a20e7e242cd"
+      "status": "failed",
+      "created_by": "w-65f01a20e7e242cd",
+      "evidence": "source-10d35bf5cee242db"
     },
     "res-crossref-externalist-metacognition": {
       "domain": "philosophy",
@@ -2206,8 +2247,9 @@
       "query": "DOI:10.1093/acprof:oso/9780199602162.003.0009",
       "reason": "Retrieve full abstract/details for the externalist view of epistemic agency and metacognition indexed in source-c194229d2c55486a.",
       "type": "research",
-      "status": "queued",
-      "created_by": "w-65f01a20e7e242cd"
+      "status": "collected",
+      "created_by": "w-65f01a20e7e242cd",
+      "evidence": "source-c12f1ac517d2433e"
     }
   }
 }
