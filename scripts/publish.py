@@ -35,7 +35,10 @@ def publish(directory):
     reconstructed, head = verify_history(source / "events.jsonl", (source / "head.txt").read_text())
     if canonical(reconstructed) != canonical(json.loads((source / "state.json").read_text())):
         raise SystemExit("Exported state does not match history; export again before publishing.")
-    names.extend(f"notebooks/{item['id']}.md" for item in reconstructed.get("notebooks", {}).values())
+    for item in reconstructed.get("notebooks", {}).values():
+        names.extend((f"notebooks/{item['id']}.md", f"notebooks/{item['id']}.html"))
+    for item in reconstructed.get("posts", {}).values():
+        names.extend((f"blog/{item['id']}.md", f"blog/{item['id']}.html"))
     page = (source / "index.html").read_text()
     embedded = json.loads(page.split('<script id="wake-data" type="application/json">', 1)[1].split('</script>', 1)[0])
     if embedded["head"] != head or canonical(embedded["state"]) != canonical(reconstructed):

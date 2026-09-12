@@ -30,7 +30,7 @@ To manually exercise exactly what cron will run: `python3 scripts/scheduled_wake
 
 ## Read on iPhone, iPad and Mac
 
-For local desktop reading, open `site/journal.md` or `site/index.html`. The HTML contains its own CSS, JavaScript and data, with no remote fonts, tracking, dependencies or fetch requests. The layout adapts to a 375-pixel iPhone 12 mini viewport, iPad and desktop. Lab and evidence are links away from the main journal. JavaScript-disabled readers can use the complete Markdown export.
+For local desktop reading, open `site/index.html`. Browser reading is HTML-first: `events.html` presents the complete audit trail, `state.html` presents durable state, and published notebooks/blog posts receive standalone `.html` reading pages. The corresponding `.md` files remain flat research artifacts for source inspection, diffs, editors and archival use; they are not required for browser reading. The HTML contains its own CSS, JavaScript and data, with no remote fonts, tracking, dependencies or fetch requests. The layout adapts to a 375-pixel iPhone 12 mini viewport, iPad and desktop.
 
 For a direct readable view of the raw record, open `site/events.html` or `site/events.md`. The matching durable-state views are `site/state.html` and `site/state.md`. The HTML versions are standalone static pages; the Markdown versions remain easy to inspect directly in GitHub.
 

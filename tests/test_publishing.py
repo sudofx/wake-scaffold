@@ -32,6 +32,9 @@ class PublishingTests(unittest.TestCase):
                 export(engine.store, project/"site")
                 for name in ("events.md", "events.html", "state.md", "state.html"):
                     self.assertTrue((project/"site"/name).is_file())
+                page = (project/"site/index.html").read_text()
+                self.assertIn('href="events.html">Readable history', page)
+                self.assertIn('href="state.html">State', page)
                 module.publish(project/"site")
                 module.publish(project/"site")
                 count = subprocess.check_output(["git", "--git-dir", str(remote), "rev-list", "--count", "journal-pages"],text=True).strip()

@@ -228,6 +228,56 @@ def _human_state_html(state, head):
     return _human_page("Human-readable durable state", "The current projected state, reorganized for reading without changing the canonical JSON.", "".join(chunks), head, "state.json", "state.md")
 
 
+def _reading_page(title, eyebrow, body, source_href, back_href="../index.html"):
+    """Standalone browser reading page; Markdown remains a secondary flat artifact."""
+    return f"""<!doctype html>
+<html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">
+<title>{html.escape(title)} · WAKE✳</title>
+<style>
+:root{{color-scheme:light dark;--bg:#f3f0e8;--fg:#181818;--muted:#666;--card:#fff;--line:#d7d1c5;--accent:#b64a2c}}
+@media(prefers-color-scheme:dark){{:root{{--bg:#171715;--fg:#eee;--muted:#aaa;--card:#22221f;--line:#3a3933;--accent:#e47b58}}}}
+*{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--fg);font:17px/1.68 ui-serif,Georgia,Cambria,\"Times New Roman\",serif}}main{{max-width:820px;margin:auto;padding:34px 20px 90px}}header{{border-bottom:1px solid var(--line);padding-bottom:22px;margin-bottom:30px}}h1{{font:700 clamp(2.2rem,7vw,4.6rem)/.98 ui-sans-serif,system-ui,-apple-system,sans-serif;letter-spacing:-.035em;margin:.16em 0 .3em}}h2{{font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;margin-top:2.2em}}h3{{font-family:ui-sans-serif,system-ui,-apple-system,sans-serif}}a{{color:var(--accent)}}nav{{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;font-size:.92rem}}.eyebrow,.meta{{font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-size:.78rem}}.lede{{font-size:1.25rem;line-height:1.5}}.note{{border-left:3px solid var(--accent);padding-left:18px;margin:28px 0}}.sources{{font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;font-size:.95rem}}code{{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}}hr{{border:0;border-top:1px solid var(--line);margin:34px 0}}
+</style></head><body><main><header><div class=\"eyebrow\">{html.escape(eyebrow)}</div><h1>{html.escape(title)}</h1><nav><a href=\"{html.escape(back_href)}\">WAKE site</a><a href=\"{html.escape(source_href)}\">Markdown source</a></nav></header>{body}</main></body></html>"""
+
+
+def _notebook_html(notebook, state):
+    source_items = []
+    for eid in notebook["evidence"]:
+        evidence = state["evidence"][eid]
+        source_items.append(f'<li><a href="{html.escape(str(evidence["source"]))}">{html.escape(eid)}</a></li>')
+    body = (
+        f'<p class="lede">{html.escape(notebook["summary"])}</p>'
+        f'<h2>Findings</h2><p>{html.escape(notebook["findings"])}</p>'
+        f'<h2>Limitations and competing views</h2><p>{html.escape(notebook["limitations"])}</p>'
+        f'<h2>Next questions</h2><p>{html.escape(notebook["next_questions"])}</p>'
+        f'<h2>Collected sources</h2><ul class="sources">{"".join(source_items)}</ul>'
+        f'<hr><p class="meta">Revision {notebook["revision"]} · AI-authored research synthesis; see source scopes in the journal.</p>'
+    )
+    return _reading_page(notebook["title"], "WAKE✳ / RESEARCH NOTEBOOK", body, notebook["id"] + ".md")
+
+
+def _blog_html(post, state):
+    paragraphs = "".join(f"<p>{html.escape(part)}</p>" for part in str(post["body"]).split("\n\n") if part.strip())
+    lens = f'<div class="note"><div class="eyebrow">BOB’S LENS / PHILOSOPHICAL REFLECTION</div><p>{html.escape(post["lens"])}</p></div>' if post.get("lens") else ""
+    notebooks = "".join(
+        f'<li><a href="../notebooks/{html.escape(nid)}.html">{html.escape(state["notebooks"][nid]["title"])}</a> <small>· <a href="../notebooks/{html.escape(nid)}.md">Markdown source</a></small></li>'
+        for nid in post["notebooks"])
+    sources = "".join(
+        f'<li><a href="{html.escape(str(state["evidence"][eid]["source"]))}">{html.escape(eid)}</a></li>'
+        for eid in post["evidence"])
+    correction = ""
+    if post.get("superseded_by"):
+        correction = f'<p class="note">Superseded by <a href="{html.escape(post["superseded_by"])}.html">{html.escape(post["superseded_by"])}</a>.</p>'
+    body = (
+        f'<p class="lede">{html.escape(post["lede"])}</p>{correction}{paragraphs}{lens}'
+        f'<h2>Follow the receipts</h2><h3>Research notebooks</h3><ul class="sources">{notebooks}</ul>'
+        f'<h3>Collected sources</h3><ul class="sources">{sources}</ul>'
+        f'<p><a href="../index.html#history/{html.escape(post["created_by"])}">Exact wake and decision →</a></p>'
+        '<hr><p class="meta">AI-authored from WAKE✳’s durable research record. Research claims link to evidence; philosophical reflections are reflections.</p>'
+    )
+    return _reading_page(post["title"], "BOB / WAKE✳ BLOG", body, post["id"] + ".md")
+
+
 def export(store, destination="site", experiment=None, operation=None):
     with store.lock():
         state = store.load()
@@ -247,6 +297,13 @@ def export(store, destination="site", experiment=None, operation=None):
         page = page.replace("/* WAKE_SCRIPT */", (assets / "app.js").read_text())
         page = page.replace("/* HELP_SCRIPT */", (assets / "help.js").read_text())
         page = page.replace("/* PET_SCRIPT */", (assets / "pet.js").read_text()).replace("WAKE_DATA", embedded)
+        # Browser UX is HTML-first. Markdown remains available as a flat source artifact.
+        page = page.replace('href="journal.md">Markdown ↓</a>', 'href="events.html">Readable history →</a>')
+        page = page.replace('Read the complete <a href="journal.md">Markdown journal</a> or download <a href="state.json">the durable state</a>.',
+                            'Read the <a href="events.html">human-readable history</a> or <a href="state.html">human-readable durable state</a>.')
+        page = page.replace('<a href="state.json">State →</a><a href="events.jsonl">History →</a><a href="journal.md">Markdown →</a>',
+                            '<a href="state.html">State →</a><a href="events.html">History →</a><a href="journal.md">Journal source ↓</a>')
+        page = page.replace("'.md'>Markdown ↓</a>", "'.html'>Standalone HTML →</a> · <a class=\"subtle\" href=\"blog/'+encodeURIComponent(post.id)+'.md\">Markdown source ↓</a>")
         lines = ["# WAKE✳ — The journal", "", "> Disposable models. Durable state. Receipts for everything.", "",
                  f"Objective: {state['objective']}", "", f"Verified head: `{head}`", "",
                  "Fixture entries are deterministic simulations, not live model experiments.", ""]
@@ -271,6 +328,7 @@ def export(store, destination="site", experiment=None, operation=None):
                         f"## Next questions\n\n{notebook['next_questions']}\n\n## Collected sources\n\n{sources}\n\n"
                         f"Revision {notebook['revision']} · AI-authored research synthesis; see source scopes in the journal.\n")
             atomic_write(target / "notebooks" / (notebook["id"] + ".md"), markdown)
+            atomic_write(target / "notebooks" / (notebook["id"] + ".html"), _notebook_html(notebook, state))
         for post in state.get("posts", {}).values():
             newline = chr(10)
             notebook_links = newline.join(
@@ -288,6 +346,7 @@ def export(store, destination="site", experiment=None, operation=None):
                       f"[Exact wake and decision](../index.html#history/{post['created_by']})", "",
                       "AI-authored from WAKE✳'s durable research record. Research claims link to evidence; philosophical reflections are reflections.", ""]
             atomic_write(target / "blog" / (post["id"] + ".md"), newline.join(parts))
+            atomic_write(target / "blog" / (post["id"] + ".html"), _blog_html(post, state))
         if experiment:
             atomic_write(target / "experiment.json", json.dumps(experiment, indent=2))
         else:
