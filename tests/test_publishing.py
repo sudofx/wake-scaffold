@@ -30,6 +30,8 @@ class PublishingTests(unittest.TestCase):
             try:
                 engine.run(Fixture())
                 export(engine.store, project/"site")
+                for name in ("events.md", "events.html", "state.md", "state.html"):
+                    self.assertTrue((project/"site"/name).is_file())
                 module.publish(project/"site")
                 module.publish(project/"site")
                 count = subprocess.check_output(["git", "--git-dir", str(remote), "rev-list", "--count", "journal-pages"],text=True).strip()
@@ -40,7 +42,12 @@ class PublishingTests(unittest.TestCase):
                 count = subprocess.check_output(["git", "--git-dir", str(remote), "rev-list", "--count", "journal-pages"],text=True).strip()
                 self.assertEqual(count, "2")
                 files = subprocess.check_output(["git", "--git-dir", str(remote), "ls-tree", "--name-only", "journal-pages"],text=True).splitlines()
-                self.assertEqual(set(files), {".nojekyll", "index.html", "journal.md", "state.json", "events.jsonl", "head.txt"})
+                self.assertEqual(set(files), {
+                    ".nojekyll", "index.html", "journal.md",
+                    "state.json", "state.md", "state.html",
+                    "events.jsonl", "events.md", "events.html",
+                    "head.txt",
+                })
                 self.assertFalse((project/"index.html").exists())
                 (project/"site/state.json").write_text('{}')
                 with self.assertRaises(SystemExit):

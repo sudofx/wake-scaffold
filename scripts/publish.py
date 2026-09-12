@@ -25,6 +25,10 @@ def publish(directory):
     names = ["index.html", "journal.md", "state.json", "events.jsonl", "head.txt"]
     if not all((source / name).is_file() for name in names):
         raise SystemExit("Export the journal first.")
+    # Newer exports include human-readable companions. Keep older fixture exports publishable.
+    for name in ("state.md", "state.html", "events.md", "events.html"):
+        if (source / name).is_file():
+            names.append(name)
     if (source / "experiment.json").exists():
         names.append("experiment.json")
     # Fail before remote access if the export mixes generations or was edited.

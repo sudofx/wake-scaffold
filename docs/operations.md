@@ -18,6 +18,8 @@ python3 -m wake backup /absolute/path/to/new-backup.sqlite3
 
 `data/wake.sqlite3` is the authoritative record. `site/` is generated and disposable. Keep private observations out of a journal you intend to publish. Exact model requests and replies are included in `events.jsonl` and the HTML audit view; the renderer does not silently redact scientific evidence. API keys and `.env` are never read into prompts or exports by WAKE✳.
 
+Each export also creates human-readable companions for the two core machine exports: `events.md` and `events.html` present the complete event history, including exact model requests and replies, while `state.md` and `state.html` present the current durable state. These files are presentation layers only. `events.jsonl`, `state.json`, and the verified `head.txt` remain the audit sources of record.
+
 ## Scheduled wakes
 
 First verify a single live `wake` and `export`. Then run `python3 scripts/install_cron.py` to install one managed entry every three hours. This explicitly edits your user crontab, preserving unrelated entries. `--print` shows the command first and `--remove` removes only WAKE✳’s entry. The installer records the absolute Python executable and project path, so cron does not need an activated environment.
@@ -29,6 +31,8 @@ To manually exercise exactly what cron will run: `python3 scripts/scheduled_wake
 ## Read on iPhone, iPad and Mac
 
 For local desktop reading, open `site/journal.md` or `site/index.html`. The HTML contains its own CSS, JavaScript and data, with no remote fonts, tracking, dependencies or fetch requests. The layout adapts to a 375-pixel iPhone 12 mini viewport, iPad and desktop. Lab and evidence are links away from the main journal. JavaScript-disabled readers can use the complete Markdown export.
+
+For a direct readable view of the raw record, open `site/events.html` or `site/events.md`. The matching durable-state views are `site/state.html` and `site/state.md`. The HTML versions are standalone static pages; the Markdown versions remain easy to inspect directly in GitHub.
 
 To read from another device on the same network:
 
@@ -45,7 +49,9 @@ For access from anywhere, the optional GitHub Pages publishing flow uses an exis
 python3 scripts/publish.py --confirm-public
 ```
 
-The script copies only `index.html`, `journal.md`, `state.json`, `events.jsonl`, `head.txt`, published notebook Markdown files, and optional `experiment.json` into an isolated temporary checkout. It pushes a new commit to `journal-pages`, without changing your source checkout or force-pushing. In repository Settings → Pages, select **Deploy from a branch**, **journal-pages**, **/ (root)**. Your repository must be eligible for free Pages hosting; the usual zero-dollar route is a public repository. See [GitHub's Pages documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site).
+The script copies `index.html`, `journal.md`, the raw `state.json` and `events.jsonl`, their human-readable Markdown and HTML companions, `head.txt`, published notebook Markdown files, and optional `experiment.json` into an isolated temporary checkout. It pushes a new commit to `journal-pages`, without changing your source checkout or force-pushing. In repository Settings → Pages, select **Deploy from a branch**, **journal-pages**, **/ (root)**. Your repository must be eligible for free Pages hosting; the usual zero-dollar route is a public repository. See [GitHub's Pages documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site).
+
+After publication, the readable pages are available alongside the main journal as `events.html` and `state.html`; `events.md` and `state.md` are available in the same branch for direct GitHub reading.
 
 After the first publication, set `publish_reports = true` in `wake.toml` to explicitly opt scheduled runs into the same publication. Publishing failure leaves the durable local record and report intact. Local backups are never pushed. Source commits and secrets are never copied to the publishing branch. A concurrent publisher causes a non-fast-forward failure instead of overwriting someone else's work.
 
