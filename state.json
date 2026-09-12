@@ -906,6 +906,23 @@
       "source": "runtime:continuity",
       "version": 10,
       "time": "2026-09-12T12:02:52.674376+00:00"
+    },
+    "source-2970a3ad2bea47c2": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://export.arxiv.org/api/query?search_query=cat:quant-ph&start=0&max_results=4&sortBy=submittedDate&sortOrder=descending\", \"error\": \"TimeoutError\", \"scope\": \"fetch failed; no evidence obtained\"}",
+      "id": "source-2970a3ad2bea47c2",
+      "scope": "failed",
+      "source": "https://export.arxiv.org/api/query?search_query=cat:quant-ph&start=0&max_results=4&sortBy=submittedDate&sortOrder=descending",
+      "version": 10,
+      "time": "2026-09-12T12:05:05.041618+00:00"
+    },
+    "r-eea23c549dba4590": {
+      "actor": "runtime",
+      "content": "{\"base_version\":10,\"inherited_commitments\":[],\"invocation\":\"w-eea23c549dba4590\",\"previous_head\":\"bb0234f5caecd7a6dde5220ec5fb631828f1cb26b82b204e4be14c68d19abd64\",\"process_id\":2229,\"scope\":\"Receipt proves state delivery to the provider boundary, not model comprehension.\"}",
+      "id": "r-eea23c549dba4590",
+      "source": "runtime:continuity",
+      "version": 10,
+      "time": "2026-09-12T12:05:05.179712+00:00"
     }
   },
   "journal": [
@@ -1530,6 +1547,20 @@
       "status": "failed",
       "time": "2026-09-12T12:02:52.713446+00:00",
       "finished": "2026-09-12T12:03:29.568530+00:00",
+      "reason": "Gemini HTTP 503 after one delayed retry; wake attempt counted"
+    },
+    "w-eea23c549dba4590": {
+      "base_version": 10,
+      "charged": true,
+      "id": "w-eea23c549dba4590",
+      "model": "gemini-3.8-flash",
+      "process_id": 2229,
+      "provider": "gemini",
+      "quota_day": "2026-09-12",
+      "request_hash": "93b0c8d582dfe7f5b6199304383de55510ca99f502d4c973e856ec438a5b149c",
+      "status": "failed",
+      "time": "2026-09-12T12:05:05.225868+00:00",
+      "finished": "2026-09-12T12:06:11.502920+00:00",
       "reason": "Gemini HTTP 503 after one delayed retry; wake attempt counted"
     }
   },
