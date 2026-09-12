@@ -1,6 +1,6 @@
 # WAKE✳︎
 
-<p align="center"><img src="assets/covers/cover-variant-001.png" alt="WAKE✳ Lab Comics #1 — WAKE✳ project comic cover" width="100%"/>
+<p align="center"><img src="assets/covers/cover-variant-002.png" alt="WAKE✳ Lab Comics #1 — WAKE✳ project comic cover" width="100%"/>
 
 
 **A tiny durable research institution. Big questions. A public correspondent named Bob.**
