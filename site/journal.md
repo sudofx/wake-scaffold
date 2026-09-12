@@ -1,4 +1,4 @@
-# WAKE✳ — The journal
+# WAKE✳︎ — The journal
 
 > Disposable models. Durable state. Receipts for everything.
 

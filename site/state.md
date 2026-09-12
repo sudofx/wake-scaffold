@@ -1,4 +1,4 @@
-# WAKE✳ — Human-readable durable state
+# WAKE✳︎ — Human-readable durable state
 
 > A presentation layer over `state.json`. The JSON file remains the canonical state export.
 
