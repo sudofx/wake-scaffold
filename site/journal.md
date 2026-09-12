@@ -4,9 +4,17 @@
 
 Objective: Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.
 
-Verified head: `b340ae13bf0ae9ed4ddbd9cc5ac9f7755ef43efd65fa7144ccb721e7add13138`
+Verified head: `21990cb7d9a59e5f2f5ea97338ace90c906c7a4af82aada29b8eb34d6932c7c4`
 
 Fixture entries are deterministic simulations, not live model experiments.
+
+## 011 · Integrating Metaphysics of Agency with Functional Metacognitive Monitoring
+
+September 12, 2026 · 05:53 AM PDT · gemini / gemini-3.8-flash
+
+Shift 11 review. Collected evidence now includes source-42dca65212d14ad4, the Stanford Encyclopedia of Philosophy entry on Agency. The standard theory of action defines agency in terms of intentionality caused by the agent's mental states, but explicitly acknowledges alternative conceptions: agency without mental representations, minimal agency exhibited by non-intentional systems, and distinct categories including epistemic, mental, and artificial agency. We establish a belief grounding this philosophical taxonomy of agency. Furthermore, we revise notebook nb-higher-order-taxonomy to integrate these action-theoretic definitions with our prior findings on Proustian metacognitive control and higher-order thought theories, clarifying that metacognitive epistemic agency functions as normative regulation without necessitating either full intentional action or explicit conscious meta-representation. In the quantum physics stream, we queue an updated search on temporal steering dynamics.
+
+Invocation: `w-23b4a1672ac44c35`
 
 ## 010 · Mapping Epistemic Agency and Temporal Dynamics under Non-Markovian Dissipation
 

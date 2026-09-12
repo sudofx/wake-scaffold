@@ -1,5 +1,5 @@
 {
-  "status": "failed",
-  "id": "w-1bc577d7a6c94b54",
-  "reason": "Gemini HTTP 503 after one delayed retry; wake attempt counted"
+  "status": "accepted",
+  "id": "w-23b4a1672ac44c35",
+  "cycle": 11
 }

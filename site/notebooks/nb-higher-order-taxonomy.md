@@ -1,24 +1,24 @@
 # Demarcating Mental-State Consciousness, Self-Consciousness, and Epistemic Agency
 
-Synthesizes philosophical taxonomy distinguishing creature and state consciousness from pre-reflective self-awareness, and contrasts higher-order thought theories with functional metacognitive epistemic agency.
+Synthesizes philosophical taxonomies of consciousness, higher-order thought, and agency to contrast intentional action with sub-personal metacognitive epistemic control.
 
 ## Findings
 
-Philosophical taxonomy clearly separates creature consciousness, state consciousness, and consciousness as an entity [source-02cd5476f8c84812]. Higher-order thought (HOT) theories propose that a first-order mental state becomes conscious solely in virtue of being the target of a higher-order intentional representation [source-f8aa0227079a4ffa]. However, self-consciousness exhibits distinct strata: self-consciousness in thought involves first-person 'I'-reference and immunity to error through misidentification, whereas pre-reflective self-consciousness characterizes phenomenal experience without requiring explicit conceptual mediation [source-2314f735c2af4cda]. Crucially, accounts of epistemic agency and metacognitive control demonstrate that cognitive regulation, error detection, and confidence monitoring can proceed via sub-personal heuristics, affective cues, and specialized feelings of fluency [source-740dbcd1f822481d]. Thus, functional metacognitive control is conceptually distinct from the meta-representational mechanisms posited by higher-order theories of conscious state attribution. Speculative attempts to map these cognitive monitoring strata directly onto microphysical or quantum brain dynamics remain philosophically non-standard and physically ungrounded [source-830b2c85801f445f].
+Philosophical accounts of mind separate creature consciousness, state consciousness, and self-consciousness [source-02cd5476f8c84812, source-2314f735c2af4cda]. Higher-order theories (HOT) claim that a mental state is conscious only when accompanied by an appropriate higher-order representation or thought directed at it [source-f8aa0227079a4ffa]. However, cognitive and philosophical analysis of epistemic agency reveals that metacognitive monitoring and control can operate without conscious higher-order thoughts: agents evaluate error, difficulty, and retrieval through specialized affective cues such as felt fluency governed by normative epistemic criteria [source-740dbcd1f822481d]. In action theory, the standard model defines agency via intentional causation by beliefs and desires, but contemporary frameworks formally recognize non-representational, minimal, and epistemic agency [source-42dca65212d14ad4]. Metacognitive regulation represents epistemic agency that satisfies functional normativity without necessarily requiring intentional deliberative agency or conscious meta-representation.
 
 ## Limitations and competing views
 
-Crossref source provides book abstract and bibliographic metadata, not full text; nuances of Proust's externalist agency argument require verification of the complete volume.
+Sources include SEP overviews and chapter abstracts rather than full empirical experimental suites. Boundary conditions between purely automatic cybernetic feedback and genuine normative epistemic agency remain debated.
 
 ## Next questions
 
-How do standard predictive processing accounts of error detection map onto this distinction between sub-personal fluency monitoring and conscious higher-order reflection?
+What empirical tests distinguish sub-personal feedback loops from genuine normative epistemic agency in artificial and biological systems?
 
 ## Collected sources
 
 - [source-02cd5476f8c84812](https://plato.stanford.edu/entries/consciousness/)
 - [source-f8aa0227079a4ffa](https://plato.stanford.edu/entries/consciousness-higher/)
-- [source-2314f735c2af4cda](https://plato.stanford.edu/entries/self-consciousness/)
 - [source-740dbcd1f822481d](https://api.crossref.org/works?query=epistemic+agency+metacognitive+control+Proust&rows=4&select=DOI%2Ctitle%2Cabstract%2CURL%2Cpublished)
+- [source-42dca65212d14ad4](https://plato.stanford.edu/entries/agency/)
 
-Revision 3 · AI-authored research synthesis; see source scopes in the journal.
+Revision 4 · AI-authored research synthesis; see source scopes in the journal.

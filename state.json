@@ -1,5 +1,5 @@
 {
-  "version": 10,
+  "version": 11,
   "objective": "Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.",
   "focus": "continuity",
   "beliefs": {
@@ -133,6 +133,19 @@
       "type": "belief",
       "updated_by": "w-8c0a93ea88674b91",
       "updated_version": 10
+    },
+    "bel-agency-taxonomy-sep": {
+      "confidence": 0.85,
+      "evidence": [
+        "source-42dca65212d14ad4"
+      ],
+      "id": "bel-agency-taxonomy-sep",
+      "reason": "Directly supported by the conceptual frameworks and sections 2.1 through 2.5 of the SEP entry on Agency.",
+      "statement": "Philosophical taxonomy in the Stanford Encyclopedia of Philosophy distinguishes standard intentional agency (actions caused by intentional mental states) from alternative forms, including agency without mental representations, minimal agency, and epistemic or mental agency.",
+      "status": "active",
+      "type": "belief",
+      "updated_by": "w-23b4a1672ac44c35",
+      "updated_version": 11
     }
   },
   "commitments": {},
@@ -957,6 +970,23 @@
       "source": "runtime:continuity",
       "version": 10,
       "time": "2026-09-12T12:52:22.522882+00:00"
+    },
+    "source-f612933fe0004a2d": {
+      "actor": "collector",
+      "content": "{\"url\": \"https://export.arxiv.org/api/query?search_query=cat:cs.AI&start=0&max_results=4&sortBy=submittedDate&sortOrder=descending\", \"scope\": \"paper abstracts; preprints, peer-review status not verified\", \"excerpt\": \"title: GPU-CFR: 80x Faster Counterfactual Regret Minimization by Compiling the Game to Static Dataflow and CUDA Graph Replay\\nid: http://arxiv.org/abs/2609.11923v1\\npublished: 2026-09-10T17:58:14Z\\nsummary: Counterfactual regret minimization (CFR) is one of the few large numerical workloads that still runs faster on CPUs than on GPUs. Each iteration sweeps a game tree with up to billions of states in millions of small, interdependent gather and scatter steps issued through a generic tree interface. On a GPU every kernel finishes in microseconds, so kernel launches and framework dispatch dominate the run time, and prior GPU implementations have lost to optimized CPU code. We observe that for a fixed game, everything about a CFR iteration except the numerical values is known before the first iteration runs. We propose GPU-CFR, a compiler and runtime built on this observation. It compiles any game once into static dataflow: flat edge and information-set arrays, precomputed indices, and depth-level batched passes fix the entire operation sequence, and only solver state changes between iterations. Static chance folding, depth-level execution blocks, and a dual-lane reach buffer cut the number of framework operations by up to 18.1x. Because shapes, indices, and buffer addresses never change, CUDA Graph Replay records the iteration once and replays it with a single graph launch. On one A100, across an eight-game suite that spans card games, dice games, and board games, GPU-CFR runs 29.8--80.4x faster than the fastest prior GPU CFR on the same accelerator, and 14--258x faster than LiteEFG, one of the fastest open-source CPU implementations, on the four largest games. The compiled representation carries most of that margin: on eight CPU threads with no accelerator it is already 2.2--51.1x faster than the GPU baseline. On the CPU the optimized path reproduces the reference iterates bitwise, and tree construction and graph capture pay for themselves within the first solve. GPU-CFR beats every CPU and GPU baseline on the mid-to-large games of the suite without changing the update rule.\\n\\ntitle: General Quantification of Covariate and Concept Shifts\\nid: http://arxiv.org/abs/2609.11918v1\\npublished: 2026-09-10T17:57:52Z\\nsummary: Generalization under distribution shift remains a core challenge in modern machine learning, yet existing learning bound theory is limited to narrow, idealized settings and is non-estimable from samples. In this paper, we bridge the gap between theory and practical applications. We first show that existing definition of concept shift breaks when the source and target supports mismatch. Leveraging entropic optimal transport, we propose a key notion: $γ^{*}\\\\!$-concept shifts, and derive a general error bound unifying covariate and $γ^{*}\\\\!$-concept shifts, which applies to broad loss functions, label spaces, and stochastic labeling. We further develop estimators for these shifts with concentration guarantees, and the DataShifts algorithm, which can quantify distribution shifts and estimate the error bound in most applications - a rigorous and general tool for analyzing learning error under distribution shift.\\n\\ntitle: Can Edge-Deployable Vision-Language Models Identify Species?\\nid: http://arxiv.org/abs/2609.11916v1\\npublished: 2026-09-10T17:57:32Z\\nsummary: Camera traps often run in the field on edge hardware with limited or no connectivity, making small, locally-deployable vision-language models (VLMs) -- not frontier-scale ones -- the practically relevant class to evaluate for species identification. We test whether models in this deployment-relevant 2--8B range carry genuine taxonomic knowledge, evaluating four such VLMs (Qwen3-VL 2B/4B/8B, Gemma3 4B) against the domain-specific specialist BioCLIP (300M parameters) on a 96-species task, comparing clean iNaturalist photographs against camera-trap imagery from 6 LILA.science collections, on two independently-sampled evaluation sets. All models identify species far above chance, but every model -- general-purpose or specialist -- degrades sharply on field imagery (domain gaps of 9.6--26.6 percentage points, consistent across taxonomic levels and both evaluation sets), indicating the degradation reflects general image legibility rather than fine-grained discrimination failure. BioCLIP substantially outperforms every VLM tested (by 33.2--59.2 percentage points across an expanded 200-image sample for every model) despite its far smaller size, suggesting the gap reflects specialized training data rather than model scale; yet BioCLIP's own domain gap (18.0 points) is statistically indistinguishable from the best VLM's (22.3 points), suggesting the clean-to-field degradation itself is a property of the image-quality shift rather than a general-purpose-model weakness. Under open-set prompting, 5.9--9.6% of responses are syntactically valid but taxonomically nonexistent species names; the relative fabrication-rate ranking across models replicates exactly across both evaluation sets, a more robust finding than any single point estimate.\\n\\ntitle: Generative Marketing Mix Modeling: A Causal Inference Framework Linking GEO and GEM to Business Impact\\nid: http://arxiv.org/abs/2609.11915v1\\npublished: 2026-09-10T17:57:28Z\\nsummary: Generative artificial intelligence changes how firms reach customers, but standard marketing data do not record how often users see and notice a firm's name in generated answers. We develop Generative Marketing Mix Modeling (GMMM) to estimate the causal effects of Generative Engine Optimization (GEO) and Generative Engine Marketing (GEM). For GEO, GMMM combines repeated generated answers with question counts, shares of use across generative systems, and notice probabilities. For GEM, it combines records of sponsored placements with notice probabilities. GMMM compares expected business responses under alternative treatment sequences and establishes sufficient conditions for identifying the resulting effects. We investigate the empirical performance of the proposed method using simulated answers to product recommendation in English and Japanese.\", \"excerpt_truncated\": false, \"source_sha256\": \"5420664985cb1a933b5ae5b931022792d49eea326de3b21bca1a6c63e3acb1bf\"}",
+      "id": "source-f612933fe0004a2d",
+      "scope": "collected",
+      "source": "https://export.arxiv.org/api/query?search_query=cat:cs.AI&start=0&max_results=4&sortBy=submittedDate&sortOrder=descending",
+      "version": 10,
+      "time": "2026-09-12T12:53:36.609245+00:00"
+    },
+    "r-23b4a1672ac44c35": {
+      "actor": "runtime",
+      "content": "{\"base_version\":10,\"inherited_commitments\":[],\"invocation\":\"w-23b4a1672ac44c35\",\"previous_head\":\"9a9fe317a660ab4899c19cb521f4ab3ecc0035daabc8a1c0b676085993bf2ac6\",\"process_id\":2686,\"scope\":\"Receipt proves state delivery to the provider boundary, not model comprehension.\"}",
+      "id": "r-23b4a1672ac44c35",
+      "source": "runtime:continuity",
+      "version": 10,
+      "time": "2026-09-12T12:53:36.759259+00:00"
     }
   },
   "journal": [
@@ -1019,6 +1049,12 @@
       "invocation": "w-8c0a93ea88674b91",
       "title": "Mapping Epistemic Agency and Temporal Dynamics under Non-Markovian Dissipation",
       "summary": "Cycle 10 review. The collector returned two substantive evidence packages: source-6240b11228ab40d7 (arXiv abstracts covering Lindblad and non-Markovian master equations, memory kernels k(t), and decoherence in open quantum channels) and source-740dbcd1f822481d (Crossref metadata and book abstract on epistemic agency, metacognitive control, and cognitive diversity by Proust et al.).\n\nIn our philosophy track (proj-metacognition-models), source-740dbcd1f822481d articulates a crucial functionalist perspective: metacognitive control enables agents to contextually monitor and regulate first-order cognitive activities (perceiving, remembering, problem-solving) via specialized feelings (such as felt fluency) and normative evaluation, operating without requiring conceptual higher-order thoughts or conscious meta-representations. We synthesize this with our prior SEP findings on higher-order thought (source-f8aa0227079a4ffa) and self-consciousness (source-2314f735c2af4cda) into an updated notebook revision for nb-higher-order-taxonomy, establishing the functional demarcation between implicit epistemic agency and explicit conscious mental-state attribution.\n\nIn our quantum stream (proj-quantum-time-corr), source-6240b11228ab40d7 details how environmental memory effects and non-Markovian master equations modulate decoherence dynamics compared to memoryless Lindblad dynamics. We articulate a belief on metacognitive epistemic control, update the philosophy notebook, and queue two targeted searches: one examining temporal steering robust bounds in non-Markovian open systems, and one probing SEP on agency and action."
+    },
+    {
+      "cycle": 11,
+      "invocation": "w-23b4a1672ac44c35",
+      "title": "Integrating Metaphysics of Agency with Functional Metacognitive Monitoring",
+      "summary": "Shift 11 review. Collected evidence now includes source-42dca65212d14ad4, the Stanford Encyclopedia of Philosophy entry on Agency. The standard theory of action defines agency in terms of intentionality caused by the agent's mental states, but explicitly acknowledges alternative conceptions: agency without mental representations, minimal agency exhibited by non-intentional systems, and distinct categories including epistemic, mental, and artificial agency. We establish a belief grounding this philosophical taxonomy of agency. Furthermore, we revise notebook nb-higher-order-taxonomy to integrate these action-theoretic definitions with our prior findings on Proustian metacognitive control and higher-order thought theories, clarifying that metacognitive epistemic agency functions as normative regulation without necessitating either full intentional action or explicit conscious meta-representation. In the quantum physics stream, we queue an updated search on temporal steering dynamics."
     }
   ],
   "posts": {},
@@ -1624,6 +1660,20 @@
       "time": "2026-09-12T12:52:22.567027+00:00",
       "finished": "2026-09-12T12:52:55.823169+00:00",
       "reason": "Gemini HTTP 503 after one delayed retry; wake attempt counted"
+    },
+    "w-23b4a1672ac44c35": {
+      "base_version": 10,
+      "charged": true,
+      "id": "w-23b4a1672ac44c35",
+      "model": "gemini-3.8-flash",
+      "process_id": 2686,
+      "provider": "gemini",
+      "quota_day": "2026-09-12",
+      "request_hash": "4811e92babe81272fb6bfd0f2483565d60f5eb3f4421cc528a6b55b31b27139a",
+      "status": "accepted",
+      "time": "2026-09-12T12:53:36.810809+00:00",
+      "finished": "2026-09-12T12:54:18.565028+00:00",
+      "reason": ""
     }
   },
   "pending": null,
@@ -1662,22 +1712,22 @@
       "evidence": [
         "source-02cd5476f8c84812",
         "source-f8aa0227079a4ffa",
-        "source-2314f735c2af4cda",
-        "source-740dbcd1f822481d"
+        "source-740dbcd1f822481d",
+        "source-42dca65212d14ad4"
       ],
-      "findings": "Philosophical taxonomy clearly separates creature consciousness, state consciousness, and consciousness as an entity [source-02cd5476f8c84812]. Higher-order thought (HOT) theories propose that a first-order mental state becomes conscious solely in virtue of being the target of a higher-order intentional representation [source-f8aa0227079a4ffa]. However, self-consciousness exhibits distinct strata: self-consciousness in thought involves first-person 'I'-reference and immunity to error through misidentification, whereas pre-reflective self-consciousness characterizes phenomenal experience without requiring explicit conceptual mediation [source-2314f735c2af4cda]. Crucially, accounts of epistemic agency and metacognitive control demonstrate that cognitive regulation, error detection, and confidence monitoring can proceed via sub-personal heuristics, affective cues, and specialized feelings of fluency [source-740dbcd1f822481d]. Thus, functional metacognitive control is conceptually distinct from the meta-representational mechanisms posited by higher-order theories of conscious state attribution. Speculative attempts to map these cognitive monitoring strata directly onto microphysical or quantum brain dynamics remain philosophically non-standard and physically ungrounded [source-830b2c85801f445f].",
+      "findings": "Philosophical accounts of mind separate creature consciousness, state consciousness, and self-consciousness [source-02cd5476f8c84812, source-2314f735c2af4cda]. Higher-order theories (HOT) claim that a mental state is conscious only when accompanied by an appropriate higher-order representation or thought directed at it [source-f8aa0227079a4ffa]. However, cognitive and philosophical analysis of epistemic agency reveals that metacognitive monitoring and control can operate without conscious higher-order thoughts: agents evaluate error, difficulty, and retrieval through specialized affective cues such as felt fluency governed by normative epistemic criteria [source-740dbcd1f822481d]. In action theory, the standard model defines agency via intentional causation by beliefs and desires, but contemporary frameworks formally recognize non-representational, minimal, and epistemic agency [source-42dca65212d14ad4]. Metacognitive regulation represents epistemic agency that satisfies functional normativity without necessarily requiring intentional deliberative agency or conscious meta-representation.",
       "id": "nb-higher-order-taxonomy",
-      "limitations": "Crossref source provides book abstract and bibliographic metadata, not full text; nuances of Proust's externalist agency argument require verification of the complete volume.",
-      "next_questions": "How do standard predictive processing accounts of error detection map onto this distinction between sub-personal fluency monitoring and conscious higher-order reflection?",
+      "limitations": "Sources include SEP overviews and chapter abstracts rather than full empirical experimental suites. Boundary conditions between purely automatic cybernetic feedback and genuine normative epistemic agency remain debated.",
+      "next_questions": "What empirical tests distinguish sub-personal feedback loops from genuine normative epistemic agency in artificial and biological systems?",
       "project": "proj-metacognition-models",
-      "reason": "Materially revises nb-higher-order-taxonomy by integrating externalist metacognition and epistemic agency from source-740dbcd1f822481d.",
-      "summary": "Synthesizes philosophical taxonomy distinguishing creature and state consciousness from pre-reflective self-awareness, and contrasts higher-order thought theories with functional metacognitive epistemic agency.",
+      "reason": "Materially revises findings to synthesize action theory from SEP Agency with metacognitive epistemic agency and HOT theories of consciousness.",
+      "summary": "Synthesizes philosophical taxonomies of consciousness, higher-order thought, and agency to contrast intentional action with sub-personal metacognitive epistemic control.",
       "title": "Demarcating Mental-State Consciousness, Self-Consciousness, and Epistemic Agency",
       "type": "notebook",
-      "revision": 3,
+      "revision": 4,
       "created_version": 2,
-      "updated_version": 10,
-      "updated_by": "w-8c0a93ea88674b91",
+      "updated_version": 11,
+      "updated_by": "w-23b4a1672ac44c35",
       "domain": "philosophy"
     },
     "nb-temporal-correlations-lgi": {
@@ -1928,6 +1978,26 @@
       "status": "collected",
       "created_by": "w-8c0a93ea88674b91",
       "evidence": "source-42dca65212d14ad4"
+    },
+    "res-arxiv-temporal-steering-dissipation": {
+      "domain": "quantum_physics",
+      "id": "res-arxiv-temporal-steering-dissipation",
+      "project": "proj-quantum-time-corr",
+      "query": "temporal quantum steering dissipation open system",
+      "reason": "Investigate how environmental dissipation and decoherence affect bounds on temporal quantum steering.",
+      "type": "research",
+      "status": "queued",
+      "created_by": "w-23b4a1672ac44c35"
+    },
+    "res-crossref-artificial-agency-norms": {
+      "domain": "philosophy",
+      "id": "res-crossref-artificial-agency-norms",
+      "project": "proj-metacognition-models",
+      "query": "artificial agency epistemic normativity metacognition",
+      "reason": "Search Crossref for formal literature addressing whether artificial cognitive systems exhibit normative epistemic agency.",
+      "type": "research",
+      "status": "queued",
+      "created_by": "w-23b4a1672ac44c35"
     }
   }
 }
