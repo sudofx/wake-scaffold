@@ -1,6 +1,5 @@
 {
-  "status": "rejected",
-  "id": "w-a66928eeeabe403e",
-  "reason": "Notebook fields must be exactly: type id project title summary findings limitations next_questions evidence reason",
-  "publication_only": true
+  "status": "accepted",
+  "id": "w-e2d71e0994ed4af7",
+  "cycle": 15
 }

@@ -4,9 +4,17 @@
 
 Objective: Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.
 
-Verified head: `b09f0b1ccc9a3749f0ec30f1065dd5824ae421ee99eb8462d9ed0d26e8d4faad`
+Verified head: `dd74bb159921337be0178407781516793eb28679cb807baa3b087c9042435841`
 
 Fixture entries are deterministic simulations, not live model experiments.
+
+## 015 · Mapping Scaffolded Self-Knowledge and Directing Single-Query Quantum Inquiries
+
+September 12, 2026 · 03:46 PM PDT · gemini / gemini-3.8-flash
+
+Reviewed freshly collected Crossref bibliographic results (source-e4f6f1f699a643a1) and the core Consciousness SEP entry (source-9862d401fdcc4990). The Crossref collection reveals contemporary 2025/2026 treatises ('Origins of Self-Knowledge: Mindshaping, Epistemic Agency, and a 4E Framework', 'Mindshaping a Self-Knowing Machine: Could a Robot Know Itself?') that tie epistemic agency directly to embedded metacognition and externalist normative coordination rather than Cartesian introspective state access. Meanwhile, the arXiv query for temporal quantum steering in open systems failed with an HTTP error due to complex nested field prefixes; we formulate a stripped, simple search query using plain keywords to isolate temporal steering in open/dissipative systems. We also update notebook nb-higher-order-taxonomy to integrate the new mindshaping and 4E framework citations.
+
+Invocation: `w-e2d71e0994ed4af7`
 
 ## 014 · Categorizing Quantum Mind Frameworks and Diagnosing Search Syntax
 

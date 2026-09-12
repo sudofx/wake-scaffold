@@ -2,10 +2,10 @@
 
 > A presentation layer over `state.json`. The JSON file remains the canonical state export.
 
-**Version:** 14  
+**Version:** 15  
 **Objective:** Test whether durable state and mechanically enforced rules can make fresh model invocations act as one accountable process.  
 **Focus:** continuity  
-**Verified head:** `b09f0b1ccc9a3749f0ec30f1065dd5824ae421ee99eb8462d9ed0d26e8d4faad`
+**Verified head:** `dd74bb159921337be0178407781516793eb28679cb807baa3b087c9042435841`
 
 [Open the HTML version](state.html) · [Raw JSON](state.json) · [Readable history](events.md)
 
@@ -321,21 +321,23 @@ _None recorded._
     "source-740dbcd1f822481d",
     "source-42dca65212d14ad4",
     "source-693423395d334b51",
-    "source-c194229d2c55486a"
+    "source-c194229d2c55486a",
+    "source-e4f6f1f699a643a1",
+    "source-9862d401fdcc4990"
   ],
-  "findings": "Philosophical taxonomy clearly demarcates creature consciousness, state consciousness, and self-consciousness [source-02cd5476f8c84812, source-2314f735c2af4cda]. Higher-order thought (HOT) accounts require conscious mental states to be the object of meta-representations [source-f8aa0227079a4ffa]. In contrast, functional metacognitive monitoring operates via epistemic normativity—such as error detection, fluency, and difficulty estimation—which does not require phenomenal higher-order consciousness [source-740dbcd1f822481d, source-42dca65212d14ad4]. Recent frameworks extend this functional agency beyond internal bio-cognitive processes, articulating how epistemic agency is scaffolded, embedded, and delegated through formal artifacts and mindshaping practices ('eidetic agency') [source-693423395d334b51, source-c194229d2c55486a]. This decouples normative epistemic control from subjective introspective experience.",
+  "findings": "Philosophical taxonomies distinguish creature consciousness from mental-state consciousness and self-consciousness [source-02cd5476f8c84812, source-9862d401fdcc4990]. Higher-order thought (HOT) theories maintain that mental states become conscious when accompanied by higher-order representations directed at them [source-f8aa0227079a4ffa]. However, agency and metacognitive control do not strictly presuppose higher-order conscious conceptual awareness. Metacognitive monitoring can operate via non-conceptual feelings of fluency and functional heuristics [source-740dbcd1f822481d], falling into broader agency taxonomies that encompass minimal agency, agency without mental representations, and mental agency [source-42dca65212d14ad4]. In 4E cognitive science and material agency literature, epistemic agency is increasingly understood as structurally scaffolded onto external artifacts ('eidetic agency') and mediated through socially or normatively embedded mindshaping practices rather than isolated inner introspection [source-693423395d334b51, source-c194229d2c55486a, source-e4f6f1f699a643a1].",
   "id": "nb-higher-order-taxonomy",
-  "limitations": "Crossref sources provide title metadata and short abstract snippets; the complete formal criteria of eidetic agency and mindshaping frameworks are not fully detailed in the current receipts.",
-  "next_questions": "How specifically do formal artificial constraints enforce normative correctness without subjective feedback loops?",
+  "limitations": "Crossref source-e4f6f1f699a643a1 provides bibliographic chapter titles without extended abstracts. Claims regarding 4E self-knowledge and robotic self-knowledge reflect emerging conceptual book structures rather than empirical performance claims.",
+  "next_questions": "How does the functional demarcation between minimal agency and full epistemic agency translate into verifiable metrics in synthetic or autonomous agents?",
   "project": "proj-metacognition-models",
-  "reason": "Incorporates freshly collected evidence on artifact-scaffolded epistemic agency and mindshaping into the active taxonomy notebook.",
-  "summary": "Synthesizes philosophical taxonomies of consciousness, higher-order thought, and externalist agency, showing how epistemic normativity is scaffolded across formal artifacts.",
+  "reason": "Materially revises nb-higher-order-taxonomy to integrate newly collected evidence on 4E mindshaping and epistemic agency from source-e4f6f1f699a643a1 and source-9862d401fdcc4990.",
+  "summary": "Synthesizes philosophical taxonomies of consciousness, higher-order thought, and externalist agency, showing how epistemic normativity is scaffolded across formal artifacts and 4E mindshaping practices.",
   "title": "Demarcating Mental-State Consciousness, Self-Consciousness, and Scaffolded Epistemic Agency",
   "type": "notebook",
-  "revision": 5,
+  "revision": 6,
   "created_version": 2,
-  "updated_version": 13,
-  "updated_by": "w-65f01a20e7e242cd",
+  "updated_version": 15,
+  "updated_by": "w-e2d71e0994ed4af7",
   "domain": "philosophy"
 }
 ```
@@ -1335,6 +1337,25 @@ _None recorded._
   "time": "2026-09-12T21:36:29.166468+00:00",
   "finished": "2026-09-12T21:36:36.168352+00:00",
   "reason": "Notebook fields must be exactly: type id project title summary findings limitations next_questions evidence reason"
+}
+```
+
+### `w-e2d71e0994ed4af7`
+
+```json
+{
+  "base_version": 14,
+  "charged": true,
+  "id": "w-e2d71e0994ed4af7",
+  "model": "gemini-3.8-flash",
+  "process_id": 2318,
+  "provider": "gemini",
+  "quota_day": "2026-09-12",
+  "request_hash": "1d30dcdc0787675de6e09874f573753affda8b79c871e3b04555a85c383bb176",
+  "status": "accepted",
+  "time": "2026-09-12T22:46:08.900349+00:00",
+  "finished": "2026-09-12T22:46:15.595882+00:00",
+  "reason": ""
 }
 ```
 
@@ -2913,6 +2934,33 @@ _None recorded._
 }
 ```
 
+### `source-9862d401fdcc4990`
+
+```json
+{
+  "actor": "collector",
+  "content": "{\"url\": \"https://plato.stanford.edu/entries/consciousness/\", \"scope\": \"extracted web-page text; may be incomplete\", \"excerpt\": \"Consciousness (Stanford Encyclopedia of Philosophy)\\nStanford Encyclopedia of Philosophy\\nMenu\\nBrowse\\nTable of Contents\\nWhat's New\\nRandom Entry\\nChronological\\nArchives\\nAbout\\nEditorial Information\\nAbout the SEP\\nEditorial Board\\nHow to Cite the SEP\\nSpecial Characters\\nAdvanced Tools\\nContact\\nSupport SEP\\nSupport the SEP\\nPDFs for SEP Friends\\nMake a Donation\\nSEPIA for Libraries\\nEntry Navigation\\nEntry Contents\\nBibliography\\nAcademic Tools\\nFriends PDF Preview\\nAuthor and Citation Info\\nBack to Top\\nConsciousness\\nFirst published Fri Jun 18, 2004; substantive revision Tue Jan 14, 2014\\nPerhaps no aspect of mind is more familiar or more puzzling than\\nconsciousness and our conscious experience of self and world. The\\nproblem of consciousness is arguably the central issue in current\\ntheorizing about the mind. Despite the lack of any agreed upon theory\\nof consciousness, there is a widespread, if less than universal,\\nconsensus that an adequate account of mind requires a clear\\nunderstanding of it and its place in nature. We need to understand both\\nwhat consciousness is and how it relates to other, nonconscious, aspects\\nof reality.\\n1. History of the issue\\n2. Concepts of Consciousness\\n2.1 Creature Consciousness\\n2.2 State consciousness\\n2.3 Consciousness as an entity\\n3. Problems of Consciousness\\n4. The descriptive question:\\nWhat\\nare the features of consciousness?\\n4.1 First-person and third-person data\\n4.2 Qualitative character\\n4.3 Phenomenal structure\\n4.4 Subjectivity\\n4.5 Self-perspectival organization\\n4.6 Unity\\n4.7 Intentionality and transparency\\n4.8 Dynamic flow\\n5. The explanatory question:\\nHow\\ncan consciousness exist?\\n5.1 Diversity of explanatory projects\\n5.2 The explanatory gap\\n5.3 Reductive and non-reductive explanation\\n5.4 Prospects of explanatory success\\n6. The functional question:\\nWhy\\ndoes consciousness exist?\\n6.1 Causal status of consciousness\\n6.2 Flexible control\\n6.3 Social coordination\\n6.4 Integrated representation\\n6.5 Informational access\\n6.6 Freedom of will\\n6.7 Intrinsic motivation\\n6.8 Constitutive and contingent roles\\n7. Theories of consciousness\\n8. Metaphysical theories of consciousness\\n8.1 Dualist theories\\n8.2 Physicalist theories\\n9. Specific Theories of Consciousness\\n9.1 Higher-order theories\\n9.2 Reflexive theories\\n9.3 Representationalist theories\\n9.4 Narrative Interpretative Theories\\n9.5 Cognitive Theories\\n9.6 Information Integration Theory\\n9.7 Neural Theories\\n9.8 Quantum theories\\n9.9 Non-physical theories\\n10. Conclusion\\nBibliography\\nAcademic Tools\\nOther Internet Resources\\nRelated Entries\\n1. History of the issue\\nQuestions about the nature of conscious awareness have likely been\\nasked for as long as there have been humans. Neolithic burial practices\\nappear to express spiritual beliefs and provide early evidence for at\\nleast minimally reflective thought about the nature of human\\nconsciousness (Pearson 1999, Clark and Riel-Salvatore 2001).\\nPreliterate cultures have similarly been found invariably to embrace\\nsome form of spiritual or at least animist view that indicates a degree\\nof reflection about the nature of conscious awareness.\\nNonetheless, some have argued that consciousness as we know it today\\nis a relatively recent historical development that arose sometime after\\nthe Homeric era (Jaynes 1974). According to this view, earlier humans\\nincluding those who fought the Trojan War did not experience themselves\\nas unified internal subjects of their thoughts and actions, at least\\nnot in the ways we do today. Others have claimed that even during the\\nclassical period, there was no word of ancient Greek that corresponds\\nto “consciousness” (Wilkes 1984, 1988, 1995). Though the\\nancients had much to say about mental matters, it is less clear whether\\nthey had any specific concepts or concerns for what we now think of as \\nconsciousness.\\nAlthough the words “conscious” and\\n“conscience” are used quite differently today, it is likely\\nthat the Reformation emphasis on the latter as an inner source of truth\\nplayed some role in the inward turn so characteristic of the modern\\nreflective view of self. The Hamlet who walked the stage in 1600\\nalready saw his world and self with profoundly modern eyes.\\nBy the beginning of the early modern era in the seventeenth century,\\nconsciousness had come full center in thinking about the mind. Indeed\\nfrom the mid-17th through the late 19th century, consciousness was\\nwidely regarded as essential or definitive of the mental. René\\nDescartes defined the very notion of thought (\\npensée\\n) in terms of\\nreflexive consciousness or self-awareness. In the\\nPrinciples of\\nPhilosophy\\n(1640) he wrote,\\nBy the word ‘thought’\\n(‘\\npensée\\n’) I understand all that of which we are\\nconscious as operating in us.\\nLater, toward the end of the 17th century, John Locke offered a\\nsimilar if slightly more qualified claim in\\nAn Essay on Human\\nUnderstanding\\n(1688),\\nI do not say there is no soul in man because he is not\\nsensible of it in his sleep. But I do say he can not think at any time,\\nwaking or sleeping, without being sensible of it. Our being sensible of\\nit is not necessary to anything but our thoughts, and to them it is and\\nto them it always will be necessary.\\nLocke explicitly forswore making any hypothesis about the\\nsubstantial basis of consciousness and its relation to matter, but he\\nclearly regarded it as essential to thought as well as to personal\\nidentity.\\nLocke's contemporary G.W. Leibniz, drawing possible inspiration from\\nhis mathematical work on differentiation and integration, offered a\\ntheory of mind in the\\nDiscourse on Metaphysics\\n(1686) that\\nallowed for infinitely many degrees of consciousness and perhaps even\\nfor some thoughts that were unconscious, the so called “petites\\nperceptions”. Leibniz was the first to distinguish explicitly\\nbetween perception and apperception, i.e., roughly between awareness\\nand self-awareness. In the\\nMonadology\\n(1720) he also offered\\nhis famous analogy of the mill to express his belief that consciousness\\ncould not arise from mere matter. He asked his reader to imagine\\nsomeone walking through an expanded brain as one would walk through a\\nmill and observing all its mechanical operations, which for Leibniz\\nexhausted its physical nature. Nowhere, he asserts, would such an\\nobserver see any conscious thoughts.\\nDespite Leibniz's recognition of the possibility of unconscious\\nthought, for most of the next two centuries the domains of thought and\\nconsciousness were regarded as more or less the same. Associationist\\npsychology, whether pursued by Locke or later in the eighteenth century\\nby David Hume (1739) or in the nineteenth by James Mill (1829), aimed\\nto discover the principles by which conscious thoughts or ideas\\ninteracted or affected each other. James Mill's son, John Stuart Mill\\ncontinued his father's work on associationist psychology, but he\\nallowed that combinations of ideas might produce resultants that went\\nbeyond their constituent mental parts, thus providing an early model of\\nmental emergence (1865).\\nThe purely associationist approach was critiqued in the late\\neighteenth century by Immanuel Kant (1787), who argued that an adequate\\naccount of experience and phenomenal consciousness required a far\\nricher structure of mental and intentional organization. Phenomenal\\nconsciousness according to Kant could not be a mere succession of\\nassociated ideas, but at a minimum had to be the experience of a\\nconscious self situated in an objective world structured with respect\\nto space, time and causality.\\nWithin the Anglo-American world, associationist approaches continued\\nto be influential in both philosophy and psychology well into the\\ntwentieth century, while in the German and European sphere there was a\\ngreater interest in the larger structure of experience that led in\\npart to the study of phenomenology through the work of Edmund Husserl\\n(1913, 1929), Martin Heidegger (1927), Maurice Merleau-Ponty (1945) and\\nothers who expanded the study of consciousness into the realm of the\\nsocial, the bodily and the interpersonal.\\nAt the outset of modern scientific psychology in the mid-nineteenth\\ncentury, the mind was still largely equated with consciousness, and\\nintrospective methods dominated the field as in the work of Wilhelm\\nWundt (1897), Hermann von Helmholtz (1897), William James (1890) and\\nAlfred Titchener (1901). However, the relation of consciousness to\\nbrain remained very much a mystery as expressed in T. H. Huxley's\\nfamous remark,\\nHow it is that anything so remarkable as a state of\\nconsciousness comes about as a result of irritating nervous tissue, is\\njust as unaccountable as the appearance of the Djin, when Aladdin\\nrubbed his lamp (1866).\\nThe early twentieth century saw the eclipse of consciousness from\\nscientific psychology, especially in the United States with the rise of\\nbehaviorism (Watson 1924, Skinner 1953) though movements such as\\nGestalt psychology kept it a matter of ongoing scientific concern in\\nEurope (Köhler 1929, Köffka 1935). In the 1960s, the grip of\\nbehaviorism weakened with the rise of cognitive psychology and its\\nemphasis on information processing and the modeling of internal mental\\nprocesses (Neisser 1965, Gardiner 1985). However, despite the renewed\\nemphasis on explaining cognitive capacities such as memory, perception\\nand language comprehension, consciousness remained a largely neglected\\ntopic for several further decades.\\nIn the 1980s and 90s there was a major resurgence of scientific and\\nphilosophical research into the nature and basis of consciousness\\n(Baars 1988, Dennett 1991, Penrose 1989, 1994, Crick 1994, Lycan 1987,\\n1996, Chalmers 1996). Once consciousness was back under discussion,\\nthere was a rapid proliferation of research with a flood of books and\\narticles, as well as the introduction of specialty journals (\\nThe\\nJournal of Consciousness Studies, Consciousness and Cognition,\\nPsyche)\\n, professional societies (Association for the Scientific\\nStudy of Consciousness—ASSC) and annual conferences devoted\\nexclusively to its investigation (“The Science of\\nConsciousness”).\\n2. Concepts of \", \"excerpt_truncated\": true, \"source_sha256\": \"9e814583974e4f217fa4957dbea263e49385abb554a9ce1abffcfbb86038476a\"}",
+  "id": "source-9862d401fdcc4990",
+  "scope": "collected",
+  "source": "https://plato.stanford.edu/entries/consciousness/",
+  "version": 14,
+  "time": "2026-09-12T22:46:08.636150+00:00"
+}
+```
+
+### `r-e2d71e0994ed4af7`
+
+```json
+{
+  "actor": "runtime",
+  "content": "{\"base_version\":14,\"inherited_commitments\":[],\"invocation\":\"w-e2d71e0994ed4af7\",\"previous_head\":\"aedd6215f192c821850ce05c2c30e395932951836566172b1b7b84e9fc2615b6\",\"process_id\":2318,\"scope\":\"Receipt proves state delivery to the provider boundary, not model comprehension.\"}",
+  "id": "r-e2d71e0994ed4af7",
+  "source": "runtime:continuity",
+  "version": 14,
+  "time": "2026-09-12T22:46:08.823109+00:00"
+}
+```
+
 ## Journal
 
 ### 001 · Bootstrapping research on non-classical correlation signatures and philosophical frameworks
@@ -3066,6 +3114,17 @@ _None recorded._
   "invocation": "w-7176fe9e5cfc405f",
   "title": "Categorizing Quantum Mind Frameworks and Diagnosing Search Syntax",
   "summary": "Shift 14 review. We received source-14cbec9d0fd24421, the updated Stanford Encyclopedia of Philosophy entry on Quantum Approaches to Consciousness (revised May 2024). The entry formally categorizes existing quantum approaches into three distinct epistemological paradigms: (1) consciousness as a manifestation of neurophysiological quantum processes in the brain (e.g., Stapp, Vitiello & Freeman, Beck & Eccles, Penrose & Hameroff), (2) quantum formalisms applied to mental systems without requiring neural quantum states, and (3) dual-aspect monism (such as the Pauli-Jung conjecture and decompositional variants). This firmly validates and enriches our belief bel-quantum-consciousness-typology with specific primary taxonomic distinctions. In parallel, we diagnose that our arXiv query failed due to redundant category prefixes, and we reissue clean queries for open-system temporal quantum correlations and externalist epistemic agency."
+}
+```
+
+### 015 · Mapping Scaffolded Self-Knowledge and Directing Single-Query Quantum Inquiries
+
+```json
+{
+  "cycle": 15,
+  "invocation": "w-e2d71e0994ed4af7",
+  "title": "Mapping Scaffolded Self-Knowledge and Directing Single-Query Quantum Inquiries",
+  "summary": "Reviewed freshly collected Crossref bibliographic results (source-e4f6f1f699a643a1) and the core Consciousness SEP entry (source-9862d401fdcc4990). The Crossref collection reveals contemporary 2025/2026 treatises ('Origins of Self-Knowledge: Mindshaping, Epistemic Agency, and a 4E Framework', 'Mindshaping a Self-Knowing Machine: Could a Robot Know Itself?') that tie epistemic agency directly to embedded metacognition and externalist normative coordination rather than Cartesian introspective state access. Meanwhile, the arXiv query for temporal quantum steering in open systems failed with an HTTP error due to complex nested field prefixes; we formulate a stripped, simple search query using plain keywords to isolate temporal steering in open/dissipative systems. We also update notebook nb-higher-order-taxonomy to integrate the new mindshaping and 4E framework citations."
 }
 ```
 
@@ -3521,6 +3580,36 @@ _None recorded._
   "status": "collected",
   "created_by": "w-7176fe9e5cfc405f",
   "evidence": "source-e4f6f1f699a643a1"
+}
+```
+
+### `res-arxiv-temporal-steering-simple`
+
+```json
+{
+  "domain": "quantum_physics",
+  "id": "res-arxiv-temporal-steering-simple",
+  "project": "proj-quantum-time-corr",
+  "query": "temporal steering open quantum systems",
+  "reason": "Re-queries arXiv using minimal search syntax without complex boolean operators to prevent collector HTTP errors when retrieving open-system temporal steering papers.",
+  "type": "research",
+  "status": "queued",
+  "created_by": "w-e2d71e0994ed4af7"
+}
+```
+
+### `res-crossref-minimal-epistemic-agency`
+
+```json
+{
+  "domain": "philosophy",
+  "id": "res-crossref-minimal-epistemic-agency",
+  "project": "proj-metacognition-models",
+  "query": "minimal epistemic agency metacognition synthetic",
+  "reason": "Searches for literature clarifying formal criteria for minimal epistemic agency in synthetic or non-human cognitive architectures.",
+  "type": "research",
+  "status": "queued",
+  "created_by": "w-e2d71e0994ed4af7"
 }
 ```
 
